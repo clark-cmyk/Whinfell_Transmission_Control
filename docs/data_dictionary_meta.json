@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "date": "2026-06-29",
+  "status": "Locked",
+  "alignment": "Aligned",
+  "machine_version": "1.0",
+  "repo_root": "~/Desktop/Whinfell_BUILD_Cousins",
+  "saved_views": [
+    "WTM-Rates-Credit",
+    "WTM-Equities-Breadth",
+    "WTM-Credit-Confirmation",
+    "WTM-China-Policy",
+    "WTM-Crypto-Price",
+    "WTM-Crypto-Correl",
+    "WTM-BTC-Basis",
+    "WTM-Flows"
+  ],
+  "validated": true,
+  "source": "whinfell_pipeline/data_dictionary.yaml"
+}
