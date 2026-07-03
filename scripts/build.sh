@@ -51,6 +51,7 @@ done
 
 # Hydration bundle (local or sibling repo paths)
 for HYDRATE in \
+  "${ROOT}/docs/data/hydration/latest.json" \
   "${ROOT}/data/hydration/latest.json" \
   "${ROOT}/../Whinfell_BUILD_Cousins/data/hydration/latest.json" \
   "${ARCHIVE}/data/hydration/latest.json"; do
@@ -62,6 +63,7 @@ for HYDRATE in \
 done
 
 for HYDRATE_LOG in \
+  "${ROOT}/docs/data/hydration/hydration_log.json" \
   "${ROOT}/data/hydration/hydration_log.json" \
   "${ARCHIVE}/data/hydration/hydration_log.json"; do
   if [[ -f "$HYDRATE_LOG" ]]; then

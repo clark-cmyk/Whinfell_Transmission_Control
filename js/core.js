@@ -6754,6 +6754,8 @@ function runMissionSurfaceProbe(nodeId, bundle, options = {}) {
   };
 }
 
+window.runMissionSurfaceProbe = runMissionSurfaceProbe;
+
 window.__creditMissionProbe = function creditMissionProbe(bundle) {
   return runMissionSurfaceProbe('credit', bundle, {
     chinaInputs: { policy: 50, state: 0, growth: 0 },
@@ -6804,6 +6806,11 @@ window.__uiAuditProbe = function uiAuditProbe(bundle) {
     failureCodes,
     uiAudit: payload,
   };
+};
+
+window.__testExports = {
+  resolveRvHorizonValueFallback,
+  buildRvHorizonEvidenceMarkup,
 };
 
 window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId = 'credit') {
