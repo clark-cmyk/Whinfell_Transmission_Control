@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Build + publish dist/ to docs/ for GitHub Pages (if repo is initialized).
+# Build + publish dist/ → docs/ for GitHub Pages. Targeted git add only — never git add -A.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+echo "publish: pre-flight status"
+git status -sb
 
 bash "${ROOT}/scripts/build_desk_preview.sh"
 
@@ -13,8 +16,6 @@ touch docs/.nojekyll
 
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "publish: not a git repo — built docs/ only (no push)."
-  echo "  Preview: cd $ROOT && python3 -m http.server 8765"
-  echo "  Open:    http://localhost:8765/"
   exit 0
 fi
 
@@ -30,12 +31,31 @@ if [[ -n "$REMOTE" ]]; then
   fi
 fi
 
-git add docs/ index.html css/ js/ scripts/ .github/ README.md .gitignore
+# Targeted add only (BEST_PRACTICES — no git add -A)
+git add \
+  docs/ \
+  index.html \
+  css/ \
+  js/ \
+  scripts/ \
+  .github/ \
+  README.md \
+  BEST_PRACTICES.md \
+  .gitignore \
+  Whinfell_BasisWatch.html
+
 if git diff --cached --quiet; then
   echo "publish: nothing to commit — already up to date."
-  exit 0
+else
+  git commit -m "desk preview: TC $(date -u +%Y-%m-%dT%H:%MZ)"
 fi
 
-git commit -m "desk preview: disaggregated TC $(date -u +%Y-%m-%dT%H:%MZ)"
+if ! git diff --quiet || [[ -n "$(git status --porcelain)" ]]; then
+  echo "publish: ERROR — working tree not clean after commit:" >&2
+  git status -sb >&2
+  exit 1
+fi
+
+git pull --rebase origin main
 git push origin HEAD
-echo "publish: pushed — GitHub Actions will redeploy Pages if workflow is configured."
+echo "publish: pushed — clean working tree confirmed."

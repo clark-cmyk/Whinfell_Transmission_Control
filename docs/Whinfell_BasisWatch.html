@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Whinfell WTM BasisWatch — CME-style crypto futures basis, implied rate, and TradFi cross-asset bridge." />
+  <meta name="theme-color" content="#090d12" id="bwThemeColor" />
+  <title>WTM BasisWatch &amp; Implied Rate — Whinfell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="basis_watch.css" />
+</head>
+<body class="bw-standalone" data-bw-layout="standalone">
+
+  <header class="bw-topbar">
+    <div class="bw-brand-block">
+      <p class="bw-brand-eyebrow">Whinfell · BUILD Cousins · TeamLibby</p>
+      <h1 class="bw-brand-title">BasisWatch &amp; Implied Rate</h1>
+      <p class="bw-brand-sub">TradFi ↔ Crypto bridge · CME-style basis &amp; forward curve · desk hydration</p>
+    </div>
+    <div class="bw-topbar-actions">
+      <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
+      <span id="bwBuildBadge" class="bw-status-chip" style="color:var(--bw-muted)">—</span>
+      <button type="button" id="btnBwTheme" class="bw-btn bw-btn--theme" aria-pressed="false" title="Toggle light / dark theme">
+        <span class="bw-theme-icon" aria-hidden="true">☀</span>
+        <span class="bw-theme-label">Light mode</span>
+      </button>
+      <a href="./" class="bw-btn bw-btn--primary" title="Return to Transmission Control">← Transmission Control</a>
+    </div>
+  </header>
+
+  <main class="bw-shell">
+    <div class="bw-control-strip">
+      <div class="bw-segment" role="tablist" aria-label="View mode">
+        <button type="button" class="bw-view-tab bw-view-tab--active" data-bw-view="basis" role="tab" aria-selected="true">Basis Watch</button>
+        <button type="button" class="bw-view-tab" data-bw-view="implied" role="tab" aria-selected="false">Implied Rate</button>
+      </div>
+      <div class="bw-asset-group" role="group" aria-label="Asset">
+        <button type="button" class="bw-asset-btn bw-asset-btn--active" data-bw-asset="BTC">BTC</button>
+        <button type="button" class="bw-asset-btn" data-bw-asset="ETH">ETH</button>
+      </div>
+      <span id="bwShapeBadge" class="bw-shape-badge bw-shape-badge--flat">—</span>
+      <span id="bwDataNote"></span>
+      <div class="bw-toolbar">
+        <label>Roll
+          <select id="bwRollLogic">
+            <option value="nearest">Nearest</option>
+            <option value="constant">Constant maturity</option>
+            <option value="manual">Manual (L3)</option>
+          </select>
+        </label>
+        <label>Mode
+          <select id="bwModeToggle">
+            <option value="live">Live</option>
+            <option value="snapshot">Snapshot</option>
+          </select>
+        </label>
+        <button type="button" id="btnBwRefresh" class="bw-btn bw-btn--primary">Refresh</button>
+        <button type="button" id="btnBwExportCsv" class="bw-btn">CSV</button>
+        <button type="button" id="btnBwExportPng" class="bw-btn">PNG</button>
+        <button type="button" id="btnBwBarchart" class="bw-btn" title="Open Clark Barchart watchlist">Barchart ↗</button>
+        <button type="button" id="btnBwKoyfin" class="bw-btn" title="Open Clark Koyfin MYD">Koyfin ↗</button>
+      </div>
+    </div>
+
+    <div class="bw-layout">
+      <section class="bw-panel">
+        <div class="bw-panel-head">
+          <span class="bw-panel-title">Futures curve vs spot</span>
+          <span class="bw-panel-title" id="bwCurveMeta">—</span>
+        </div>
+        <div class="bw-chart-wrap">
+          <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+          <div id="bwChartLegend" class="bw-chart-legend" aria-hidden="true">
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>Spot (CF proxy)</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>Futures curve</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front contract</span>
+          </div>
+        </div>
+        <div class="bw-main-body" id="bwMainView"></div>
+        <aside class="bw-methodology" id="bwMethodology" aria-label="Methodology"></aside>
+      </section>
+
+      <aside class="bw-panel" style="display:flex;flex-direction:column">
+        <div class="bw-panel-head"><span class="bw-panel-title">Mission metrics</span></div>
+        <div id="bwSummaryCards" class="bw-summary-grid"></div>
+        <div id="bwCallouts"></div>
+        <div class="bw-panel-head" style="margin-top:auto"><span class="bw-panel-title">Cross-asset context</span></div>
+        <div id="bwCrossAsset" class="bw-xasset-host"></div>
+        <div class="bw-links-bar">
+          <span>HYG/LQD vs BTC: <a href="https://app.koyfin.com/etf/HYG.US" target="_blank" rel="noopener">Koyfin credit</a></span>
+          <span>·</span>
+          <span>USDCNH NDF: ARCH-4</span>
+          <span>·</span>
+          <a href="https://www.cmegroup.com/markets/cryptocurrencies/cryptocurrency-basis-watch-and-implied-rate-tool.html" target="_blank" rel="noopener">CME reference ↗</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="bw-footer">
+    <span>Whinfell · BUILD Cousins · TeamLibby</span>
+    <span id="bwFooterStamp">—</span>
+    <span>CME-inspired basis &amp; implied rate · desk hydration</span>
+  </footer>
+
+  <script src="basis_watch_analytics.js"></script>
+  <script src="basis_watch_panel.js"></script>
+</body>
+</html>

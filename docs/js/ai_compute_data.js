@@ -1,0 +1,63 @@
+/** Default Architect AI Exchange thesis data — override via hydration bundle.ai_compute */
+window.AI_COMPUTE_DEFAULTS = {
+  thesis: 'Architect AI Exchange: GPU capacity trades as a new transmission stage between liquidity stress and high-beta BTC. Monitor forward curves, rental basis, and vol surfaces for crush opportunities when spot rental diverges from fwd.',
+  as_of: '2026-07-02',
+  source: 'desk_thesis_v1',
+  ladder_stage: {
+    id: 'aicompute',
+    name: 'AI Compute / GPU',
+    short: 'GPU',
+    posture: 'watch',
+    note: 'Fwd curve backwardation + BTC basis widening → transmission drag on high-beta leg',
+  },
+  players: [
+    { rank: 1, name: 'NVIDIA', role: 'GPU spot anchor', exp_return: 18.5, risk: 'high', note: 'Fwd premium compression risk' },
+    { rank: 2, name: 'CoreWeave', role: 'H100 forwards', exp_return: 24.2, risk: 'high', note: 'Capacity delivery slippage' },
+    { rank: 3, name: 'Lambda Labs', role: 'Rental basis', exp_return: 12.8, risk: 'med', note: 'Spot/fwd spread trade' },
+    { rank: 4, name: 'Microsoft Azure', role: 'Hyperscaler alloc', exp_return: 9.4, risk: 'low', note: 'Sticky enterprise demand' },
+    { rank: 5, name: 'Google Cloud', role: 'TPU/GPU mix', exp_return: 11.1, risk: 'med', note: 'Inference seasonality' },
+    { rank: 6, name: 'Amazon AWS', role: 'Trainium hedge', exp_return: 8.6, risk: 'low', note: 'Cross-asset basis' },
+    { rank: 7, name: 'Crusoe', role: 'Energy-linked', exp_return: 15.3, risk: 'med', note: 'Power basis volatility' },
+    { rank: 8, name: 'Fluidstack', role: 'EU capacity', exp_return: 13.7, risk: 'med', note: 'Regulatory latency' },
+    { rank: 9, name: 'Vast.ai', role: 'Spot market', exp_return: 22.1, risk: 'high', note: 'Liquidity gaps' },
+    { rank: 10, name: 'Together AI', role: 'Token inference', exp_return: 10.9, risk: 'med', note: 'Model release shocks' },
+  ],
+  gpu_forward_curve: [
+    { tenor: 'Spot', price: 2.85 },
+    { tenor: '1M', price: 3.12 },
+    { tenor: '3M', price: 3.45 },
+    { tenor: '6M', price: 3.68 },
+    { tenor: '12M', price: 3.92 },
+  ],
+  basis_vs_btc: [
+    { date: 'W-4', gpu_basis: 0.12, btc_ret: -2.1 },
+    { date: 'W-3', gpu_basis: 0.18, btc_ret: 1.4 },
+    { date: 'W-2', gpu_basis: 0.22, btc_ret: 3.8 },
+    { date: 'W-1', gpu_basis: 0.15, btc_ret: -0.9 },
+    { date: 'Now', gpu_basis: 0.08, btc_ret: 2.2 },
+  ],
+  vol_surface: {
+    tenors: ['1W', '1M', '3M'],
+    strikes: [80, 100, 120],
+    values: [
+      [42, 38, 45],
+      [36, 32, 39],
+      [33, 28, 35],
+    ],
+  },
+  crush_trade: {
+    structure: 'Long 3M H100 fwd · Short spot rental (Lambda)',
+    entry_basis: 0.22,
+    current_basis: 0.08,
+    expected_pnl_pct: 6.4,
+    max_loss_pct: -3.2,
+    horizon_days: 45,
+    status: 'watch',
+  },
+  risks: [
+    'Delivery slippage on forward GPU contracts',
+    'BTC high-beta decoupling breaks basis hedge',
+    'Hyperscaler capex cuts flatten forward curve',
+    'Regulatory export controls on H100 clusters',
+  ],
+};

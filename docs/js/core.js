@@ -4,7 +4,7 @@ const STORAGE_KEY = 'whinfell_transmission_control_v7';
 const LEGACY_KEYS = ['whinfell_transmission_control_v1', 'whinfell_transmission_control_v0', 'whinfell_operator_v1_1'];
 const STATE_VERSION = 7;
 /** Bump when operator-console UX changes — visible in header for reload verification. */
-const TC_CONSOLE_BUILD = '2.2-UX-TIPS-2026-06-30';
+const TC_CONSOLE_BUILD = '2.3-FULL-INTEGRATION-2026-07-02';
 const DESK_GITHUB_BLOB = 'https://github.com/clark-cmyk/Whinfell_Transmission_Control/blob/main/';
 const DESK_GITHUB_RAW = 'https://raw.githubusercontent.com/clark-cmyk/Whinfell_Transmission_Control/main/';
 const DESK_PAGES_URL = 'https://clark-cmyk.github.io/Whinfell_Transmission_Control/';
@@ -2732,6 +2732,9 @@ function hydrateFromBundle(bundle, options = {}) {
   }
   if (bundle.hydration_audit) {
     appState.hydration.hydration_audit = bundle.hydration_audit;
+  }
+  if (bundle.ai_compute) {
+    appState.hydration.ai_compute = bundle.ai_compute;
   }
 
   renderAll();
@@ -6252,11 +6255,20 @@ function applyWorkspaceView(view) {
   appState.ui = appState.ui || createEmptyState().ui;
   appState.ui.workspaceView = view;
   const cockpitOn = view === 'cockpit';
-  el('nodeCockpitZone')?.classList.toggle('zone-hidden', !cockpitOn);
-  el('legacyConsoleZone')?.classList.toggle('zone-hidden', cockpitOn);
+  const cockpitZone = el('nodeCockpitZone');
+  const legacyZone = el('legacyConsoleZone');
+  cockpitZone?.classList.toggle('zone-hidden', !cockpitOn);
+  legacyZone?.classList.toggle('zone-hidden', cockpitOn);
+  if (cockpitZone) cockpitZone.style.display = cockpitOn ? '' : 'none';
+  if (legacyZone) legacyZone.style.display = cockpitOn ? 'none' : '';
   const btn = el('btnWorkspaceToggle');
-  if (btn) btn.textContent = cockpitOn ? 'Legacy Console' : 'Node Cockpits';
+  if (btn) {
+    btn.textContent = cockpitOn ? 'Legacy Console' : 'Node Cockpits';
+    btn.setAttribute('aria-pressed', cockpitOn ? 'false' : 'true');
+    btn.title = cockpitOn ? 'Open legacy intake + tracer console' : 'Return to node cockpits';
+  }
   if (cockpitOn) renderNodeCockpitShell(buildStateFromDOM());
+  else renderAll();
 }
 
 function isTypingTarget(target) {
@@ -6354,6 +6366,12 @@ function renderAll() {
   renderTracerFlowChrome();
   renderTracerVisual();
   renderNodeCockpitShell(state);
+  if (typeof WTM_BasisWatch !== 'undefined') {
+    WTM_BasisWatch.refresh(appState, { renderAll });
+  }
+  if (typeof window.renderVisualizationDiagnostics === 'function') {
+    window.renderVisualizationDiagnostics();
+  }
 }
 
 function applyShock(shockId, skipSnapshot) {
@@ -6502,6 +6520,7 @@ function applyConsoleTheme(theme) {
     }
   }
   try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch (_) { /* private browsing */ }
+  if (typeof WTM_BasisWatch !== 'undefined' && WTM_BasisWatch.applyTheme) WTM_BasisWatch.applyTheme(next);
 }
 
 function initConsoleTheme() {
@@ -6654,7 +6673,12 @@ if (!appState.provenance?.hydratedAt || !appState.hydration?.node_cockpits) {
 }
 applyWorkspaceView(appState.ui?.workspaceView || 'cockpit');
 applyTrackView(appState.ui?.trackView || 'both');
+if (typeof WTM_BasisWatch !== 'undefined') {
+  WTM_BasisWatch.init({ getState: () => appState, renderAll });
+}
+
 tryAutoHydrateFromDeploy().finally(() => {
+  if (typeof WTM_BasisWatch !== 'undefined') WTM_BasisWatch.refresh(appState, { renderAll });
   renderAll();
   maybePromptFirstHydrationImport(buildStateFromDOM());
   if (scenarioLoop.variants[0]) {

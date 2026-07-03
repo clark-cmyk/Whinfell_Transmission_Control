@@ -1,4 +1,6 @@
 .DS_Store
 dist/
 *.swp
-data/hydration/*.json
+
+# Local data — never commit; hydration ships in docs/data/ via publish
+data/

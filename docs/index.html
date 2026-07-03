@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Whinfell Transmission Control — Phase 2.2 Operator Console</title>
+  <title>Whinfell Transmission Control — Phase 2.3 Operator Console</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- DD_BADGE_SYNC_START -->
@@ -20,21 +20,31 @@ window.DICTIONARY_BADGE_DEFAULT = {
 <!-- DD_BADGE_SYNC_END -->
 
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            wtm: {
-              bg: '#0b0f14', surface: '#141b24', card: '#1a2332', border: '#2a3548',
-              muted: '#8b9cb3', accent: '#3d8bfd', green: '#3dd68c', amber: '#f5a623', red: '#f56565',
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              wtm: {
+                bg: '#0b0f14', surface: '#141b24', card: '#1a2332', border: '#2a3548',
+                muted: '#8b9cb3', accent: '#3d8bfd', green: '#3dd68c', amber: '#f5a623', red: '#f56565',
+              },
             },
+            fontFamily: { sans: ['"Segoe UI"', 'system-ui', 'sans-serif'] },
           },
-          fontFamily: { sans: ['"Segoe UI"', 'system-ui', 'sans-serif'] },
         },
-      },
-    };
+      };
+    }
   </script>
+  <style id="tailwind-fallback">
+    html, body { background: #0b0f14; color: #e8eef5; margin: 0; min-height: 100%; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; }
+    .hidden, .zone-hidden, .panel-hidden { display: none !important; }
+  </style>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/ai_compute.css">
+    <link rel="stylesheet" href="css/basis_watch.css">
+    <link rel="stylesheet" href="css/ui_polish.css">
 </head>
 <body class="bg-wtm-bg text-slate-100 font-sans h-screen flex flex-col overflow-hidden">
 
@@ -300,6 +310,61 @@ window.DICTIONARY_BADGE_DEFAULT = {
     </div>
   </section>
 
+<section id="basisWatchPanel" class="basis-watch-panel" aria-label="BasisWatch and implied rate">
+    <div class="basis-watch-head">
+      <div>
+        <span class="basis-watch-title">WTM BasisWatch</span>
+        <span class="basis-watch-sub"> · TradFi ↔ Crypto bridge</span>
+      </div>
+      <button type="button" class="bw-view-tab bw-view-tab--active" data-bw-view="basis">Basis Watch</button>
+      <button type="button" class="bw-view-tab" data-bw-view="implied">Implied Rate</button>
+      <button type="button" class="bw-asset-btn bw-asset-btn--active" data-bw-asset="BTC">BTC</button>
+      <button type="button" class="bw-asset-btn" data-bw-asset="ETH">ETH</button>
+      <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
+      <span id="bwDataNote"></span>
+      <div class="bw-toolbar">
+        <label class="text-[8px] text-wtm-muted">Roll
+          <select id="bwRollLogic" class="ml-1">
+            <option value="nearest">Nearest</option>
+            <option value="constant">Constant maturity</option>
+            <option value="manual">Manual (L3)</option>
+          </select>
+        </label>
+        <label class="text-[8px] text-wtm-muted">Mode
+          <select id="bwModeToggle" class="ml-1">
+            <option value="live">Live</option>
+            <option value="snapshot">Snapshot</option>
+          </select>
+        </label>
+        <button type="button" id="btnBwPopOut" class="bw-btn bw-btn--popout" title="Open full-screen BasisWatch">Pop out ↗</button>
+        <button type="button" id="btnBwRefresh" title="Refresh curve + sync dashboard">Refresh</button>
+        <button type="button" id="btnBwExportCsv">CSV</button>
+        <button type="button" id="btnBwExportPng">PNG</button>
+        <button type="button" id="btnBwBarchart">Barchart ↗</button>
+        <button type="button" id="btnBwKoyfin">Koyfin ↗</button>
+        <button type="button" id="btnBwCollapse" title="Collapse panel">▾</button>
+      </div>
+    </div>
+    <div class="basis-watch-body">
+      <div class="basis-watch-main">
+        <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+        <div id="bwMainView"></div>
+        <aside class="bw-methodology bw-methodology--compact" id="bwMethodology" aria-label="Methodology"></aside>
+      </div>
+      <aside class="basis-watch-rail">
+        <div id="bwSummaryCards" class="bw-summary-grid"></div>
+        <div id="bwCallouts"></div>
+        <div>
+          <p class="bw-subhead">Cross-asset context</p>
+          <div id="bwCrossAsset" class="bw-xasset-host"></div>
+        </div>
+        <div class="bw-links text-[9px] text-wtm-muted">
+          <span>HYG/LQD vs BTC: use Koyfin credit view · USDCNH NDF: wire in ARCH-4</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
   <!-- Legacy Three-Zone Layout -->
   <div id="legacyConsoleZone" class="zone-hidden flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
 
@@ -428,6 +493,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
       <button type="button" data-tab="risk" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Gross Risk</button>
       <button type="button" data-tab="tracer" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Signal Tracer</button>
       <button type="button" data-tab="scenario" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Scenario Loop</button>
+      <button type="button" data-tab="aicompute" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">AI Compute</button>
     </div>
     <div class="flex-1 overflow-y-auto p-4">
       <div id="panel-prompts" class="space-y-2" data-panel="prompts"></div>
@@ -552,6 +618,52 @@ window.DICTIONARY_BADGE_DEFAULT = {
         <p class="text-[10px] text-wtm-muted mb-3">Session-only what-if intake variants — compare gate and transmission health side-by-side without overwriting live intake.</p>
         <div id="scenarioColumns" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
         <button type="button" id="btnRunScenarioLoop" class="mt-3 text-[10px] px-3 py-1.5 rounded border border-wtm-accent/50 text-wtm-accent bg-wtm-accent/10 hover:bg-wtm-accent/20">Run Comparison</button>
+      </div>
+      <div id="panel-aicompute" class="panel-hidden ai-compute-panel" data-panel="aicompute">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+          <h3 class="text-[11px] font-bold text-wtm-accent">Architect Exchange Monitor</h3>
+          <span id="aiComputeHydrationBadge" class="ai-hydration-badge">—</span>
+        </div>
+        <p id="aiComputeThesis" class="ai-compute-thesis mb-2">—</p>
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="text-[9px] font-bold uppercase text-wtm-muted">Transmission ladder overlay</span>
+          <span id="aiLadderChip" class="ai-ladder-chip">—</span>
+          <span id="aiLadderNote" class="text-[9px] text-wtm-muted">—</span>
+        </div>
+        <div class="ai-compute-card mb-2">
+          <h3>Top 10 Players · Expected Returns</h3>
+          <table class="ai-table">
+            <thead><tr><th>#</th><th>Player</th><th>Exp Ret</th><th>Risk</th><th>Note</th></tr></thead>
+            <tbody id="aiComputePlayersBody"></tbody>
+          </table>
+        </div>
+        <div class="ai-compute-grid">
+          <div class="ai-compute-card">
+            <h3>GPU Forward Curve ($/GPU-hr)</h3>
+            <canvas id="aiChartGpuFwd" class="ai-chart" aria-label="GPU forward curve"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Basis vs BTC (%)</h3>
+            <canvas id="aiChartBasisBtc" class="ai-chart" aria-label="GPU basis vs BTC returns"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Volatility Surface (GPU vol %)</h3>
+            <canvas id="aiChartVolSurface" class="ai-chart" aria-label="GPU volatility surface"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Crush Trade · GPU Futures vs BTC Basis</h3>
+            <canvas id="aiChartCrushTrade" class="ai-chart" aria-label="Crush trade GPU futures vs BTC basis"></canvas>
+            <div id="aiCrushOutput"></div>
+            <label class="block mt-2 text-[9px] text-wtm-muted">Basis shock slider
+              <input id="aiCrushSimSlider" type="range" min="-50" max="50" value="0" class="w-full accent-wtm-accent" />
+            </label>
+            <p id="aiCrushSimResult" class="text-[9px] text-wtm-muted mt-1">Sim crush P&amp;L: +0.0%</p>
+          </div>
+        </div>
+        <div class="ai-compute-card mt-1">
+          <h3>Key Risks</h3>
+          <ul id="aiComputeRisks" class="text-[10px] text-wtm-muted list-disc pl-4 space-y-1"></ul>
+        </div>
       </div>
     </div>
     </main>
@@ -694,8 +806,13 @@ window.DICTIONARY_BADGE_DEFAULT = {
 
   <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
 
-  <script src="js/desk_china_ladder_models.js"></script>
+<script src="js/desk_china_ladder_models.js"></script>
+  <script src="js/basis_watch_analytics.js"></script>
+  <script src="js/basis_watch_panel.js"></script>
   <script src="js/bootstrap.js"></script>
   <script src="js/core.js"></script>
+  <script src="js/ai_compute_data.js"></script>
+  <script src="js/ai_compute_panel.js"></script>
+  <script src="js/ui_polish.js"></script>
 </body>
 </html>
