@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-bash "${ROOT}/scripts/build.sh"
+bash "${ROOT}/scripts/build_desk_preview.sh"
 
 rm -rf docs
 cp -R dist docs

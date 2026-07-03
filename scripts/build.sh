@@ -15,6 +15,15 @@ cp "${ROOT}/css/main.css" "$OUT/css/main.css"
 cp "${ROOT}/js/bootstrap.js" "$OUT/js/bootstrap.js"
 cp "${ROOT}/js/core.js" "$OUT/js/core.js"
 cp "${ROOT}/js/desk_china_ladder_models.js" "$OUT/js/desk_china_ladder_models.js"
+cp "${ROOT}/css/ai_compute.css" "$OUT/css/ai_compute.css"
+cp "${ROOT}/js/ai_compute_data.js" "$OUT/js/ai_compute_data.js"
+cp "${ROOT}/js/ai_compute_panel.js" "$OUT/js/ai_compute_panel.js"
+cp "${ROOT}/css/ui_polish.css" "$OUT/css/ui_polish.css"
+cp "${ROOT}/css/basis_watch.css" "$OUT/css/basis_watch.css"
+cp "${ROOT}/js/basis_watch_analytics.js" "$OUT/js/basis_watch_analytics.js"
+cp "${ROOT}/js/basis_watch_panel.js" "$OUT/js/basis_watch_panel.js"
+cp "${ROOT}/js/ui_polish.js" "$OUT/js/ui_polish.js"
+[[ -f "${ROOT}/Whinfell_BasisWatch.html" ]] && cp "${ROOT}/Whinfell_BasisWatch.html" "$OUT/"
 
 touch "$OUT/.nojekyll"
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT/BUILD_STAMP.txt"
@@ -71,6 +80,14 @@ for req in \
   js/bootstrap.js \
   js/core.js \
   js/desk_china_ladder_models.js \
+  css/ai_compute.css \
+  js/ai_compute_data.js \
+  js/ai_compute_panel.js \
+  css/ui_polish.css \
+  css/basis_watch.css \
+  js/basis_watch_analytics.js \
+  js/basis_watch_panel.js \
+  js/ui_polish.js \
   data/hydration/latest.json \
   .nojekyll; do
   if [[ ! -f "$OUT/$req" ]]; then
