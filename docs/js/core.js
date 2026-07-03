@@ -1306,6 +1306,10 @@ function createEmptyHydration() {
     barchart_as_of: null,
     ingest_provenance: null,
     ai_compute: null,
+    corporate_credit: null,
+    trade_tracker: null,
+    btc_attribution: null,
+    margin_rules: null,
     hydration_audit: null,
   };
 }
@@ -2738,6 +2742,9 @@ function hydrateFromBundle(bundle, options = {}) {
   if (bundle.ai_compute) {
     appState.hydration.ai_compute = bundle.ai_compute;
   }
+  for (const key of ['corporate_credit', 'trade_tracker', 'btc_attribution', 'margin_rules']) {
+    if (bundle[key]) appState.hydration[key] = bundle[key];
+  }
 
   renderAll();
   markDirty();
@@ -2982,6 +2989,10 @@ function buildStateFromDOM() {
       barchart_as_of: appState.hydration?.barchart_as_of || null,
       ingest_provenance: appState.hydration?.ingest_provenance || null,
       ai_compute: appState.hydration?.ai_compute || null,
+      corporate_credit: appState.hydration?.corporate_credit || null,
+      trade_tracker: appState.hydration?.trade_tracker || null,
+      btc_attribution: appState.hydration?.btc_attribution || null,
+      margin_rules: appState.hydration?.margin_rules || null,
       hydration_audit: appState.hydration?.hydration_audit || null,
     },
     navigation: { ...createEmptyNavigation(), ...(appState.navigation || {}) },

@@ -19,6 +19,9 @@ cp "${ROOT}/css/ai_compute.css" "$OUT/css/ai_compute.css"
 cp "${ROOT}/js/ai_compute_data.js" "$OUT/js/ai_compute_data.js"
 cp "${ROOT}/js/ai_compute_panel.js" "$OUT/js/ai_compute_panel.js"
 cp "${ROOT}/css/ui_polish.css" "$OUT/css/ui_polish.css"
+cp "${ROOT}/css/v15_desk.css" "$OUT/css/v15_desk.css"
+cp "${ROOT}/js/v15_desk_data.js" "$OUT/js/v15_desk_data.js"
+cp "${ROOT}/js/v15_desk_panel.js" "$OUT/js/v15_desk_panel.js"
 cp "${ROOT}/css/basis_watch.css" "$OUT/css/basis_watch.css"
 cp "${ROOT}/js/basis_watch_analytics.js" "$OUT/js/basis_watch_analytics.js"
 cp "${ROOT}/js/basis_watch_panel.js" "$OUT/js/basis_watch_panel.js"
@@ -88,6 +91,9 @@ for req in \
   js/basis_watch_analytics.js \
   js/basis_watch_panel.js \
   js/ui_polish.js \
+  css/v15_desk.css \
+  js/v15_desk_data.js \
+  js/v15_desk_panel.js \
   data/hydration/latest.json \
   .nojekyll; do
   if [[ ! -f "$OUT/$req" ]]; then

@@ -32,7 +32,8 @@ for req in \
   index.html css/main.css css/ai_compute.css css/ui_polish.css css/basis_watch.css \
   js/bootstrap.js js/core.js js/desk_china_ladder_models.js \
   js/basis_watch_analytics.js js/basis_watch_panel.js \
-  js/ai_compute_data.js js/ai_compute_panel.js js/ui_polish.js \
+  js/ai_compute_data.js js/ai_compute_panel.js js/v15_desk_data.js js/v15_desk_panel.js js/ui_polish.js \
+  css/v15_desk.css \
   data_dictionary_meta.json data/hydration/latest.json Whinfell_BasisWatch.html; do
   [[ -f "$OUT/$req" ]] || { echo "build_desk_preview: missing $OUT/$req" >&2; exit 1; }
 done
@@ -64,7 +65,7 @@ fi
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT/BUILD_STAMP.txt"
 grep -o "TC_CONSOLE_BUILD = '[^']*'" "${ROOT}/js/core.js" | head -1 >> "$OUT/BUILD_STAMP.txt"
 grep -o "BW_BUILD = '[^']*'" "${ROOT}/js/basis_watch_panel.js" | head -1 >> "$OUT/BUILD_STAMP.txt" 2>/dev/null || true
-echo "integration=ai_compute+basiswatch+ui_polish+v1.5_ornn_miso" >> "$OUT/BUILD_STAMP.txt"
+echo "integration=ai_compute+basiswatch+ui_polish+v1.5_full" >> "$OUT/BUILD_STAMP.txt"
 
 echo "==> build_desk_preview OK → $OUT"
 cat "$OUT/BUILD_STAMP.txt"

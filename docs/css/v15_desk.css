@@ -1,0 +1,13 @@
+.v15-desk-panel { font-size: 10px; }
+.v15-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.v15-card { background: #111820; border: 1px solid #2a3548; border-radius: 8px; padding: 10px; }
+.v15-card h4 { margin: 0 0 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #3d8bfd; }
+.v15-metric { font-size: 14px; font-weight: 800; color: #e8eef5; }
+.v15-muted { color: #8b9cb3; font-size: 9px; }
+.v15-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+.v15-table th, .v15-table td { border-bottom: 1px solid #2a3548; padding: 4px 6px; text-align: left; }
+.v15-chip { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 700; }
+.v15-chip--cheap { background: #1a3a2a; color: #3dd68c; }
+.v15-chip--watch { background: #3a2f1a; color: #f5a623; }
+.v15-chip--blocked { background: #3a1a1a; color: #f56565; }
+.v15-badge { font-size: 8px; color: #8b9cb3; }

@@ -43,6 +43,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
   </style>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/ai_compute.css">
+    <link rel="stylesheet" href="css/v15_desk.css">
     <link rel="stylesheet" href="css/basis_watch.css">
     <link rel="stylesheet" href="css/ui_polish.css">
 </head>
@@ -494,6 +495,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
       <button type="button" data-tab="tracer" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Signal Tracer</button>
       <button type="button" data-tab="scenario" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Scenario Loop</button>
       <button type="button" data-tab="aicompute" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">AI Compute</button>
+      <button type="button" data-tab="v15desk" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">v1.5 Desk</button>
     </div>
     <div class="flex-1 overflow-y-auto p-4">
       <div id="panel-prompts" class="space-y-2" data-panel="prompts"></div>
@@ -665,6 +667,31 @@ window.DICTIONARY_BADGE_DEFAULT = {
           <ul id="aiComputeRisks" class="text-[10px] text-wtm-muted list-disc pl-4 space-y-1"></ul>
         </div>
       </div>
+      <div id="panel-v15desk" class="panel-hidden v15-desk-panel" data-panel="v15desk">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <h3 class="text-[11px] font-bold text-wtm-accent">v1.5 Desk Modules</h3>
+          <span id="v15HydrationBadge" class="v15-badge">—</span>
+        </div>
+        <div class="v15-grid">
+          <div class="v15-card">
+            <h4>Corporate Credit</h4>
+            <div id="v15CreditBody">—</div>
+          </div>
+          <div class="v15-card">
+            <h4>Unified Trade Tracker</h4>
+            <table class="v15-table"><thead><tr><th>Book</th><th>Structure</th><th>Status</th><th>P&amp;L</th><th>Cap</th></tr></thead>
+            <tbody id="v15TradesBody"></tbody></table>
+          </div>
+          <div class="v15-card">
+            <h4>BTC Attribution</h4>
+            <div id="v15AttributionBody">—</div>
+          </div>
+          <div class="v15-card">
+            <h4>Margin Rules</h4>
+            <div id="v15MarginBody">—</div>
+          </div>
+        </div>
+      </div>
     </div>
     </main>
 
@@ -813,6 +840,8 @@ window.DICTIONARY_BADGE_DEFAULT = {
   <script src="js/core.js"></script>
   <script src="js/ai_compute_data.js"></script>
   <script src="js/ai_compute_panel.js"></script>
+  <script src="js/v15_desk_data.js"></script>
+  <script src="js/v15_desk_panel.js"></script>
   <script src="js/ui_polish.js"></script>
 </body>
 </html>

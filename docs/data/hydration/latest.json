@@ -4069,9 +4069,121 @@
       "status": "watch"
     }
   },
+  "corporate_credit": {
+    "as_of": "2026-07-02",
+    "source": "pipeline_v15",
+    "hy_oas_bps": 339.2,
+    "percentile": 90.5,
+    "quartile": 4,
+    "richness": "cheap",
+    "band": "Blocked",
+    "composite_score": 12,
+    "composite_score_source": "horizon_net_fallback",
+    "rv_posture": "long_spread",
+    "directional_posture": "short",
+    "size_hint": "half",
+    "is_weakest_link": true,
+    "preferred_expression": "HYG vs LQD (or HY\u2212IG OAS proxy)",
+    "tactical_lead": "HY OAS proxy cheap at \u2014 bps; Blocked band."
+  },
+  "trade_tracker": {
+    "as_of": "2026-07-02",
+    "source": "pipeline_v15",
+    "trades": [
+      {
+        "id": "btc_calendar_jul_back",
+        "book": "prop",
+        "structure": "BTC Jul/Back calendar",
+        "status": "watch",
+        "pnl_pct": 1.2,
+        "size_cap": "half",
+        "gate": "stressed"
+      },
+      {
+        "id": "hyg_lqd_rv",
+        "book": "client",
+        "structure": "HYG/LQD long spread",
+        "status": "watch",
+        "pnl_pct": 0.4,
+        "size_cap": "half",
+        "gate": "tight_risk"
+      },
+      {
+        "id": "h200_crush",
+        "book": "research",
+        "structure": "Long 3M H200 fwd \u00b7 Short spot rental",
+        "status": "watch",
+        "pnl_pct": 0.0,
+        "size_cap": "probe",
+        "gate": "observe"
+      }
+    ]
+  },
+  "btc_attribution": {
+    "as_of": "2026-07-02",
+    "source": "pipeline_v15",
+    "btc_bias": "Neutral",
+    "btc_ret_1d_pct": 2.2,
+    "attribution": [
+      {
+        "stage": "liquidity",
+        "d1": "flat",
+        "d5": "flat",
+        "net_impact": -1,
+        "btc_drag": true
+      },
+      {
+        "stage": "credit",
+        "d1": "down",
+        "d5": "down",
+        "net_impact": -3,
+        "btc_drag": true
+      },
+      {
+        "stage": "breadth",
+        "d1": "flat",
+        "d5": "flat",
+        "net_impact": 0,
+        "btc_drag": false
+      },
+      {
+        "stage": "highbeta",
+        "d1": "flat",
+        "d5": "flat",
+        "net_impact": 0,
+        "btc_drag": false
+      },
+      {
+        "stage": "basis",
+        "d1": "flat",
+        "d5": "flat",
+        "net_impact": 0,
+        "btc_drag": false
+      }
+    ],
+    "summary": "BTC bias Neutral \u2014 credit leg dragging on impaired transmission."
+  },
+  "margin_rules": {
+    "as_of": "2026-07-02",
+    "source": "pipeline_v15",
+    "whinfell_score": 46,
+    "tier": "defensive",
+    "gross_risk_cap_pct": 15,
+    "max_per_trade_risk_pct": 0.5,
+    "max_concurrent_trades": 2,
+    "layer2_allowed": false,
+    "layer3_allowed": false,
+    "rv_half_size_below": 70,
+    "rules": [
+      "Score 46 \u2192 defensive tier \u00b7 gross cap 15%",
+      "Layer 2/3 blocked when score < 50",
+      "RV expressions half-sized when health < 70",
+      "China SQ3 impaired \u2192 tighten size_hint to half"
+    ]
+  },
   "hydration_audit": {
     "audit_version": "1.0.0",
-    "generated_at": "2026-07-03T05:16:02.675745+00:00",
+    "generated_at": "2026-07-03T05:19:17.132861+00:00",
     "snapshot_id": "global-2026-07-02-raw2wtm-01",
     "lineage_hash": "sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e",
     "summary": {
