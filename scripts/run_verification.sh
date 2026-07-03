@@ -22,11 +22,14 @@ python3 - <<'PY' "$SAMPLE"
 import sys
 from pathlib import Path
 drop = Path(sys.argv[1])
-rows = "date,close,volume\n2026-07-01,100.5,1200\n2026-07-02,101.2,980\n"
-(drop / "koyfin_credit_20260703.csv").write_text(rows)
-(drop / "WTM-Flows-Global_2026.07.03.csv").write_text(rows)
-(drop / "barchart_GC_historical.csv").write_text(rows)
-(drop / "tiny_bad.csv").write_text("x")
+samples = {
+    "koyfin_credit_20260703.csv": "date,close,volume\n2026-07-01,100.5,1200\n2026-07-02,101.2,980\n",
+    "WTM-Flows-Global_2026.07.03.csv": "date,close,volume\n2026-07-01,50.1,500\n2026-07-02,51.0,480\n",
+    "barchart_GC_historical.csv": "date,close,volume\n2026-07-01,2000.1,100\n2026-07-02,2001.5,95\n",
+    "tiny_bad.csv": "x",
+}
+for name, body in samples.items():
+    (drop / name).write_text(body)
 PY
 bash scripts/normalize_whinfell_drop.sh "$SAMPLE" --dry-run 2>&1 | tee "$SCRATCH/staging_run.log"
 

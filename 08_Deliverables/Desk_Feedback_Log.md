@@ -64,4 +64,4 @@
 | 2 | Mission-surface probes ×5 | **PASS** |
 | 3 | Freshness / composite_score_source on all nodes | **PASS** |
 | 4 | `build_desk_preview.sh` ×2 identical stamp | **PASS** (see scratch evidence) |
-| 5 | Staging normalize — relaxed quarantine | **PASS** (see `staging_run.log`) |
+| 5 | Staging normalize — relaxed quarantine | **PASS** — sample run `accepted=3 quarantined=1 skipped=0` (3 distinct CSVs staged, 1 tiny file quarantined); see `staging_run.log` |

@@ -6716,11 +6716,22 @@ tryAutoHydrateFromDeploy().finally(() => {
   renderSnapshotList();
 });
 
+function ensureCockpitMissionView() {
+  appState.navigation = appState.navigation || createEmptyNavigation();
+  appState.navigation.focus_mode = false;
+  appState.navigation.focus_node_id = null;
+  if (appState.navigation.view_mode === 'compare') {
+    appState.navigation.view_mode = 'flip';
+    appState.navigation.compare_node_ids = [];
+  }
+}
+
 function runMissionSurfaceProbe(nodeId, bundle, options = {}) {
   if (!bundle || typeof bundle !== 'object') {
     return { error: 'bundle required' };
   }
   hydrateFromBundle(bundle);
+  ensureCockpitMissionView();
   if (options.chinaInputs) {
     if (el('chinaPolicyStrength')) el('chinaPolicyStrength').value = String(options.chinaInputs.policy ?? '50');
     if (el('chinaStateImpulse')) el('chinaStateImpulse').value = String(options.chinaInputs.state ?? '0');
@@ -6818,6 +6829,8 @@ window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId
   hydrateFromBundle(bundle);
   appState.ui = appState.ui || createEmptyState().ui;
   appState.ui.workspaceView = 'cockpit';
+  const prevFocus = appState.navigation?.focus_mode;
+  const prevFocusNode = appState.navigation?.focus_node_id;
   setActiveNode(nodeId);
   toggleFocusMode(true);
   renderNodeCockpitShell(buildStateFromDOM());
@@ -6828,7 +6841,7 @@ window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId
   const markup = buildRvHorizonEvidenceMarkup(cockpit, series);
   const focusHtml = el('cockpitFocusLayer')?.innerHTML || '';
   const valueMatches = focusHtml.match(/339\.2 bps/g) || [];
-  return {
+  const result = {
     nodeId,
     fallbackMode: markup.fallback?.mode || 'none',
     spotFallbackTable: focusHtml.includes('focus-horizon-table--spot-fallback'),
@@ -6837,6 +6850,15 @@ window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId
     primaryHorizon: markup.fallback?.primaryHorizon || null,
     focusHtml,
   };
+  if (prevFocus) {
+    appState.navigation = appState.navigation || createEmptyNavigation();
+    appState.navigation.focus_mode = true;
+    appState.navigation.focus_node_id = prevFocusNode || nodeId;
+  } else {
+    ensureCockpitMissionView();
+    renderNodeCockpitShell(buildStateFromDOM());
+  }
+  return result;
 };
 
 // Boot confirmation (disaggregated build)
