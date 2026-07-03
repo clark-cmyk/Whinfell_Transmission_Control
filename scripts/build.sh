@@ -32,7 +32,7 @@ touch "$OUT/.nojekyll"
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT/BUILD_STAMP.txt"
 grep -o "TC_CONSOLE_BUILD = '[^']*'" "${ROOT}/js/core.js" | head -1 >> "$OUT/BUILD_STAMP.txt" 2>/dev/null || true
 
-# Optional desk companion assets (from cousins archive)
+# Optional desk companion assets (repo root first, then cousins archive)
 for ASSET in \
   "data_dictionary_meta.json" \
   "whinfell-transmission-ladder-deep-dive.html"; do

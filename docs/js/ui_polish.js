@@ -76,6 +76,7 @@
     ok('cockpitRvCanvas', !!document.getElementById('cockpitRvCanvas'), 'RV canvas present');
     ok('basisWatchPanel', !!document.getElementById('basisWatchPanel'), 'BasisWatch panel present');
     ok('aiComputePanel', !!document.getElementById('panel-aicompute'), 'AI Compute panel present');
+    ok('v15DeskPanel', !!document.getElementById('panel-v15desk'), 'v1.5 Desk panel present');
     ok('WTM_BasisWatch', typeof window.WTM_BasisWatch !== 'undefined', window.WTM_BasisWatch?.BW_BUILD || 'missing');
     ok('WTM_AICompute', typeof window.WTM_AICompute !== 'undefined', 'module loaded');
     ok('hydration', !!(window.appState?.hydration?.node_cockpits), window.appState?.provenance?.hydratedAt || 'not hydrated');

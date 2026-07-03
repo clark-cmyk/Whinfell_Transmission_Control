@@ -67,6 +67,14 @@ grep -o "TC_CONSOLE_BUILD = '[^']*'" "${ROOT}/js/core.js" | head -1 >> "$OUT/BUI
 grep -o "BW_BUILD = '[^']*'" "${ROOT}/js/basis_watch_panel.js" | head -1 >> "$OUT/BUILD_STAMP.txt" 2>/dev/null || true
 echo "integration=ai_compute+basiswatch+ui_polish+v1.5_full" >> "$OUT/BUILD_STAMP.txt"
 
+# Operator documentation (served on Pages under /documentation/)
+if [[ -d "${ROOT}/documentation" ]]; then
+  mkdir -p "$OUT/documentation"
+  cp "${ROOT}/documentation/"*.md "$OUT/documentation/" 2>/dev/null || true
+  echo "==> Copied documentation/*.md"
+fi
+[[ -f "${ROOT}/data_dictionary_meta.json" ]] && cp "${ROOT}/data_dictionary_meta.json" "$OUT/"
+
 echo "==> build_desk_preview OK → $OUT"
 cat "$OUT/BUILD_STAMP.txt"
 du -sh "$OUT"

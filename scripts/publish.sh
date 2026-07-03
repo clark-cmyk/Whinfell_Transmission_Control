@@ -38,6 +38,8 @@ git add \
   css/ \
   js/ \
   scripts/ \
+  documentation/ \
+  data_dictionary_meta.json \
   .github/ \
   README.md \
   BEST_PRACTICES.md \

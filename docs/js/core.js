@@ -8,14 +8,22 @@ const TC_CONSOLE_BUILD = '1.5-BUILD-COUSINS-2026-07-03';
 const DESK_GITHUB_BLOB = 'https://github.com/clark-cmyk/Whinfell_Transmission_Control/blob/main/';
 const DESK_GITHUB_RAW = 'https://raw.githubusercontent.com/clark-cmyk/Whinfell_Transmission_Control/main/';
 const DESK_PAGES_URL = 'https://clark-cmyk.github.io/Whinfell_Transmission_Control/';
+const DESK_PAGES_URL_PUBLIC = 'https://clark-cmyk.github.io/Whinfell_BUILD_Cousins_v2/';
 const DESK_REPO_URL = 'https://github.com/clark-cmyk/Whinfell_Transmission_Control';
+const COUSINS_REPO_URL = 'https://github.com/clark-cmyk/Whinfell_BUILD_Cousins_v2';
 
 /** Canonical desk documentation catalog — paths relative to repo root on GitHub. */
 const DESK_DOC_CATALOG = [
   { group: 'Start here', docs: [
-    { label: 'Desk User Manual v1.0', path: '08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md', audience: 'all' },
-    { label: 'Live desk preview (auto-hydrated)', path: DESK_PAGES_URL, external: true },
-    { label: 'GitHub repo', path: DESK_REPO_URL, external: true },
+    { label: 'User Guide v1.5 (this repo)', path: 'documentation/Whinfell_Transmission_Control_User_Guide_v1.5.md', local: true },
+    { label: 'Quick Reference v1.5', path: 'documentation/Whinfell_Quick_Reference_v1.5.md', local: true },
+    { label: 'Data Dictionary v1.5', path: 'documentation/DATA_DICTIONARY_v1.5.md', local: true },
+    { label: 'Desk URLs & paths', path: 'documentation/DESK_URLS.md', local: true },
+    { label: 'Desk User Manual v1.0 (archive)', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md', external: true },
+    { label: 'Live desk preview (TC Pages)', path: DESK_PAGES_URL, external: true },
+    { label: 'Live desk preview (public fallback)', path: DESK_PAGES_URL_PUBLIC, external: true },
+    { label: 'GitHub repo (TC)', path: DESK_REPO_URL, external: true },
+    { label: 'GitHub repo (BUILD Cousins v2)', path: COUSINS_REPO_URL, external: true },
     { label: 'Latest hydration JSON', path: DESK_PAGES_URL + 'data/hydration/latest.json', external: true },
     { label: 'Hydration field log JSON', path: DESK_PAGES_URL + 'data/hydration/hydration_log.json', external: true },
     { label: 'Session activation', path: '08_Deliverables/BUILD_Cousins_Session_Activation.md' },
@@ -25,15 +33,17 @@ const DESK_DOC_CATALOG = [
     { label: 'Operator dashboard setup', path: '08_Deliverables/Whinfell_Operator_Dashboard_Setup_Guide.md' },
     { label: 'Operator dashboard (legacy HTML)', path: '08_Deliverables/Whinfell_Operator_Dashboard.html' },
 
-    { label: 'Transmission Control source HTML', path: '08_Deliverables/Whinfell_Transmission_Control.html' },
+    { label: 'Transmission Control (modular index)', path: 'index.html', local: true },
+    { label: 'Legacy monolith (archive)', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Whinfell_Transmission_Control.html', external: true },
   ]},
   { group: 'Daily operations', docs: [
     { label: 'Simple data update (Clark)', path: '08_Deliverables/Whinfell_Data_Update_Simple_Guide.md', audience: 'Clark' },
     { label: 'Full data update guide', path: '08_Deliverables/Whinfell_Data_Update_Guide.md', audience: 'Clark' },
-    { label: 'Expanded Operators Guide v1.5', path: '08_Deliverables/Whinfell_Expanded_Operators_Guide_v1.5.md' },
+    { label: 'Expanded Operators Guide v1.5 (archive)', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Whinfell_Expanded_Operators_Guide_v1.5.md', external: true },
     { label: 'Expanded Operators Guide v1.4', path: '08_Deliverables/Whinfell_Expanded_Operators_Guide_v1.4.md' },
     { label: 'Expanded Operators Guide v1.2', path: '08_Deliverables/Whinfell_Expanded_Operators_Guide_v1.2.md' },
-    { label: 'Quick Reference Card v1.5', path: '08_Deliverables/Whinfell_Quick_Reference_Card_v1.5.md' },
+    { label: 'Quick Reference v1.5 (this repo)', path: 'documentation/Whinfell_Quick_Reference_v1.5.md', local: true },
+    { label: 'Quick Reference Card v1.5 (archive)', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Whinfell_Quick_Reference_Card_v1.5.md', external: true },
     { label: 'Comet browser blueprint', path: '08_Deliverables/Comet_Browser_Operations_Blueprint.md', audience: 'Comet' },
     { label: 'Perplexity + Comet collection', path: '08_Deliverables/Perplexity_Comet_Collection_Instructions.md', audience: 'Perplexity' },
     { label: 'Comet shortcuts', path: '08_Deliverables/Comet_Shortcuts_WTM.md', audience: 'Comet' },
@@ -243,9 +253,9 @@ function escapeHtml(s) {
 
 function deskDocHref(entry) {
   if (!entry) return DESK_REPO_URL;
-  if (entry.local) return 'whinfell-transmission-ladder-deep-dive.html';
   const path = entry.path || '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (entry.external || path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (entry.local) return path.replace(/^\//, '');
   return DESK_GITHUB_BLOB + path.replace(/^\//, '');
 }
 
@@ -273,7 +283,7 @@ function renderDeskDocsPanel() {
     return `<div class="desk-docs-group"><div class="desk-docs-group-title">${escapeHtml(grp.group)}</div><ul class="desk-docs-list">${items}</ul></div>`;
   }).join('');
   const count = deskDocCatalogCount();
-  const html = `<p class="text-[9px] mb-2"><strong class="text-slate-200">${count} documents</strong> — links open on GitHub or the live desk preview. Agents: use <a href="${escapeHtml(DESK_GITHUB_RAW)}08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md" class="desk-doc-link" target="_blank" rel="noopener noreferrer">raw.githubusercontent.com</a> paths from the <a href="${escapeHtml(deskDocHref({ path: '08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md' }))}" class="desk-doc-link" target="_blank" rel="noopener noreferrer">manual index</a>.</p>${groups}`;
+  const html = `<p class="text-[9px] mb-2"><strong class="text-slate-200">${count} documents</strong> — v1.5 guides in <code>documentation/</code> · archive on <a href="${escapeHtml(COUSINS_REPO_URL)}" class="desk-doc-link" target="_blank" rel="noopener noreferrer">BUILD Cousins v2</a>. Public desk: <a href="${escapeHtml(DESK_PAGES_URL_PUBLIC)}" class="desk-doc-link" target="_blank" rel="noopener noreferrer">Pages fallback</a>.</p>${groups}`;
   targets.forEach(node => { node.innerHTML = html; });
 }
 
@@ -281,11 +291,11 @@ function renderSignalDetailDocs() {
   const node = el('signalDetailDocs');
   if (!node) return;
   const picks = [
-    { label: 'Desk User Manual', path: '08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md' },
-    { label: 'SQ3 Reference', path: '08_Deliverables/Whinfell_SQ3_Reference_v1.0.md' },
-    { label: 'Comet collection', path: '08_Deliverables/Perplexity_Comet_Collection_Instructions.md' },
-    { label: 'Feedback log', path: '08_Deliverables/Desk_Feedback_Log.md' },
-    { label: 'Live desk preview', path: DESK_PAGES_URL, external: true },
+    { label: 'User Guide v1.5', path: 'documentation/Whinfell_Transmission_Control_User_Guide_v1.5.md', local: true },
+    { label: 'Data Dictionary v1.5', path: 'documentation/DATA_DICTIONARY_v1.5.md', local: true },
+    { label: 'SQ3 Reference', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Whinfell_SQ3_Reference_v1.0.md', external: true },
+    { label: 'Feedback log', path: COUSINS_REPO_URL + '/blob/main/08_Deliverables/Desk_Feedback_Log.md', external: true },
+    { label: 'Live desk (public)', path: DESK_PAGES_URL_PUBLIC, external: true },
   ];
   const links = picks.map(d => deskDocAnchor(d)).join(' · ');
   node.innerHTML = `<p>${links}</p><p class="text-[9px] mt-1"><a href="#" class="desk-doc-link" id="signalDetailDocsOpenAll">Open full doc index in left rail</a></p>`;
