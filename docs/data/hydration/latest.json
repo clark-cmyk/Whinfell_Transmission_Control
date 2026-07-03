@@ -1,5 +1,5 @@
 {
-  "hydration_version": "1.2.0",
+  "hydration_version": "1.3.0",
   "pipeline_version": "1.0.0",
   "bundle_version": "1.0.0",
   "snapshot_id": "global-2026-07-02-raw2wtm-01",
@@ -7,7 +7,7 @@
   "validation_status": "parsed",
   "as_of": "2026-07-02T12:01:21+00:00",
   "source": "parquet_hydration",
-  "freshness_status": "fresh",
+  "freshness_status": "aging",
   "global": {
     "observation_id": "global-2026-07-02-raw2wtm-01",
     "whinfell_score": 46,
@@ -339,7 +339,7 @@
       "composite_score_source": "weighted_components",
       "band": "Supportive",
       "band_key": "supportive",
-      "freshness_status": "fresh",
+      "freshness_status": "aging",
       "as_of": "2026-07-02T12:01:21+00:00",
       "horizon_marks": {
         "d1": "flat",
@@ -645,7 +645,7 @@
       "composite_score_source": "horizon_net_fallback",
       "band": "Blocked",
       "band_key": "blocked",
-      "freshness_status": "fresh",
+      "freshness_status": "aging",
       "as_of": "2026-07-02T12:01:21+00:00",
       "horizon_marks": {
         "d1": "down",
@@ -963,7 +963,7 @@
       "composite_score_source": "weighted_components",
       "band": "Supportive",
       "band_key": "supportive",
-      "freshness_status": "fresh",
+      "freshness_status": "aging",
       "as_of": "2026-07-02T12:01:21+00:00",
       "horizon_marks": {
         "d1": "flat",
@@ -1269,7 +1269,7 @@
       "composite_score_source": "weighted_components",
       "band": "Supportive",
       "band_key": "supportive",
-      "freshness_status": "fresh",
+      "freshness_status": "aging",
       "as_of": "2026-07-02T12:01:21+00:00",
       "horizon_marks": {
         "d1": "flat",
@@ -1575,7 +1575,7 @@
       "composite_score_source": "weighted_components",
       "band": "Supportive",
       "band_key": "supportive",
-      "freshness_status": "fresh",
+      "freshness_status": "aging",
       "as_of": "2026-07-02T12:01:21+00:00",
       "horizon_marks": {
         "d1": "flat",
@@ -1898,9 +1898,12 @@
     "gate_zone": "amber",
     "whinfell_score": 46
   },
-  "wtm_export_v21": "--- WTM EXPORT v2.1 ---\nWhinfell Score: 46\nTransmission State: Stressed\nRegime Tag: Fragile Risk-On\nKey Observation: USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-02T12:01:21\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-02-raw2wtm-01\nLineage Hash: sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e\nValidation Status: parsed\nData As Of: 2026-07-02T12:01:21Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.",
-  "wtm_export_v22": "--- WTM EXPORT v2.2 ---\nWhinfell Score: 46\nTransmission State: Stressed\nRegime Tag: Fragile Risk-On\nKey Observation: USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-02T12:01:21\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-02-raw2wtm-01\nLineage Hash: sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e\nValidation Status: parsed\nData As Of: 2026-07-02T12:01:21Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.\n\n--- NODE COCKPIT: Liquidity & Rates ---\nNode ID: liquidity\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: -1\nHorizon Marks: d1\u2192 d5\u2192 d20\u2193 d60\u2192\nDirectional: neutral (low) \u2014 Liquidity & Rates mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 2s10s curve trade / SOFR spread (low)\nSelected Implementation: \u2014\nRV Series: usgg2y10y\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China liquidity & rates stage horizon_net -1 (informational)\nKey Observation: Liquidity & Rates horizon_net -1 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Credit Confirmation ---\nNode ID: credit\nComposite Score: 12\nComposite Score Source: horizon_net_fallback\nBand: Blocked\nBand Key: blocked\nFreshness Status: fresh\nHorizon Net: -3\nHorizon Marks: d1\u2193 d5\u2193 d20\u2193 d60\u2192\nDirectional: short (medium) \u2014 Credit Confirmation horizons impairing transmission. (Flows: 1D fallback only \u2014 treat as indicative.)\nRelative Value: long_spread \u2014 HYG vs LQD (or HY\u2212IG OAS proxy) (medium)\nSelected Implementation: \u2014\nRV Series: hy_oas_proxy\nRV Direction: higher_is_cheaper\nRV Horizon: 3m\nRV Quartile: Q4\nRV Percentile: 90.5\nRV Richness: cheap\nChina Parallel: present \u2014 horizon_net -3\nChina Parallel Note: China credit confirmation stage horizon_net -3 (informational)\nKey Observation: Credit Confirmation horizon_net -3 from suggested tracer marks.\nFunds Flow Enabled: true\nFunds Flow Status: fallback_1d\nFunds Flow Source: credit_cross_section\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: credit_cross_section_1d_only\nFunds Flow Verdict: mixed\nFunds Flow 1D: +0.10% AUM\nFunds Flow Breadth: 1/4\nFunds Flow Confidence Penalty: 1\nFunds Flow Summary: 1D credit flows mildly positive \u2014 5D unavailable.\n\n--- NODE COCKPIT: Equity Breadth ---\nNode ID: breadth\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Equity Breadth mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IWM/SPY participation pair (low)\nSelected Implementation: \u2014\nRV Series: iwm_spy_ratio\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net 1\nChina Parallel Note: China equity breadth stage horizon_net +1 (informational)\nKey Observation: Equity Breadth horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: High-Beta / BTC ---\nNode ID: highbeta\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 High-Beta / BTC mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IBIT vs QQQ beta spread (low)\nSelected Implementation: \u2014\nRV Series: ibit_qqq_beta_spread\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 38.1\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China high-beta / china cyclical transmission stage horizon_net -1 (informational)\nKey Observation: BTC bias Neutral; horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Basis & Term Structure ---\nNode ID: basis\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Basis & Term Structure mixed marks \u2014 prefer RV or reduced size.\nRelative Value: short_spread \u2014 BT near vs deferred calendar (medium)\nSelected Implementation: \u2014\nRV Series: btc_calendar_bt_near_deferred\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q3\nRV Percentile: 57.1\nRV Richness: rich\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China basis & term structure stage horizon_net -1 (informational)\nKey Observation: Calendar at 61530.00% (Jul/Back); horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014",
-  "warnings": [],
+  "wtm_export_v21": "--- WTM EXPORT v2.1 ---\nWhinfell Score: 46\nTransmission State: Stressed\nRegime Tag: Fragile Risk-On\nKey Observation: USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-02T12:01:21\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-02-raw2wtm-01\nLineage Hash: sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e\nValidation Status: parsed\nData As Of: 2026-07-02T12:01:21Z\nSource Channel: koyfin\nFreshness Status: aging\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.",
+  "wtm_export_v22": "--- WTM EXPORT v2.2 ---\nWhinfell Score: 46\nTransmission State: Stressed\nRegime Tag: Fragile Risk-On\nKey Observation: USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-02T12:01:21\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-02-raw2wtm-01\nLineage Hash: sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e\nValidation Status: parsed\nData As Of: 2026-07-02T12:01:21Z\nSource Channel: koyfin\nFreshness Status: aging\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.\n\n--- NODE COCKPIT: Liquidity & Rates ---\nNode ID: liquidity\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: aging\nHorizon Net: -1\nHorizon Marks: d1\u2192 d5\u2192 d20\u2193 d60\u2192\nDirectional: neutral (low) \u2014 Liquidity & Rates mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 2s10s curve trade / SOFR spread (low)\nSelected Implementation: \u2014\nRV Series: usgg2y10y\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China liquidity & rates stage horizon_net -1 (informational)\nKey Observation: Liquidity & Rates horizon_net -1 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Credit Confirmation ---\nNode ID: credit\nComposite Score: 12\nComposite Score Source: horizon_net_fallback\nBand: Blocked\nBand Key: blocked\nFreshness Status: aging\nHorizon Net: -3\nHorizon Marks: d1\u2193 d5\u2193 d20\u2193 d60\u2192\nDirectional: short (medium) \u2014 Credit Confirmation horizons impairing transmission. (Flows: 1D fallback only \u2014 treat as indicative.)\nRelative Value: long_spread \u2014 HYG vs LQD (or HY\u2212IG OAS proxy) (medium)\nSelected Implementation: \u2014\nRV Series: hy_oas_proxy\nRV Direction: higher_is_cheaper\nRV Horizon: 3m\nRV Quartile: Q4\nRV Percentile: 90.5\nRV Richness: cheap\nChina Parallel: present \u2014 horizon_net -3\nChina Parallel Note: China credit confirmation stage horizon_net -3 (informational)\nKey Observation: Credit Confirmation horizon_net -3 from suggested tracer marks.\nFunds Flow Enabled: true\nFunds Flow Status: fallback_1d\nFunds Flow Source: credit_cross_section\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: credit_cross_section_1d_only\nFunds Flow Verdict: mixed\nFunds Flow 1D: +0.10% AUM\nFunds Flow Breadth: 1/4\nFunds Flow Confidence Penalty: 1\nFunds Flow Summary: 1D credit flows mildly positive \u2014 5D unavailable.\n\n--- NODE COCKPIT: Equity Breadth ---\nNode ID: breadth\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: aging\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Equity Breadth mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IWM/SPY participation pair (low)\nSelected Implementation: \u2014\nRV Series: iwm_spy_ratio\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net 1\nChina Parallel Note: China equity breadth stage horizon_net +1 (informational)\nKey Observation: Equity Breadth horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: High-Beta / BTC ---\nNode ID: highbeta\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: aging\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 High-Beta / BTC mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IBIT vs QQQ beta spread (low)\nSelected Implementation: \u2014\nRV Series: ibit_qqq_beta_spread\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 38.1\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China high-beta / china cyclical transmission stage horizon_net -1 (informational)\nKey Observation: BTC bias Neutral; horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Basis & Term Structure ---\nNode ID: basis\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: aging\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Basis & Term Structure mixed marks \u2014 prefer RV or reduced size.\nRelative Value: short_spread \u2014 BT near vs deferred calendar (medium)\nSelected Implementation: \u2014\nRV Series: btc_calendar_bt_near_deferred\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q3\nRV Percentile: 57.1\nRV Richness: rich\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China basis & term structure stage horizon_net -1 (informational)\nKey Observation: Calendar at 61530.00% (Jul/Back); horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014",
+  "warnings": [
+    "ornn_h200: stub data (live fetch not configured)",
+    "miso_indiana_hub: stub data (live fetch not configured)"
+  ],
   "flows_health": {
     "status": "unavailable",
     "node_id": "credit",
@@ -3958,9 +3961,117 @@
       "unknown"
     ]
   },
+  "ai_compute": {
+    "as_of": "2026-07-02",
+    "source": "pipeline_v15",
+    "thesis": "Architect AI Exchange v1.5: H200 forward curve + MISO Indiana Hub power as transmission inputs between liquidity stress and high-beta BTC.",
+    "ornn_h200": {
+      "source": "ornn_stub_v1",
+      "as_of": "2026-07-03T05:16:02Z",
+      "gpu": "H200",
+      "rental_usd_per_hr": {
+        "spot": 4.12,
+        "1m_fwd": 4.45,
+        "3m_fwd": 4.78,
+        "6m_fwd": 5.02
+      },
+      "forward_curve": [
+        {
+          "tenor": "Spot",
+          "price": 4.12
+        },
+        {
+          "tenor": "1M",
+          "price": 4.45
+        },
+        {
+          "tenor": "3M",
+          "price": 4.78
+        },
+        {
+          "tenor": "6M",
+          "price": 5.02
+        },
+        {
+          "tenor": "12M",
+          "price": 5.28
+        }
+      ],
+      "basis_vs_h100_pct": -8.4,
+      "delivery_slippage_days": 12,
+      "status": "stub"
+    },
+    "miso_indiana_hub": {
+      "source": "gridstatus_stub_v1",
+      "as_of": "2026-07-03T05:16:02Z",
+      "hub": "MISO.INDIANA.HUB",
+      "lmp_usd_per_mwh": {
+        "rt": 38.6,
+        "da": 35.2
+      },
+      "recent_rt": [
+        {
+          "hour": "H-4",
+          "lmp": 41.2
+        },
+        {
+          "hour": "H-3",
+          "lmp": 39.8
+        },
+        {
+          "hour": "H-2",
+          "lmp": 37.1
+        },
+        {
+          "hour": "H-1",
+          "lmp": 38.6
+        }
+      ],
+      "gpu_power_sensitivity": "med",
+      "status": "stub"
+    },
+    "gpu_forward_curve": [
+      {
+        "tenor": "Spot",
+        "price": 4.12
+      },
+      {
+        "tenor": "1M",
+        "price": 4.45
+      },
+      {
+        "tenor": "3M",
+        "price": 4.78
+      },
+      {
+        "tenor": "6M",
+        "price": 5.02
+      },
+      {
+        "tenor": "12M",
+        "price": 5.28
+      }
+    ],
+    "ladder_stage": {
+      "id": "aicompute",
+      "name": "AI Compute / GPU",
+      "short": "H200",
+      "posture": "watch",
+      "note": "H200 fwd vs spot \u00b7 MISO RT $38.6/MWh"
+    },
+    "crush_trade": {
+      "structure": "Long 3M H200 fwd \u00b7 Short spot rental (Ornn)",
+      "entry_basis": 0.18,
+      "current_basis": 0.06,
+      "expected_pnl_pct": 5.8,
+      "max_loss_pct": -3.5,
+      "horizon_days": 45,
+      "status": "watch"
+    }
+  },
   "hydration_audit": {
     "audit_version": "1.0.0",
-    "generated_at": "2026-07-02T12:02:28.098702+00:00",
+    "generated_at": "2026-07-03T05:16:02.675745+00:00",
     "snapshot_id": "global-2026-07-02-raw2wtm-01",
     "lineage_hash": "sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e",
     "summary": {
@@ -4017,8 +4128,8 @@
         "ui_target": "freshness chip",
         "status": "ok",
         "required": true,
-        "value": "fresh",
-        "value_preview": "fresh",
+        "value": "aging",
+        "value_preview": "aging",
         "notes": ""
       },
       {
@@ -4039,8 +4150,8 @@
         "ui_target": "import compatibility",
         "status": "ok",
         "required": true,
-        "value": "1.2.0",
-        "value_preview": "1.2.0",
+        "value": "1.3.0",
+        "value_preview": "1.3.0",
         "notes": ""
       },
       {

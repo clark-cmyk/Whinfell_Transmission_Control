@@ -64,7 +64,7 @@ fi
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT/BUILD_STAMP.txt"
 grep -o "TC_CONSOLE_BUILD = '[^']*'" "${ROOT}/js/core.js" | head -1 >> "$OUT/BUILD_STAMP.txt"
 grep -o "BW_BUILD = '[^']*'" "${ROOT}/js/basis_watch_panel.js" | head -1 >> "$OUT/BUILD_STAMP.txt" 2>/dev/null || true
-echo "integration=ai_compute+basiswatch+ui_polish" >> "$OUT/BUILD_STAMP.txt"
+echo "integration=ai_compute+basiswatch+ui_polish+v1.5_ornn_miso" >> "$OUT/BUILD_STAMP.txt"
 
 echo "==> build_desk_preview OK → $OUT"
 cat "$OUT/BUILD_STAMP.txt"

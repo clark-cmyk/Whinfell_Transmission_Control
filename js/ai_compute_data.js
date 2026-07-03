@@ -1,8 +1,20 @@
 /** Default Architect AI Exchange thesis data — override via hydration bundle.ai_compute */
 window.AI_COMPUTE_DEFAULTS = {
   thesis: 'Architect AI Exchange: GPU capacity trades as a new transmission stage between liquidity stress and high-beta BTC. Monitor forward curves, rental basis, and vol surfaces for crush opportunities when spot rental diverges from fwd.',
-  as_of: '2026-07-02',
-  source: 'desk_thesis_v1',
+  as_of: '2026-07-03',
+  source: 'desk_thesis_v1.5',
+  ornn_h200: {
+    gpu: 'H200',
+    rental_usd_per_hr: { spot: 4.12, '1m_fwd': 4.45, '3m_fwd': 4.78, '6m_fwd': 5.02 },
+    basis_vs_h100_pct: -8.4,
+    status: 'desk_default',
+  },
+  miso_indiana_hub: {
+    hub: 'MISO.INDIANA.HUB',
+    lmp_usd_per_mwh: { rt: 38.6, da: 35.2 },
+    gpu_power_sensitivity: 'med',
+    status: 'desk_default',
+  },
   ladder_stage: {
     id: 'aicompute',
     name: 'AI Compute / GPU',
@@ -23,11 +35,11 @@ window.AI_COMPUTE_DEFAULTS = {
     { rank: 10, name: 'Together AI', role: 'Token inference', exp_return: 10.9, risk: 'med', note: 'Model release shocks' },
   ],
   gpu_forward_curve: [
-    { tenor: 'Spot', price: 2.85 },
-    { tenor: '1M', price: 3.12 },
-    { tenor: '3M', price: 3.45 },
-    { tenor: '6M', price: 3.68 },
-    { tenor: '12M', price: 3.92 },
+    { tenor: 'Spot', price: 4.12 },
+    { tenor: '1M', price: 4.45 },
+    { tenor: '3M', price: 4.78 },
+    { tenor: '6M', price: 5.02 },
+    { tenor: '12M', price: 5.28 },
   ],
   basis_vs_btc: [
     { date: 'W-4', gpu_basis: 0.12, btc_ret: -2.1 },

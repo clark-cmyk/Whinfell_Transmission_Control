@@ -1,18 +1,18 @@
 {
   "audit_version": "1.0.0",
-  "generated_at": "2026-06-30T18:22:38.566157+00:00",
-  "snapshot_id": "global-2026-06-30-raw2wtm-01",
-  "lineage_hash": "sha256:40a464ae4c07c99eccf8db49d9ed7adbad46245c7cfc577f8cd3d4f568633fed",
+  "generated_at": "2026-07-03T05:16:02.678711+00:00",
+  "snapshot_id": "global-2026-07-02-raw2wtm-01",
+  "lineage_hash": "sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e",
   "summary": {
     "total_fields": 43,
     "required_fields": 33,
     "required_ok": 33,
     "status_counts": {
-      "ok": 41,
+      "ok": 36,
       "optional_empty": 1,
-      "partial": 1
+      "partial": 6
     },
-    "bundle_quality_score": 90,
+    "bundle_quality_score": 63,
     "tc_session_level": "ok",
     "coverage_pct": 100.0
   },
@@ -24,8 +24,8 @@
       "ui_target": "command bar \u00b7 provenance",
       "status": "ok",
       "required": true,
-      "value": "global-2026-06-30-raw2wtm-01",
-      "value_preview": "global-2026-06-30-raw2wtm-01",
+      "value": "global-2026-07-02-raw2wtm-01",
+      "value_preview": "global-2026-07-02-raw2wtm-01",
       "notes": ""
     },
     {
@@ -35,8 +35,8 @@
       "ui_target": "command bar \u00b7 lineage",
       "status": "ok",
       "required": true,
-      "value": "sha256:40a464ae4c07c99eccf8db49d9ed7adbad46245c7cfc577f8cd3d4f568633fed",
-      "value_preview": "sha256:40a464ae4c07c99eccf8db49d9ed7adbad46245c7cfc577f8cd3d4f568633fed",
+      "value": "sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e",
+      "value_preview": "sha256:f8e459bdf1895393ef844f94c18b96063e19ea1429557220e73ab53ab00e851e",
       "notes": ""
     },
     {
@@ -46,8 +46,8 @@
       "ui_target": "freshness chip \u00b7 data as-of",
       "status": "ok",
       "required": true,
-      "value": "2026-06-30T18:20:01+00:00",
-      "value_preview": "2026-06-30T18:20:01+00:00",
+      "value": "2026-07-02T12:01:21+00:00",
+      "value_preview": "2026-07-02T12:01:21+00:00",
       "notes": ""
     },
     {
@@ -57,8 +57,8 @@
       "ui_target": "freshness chip",
       "status": "ok",
       "required": true,
-      "value": "fresh",
-      "value_preview": "fresh",
+      "value": "aging",
+      "value_preview": "aging",
       "notes": ""
     },
     {
@@ -79,8 +79,8 @@
       "ui_target": "import compatibility",
       "status": "ok",
       "required": true,
-      "value": "1.2.0",
-      "value_preview": "1.2.0",
+      "value": "1.3.0",
+      "value_preview": "1.3.0",
       "notes": ""
     },
     {
@@ -90,8 +90,8 @@
       "ui_target": "#whinfellScore",
       "status": "ok",
       "required": true,
-      "value": 80,
-      "value_preview": "80",
+      "value": 46,
+      "value_preview": "46",
       "notes": ""
     },
     {
@@ -101,8 +101,8 @@
       "ui_target": "#transmissionState",
       "status": "ok",
       "required": true,
-      "value": "normal",
-      "value_preview": "normal",
+      "value": "stressed",
+      "value_preview": "stressed",
       "notes": ""
     },
     {
@@ -112,8 +112,8 @@
       "ui_target": "#regimeTag",
       "status": "ok",
       "required": true,
-      "value": "Confirmed Risk-On",
-      "value_preview": "Confirmed Risk-On",
+      "value": "Fragile Risk-On",
+      "value_preview": "Fragile Risk-On",
       "notes": ""
     },
     {
@@ -123,8 +123,8 @@
       "ui_target": "#keyObservation \u00b7 handover",
       "status": "ok",
       "required": true,
-      "value": "HYG +; MBB +; MUB +; AGG +; US10Y +; US10YT +",
-      "value_preview": "HYG +; MBB +; MUB +; AGG +; US10Y +; US10YT +",
+      "value": "USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +",
+      "value_preview": "USDCNY -; USDCNH -; CN10Y +; CN2Y -; US2Y +",
       "notes": ""
     },
     {
@@ -244,8 +244,8 @@
       "ui_target": "L3 basis spread",
       "status": "ok",
       "required": true,
-      "value": "58620.00",
-      "value_preview": "58620.00",
+      "value": "61530.00",
+      "value_preview": "61530.00",
       "notes": ""
     },
     {
@@ -255,8 +255,8 @@
       "ui_target": "L3 ref low",
       "status": "ok",
       "required": true,
-      "value": "46896.00",
-      "value_preview": "46896.00",
+      "value": "49224.00",
+      "value_preview": "49224.00",
       "notes": ""
     },
     {
@@ -266,8 +266,8 @@
       "ui_target": "L3 ref mid",
       "status": "ok",
       "required": true,
-      "value": "58620.00",
-      "value_preview": "58620.00",
+      "value": "61530.00",
+      "value_preview": "61530.00",
       "notes": ""
     },
     {
@@ -277,8 +277,8 @@
       "ui_target": "L3 ref high",
       "status": "ok",
       "required": true,
-      "value": "70344.00",
-      "value_preview": "70344.00",
+      "value": "73836.00",
+      "value_preview": "73836.00",
       "notes": ""
     },
     {
@@ -299,8 +299,8 @@
       "ui_target": "coverage \u00b7 flows pill",
       "status": "ok",
       "required": true,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "fallback_1d",
+      "value_preview": "fallback_1d",
       "notes": ""
     },
     {
@@ -310,8 +310,8 @@
       "ui_target": "flows sponsorship as-of",
       "status": "ok",
       "required": false,
-      "value": "2026-06-29",
-      "value_preview": "2026-06-29",
+      "value": "2026-07-02",
+      "value_preview": "2026-07-02",
       "notes": "Re-export WTM-Flows-Global.csv when stale"
     },
     {
@@ -321,8 +321,8 @@
       "ui_target": "funds-flow card",
       "status": "ok",
       "required": false,
-      "value": 15,
-      "value_preview": "15",
+      "value": 3,
+      "value_preview": "3",
       "notes": ""
     },
     {
@@ -352,10 +352,10 @@
       "field": "liquidity.flows_status",
       "bundle_path": "node_cockpits.liquidity.funds_flows.flows_meta.flows_status",
       "ui_target": "funds-flow card \u00b7 liquidity",
-      "status": "ok",
+      "status": "partial",
       "required": false,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "unavailable",
+      "value_preview": "unavailable",
       "notes": ""
     },
     {
@@ -385,10 +385,10 @@
       "field": "credit.flows_status",
       "bundle_path": "node_cockpits.credit.funds_flows.flows_meta.flows_status",
       "ui_target": "funds-flow card \u00b7 credit",
-      "status": "ok",
+      "status": "partial",
       "required": false,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "fallback_1d",
+      "value_preview": "fallback_1d",
       "notes": ""
     },
     {
@@ -418,10 +418,10 @@
       "field": "breadth.flows_status",
       "bundle_path": "node_cockpits.breadth.funds_flows.flows_meta.flows_status",
       "ui_target": "funds-flow card \u00b7 breadth",
-      "status": "ok",
+      "status": "partial",
       "required": false,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "unavailable",
+      "value_preview": "unavailable",
       "notes": ""
     },
     {
@@ -451,10 +451,10 @@
       "field": "highbeta.flows_status",
       "bundle_path": "node_cockpits.highbeta.funds_flows.flows_meta.flows_status",
       "ui_target": "funds-flow card \u00b7 highbeta",
-      "status": "ok",
+      "status": "partial",
       "required": false,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "unavailable",
+      "value_preview": "unavailable",
       "notes": ""
     },
     {
@@ -484,10 +484,10 @@
       "field": "basis.flows_status",
       "bundle_path": "node_cockpits.basis.funds_flows.flows_meta.flows_status",
       "ui_target": "funds-flow card \u00b7 basis",
-      "status": "ok",
+      "status": "partial",
       "required": false,
-      "value": "ok",
-      "value_preview": "ok",
+      "value": "unavailable",
+      "value_preview": "unavailable",
       "notes": ""
     }
   ],
@@ -499,7 +499,7 @@
       "rv_richness": "fair",
       "component_count": 5,
       "signals_status": "partial",
-      "flows_status": "ok",
+      "flows_status": "unavailable",
       "fields": [
         {
           "section": "node_rv",
@@ -528,22 +528,22 @@
           "field": "liquidity.flows_status",
           "bundle_path": "node_cockpits.liquidity.funds_flows.flows_meta.flows_status",
           "ui_target": "funds-flow card \u00b7 liquidity",
-          "status": "ok",
+          "status": "partial",
           "required": false,
-          "value": "ok",
-          "value_preview": "ok",
+          "value": "unavailable",
+          "value_preview": "unavailable",
           "notes": ""
         }
       ]
     },
     "credit": {
-      "composite_score": 75,
+      "composite_score": 12,
       "composite_score_source": "horizon_net_fallback",
       "rv_horizon_count": 5,
       "rv_richness": "cheap",
       "component_count": 0,
       "signals_status": "partial",
-      "flows_status": "ok",
+      "flows_status": "fallback_1d",
       "fields": [
         {
           "section": "node_rv",
@@ -572,22 +572,22 @@
           "field": "credit.flows_status",
           "bundle_path": "node_cockpits.credit.funds_flows.flows_meta.flows_status",
           "ui_target": "funds-flow card \u00b7 credit",
-          "status": "ok",
+          "status": "partial",
           "required": false,
-          "value": "ok",
-          "value_preview": "ok",
+          "value": "fallback_1d",
+          "value_preview": "fallback_1d",
           "notes": ""
         }
       ]
     },
     "breadth": {
-      "composite_score": 85,
+      "composite_score": 72,
       "composite_score_source": "weighted_components",
       "rv_horizon_count": 5,
       "rv_richness": "fair",
       "component_count": 5,
       "signals_status": "partial",
-      "flows_status": "ok",
+      "flows_status": "unavailable",
       "fields": [
         {
           "section": "node_rv",
@@ -616,10 +616,10 @@
           "field": "breadth.flows_status",
           "bundle_path": "node_cockpits.breadth.funds_flows.flows_meta.flows_status",
           "ui_target": "funds-flow card \u00b7 breadth",
-          "status": "ok",
+          "status": "partial",
           "required": false,
-          "value": "ok",
-          "value_preview": "ok",
+          "value": "unavailable",
+          "value_preview": "unavailable",
           "notes": ""
         }
       ]
@@ -631,7 +631,7 @@
       "rv_richness": "fair",
       "component_count": 5,
       "signals_status": "partial",
-      "flows_status": "ok",
+      "flows_status": "unavailable",
       "fields": [
         {
           "section": "node_rv",
@@ -660,10 +660,10 @@
           "field": "highbeta.flows_status",
           "bundle_path": "node_cockpits.highbeta.funds_flows.flows_meta.flows_status",
           "ui_target": "funds-flow card \u00b7 highbeta",
-          "status": "ok",
+          "status": "partial",
           "required": false,
-          "value": "ok",
-          "value_preview": "ok",
+          "value": "unavailable",
+          "value_preview": "unavailable",
           "notes": ""
         }
       ]
@@ -675,7 +675,7 @@
       "rv_richness": "rich",
       "component_count": 5,
       "signals_status": "ok",
-      "flows_status": "ok",
+      "flows_status": "unavailable",
       "fields": [
         {
           "section": "node_rv",
@@ -704,10 +704,10 @@
           "field": "basis.flows_status",
           "bundle_path": "node_cockpits.basis.funds_flows.flows_meta.flows_status",
           "ui_target": "funds-flow card \u00b7 basis",
-          "status": "ok",
+          "status": "partial",
           "required": false,
-          "value": "ok",
-          "value_preview": "ok",
+          "value": "unavailable",
+          "value_preview": "unavailable",
           "notes": ""
         }
       ]
@@ -716,24 +716,10 @@
   "remediation": [
     {
       "priority": "medium",
-      "field": "node.liquidity.10Y yield 3M change",
-      "bundle_path": "node_cockpits.liquidity.component_inputs",
-      "ui_target": "mission diagnostics \u00b7 liquidity",
-      "action": "Map RV history for component us10y or accept horizon_fallback"
-    },
-    {
-      "priority": "medium",
-      "field": "node.liquidity.DXY 5D+20D (liquidity conditions)",
-      "bundle_path": "node_cockpits.liquidity.component_inputs",
-      "ui_target": "mission diagnostics \u00b7 liquidity",
-      "action": "Map RV history for component dxy_continuous or accept horizon_fallback"
-    },
-    {
-      "priority": "medium",
-      "field": "node.liquidity.Real rates / duration pressure proxy",
-      "bundle_path": "node_cockpits.liquidity.component_inputs",
-      "ui_target": "mission diagnostics \u00b7 liquidity",
-      "action": "Map RV history for component us10y or accept horizon_fallback"
+      "field": "node_flows.liquidity.flows_status",
+      "bundle_path": "node_cockpits.liquidity.funds_flows.flows_meta.flows_status",
+      "ui_target": "funds-flow card \u00b7 liquidity",
+      "action": "Review fallback for node_cockpits.liquidity.funds_flows.flows_meta.flows_status"
     },
     {
       "priority": "medium",
@@ -744,10 +730,59 @@
     },
     {
       "priority": "medium",
+      "field": "node_flows.credit.flows_status",
+      "bundle_path": "node_cockpits.credit.funds_flows.flows_meta.flows_status",
+      "ui_target": "funds-flow card \u00b7 credit",
+      "action": "Review fallback for node_cockpits.credit.funds_flows.flows_meta.flows_status"
+    },
+    {
+      "priority": "medium",
+      "field": "node_flows.breadth.flows_status",
+      "bundle_path": "node_cockpits.breadth.funds_flows.flows_meta.flows_status",
+      "ui_target": "funds-flow card \u00b7 breadth",
+      "action": "Review fallback for node_cockpits.breadth.funds_flows.flows_meta.flows_status"
+    },
+    {
+      "priority": "medium",
+      "field": "node.breadth.Equal-weight vs cap-weight participation",
+      "bundle_path": "node_cockpits.breadth.component_inputs",
+      "ui_target": "mission diagnostics \u00b7 breadth",
+      "action": "Map RV history for component spy or accept horizon_fallback"
+    },
+    {
+      "priority": "medium",
+      "field": "node.breadth.Cyclicals keeping pace with index",
+      "bundle_path": "node_cockpits.breadth.component_inputs",
+      "ui_target": "mission diagnostics \u00b7 breadth",
+      "action": "Map RV history for component spy or accept horizon_fallback"
+    },
+    {
+      "priority": "medium",
+      "field": "node.breadth.Multi-sector participation breadth",
+      "bundle_path": "node_cockpits.breadth.component_inputs",
+      "ui_target": "mission diagnostics \u00b7 breadth",
+      "action": "Map RV history for component spy or accept horizon_fallback"
+    },
+    {
+      "priority": "medium",
+      "field": "node_flows.highbeta.flows_status",
+      "bundle_path": "node_cockpits.highbeta.funds_flows.flows_meta.flows_status",
+      "ui_target": "funds-flow card \u00b7 highbeta",
+      "action": "Review fallback for node_cockpits.highbeta.funds_flows.flows_meta.flows_status"
+    },
+    {
+      "priority": "medium",
       "field": "node.highbeta.ETH/BTC high-beta confirmation",
       "bundle_path": "node_cockpits.highbeta.component_inputs",
       "ui_target": "mission diagnostics \u00b7 highbeta",
       "action": "Map RV history for component eth_spot_usd or accept horizon_fallback"
+    },
+    {
+      "priority": "medium",
+      "field": "node_flows.basis.flows_status",
+      "bundle_path": "node_cockpits.basis.funds_flows.flows_meta.flows_status",
+      "ui_target": "funds-flow card \u00b7 basis",
+      "action": "Review fallback for node_cockpits.basis.funds_flows.flows_meta.flows_status"
     }
   ]
 }

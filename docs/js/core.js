@@ -4,7 +4,7 @@ const STORAGE_KEY = 'whinfell_transmission_control_v7';
 const LEGACY_KEYS = ['whinfell_transmission_control_v1', 'whinfell_transmission_control_v0', 'whinfell_operator_v1_1'];
 const STATE_VERSION = 7;
 /** Bump when operator-console UX changes — visible in header for reload verification. */
-const TC_CONSOLE_BUILD = '2.3-FULL-INTEGRATION-2026-07-02';
+const TC_CONSOLE_BUILD = '1.5-BUILD-COUSINS-2026-07-03';
 const DESK_GITHUB_BLOB = 'https://github.com/clark-cmyk/Whinfell_Transmission_Control/blob/main/';
 const DESK_GITHUB_RAW = 'https://raw.githubusercontent.com/clark-cmyk/Whinfell_Transmission_Control/main/';
 const DESK_PAGES_URL = 'https://clark-cmyk.github.io/Whinfell_Transmission_Control/';
@@ -1305,6 +1305,8 @@ function createEmptyHydration() {
     china_as_of: null,
     barchart_as_of: null,
     ingest_provenance: null,
+    ai_compute: null,
+    hydration_audit: null,
   };
 }
 
@@ -2979,6 +2981,8 @@ function buildStateFromDOM() {
       china_as_of: appState.hydration?.china_as_of || null,
       barchart_as_of: appState.hydration?.barchart_as_of || null,
       ingest_provenance: appState.hydration?.ingest_provenance || null,
+      ai_compute: appState.hydration?.ai_compute || null,
+      hydration_audit: appState.hydration?.hydration_audit || null,
     },
     navigation: { ...createEmptyNavigation(), ...(appState.navigation || {}) },
     chart: { ...createEmptyChartState(), ...(appState.chart || {}) },
