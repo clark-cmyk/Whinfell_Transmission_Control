@@ -40,10 +40,26 @@ class ElementShim {
     return child;
   }
 
+  replaceChildren(...nodes) {
+    const expanded = [];
+    nodes.flat().forEach((n) => {
+      if (n?.tagName === 'FRAGMENT') expanded.push(...(n.children || []));
+      else if (n) expanded.push(n);
+    });
+    this.children = expanded;
+    expanded.forEach((n) => { n.parentElement = this; });
+  }
+
   querySelector(sel) {
     if (sel.startsWith('.')) {
       const cls = sel.slice(1);
       if (this.classList.contains(cls)) return this;
+    }
+    if (sel.startsWith('#') && this.id === sel.slice(1)) return this;
+    const dataEq = sel.match(/^\[data-([^\]=]+)="([^"]*)"\]$/);
+    if (dataEq) {
+      const key = dataEq[1].replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      if (this.dataset?.[key] === dataEq[2]) return this;
     }
     for (const c of this.children) {
       const hit = c.querySelector?.(sel);
@@ -55,9 +71,18 @@ class ElementShim {
   querySelectorAll(sel) {
     const out = [];
     const walk = (node) => {
-      if (sel.startsWith('[data-') && sel.includes(']')) {
-        const key = sel.match(/data-([^\]=]+)/)?.[1];
-        if (key && node.dataset?.[key] != null) out.push(node);
+      if (sel.startsWith('.')) {
+        const cls = sel.slice(1);
+        if (node.classList?.contains(cls)) out.push(node);
+      } else if (sel.startsWith('[data-') && sel.includes(']')) {
+        const m = sel.match(/^\[data-([^\]=]+)="([^"]*)"\]$/);
+        if (m) {
+          const key = m[1].replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+          if (node.dataset?.[key] === m[2]) out.push(node);
+        } else {
+          const key = sel.match(/data-([^\]=]+)/)?.[1];
+          if (key && node.dataset?.[key] != null) out.push(node);
+        }
       }
       node.children?.forEach(walk);
     };
@@ -118,6 +143,14 @@ class DocumentShim {
       if (sentence) banner.appendChild(sentence);
       if (suffix) banner.appendChild(suffix);
     }
+    const scanStrip = this._byId.get('scanKpiStrip');
+    const scanTiles = this._byId.get('scanKpiTiles');
+    if (scanStrip && scanTiles) scanStrip.appendChild(scanTiles);
+    const radar = this._byId.get('transmissionRadar');
+    const radarMount = this._byId.get('transmissionRadarMount');
+    if (radar && radarMount) radar.appendChild(radarMount);
+    this._metaMount = new ElementShim('div');
+    this._metaMount.className = 'console-tech-meta';
     this.body = new ElementShim('body');
     this.documentElement = new ElementShim('html');
     this.documentElement.setAttribute = (k, v) => { this.documentElement[`_${k}`] = v; };
@@ -125,11 +158,27 @@ class DocumentShim {
   }
 
   getElementById(id) {
-    return this._byId.get(id) || null;
+    const direct = this._byId.get(id);
+    if (direct) return direct;
+    const walk = (node) => {
+      if (!node) return null;
+      if (node.id === id) return node;
+      for (const c of node.children || []) {
+        const hit = walk(c);
+        if (hit) return hit;
+      }
+      return null;
+    };
+    for (const el of this._byId.values()) {
+      const hit = walk(el);
+      if (hit) return hit;
+    }
+    return walk(this._metaMount);
   }
 
   querySelector(sel) {
     if (sel.startsWith('#')) return this.getElementById(sel.slice(1));
+    if (sel === '.console-tech-meta') return this._metaMount || null;
     if (sel === '#cockpitShell .cockpit-main') {
       const shell = this.getElementById('cockpitShell');
       return shell?.children?.[0] || null;
@@ -139,6 +188,15 @@ class DocumentShim {
 
   querySelectorAll() { return []; }
   createElement(tag) { return tag === 'div' ? new ElementShim('div') : new ElementShim(tag); }
+  createDocumentFragment() {
+    const frag = new ElementShim('fragment');
+    frag.appendChild = (child) => {
+      child.parentElement = frag;
+      frag.children.push(child);
+      return child;
+    };
+    return frag;
+  }
   addEventListener() {}
 }
 
@@ -149,8 +207,20 @@ function extractIdsFromIndex() {
   return [...ids];
 }
 
+/** domIds rendered by js/top_utility_registry.js (not in static index.html). */
+function extractTopUtilityDomIds() {
+  try {
+    const js = fs.readFileSync(path.join(ROOT, 'js/top_utility_registry.js'), 'utf8');
+    const ids = new Set();
+    for (const m of js.matchAll(/domId:\s*'([^']+)'/g)) ids.add(m[1]);
+    return [...ids];
+  } catch {
+    return [];
+  }
+}
+
 export function loadCoreJs() {
-  const ids = extractIdsFromIndex();
+  const ids = [...new Set([...extractIdsFromIndex(), ...extractTopUtilityDomIds()])];
   const document = new DocumentShim(ids);
   const window = {
     document,
@@ -178,6 +248,8 @@ export function loadCoreJs() {
     clearInterval: globalThis.clearInterval.bind(globalThis),
     requestAnimationFrame: (fn) => setTimeout(fn, 0),
     cancelAnimationFrame: () => {},
+    confirm: () => false,
+    alert: () => {},
     console,
     appState: {},
     DICTIONARY_BADGE_DEFAULT: {},
@@ -189,7 +261,17 @@ export function loadCoreJs() {
   window.globalThis = window;
 
   const ctx = vm.createContext(window);
-  const preload = ['desk_china_ladder_models.js', 'core.js'];
+  const preload = [
+    'data_states.js',
+    'command_bar_kpis.js',
+    'scan_kpi_strip.js',
+    'top_utility_registry.js',
+    'signal_detail_copy.js',
+    'transmission_radar.js',
+    'desk_china_ladder_models.js',
+    'task_force_panel_feed.js',
+    'core.js',
+  ];
   for (const file of preload) {
     const src = fs.readFileSync(path.join(ROOT, 'js', file), 'utf8');
     vm.runInContext(src, ctx, { filename: file });

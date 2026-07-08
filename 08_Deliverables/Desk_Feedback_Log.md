@@ -2,7 +2,20 @@
 
 **Purpose:** Structured feedback for mission-surface rollout + desk-readiness (BUILD_MASTER_PROMPT 2026-06-30)  
 **Maintained by:** Desk → BUILD Cousins (Bridge)  
-**Last updated:** July 3, 2026
+**Last updated:** July 3, 2026  
+**Phase:** **2.2 — Desk testing** (live operator walk-through)
+
+---
+
+## Current gate
+
+| Item | Status |
+|------|--------|
+| BUILD_MASTER_PROMPT chunks 1–4 | **Accepted complete** |
+| New feature / code work | **HOLD** — await operator ratings |
+| Hydration bundle for walk-through | `global-2026-06-30-raw2wtm-01` |
+| Operators | Clark · Wes |
+| Ratings destination | Table below in this file |
 
 ---
 
@@ -27,7 +40,8 @@
 | **Breadth** | PASS | PASS | — | `weighted_components` · aging |
 | **Highbeta** | PASS | PASS | — | `weighted_components` · aging |
 
-**Hydration source:** `docs/data/hydration/latest.json` · `as_of=2026-07-02T12:01:21+00:00` · `freshness_status=aging`
+**Hydration bundle (desk test):** `global-2026-06-30-raw2wtm-01`  
+**Bundled fallback:** `docs/data/hydration/latest.json` · `as_of=2026-07-02T12:01:21+00:00` · `freshness_status=aging`
 
 ---
 
@@ -36,7 +50,7 @@
 1. **Build:** From repo root run `bash scripts/build_desk_preview.sh` twice; confirm identical `BUILD_STAMP.txt`.
 2. **Serve:** `cd dist && python3 -m http.server 8765` → open `http://localhost:8765/`.
 3. **Boot:** Confirm `#js-boot-check` shows **RENDER SUCCESS** (or disappears after green flash).
-4. **Import:** If not auto-hydrated, use **Import hydration** → select `dist/data/hydration/latest.json`.
+4. **Import:** Use **Import hydration** → select bundle `global-2026-06-30-raw2wtm-01` (or `dist/data/hydration/latest.json` if bundled).
 5. **Per node (Basis · Credit · Liquidity · Breadth · Highbeta):**
    - Mission tactical banner visible (eyebrow + lead; SQ3 suffix when impaired).
    - Summary strip shows current reading + expression row.

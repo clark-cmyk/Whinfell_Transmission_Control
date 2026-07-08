@@ -1,0 +1,333 @@
+Whinfell UI Optimization Plan
+
+This plan reconciles the GROK UI Optimization Report (file:///Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/Whinfell%20Transmission%20Control%20%E2%80%94%20UI%20Optimization%20Report%20for%20GROK.txt) with what is already shipped in the Phase 2.3 console.
+
+───
+
+Executive Summary
+
+Phase 16 (July 2026) delivered the structural shell — scan · dig · iterate layers, left nav, Transmission Radar hero, slim topbar, and KPI strip. That covers roughly half of the GROK report’s vision.
+
+What remains is Koyfin-style widgetization: turn the long vertical document into a dashboard grid of card widgets with collapsible top/left frames wired end-to-end. The CSS primitives exist (wf-panel, wf-panel-grid, ia-top-frame) but are not yet applied in index.html.
+
+Recommended approach: 8 micro-chunks, one per session, presentation-only (no business-logic forks), building on console_ia_shell.js and existing registries.
+
+───
+
+Current State vs GROK Report
+
+┌───────────────┬───────────────────────┬──────────┬────────────────────────────────────────────────┐
+│ GROK chunk    │ Goal                  │ Status   │ Notes                                          │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 1 Shell       │ TopShell + LeftNav +  │ ~70%     │ wtmIaShell + iaLeftFrame exist; top bar is     │
+│ components    │ MainContent wrapper   │ done     │ still a separate <header class="console-       │
+│               │                       │          │ topbar"> outside the shell                     │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 2 Collapsible │ Shallow, collapsible  │ ~40%     │ Left collapse wired (btnIaLeftCollapse); ia-   │
+│ frames        │ top + left            │ done     │ top-frame CSS exists but not in HTML/JS        │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 3 Risk        │ Card for Score/       │ Not      │ Lives in scanKpiStrip tiles + cockpit zone —   │
+│ Cockpit       │ Transmission/Gate     │ started  │ no wf-panel wrapper                            │
+│ widget        │ /etc.                 │          │                                                │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 4 Radar +     │ Separate widget cards │ ~50%     │ Radar is a hero section; risk curve is in left │
+│ Risk Curve    │                       │ done     │ nav (nodeRail relocated) — not a dashboard     │
+│               │                       │          │ card                                           │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 5 HY OAS      │ Card for mission read │ Not      │ basisTacticalBanner + cockpitRvTableWrap are   │
+│ widget        │ / RV table            │ started  │ flat markup                                    │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 6 Flipchart   │ Card for flipchart +  │ Not      │ flipchartState + cockpitActions are inline at  │
+│ widget        │ implications          │ started  │ bottom of cockpit                              │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 7 Depth &     │ Card for command bar  │ Partial  │ Depth is below fold per Chunk 12; not yet a    │
+│ Ladders       │ / ladders             │          │ wf-panel                                       │
+├───────────────┼───────────────────────┼──────────┼────────────────────────────────────────────────┤
+│ 8 Theme       │ Koyfin-like tokens    │ ~60%     │ --wf-* tokens in console_ia.css; not applied   │
+│ alignment     │ across all widgets    │ done     │ uniformly because widgets aren’t cardized      │
+└───────────────┴───────────────────────┴──────────┴────────────────────────────────────────────────┘
+
+───
+
+Architecture (build on what exists)
+
+╭ mermaid: flowchart ────────────────────────────────────────────────────────────────╮
+│ flowchart TB                                                                       │
+│   subgraph shell [Shell Layer]                                                     │
+│     TopShell["TopShell — pipeline + global actions"]                               │
+│     LeftNav["LeftNav — views + tools + risk curve"]                                │
+│     MainGrid["MainContentGrid — wf-panel-grid"]                                    │
+│   end                                                                              │
+│                                                                                    │
+│   subgraph widgets [Widget Cards — presentation wrappers only]                     │
+│     RiskCockpit["RiskCockpit — scan KPI host"]                                     │
+│     RiskCurve["RiskCurveCard"]                                                     │
+│     Radar["TransmissionRadarCard"]                                                 │
+│     HyOas["HyOasWidget"]                                                           │
+│     Flipchart["FlipchartWidget"]                                                   │
+│     Depth["DepthLaddersWidget"]                                                    │
+│   end                                                                              │
+│                                                                                    │
+│   TopShell --> MainGrid                                                            │
+│   LeftNav --> MainGrid                                                             │
+│   MainGrid --> RiskCockpit                                                         │
+│   MainGrid --> RiskCurve                                                           │
+│   MainGrid --> Radar                                                               │
+│   MainGrid --> HyOas                                                               │
+│   MainGrid --> Flipchart                                                           │
+│   MainGrid --> Depth                                                               │
+│                                                                                    │
+│   console_ia["console_ia_shell.js"] --> shell                                      │
+│   registries["scan_kpi_strip / transmission_radar / command_bar_kpis"] --> widgets │
+╰────────────────────────────────────────────────────────────────────────────────────╯
+This diagram is too wide to display here — open the image to view it in full.
+
+Non-negotiable constraints (from shipped program)
+
+1. Presentation-only — console_ia_shell.js relocates DOM nodes; it does not fork render logic.
+2. Registries stay authoritative — widgets wrap existing mounts; no new if chains in core.js.
+3. One chunk per session — max ~6 files touched; run targeted tests after each chunk.
+4. Safe fallback — if shell hosts are missing, legacy layout still renders.
+
+Reuse, don’t reinvent
+
+┌─────────────────┬───────────────────────────────────────────────────────────────────────┐
+│ GROK concept    │ Existing primitive                                                    │
+├─────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ WidgetCard      │ .wf-panel + .wf-panel__header + .wf-panel__body in css/console_ia.css │
+├─────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ TopShell        │ Merge console-topbar into ia-top-frame pattern already in CSS         │
+├─────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ LeftNav         │ Extend iaLeftFrame with view shortcuts per GROK §2.2                  │
+├─────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ MainContentGrid │ .wf-panel-grid / .wf-panel-grid--2                                    │
+└─────────────────┴───────────────────────────────────────────────────────────────────────┘
+
+───
+
+Micro-Chunk Implementation Plan
+
+Chunk 1 — Unify shell layout (GROK §4 Chunk 1)
+
+Goal: Single Shell = TopShell + LeftNav + MainContent — no duplicate top framing.
+
+Scope:
+• index.html — wrap console-topbar + scanKpiStrip into ia-top-frame host inside or above wtmIaShell
+• js/console_ia_shell.js — optional relocateTopBar() if needed
+• css/console_ia.css — connect existing .ia-top-frame rules to live DOM
+
+Out of scope: Widget extraction, collapse behavior
+
+Acceptance:
+• One visual top frame containing branding, pipeline status, global actions, KPI strip
+• Left nav + center canvas unchanged functionally
+• tests/phase16_integration.test.mjs still PASS
+
+───
+
+Chunk 2 — Collapsible frames (GROK §4 Chunk 2)
+
+Goal: Koyfin-like shallow, collapsible top and left rails.
+
+Scope:
+• index.html — add btnIaTopCollapse; wire data-collapsed on .ia-top-frame
+• js/console_ia_shell.js — bindTopCollapse() mirroring left collapse
+• css/console_ia.css — collapsed top leaves thin pipeline strip (--ia-top-h-collapsed: 28px); left icons-only mode with tooltips
+
+Acceptance:
+• Top collapses to status strip; left collapses to icon rail
+• Collapse state persists in sessionStorage (optional, low risk)
+• Visual height reduction ≥30% in expanded mode vs pre-Chunk-02 baseline
+
+───
+
+Chunk 3 — Risk Cockpit widget (GROK §4 Chunk 3)
+
+Goal: Scan KPIs in a named dashboard card.
+
+Scope:
+• index.html — wrap #scanKpiStrip in .wf-panel with header “Risk Cockpit”
+• js/scan_kpi_strip.js — optional renderPanelHeader() helper (presentation only)
+• css/console_ia.css — place card in grid top-left
+
+Out of scope: Changing tile content (already done in Chunks 03–05)
+
+Acceptance:
+• Risk Cockpit is visually one card with consistent header/body padding
+• All 4–6 KPI tiles still render and click-through to signal detail works
+
+───
+
+Chunk 4 — Radar + Risk Curve cards (GROK §4 Chunk 4)
+
+Goal: Two adjacent widgets in the dashboard grid.
+
+Layout target:
+
+[ Risk Cockpit (2/3) ] [ Risk Curve (1/3) ]
+[ Transmission Radar (1/2) ] [ HY OAS placeholder or empty ]
+
+Scope:
+• index.html — wf-panel around #transmissionRadar; extract risk curve list from left nav into RiskCurveCard in main grid (or duplicate mount with shell relocation)
+• js/console_ia_shell.js — update relocateNodes() for new hosts
+• js/transmission_radar.js — panel header meta (regime line, weakest link)
+• tests/transmission_radar.test.mjs — assert panel wrapper present
+
+Acceptance:
+• Radar and risk curve are sibling cards in wf-panel-grid
+• Left nav retains view shortcuts; risk curve is not only buried in the rail
+
+───
+
+Chunk 5 — HY OAS proxy widget (GROK §4 Chunk 5)
+
+Goal: Mission read + RV table + basis structure in one card.
+
+Scope:
+• index.html — wrap basisTacticalBanner, cockpitHorizonRow, cockpitRvTableWrap, basisSummaryStrip in .wf-panel
+• Group cockpitActions primary buttons into .wf-panel__actions row
+• css/console_ia.css — subframes via .wf-subframe for table vs narrative
+
+Out of scope: Chart canvas refactor (stays in card body)
+
+Acceptance:
+• HY OAS reads as one widget with header, table body, actions row
+• “Here’s Why / Compare / Export node” still functional
+
+───
+
+Chunk 6 — Flipchart widget (GROK §4 Chunk 6)
+
+Goal: Flipchart navigation and implications in a dedicated card.
+
+Scope:
+• index.html — wrap flipchartState, keyboard hints, cockpitDecisionContent implications in .wf-panel
+• js/core.js — only if flipchart mount IDs change (prefer zero logic changes)
+
+Acceptance:
+• Flip pager, position indicator, and implication labels live inside one card
+• Keyboard nav (← →, 1–5, f, c) unchanged
+
+───
+
+Chunk 7 — Depth & Ladders widget (GROK §4 Chunk 7)
+
+Goal: Command bar / depth section as bottom-row card.
+
+Scope:
+• index.html — wrap depth/command-bar zone in .wf-panel; preserve collapse from Chunk 12
+• Leave placeholder region for future ladder viz
+
+Acceptance:
+• Depth panel is a card at grid bottom; default collapsed or below fold per layer mode
+
+───
+
+Chunk 8 — Theme alignment (GROK §4 Chunk 8)
+
+Goal: Koyfin-level clarity across light/dark modes.
+
+Scope:
+• css/console_ia.css — finalize --wf-* tokens for light mode (data-theme="light")
+• css/main.css — align .console-chip with --wf-accent
+• Apply typography scale (--wf-text-xxs through --wf-text-sm) across all wf-panel headers
+
+Acceptance:
+• Light and dark modes both desk-usable
+• All 6 widgets + shell share one visual language
+• No widget-specific one-off colors in first viewport
+
+───
+
+PR Plan (ordered, independently mergeable)
+
+┌──────┬───────────────────────────┬─────────────────────────────────────────────────────┬──────────┐
+│ PR   │ Title                     │ Files                                               │ Depends  │
+│      │                           │                                                     │ on       │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-1 │ Unify TopShell into IA    │ index.html, console_ia.css, console_ia_shell.js     │ —        │
+│      │ shell                     │                                                     │          │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-2 │ Collapsible top + left    │ index.html, console_ia_shell.js, console_ia.css     │ PR-1     │
+│      │ frames                    │                                                     │          │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-3 │ Risk Cockpit widget card  │ index.html, console_ia.css, scan_kpi_strip.js       │ PR-1     │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-4 │ Radar + Risk Curve        │ index.html, console_ia_shell.js, transmission_radar │ PR-3     │
+│      │ dashboard row             │ .js, console_ia.css                                 │          │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-5 │ HY OAS proxy widget       │ index.html, console_ia.css                          │ PR-4     │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-6 │ Flipchart widget          │ index.html, console_ia.css                          │ PR-5     │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-7 │ Depth & Ladders widget    │ index.html, console_ia.css                          │ PR-6     │
+├──────┼───────────────────────────┼─────────────────────────────────────────────────────┼──────────┤
+│ PR-8 │ Koyfin theme pass (light/ │ console_ia.css, main.css                            │ PR-7     │
+│      │ dark)                     │                                                     │          │
+└──────┴───────────────────────────┴─────────────────────────────────────────────────────┴──────────┘
+
+Verification gate per PR:
+
+node --test tests/phase16_integration.test.mjs
+node --test tests/scan_kpi_strip.test.mjs
+node --test tests/transmission_radar.test.mjs  # from PR-4 onward
+
+Build/publish: run scripts/build.sh after PR-4+ to sync docs/ mirror.
+
+───
+
+Key Decisions
+
+┌───────────────────────────┬───────────────────────────────────────────────────────────────────────┐
+│ Decision                  │ Rationale                                                             │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Extend Phase 16 shell,    │ console_ia_shell.js relocation pattern is proven and tested;          │
+│ don’t rewrite             │ widgetization is markup + CSS                                         │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Use .wf-panel as          │ Already defined with header/body/actions; avoids a parallel component │
+│ WidgetCard                │ system                                                                │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Keep scan · dig · iterate │ GROK’s “view shortcuts” map to existing layer tabs + left nav; no new │
+│ layers                    │ routing model                                                         │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Risk curve moves to main  │ GROK §3.2 puts Risk Curve beside Risk Cockpit; left nav keeps         │
+│ grid                      │ shortcuts only                                                        │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Presentation-only chunks  │ Preserves registry architecture and avoids core.js regressions        │
+├───────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Calm-first order          │ Widget shells come after unified top frame (Chunks 1–2) so the        │
+│ preserved                 │ viewport doesn’t get taller before it gets structured                 │
+└───────────────────────────┴───────────────────────────────────────────────────────────────────────┘
+
+───
+
+Context Budget (per session)
+
+Each chunk should touch at most:
+
+1. Relevant section of this plan
+2. index.html (target zone only)
+3. css/console_ia.css (panel/shell rules only)
+4. One JS module if wiring is needed
+5. One test file
+6. scripts/build.sh only when docs/ must sync
+
+Do not load full core.js, basis_watch_panel.js, or entire main.css unless the chunk explicitly requires it.
+
+───
+
+Open Questions
+
+Before implementation starts, two product decisions would help:
+
+1. Left nav view shortcuts (GROK §2.2) — Should clicking “Risk Cockpit”, “Transmission Radar”, etc. scroll/focus a widget in the grid, or switch the scan/dig/iterate layer (current behavior)?
+
+2. Risk curve placement — Move entirely to main grid (GROK layout), or keep a compact version in the left rail and show full card in the grid?
+
+───
+
+Recommended Next Step
+
+Start with Chunk 1 (PR-1): merge console-topbar + scanKpiStrip into the ia-top-frame shell so all framing lives in one component. That is the smallest change that unlocks collapse (Chunk 2) and the dashboard grid (Chunks 3–7).
+
+Say which chunk to execute, or answer the open questions above if you want the plan adjusted first.

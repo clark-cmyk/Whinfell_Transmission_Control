@@ -1,7 +1,7 @@
 /* AUTO-GENERATED — do not edit manually.
  * Source: china_policy_track/china_ladder.py
  * Version: china_ladder.v1.1
- * Generated: 2026-06-28
+ * Generated: 2026-07-04
  * Regenerate: python3 -m whinfell_pipeline.desk_china_ladder_models
  */
 'use strict';
@@ -32,13 +32,13 @@ const CHINA_LADDER_SPEC = {
       "id": "highbeta",
       "name": "High-Beta / China Cyclical Transmission",
       "short": "Cyc",
-      "sub": "Copper futures · Iron Ore futures"
+      "sub": "HG1"
     },
     {
       "id": "basis",
       "name": "Basis & Term Structure",
       "short": "Basis",
-      "sub": "Copper spreads · Iron Ore spreads"
+      "sub": "HG1 spreads"
     }
   ],
   "mark_score": {
@@ -142,7 +142,7 @@ const CHINA_LADDER_SPEC = {
           "hz": "d1"
         },
         {
-          "label": "5D copper / iron ore",
+          "label": "5D HG1 copper impulse",
           "w": 25,
           "hz": "d5"
         },
@@ -158,8 +158,7 @@ const CHINA_LADDER_SPEC = {
         }
       ],
       "proxies": [
-        "Copper futures",
-        "Iron Ore futures"
+        "HG1"
       ],
       "status": "confirmed"
     },
@@ -187,8 +186,7 @@ const CHINA_LADDER_SPEC = {
         }
       ],
       "proxies": [
-        "Copper spreads",
-        "Iron Ore spreads"
+        "HG1 spreads"
       ],
       "status": "confirmed"
     }
@@ -266,7 +264,7 @@ const CHINA_LADDER_SPEC = {
     },
     "highbeta": {
       "state": "{score} / {band} — cyclical beta {transmitting}.",
-      "evidence": "Copper / iron ore net {net}; cyclical transmission vs policy impulse.",
+      "evidence": "HG1 copper net {net}; cyclical transmission vs policy impulse.",
       "trigger": "Net ≥+2 with credit stage ≥60 for larger cyclical beta."
     },
     "basis": {

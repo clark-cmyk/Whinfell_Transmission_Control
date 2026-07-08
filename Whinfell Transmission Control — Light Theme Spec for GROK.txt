@@ -1,0 +1,71 @@
+# Whinfell Transmission Control — Light Theme Spec for GROK
+
+> FOLLOW THESE INSTRUCTIONS EXACTLY.  
+> Do not invent new colors, fonts, or component abstractions beyond what is defined here.  
+> Apply these tokens only when `data-theme="light"` is active.  
+
+---
+
+## 0. Role and scope
+
+You are my **Light Theme Tokenizer and Stylist** for the Whinfell Transmission Control Phase 2.3 console.[page:1][file:32]  
+
+Your job:
+
+- Define light‑mode tokens in `css/console_ia.css` consistent with the Whinfell PPT template styling.[file:33]  
+- Apply those tokens to the existing shell and widget components (`.ia-top-frame`, `.ia-left-frame`, `.wf-panel`, tables, buttons) without changing business logic.[file:32]  
+- Keep dark mode unchanged; only adjust behavior for `data-theme="light"`.  
+
+Do not:
+
+- Create new routing, registries, or JS logic beyond minimal theme wiring.  
+- Introduce extra brand colors; use only the palette defined below.  
+
+---
+
+## 1. Core tokens (light theme only)
+
+Add these CSS custom properties under the `data-theme="light"` scope in `css/console_ia.css` (or equivalent theme root).[file:32][file:33]  
+
+### 1.1 Surface and text colors
+
+```css
+/* Light mode root — inside [data-theme="light"] */
+:root[data-theme="light"] {
+  /* Surfaces */
+  --wf-bg-page:    #F9FAFB;  /* off-white page, PPT slide-like */
+  --wf-bg-card:    #FFFFFF;  /* cards / panels */
+  --wf-bg-subtle:  #F3F4F6;  /* table banding, subtle blocks */
+
+  /* Text */
+  --wf-text-primary:   #1A1A1A;  /* deep neutral, PPT body text */
+  --wf-text-secondary: #555555;  /* descriptions and subheaders */
+  --wf-text-muted:     #808080;  /* hints, microcopy */
+  --wf-text-inverse:   #FFFFFF;  /* text on dark chips/buttons */
+}
+```
+
+Use these mappings:
+
+- Console title, widget titles, main labels → `--wf-text-primary`.[page:1][file:33]  
+- Descriptions, explanatory copy → `--wf-text-secondary`.  
+- Keyboard hints and low‑priority status text → `--wf-text-muted`.  
+
+### 1.2 Accent and neutral colors
+
+```css
+:root[data-theme="light"] {
+  /* Brand accent and chart colors */
+  --wf-accent-green:  #2E8B57; /* Whinfell strategy/line green (approx) */
+  --wf-accent-teal:   #2E86AB; /* PPT XLRE line color */
+  --wf-accent-navy:   #1E3A5F; /* PPT SPY / 10Y navy */
+
+  /* Borders and dividers */
+  --wf-border-card:   #E5E7EB;
+  --wf-border-subtle: #D1D5DB;
+}
+```
+
+Use `--wf-accent-green` for:
+
+- 

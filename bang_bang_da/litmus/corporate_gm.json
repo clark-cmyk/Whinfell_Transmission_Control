@@ -1,0 +1,174 @@
+{
+  "schema_version": "2.0.0",
+  "adapter_version": "2.0.0-chunk24",
+  "data_status": "stub",
+  "source": "koyfin",
+  "as_of": "2026-07-07T23:57:17+00:00",
+  "export_id": "koyfin_midwest_corporate_gm",
+  "saved_view": "WTM-Midwest-Corporate-GM",
+  "trade_ids": [
+    "midwest_basis",
+    "midwest_calendar"
+  ],
+  "tables": [
+    {
+      "id": "midwest_calendar_primary",
+      "trade_id": "midwest_calendar",
+      "title": "Midwest Compute \u2014 Primary",
+      "columns": [
+        "company",
+        "segment",
+        "current_gm_pct",
+        "avg_gm_3yr",
+        "gm_z_3yr",
+        "quartile",
+        "cloud_multiplier",
+        "regime_signal",
+        "status"
+      ]
+    },
+    {
+      "id": "midwest_basis_primary",
+      "trade_id": "midwest_basis",
+      "title": "Midwest Compute \u2014 Primary",
+      "columns": [
+        "company",
+        "segment",
+        "current_gm_pct",
+        "avg_gm_3yr",
+        "gm_z_3yr",
+        "quartile",
+        "cloud_multiplier",
+        "regime_signal",
+        "status"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "ticker": "MSFT",
+      "company": "Microsoft",
+      "segment": "Intelligent Cloud",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "primary"
+    },
+    {
+      "ticker": "GOOGL",
+      "company": "Alphabet",
+      "segment": "Google Cloud",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "primary"
+    },
+    {
+      "ticker": "AMZN",
+      "company": "Amazon",
+      "segment": "AWS",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "primary"
+    },
+    {
+      "ticker": "ORCL",
+      "company": "Oracle",
+      "segment": "OCI",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "primary"
+    },
+    {
+      "ticker": "SMCI",
+      "company": "Super Micro",
+      "segment": "SMCI",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "primary"
+    }
+  ],
+  "nice_to_have": [
+    {
+      "ticker": "META",
+      "company": "Meta",
+      "segment": "Reality Labs adj.",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "nice_to_have"
+    },
+    {
+      "ticker": "VST",
+      "company": "Vistra",
+      "segment": "Merchant Power",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "nice_to_have"
+    },
+    {
+      "ticker": "CEG",
+      "company": "Constellation Energy",
+      "segment": "Merchant Power",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "nice_to_have"
+    },
+    {
+      "ticker": "NVDA",
+      "company": "Nvidia",
+      "segment": "Data Center",
+      "current_gm_pct": null,
+      "avg_gm_3yr": null,
+      "gm_z_3yr": null,
+      "quartile": null,
+      "cloud_multiplier": 1.0,
+      "regime_signal": null,
+      "status": "pending_koyfin",
+      "tier": "nice_to_have"
+    }
+  ],
+  "lineage": {
+    "watchlist_url": "https://app.koyfin.com/myw/790f7aab-ba98-43df-9807-78b01c779a29",
+    "drop_file": null,
+    "ingested_at": null,
+    "notes": "Export WTM-Midwest-Corporate-GM watchlist CSV to whinfell_drop for live GM rows"
+  }
+}

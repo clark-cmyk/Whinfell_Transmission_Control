@@ -4,7 +4,7 @@ const STORAGE_KEY = 'whinfell_transmission_control_v7';
 const LEGACY_KEYS = ['whinfell_transmission_control_v1', 'whinfell_transmission_control_v0', 'whinfell_operator_v1_1'];
 const STATE_VERSION = 7;
 /** Bump when operator-console UX changes — visible in header for reload verification. */
-const TC_CONSOLE_BUILD = '1.5-BUILD-COUSINS-2026-07-03';
+const TC_CONSOLE_BUILD = '1.5-BUILD-COUSINS-2026-07-04-PHASE23';
 const DESK_GITHUB_BLOB = 'https://github.com/clark-cmyk/Whinfell_Transmission_Control/blob/main/';
 const DESK_GITHUB_RAW = 'https://raw.githubusercontent.com/clark-cmyk/Whinfell_Transmission_Control/main/';
 const DESK_PAGES_URL = 'https://clark-cmyk.github.io/Whinfell_Transmission_Control/';
@@ -124,8 +124,104 @@ const CHINA_EXPORT_FORMAT = 'CHINA POLICY EXPORT v1.0';
 const CHINA_LADDER_EXPORT_FORMAT = 'CHINA LADDER EXPORT v1.1';
 const PIPELINE_BUNDLE_VERSION = '1.0.0';
 const MASTER_DATA_DICTIONARY_META_URL = 'data_dictionary_meta.json';
+/** Phase 2.3 — static dictionary badge only; no runtime meta.json polling. */
+const DD_META_POLLING_ENABLED = false;
 let ddMetaCache = null;
 let ddMetaFetchGen = 0;
+
+/** Keys dropped before desk hydration import (saves parse + memory on ~108KB bundles). */
+const HYDRATION_LOAD_STRIP_KEYS = ['wtm_export_v22'];
+
+function resolveSafeBoot() {
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('safe_boot') === '1') return true;
+    if (params.get('safe_boot') === '0') return false;
+  } catch (_) { /* ignore */ }
+  return !!(typeof window !== 'undefined' && window.WHINFELL_SAFE_BOOT);
+}
+
+const SAFE_BOOT = resolveSafeBoot();
+
+function resolveBootVerbose() {
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('boot_log') === '0') return false;
+    if (params.get('boot_log') === '1') return true;
+  } catch (_) { /* ignore */ }
+  return SAFE_BOOT;
+}
+
+const WTM_BOOT_VERBOSE = resolveBootVerbose();
+
+function bootLog(level, msg, extra) {
+  if (!WTM_BOOT_VERBOSE && level === 'debug') return;
+  const line = `[WTM boot] ${msg}`;
+  if (level === 'error') console.error(line, extra ?? '');
+  else if (level === 'warn') console.warn(line, extra ?? '');
+  else console.log(line, extra ?? '');
+}
+
+function signalBootCheck(message, isError) {
+  if (typeof window !== 'undefined' && typeof window.updateBootCheck === 'function') {
+    window.updateBootCheck(message, isError);
+    return;
+  }
+  const check = typeof document !== 'undefined' ? document.getElementById('js-boot-check') : null;
+  if (check) {
+    check.textContent = message;
+    check.style.color = isError ? '#f56565' : 'lime';
+    check.classList.toggle('boot-check--error', !!isError);
+  }
+}
+
+/** Yield to browser paint/input between heavy desk panels (Phase 2.3). */
+function yieldToMain() {
+  return new Promise((resolve) => {
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => setTimeout(resolve, 0));
+    } else {
+      setTimeout(resolve, 0);
+    }
+  });
+}
+
+const _deferredWorkKeys = new Map();
+
+/** Coalesce keyed deferred work onto the next macrotask. */
+function scheduleDeferredWork(key, fn) {
+  if (_deferredWorkKeys.has(key)) return;
+  const run = () => {
+    _deferredWorkKeys.delete(key);
+    try { fn(); } catch (err) { bootLog('warn', `deferred ${key} failed`, err); }
+  };
+  _deferredWorkKeys.set(key, run);
+  setTimeout(run, 0);
+}
+
+function scheduleHeavyPanelRefresh() {
+  scheduleDeferredWork('heavy_panels', () => {
+    if (typeof WTM_BasisWatch !== 'undefined') {
+      try {
+        WTM_BasisWatch.refresh(appState, {});
+      } catch (bwErr) {
+        bootLog('warn', 'BasisWatch.refresh deferred failed', bwErr);
+      }
+    }
+    if (typeof window.renderVisualizationDiagnostics === 'function') {
+      try { window.renderVisualizationDiagnostics(); } catch (_) { /* optional */ }
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.WHINFELL_SAFE_BOOT = SAFE_BOOT;
+  window.SAFE_BOOT = SAFE_BOOT;
+  window.DD_META_POLLING_ENABLED = DD_META_POLLING_ENABLED;
+  window.WTM_BOOT_VERBOSE = WTM_BOOT_VERBOSE;
+  window.WTM_yieldToMain = yieldToMain;
+  window.WTM_scheduleDeferred = scheduleDeferredWork;
+}
 const SQ3_WEIGHT_POLICY = 0.35;
 const SQ3_WEIGHT_STATE = 0.35;
 const SQ3_WEIGHT_GROWTH = 0.30;
@@ -140,6 +236,7 @@ const HORIZON_PARSE = { '1d': 'd1', '5d': 'd5', '20d': 'd20', '60d': 'd60', d1: 
 const MARK_PARSE = { up: 'up', '↑': 'up', confirming: 'up', flat: 'flat', '→': 'flat', neutral: 'flat', mixed: 'flat', down: 'down', '↓': 'down', impairing: 'down' };
 const TX_PARSE = {
   normal: 'normal', stressed: 'stressed', disorderly: 'disorderly', crisis: 'crisis',
+  elevated: 'elevated',
   'risk-on': 'normal', 'risk-off': 'disorderly', constructive: 'normal', compression: 'disorderly',
 };
 const POSTURE_PARSE = {
@@ -157,6 +254,7 @@ const DEFAULTS = {
 
 const TX_META = {
   normal: { label: 'Normal', chip: 'bg-emerald-500/15 text-wtm-green border-wtm-green' },
+  elevated: { label: 'Elevated', chip: 'bg-lime-500/15 text-lime-400 border-lime-400' },
   stressed: { label: 'Stressed', chip: 'bg-amber-500/15 text-wtm-amber border-wtm-amber' },
   disorderly: { label: 'Disorderly', chip: 'bg-orange-500/15 text-orange-400 border-orange-400' },
   crisis: { label: 'Crisis', chip: 'bg-red-500/15 text-wtm-red border-wtm-red' },
@@ -728,7 +826,10 @@ function renderPlainEnglishSummary(state, gate, health) {
   const gateHelper = el('gateHelperText');
   if (body) body.textContent = summary.paragraphs.join(' ');
   if (l3) l3.textContent = `${summary.l3Line} Next: ${l3Surface.code} · ${l3Surface.posture}.`;
-  if (gateHelper) gateHelper.textContent = gatePlainEnglishHelper(gate);
+  if (gateHelper) {
+    gateHelper.textContent = gatePlainEnglishHelper(gate);
+    syncMetaDisclosure(gateHelper);
+  }
   if (action) {
     action.textContent = summary.action.code;
     action.className = `plain-english-action ${summary.action.cls}`;
@@ -807,7 +908,16 @@ let preShockSnapshot = null;
 let compareSnapshotId = null;
 let scenarioLoop = { variants: [], lastResults: [] };
 
-function el(id) { return document.getElementById(id); }
+function el(id) {
+  const node = document.getElementById(id);
+  if (!node && WTM_BOOT_VERBOSE) bootLog('debug', `missing #${id}`);
+  return node;
+}
+
+function setElText(id, text) {
+  const node = el(id);
+  if (node) node.textContent = text;
+}
 
 function createEmptyHorizons() {
   const h = {};
@@ -1389,8 +1499,31 @@ function resolveImpairmentDriver(state, gate) {
   return '';
 }
 
+/** Chunk 05 — plain-English gate face (scan strip + command bar dominant value). */
+const GATE_STRIP_DISPLAY = Object.freeze({
+  blocked: 'No new BTC',
+  reduced: 'Reduced sizing',
+  open: 'Full access',
+  unknown: 'Not set',
+  tight: 'Reduced sizing',
+  allowed: 'Full access',
+});
+
+const GATE_STRIP_BANNER = Object.freeze({
+  BLOCKED: 'No new BTC',
+  'TIGHT RISK': 'Reduced sizing',
+  OPEN: 'Full access',
+  '—': 'Not set',
+});
+
 function gateStripTitle(gate) {
-  return gate.banner || (gate.displayLabel || gate.label || '—').toUpperCase();
+  if (!gate) return '—';
+  if (gate.chinaCaution && gate.displayLabel) return gate.displayLabel;
+  const code = gate.code || gate.key;
+  if (code && GATE_STRIP_DISPLAY[code]) return GATE_STRIP_DISPLAY[code];
+  const bannerKey = String(gate.banner || '').toUpperCase();
+  if (GATE_STRIP_BANNER[bannerKey]) return GATE_STRIP_BANNER[bannerKey];
+  return gate.displayLabel || gate.label || '—';
 }
 
 function gateExecChip(gate) {
@@ -2602,8 +2735,45 @@ function assessHydrationImportGuard(incoming, currentState) {
   };
 }
 
+function prepareHydrationBundle(raw) {
+  const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  if (!raw || typeof raw !== 'object') {
+    bootLog('warn', 'prepareHydrationBundle: invalid input', typeof raw);
+    return raw;
+  }
+  try {
+    const bundle = { ...raw };
+    for (const key of HYDRATION_LOAD_STRIP_KEYS) delete bundle[key];
+    if (bundle.task_force?.wtm_export_v21 && !bundle.wtm_export_v21) {
+      bundle.wtm_export_v21 = bundle.task_force.wtm_export_v21;
+      bootLog('debug', 'promoted task_force.wtm_export_v21');
+    }
+    const extractPanels = typeof window !== 'undefined' && window.WTM_TaskForceFeed?.extractTaskForcePanels;
+    if (bundle.task_force) {
+      if (extractPanels) {
+        const panels = extractPanels(bundle.task_force);
+        if (panels) bundle.task_force_panels = panels;
+      }
+      delete bundle.task_force;
+    }
+    if (bundle.hydration_audit && typeof bundle.hydration_audit === 'object') {
+      const audit = { ...bundle.hydration_audit };
+      delete audit.nodes;
+      bundle.hydration_audit = audit;
+    }
+    const elapsed = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
+    bootLog('debug', `prepareHydrationBundle ok ${elapsed.toFixed(1)}ms keys=${Object.keys(bundle).length}`);
+    return bundle;
+  } catch (err) {
+    bootLog('error', 'prepareHydrationBundle failed — using raw bundle', err);
+    return raw;
+  }
+}
+
 function hydrateFromBundle(bundle, options = {}) {
   if (!bundle || typeof bundle !== 'object') throw new Error('Invalid hydration bundle');
+  bootLog('info', 'hydrateFromBundle start', { force: !!options.force, keys: Object.keys(bundle).length });
+  bundle = prepareHydrationBundle(bundle);
 
   const guard = assessHydrationImportGuard(bundle, appState);
   if (!guard.allowed && !options.force) {
@@ -2614,12 +2784,15 @@ function hydrateFromBundle(bundle, options = {}) {
   const isHydration = bundle.hydration_version || bundle.source === 'parquet_hydration';
   const isPipeline = bundle.bundle_version && bundle.global;
 
-  if (bundle.wtm_export_v21) {
-    const parsed = parsePerplexityText(bundle.wtm_export_v21);
-    if (parsed.imported.length) {
-      delete parsed.fields.tracerHorizons;
-      delete parsed.fields.tracerSuggested;
-      applyImportFields(parsed.fields);
+  const wtmBlock = bundle.wtm_export_v21 || '';
+  const wtmIsTaskForce = /Source Channel:\s*task_force/i.test(wtmBlock);
+  let wtmParsed = null;
+  if (wtmBlock) {
+    wtmParsed = parsePerplexityText(wtmBlock);
+    if (wtmParsed.imported.length && !wtmIsTaskForce) {
+      delete wtmParsed.fields.tracerHorizons;
+      delete wtmParsed.fields.tracerSuggested;
+      applyImportFields(wtmParsed.fields);
     }
   }
 
@@ -2680,20 +2853,26 @@ function hydrateFromBundle(bundle, options = {}) {
   }
 
   const btcBias = exec.btc_bias || g.btc_bias || '';
-  if (btcBias) {
+  if (btcBias && !wtmIsTaskForce) {
     appState.research = { ...(appState.research || {}), btcBias };
   }
 
-  const score = parseInt(g.whinfell_score ?? el('whinfellScore').value, 10);
+  if (wtmIsTaskForce && wtmParsed?.imported.length) {
+    delete wtmParsed.fields.tracerHorizons;
+    delete wtmParsed.fields.tracerSuggested;
+    applyImportFields(wtmParsed.fields);
+  }
+
+  const score = parseInt(el('whinfellScore').value || g.whinfell_score, 10);
   applyPipelineGrossDefaults(score);
   syncHydratedSlicesFromDOM();
 
   applyProvenanceFields({
     snapshotId: bundle.snapshot_id || g.observation_id || '',
     lineageHash: bundle.lineage_hash || '',
-    validationStatus: bundle.validation_status || 'parsed',
+    validationStatus: wtmIsTaskForce ? 'complete' : (bundle.validation_status || 'parsed'),
     dataAsOf: bundle.as_of || g.as_of || null,
-    sourceChannel: isHydration ? 'parquet' : (bundle.source || 'pipeline'),
+    sourceChannel: wtmIsTaskForce ? 'task_force' : (isHydration ? 'parquet' : (bundle.source || 'pipeline')),
     freshnessStatus: bundle.freshness_status || computeFreshnessFromIso(bundle.as_of).status,
   }, { markHydrated: true });
 
@@ -2752,15 +2931,22 @@ function hydrateFromBundle(bundle, options = {}) {
   if (bundle.ai_compute) {
     appState.hydration.ai_compute = bundle.ai_compute;
   }
-  for (const key of ['corporate_credit', 'trade_tracker', 'btc_attribution', 'margin_rules']) {
+  for (const key of ['corporate_credit', 'trade_tracker', 'btc_attribution', 'margin_rules', 'task_force_panels']) {
     if (bundle[key]) appState.hydration[key] = bundle[key];
   }
 
-  renderAll();
+  try {
+    renderAll();
+  } catch (renderErr) {
+    bootLog('error', 'hydrateFromBundle renderAll failed', renderErr);
+    signalBootCheck('HYDRATE RENDER FALLBACK', true);
+    renderAllFallback(renderErr);
+  }
   markDirty();
   const label = isHydration ? 'Parquet hydration' : (isPipeline ? 'Pipeline bundle' : 'Hydration');
   const degradeNote = guard.downgrade && options.force ? ' · forced degraded import' : '';
   showToast(`${label} applied · ${bundle.freshness_status || 'freshness updated'}${degradeNote}`);
+  bootLog('info', 'hydrateFromBundle complete', { label, snapshot: bundle.snapshot_id });
   return true;
 }
 
@@ -2780,13 +2966,14 @@ function importHydrationFile(file, options = {}) {
 const DEPLOY_HYDRATION_URL = 'data/hydration/latest.json';
 
 async function tryAutoHydrateFromDeploy() {
+  if (SAFE_BOOT) return false;
   if (location.protocol === 'file:') return false;
   try {
     if (new URLSearchParams(location.search).get('auto_hydrate') === '0') return false;
   } catch (_) { /* ignore */ }
   if (appState.provenance?.hydratedAt && appState.hydration?.node_cockpits) return false;
   try {
-    const res = await fetch(`${DEPLOY_HYDRATION_URL}?_=${Date.now()}`);
+    const res = await fetch(DEPLOY_HYDRATION_URL, { cache: 'default' });
     if (!res.ok) return false;
     const bundle = await res.json();
     if (!bundle || bundle.validation_status === 'missing') return false;
@@ -3316,6 +3503,7 @@ function snapshotHealth(snap) {
 
 function renderSnapshotList() {
   const list = el('snapshotList');
+  if (!list) return;
   const snaps = appState.snapshots || [];
   if (!snaps.length) {
     list.innerHTML = '<span class="text-[9px] text-wtm-muted italic">No snapshots saved</span>';
@@ -3655,6 +3843,10 @@ function buildHydrationImportConfirmMessage(actionLabel) {
 }
 
 function maybePromptFirstHydrationImport(state) {
+  if (SAFE_BOOT) {
+    bootLog('info', 'safe_boot — hydration import prompt suppressed');
+    return;
+  }
   try {
     if (sessionStorage.getItem('whinfell_hydration_prompt_v1')) return;
     const assessment = assessHydrationSession(state);
@@ -3985,6 +4177,24 @@ function buildUiAuditPayload(state) {
   };
 }
 
+function resolveFlipchartRegimePill(metrics) {
+  const regime = String(metrics?.regime || '').toLowerCase();
+  if (/defensive|risk-off|compression|\bflat\b|fragile|no new/.test(regime)) {
+    return { label: 'Defensive', cls: 'regime-defensive' };
+  }
+  if (/crisis|stressed|impaired|disorderly/.test(regime)) {
+    return { label: 'Stressed', cls: 'regime-stressed' };
+  }
+  if (/constructive|risk-on|selective/.test(regime)) {
+    return { label: 'Constructive', cls: 'regime-constructive' };
+  }
+  const tx = String(metrics?.txState || '').toLowerCase();
+  if (/crisis|disorderly|stressed|elevated/.test(tx)) return { label: 'Stressed', cls: 'regime-stressed' };
+  if (/defensive/.test(tx)) return { label: 'Defensive', cls: 'regime-defensive' };
+  if (/normal|constructive/.test(tx)) return { label: 'Constructive', cls: 'regime-constructive' };
+  return { label: '—', cls: 'flipchart-regime-tag--unset' };
+}
+
 function renderFlipchartState() {
   const idx = nodeIndexById(activeNodeId());
   const row = idx >= 0 ? LADDER[idx] : null;
@@ -3992,10 +4202,23 @@ function renderFlipchartState() {
   const modeLabel = nav.focus_mode ? 'Focus' : nav.view_mode === 'compare' ? 'Compare' : 'Flipchart';
   const modeEl = el('flipchartMode');
   const titleEl = el('flipchartTitle');
+  const slideEl = el('flipchartSlideIndex');
   const posEl = el('flipchartPosition');
+  const regimeEl = el('flipchartRegimeTag');
   if (modeEl) modeEl.textContent = modeLabel;
   if (titleEl) titleEl.textContent = row?.short || '—';
+  const slideText = row ? `Slide ${idx + 1} of ${LADDER.length}` : '—';
+  if (slideEl) slideEl.textContent = slideText;
   if (posEl) posEl.textContent = row ? `${idx + 1} / ${LADDER.length}` : '—';
+  if (regimeEl) {
+    const domState = buildStateFromDOM();
+    const gate = deriveGate(domState);
+    const metrics = resolveCommandBarMetrics(domState, gate, domState.provenance || createEmptyProvenance());
+    const pill = resolveFlipchartRegimePill(metrics);
+    regimeEl.textContent = pill.label;
+    regimeEl.classList.remove('regime-constructive', 'regime-defensive', 'regime-stressed', 'flipchart-regime-tag--unset');
+    regimeEl.classList.add(pill.cls);
+  }
   const prevBtn = el('btnFlipPrev');
   const nextBtn = el('btnFlipNext');
   if (prevBtn) prevBtn.disabled = idx <= 0;
@@ -4109,13 +4332,38 @@ function renderMetricTips(state, gate, health, metrics) {
     `Freshness = pipeline bundle age (not market clock).\nNow: ${ageLine}\nMental math: ${freshMath}`);
 }
 
+function buildCommandBarKpiContext(state, gate, prov, metrics, health) {
+  const freshStatus = metrics.freshnessStatus || computeFreshnessFromIso(metrics.dataAsOf).status;
+  const tx = metrics.txState;
+  return {
+    state,
+    gate,
+    prov,
+    metrics,
+    health,
+    zone: metrics.scoreZone || gate.zone,
+    freshStatus,
+    freshLabel: metrics.freshnessLabel || freshnessLabelFromStatus(freshStatus),
+    sq3Key: metrics.sq3Score != null ? sq3BandKey(metrics.sq3Band) : 'unknown',
+    gateTitle: gateStripTitle(gate),
+    txLabel: tx && TX_META[tx] ? TX_META[tx].label : (tx || null),
+    shockLabel: state.tracer?.activeShock && SHOCKS[state.tracer.activeShock],
+    helpers: {
+      freshnessChipCls,
+      freshnessDotCls,
+      sq3ChipCls,
+    },
+  };
+}
+
 function renderCommandBar(state, gate) {
   const prov = state.provenance || createEmptyProvenance();
   const metrics = resolveCommandBarMetrics(state, gate, prov);
   const health = computeHealthScore(state);
   renderMetricTips(state, gate, health, metrics);
   const zone = metrics.scoreZone || gate.zone;
-  const sq3Key = metrics.sq3Score != null ? sq3BandKey(metrics.sq3Band) : 'unknown';
+  const kpiCtx = buildCommandBarKpiContext(state, gate, prov, metrics, health);
+  const freshStatus = kpiCtx.freshStatus;
 
   const cmdBar = el('commandBar');
   cmdBar.className = `shrink-0 border-b border-wtm-border bg-wtm-surface transition-all px-4 py-2 ${metrics.gateGlow || gate.glow}`;
@@ -4127,36 +4375,21 @@ function renderCommandBar(state, gate) {
     else if (zone.key === 'red') scoreCard.classList.add('zone-red');
   }
 
-  el('cmdWhinfellScore').textContent = metrics.whinfellScore == null || Number.isNaN(metrics.whinfellScore) ? '—' : String(metrics.whinfellScore);
-  el('cmdScoreZone').textContent = zone.text;
-  el('cmdScoreZone').className = `meta ${zone.key === 'green' ? 'green' : zone.key === 'amber' ? 'amber' : zone.key === 'red' ? 'red' : ''}`;
+  if (typeof WTM_ScanKpiStrip !== 'undefined') {
+    WTM_ScanKpiStrip.renderStrip(kpiCtx);
+  }
 
-  el('txHealthValue').textContent = Number.isNaN(health.score) ? '—' : String(health.score);
-  el('txHealthMeta').textContent = health.label && health.weakestStage
-    ? `${health.label} · Weakest: ${health.weakestStage}`
-    : '—';
+  if (typeof WTM_CommandBarKpis !== 'undefined') {
+    WTM_CommandBarKpis.renderAll(kpiCtx, el);
+  }
 
   const tx = metrics.txState;
   el('cmdTxState').textContent = tx && TX_META[tx] ? TX_META[tx].label : (tx || '—');
   el('cmdRegime').textContent = metrics.regime ? `Regime: ${metrics.regime}` : '—';
 
-  el('cmdSq3Score').textContent = metrics.sq3Score != null ? `SQ3 policy ${metrics.sq3Score}` : 'SQ3 policy —';
-  el('cmdSq3Band').textContent = metrics.sq3Band ? `policy ${metrics.sq3Band}` : '—';
-  el('cmdSq3Band').className = `text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${sq3ChipCls(sq3Key)}`;
-
   el('cmdGateSub').textContent = metrics.gateSub || gate.bannerSub || '—';
   paintGate(state, gate);
 
-  const shockLabel = state.tracer?.activeShock && SHOCKS[state.tracer.activeShock];
-  el('shockText').textContent = shockLabel ? shockLabel.label : 'No active shock';
-  el('shockMeta').textContent = shockLabel ? 'Active shock scenario' : 'Baseline regime';
-
-  el('cmdGrossRisk').textContent = metrics.grossRiskPct != null ? `${Number(metrics.grossRiskPct).toFixed(1)}% gross` : '—';
-  el('cmdGrossPosture').textContent = metrics.grossPosture ? `· ${metrics.grossPosture}` : '—';
-
-  const freshStatus = metrics.freshnessStatus || computeFreshnessFromIso(metrics.dataAsOf).status;
-  el('cmdFreshness').textContent = metrics.freshnessLabel || freshnessLabelFromStatus(freshStatus);
-  el('cmdFreshness').className = freshnessChipCls(freshStatus);
   const dot = el('cmdFreshnessDot');
   dot.className = freshnessDotCls(freshStatus);
   const headerDot = el('headerFreshnessDot');
@@ -4166,15 +4399,14 @@ function renderCommandBar(state, gate) {
     const freshLabel = metrics.freshnessLabel || freshnessLabelFromStatus(freshStatus);
     headerFresh.innerHTML = `<span class="${freshnessChipCls(freshStatus)}">${escapeHtml(freshLabel)}</span>`;
   }
-  el('cmdFreshnessMeta').textContent = metrics.dataAsOf ? new Date(metrics.dataAsOf).toLocaleString() : 'No pipeline timestamp';
-  el('cmdFreshnessMeta').title = metrics.snapshotId ? `Snapshot: ${metrics.snapshotId}` : (metrics.dataAsOf ? String(metrics.dataAsOf) : '');
   const regimeLine = el('headerRegimeLine');
+  const regimeSub = el('headerRegimeSub');
+  const regimeCluster = el('headerRegimeCluster');
   if (regimeLine) {
     regimeLine.textContent = metrics.regime
       ? `${metrics.regime}`
       : 'Regime pending';
   }
-  const regimeSub = el('headerRegimeSub');
   if (regimeSub) {
     const txLabel = metrics.txState && TX_META[metrics.txState] ? TX_META[metrics.txState].label : (metrics.txState || '—');
     const sq3 = metrics.sq3Score != null ? `SQ3 ${metrics.sq3Score}` : 'SQ3 —';
@@ -4183,11 +4415,16 @@ function renderCommandBar(state, gate) {
     const driverChip = driver
       ? ` <span class="impairment-driver-chip" title="Primary impairment driver in Both view">Driver: ${escapeHtml(driver)}</span>`
       : '';
+    const subText = `${txLabel} transmission · ${sq3} · ${band}${driver ? ` · Driver: ${driver}` : ''}`;
     regimeSub.innerHTML = `${escapeHtml(txLabel)} transmission · ${escapeHtml(String(sq3))} · ${escapeHtml(band)}${driverChip}`;
+    regimeSub.classList.toggle('console-regime-sub--placeholder', !metrics.regime && !metrics.txState);
+    if (regimeLine) regimeLine.title = subText;
+    if (regimeCluster) regimeCluster.classList.toggle('console-regime-cluster--populated', Boolean(metrics.regime || metrics.txState));
   }
   const subCluster = el('cmdFreshnessSubCluster');
   if (subCluster) {
     subCluster.innerHTML = renderFreshnessSubClusterHtml(buildFreshnessSubCluster(state));
+    syncFreshnessSubDisclosure(subCluster);
   }
 
   const badge = el('cmdHydrationBadge');
@@ -4291,6 +4528,20 @@ function renderDataDictionaryBadge(forceRefresh) {
   const badge = el('ddVersionBadge');
   if (!badge) return;
   const badgeDefault = getDictionaryBadgeDefault();
+  if (!DD_META_POLLING_ENABLED || SAFE_BOOT) {
+    if (badgeDefault.version && badgeDefault.status && badgeDefault.alignment) {
+      applyDataDictionaryBadge(
+        { ...badgeDefault, source: badgeDefault.source || MASTER_DATA_DICTIONARY_META_URL },
+        false,
+      );
+    } else if (ddMetaCache) {
+      applyDataDictionaryBadge(ddMetaCache, validateDataDictionaryMeta(ddMetaCache));
+    } else {
+      badge.textContent = 'Dictionary meta static';
+      badge.title = `Dictionary badge — meta polling disabled (${MASTER_DATA_DICTIONARY_META_URL})`;
+    }
+    return;
+  }
   if (!ddMetaCache || forceRefresh) {
     badge.textContent = badgeDefault.loadingLabel || 'Loading dictionary…';
   }
@@ -4868,6 +5119,28 @@ function resolveMissionGateChipLabel(gate) {
   return humanizeValue(gate?.displayLabel || gate?.label || 'Open');
 }
 
+function missionReadShortLead(fullLead) {
+  if (!fullLead || fullLead === '—') return '—';
+  const idx = fullLead.indexOf(';');
+  return idx > 0 ? fullLead.slice(0, idx).trim() : fullLead;
+}
+
+function syncMetaDisclosure(metaEl) {
+  if (!metaEl?.closest) return;
+  const disclosure = metaEl.closest('.cmd-meta-disclosure');
+  if (!disclosure?.classList) return;
+  const text = (metaEl.textContent || '').trim();
+  disclosure.classList.toggle('cmd-meta-disclosure--empty', !text || text === '—');
+}
+
+function syncFreshnessSubDisclosure(clusterEl) {
+  if (!clusterEl?.closest) return;
+  const disclosure = clusterEl.closest('.cmd-freshness-disclosure');
+  if (!disclosure?.classList) return;
+  const text = (clusterEl.textContent || '').trim();
+  disclosure.classList.toggle('cmd-freshness-disclosure--empty', !text);
+}
+
 function buildMissionTacticalLead(cockpit, hz, series, gate, health) {
   const config = missionNodeConfig(cockpit.node_id) || MISSION_NODE_CONFIG.basis;
   const seriesLabel = series?.label || config.defaultSeriesLabel;
@@ -4911,8 +5184,10 @@ function buildBasisTacticalSentence(cockpit, hz, series, gate, health) {
 
 function renderMissionTacticalBanner(cockpit, hz, series, state, gate) {
   const banner = el('basisTacticalBanner');
+  const leadEl = el('basisTacticalLead');
   const sentence = el('basisTacticalSentence');
   const suffixEl = el('basisTacticalSuffix');
+  const disclosure = el('basisTacticalDisclosure');
   const eyebrow = banner?.querySelector('.basis-tactical-eyebrow');
   const config = missionNodeConfig(cockpit.node_id);
   if (!banner || !sentence) return;
@@ -4924,8 +5199,10 @@ function renderMissionTacticalBanner(cockpit, hz, series, state, gate) {
   }
 
   const health = computeHealthScore(state);
+  const fullLead = buildMissionTacticalLead(cockpit, hz, series, gate, health);
   if (eyebrow) eyebrow.textContent = config.eyebrow;
-  sentence.textContent = buildMissionTacticalLead(cockpit, hz, series, gate, health);
+  if (leadEl) leadEl.textContent = missionReadShortLead(fullLead);
+  sentence.textContent = fullLead;
   const suffix = buildMissionChinaSuffix(cockpit, state, gate);
   if (suffixEl) {
     if (suffix) {
@@ -4936,6 +5213,7 @@ function renderMissionTacticalBanner(cockpit, hz, series, state, gate) {
       suffixEl.classList.add('zone-hidden');
     }
   }
+  if (disclosure?.removeAttribute) disclosure.removeAttribute('open');
   banner.classList.remove('zone-hidden');
   banner.classList.toggle('basis-tactical-banner--blocked', !!(gate?.blocked || cockpit.relative_value?.blocked));
   banner.classList.toggle('basis-tactical-banner--tight', !!(gate?.tight && !gate?.blocked));
@@ -6331,13 +6609,38 @@ function handleCockpitKeyboard(e) {
   }
 }
 
-function renderAll() {
-  renderDataDictionaryBadge(true);
+let _renderDepth = 0;
+
+/** Minimal desk paint when full renderAll throws (safe_boot / hydration import recovery). */
+function renderAllFallback(err) {
+  bootLog('warn', 'renderAllFallback', err?.message || err);
+  let state;
+  let gate;
+  try {
+    state = buildStateFromDOM();
+    gate = deriveGate(state);
+  } catch (stateErr) {
+    bootLog('error', 'renderAllFallback state build failed', stateErr);
+    setElText('headerRegimeLine', 'Whinfell Transmission Control — boot fallback');
+    setElText('hydrationImportStatus', 'Render fallback — check console (?boot_log=1)');
+    signalBootCheck('RENDER FALLBACK', true);
+    return;
+  }
+  try { renderCommandBar(state, gate); } catch (_) { /* partial */ }
+  try { renderHydrationImportStatus(state); } catch (_) { /* partial */ }
+  try { renderDataDictionaryBadge(false); } catch (_) { /* partial */ }
+  setElText('sq3ComputedDisplay', gate.sq3Result ? String(gate.sq3Score) : '—');
+  const tcBuildBadge = el('tcConsoleBuildBadge');
+  if (tcBuildBadge) tcBuildBadge.textContent = TC_CONSOLE_BUILD;
+  signalBootCheck('RENDER FALLBACK', true);
+}
+
+function renderAllCore() {
+  renderDataDictionaryBadge(false);
   const state = buildStateFromDOM();
   const gate = deriveGate(state);
   const zone = gate.zone;
   const health = computeHealthScore(state);
-  const total = deriveGrossTotal(state);
   const sq3Key = gate.sq3Result ? sq3BandKey(gate.sq3Band) : 'unknown';
 
   renderCommandBar(state, gate);
@@ -6346,25 +6649,38 @@ function renderAll() {
   renderPostImportWorkflowStrip(state);
   renderSessionReadyChip(state);
 
-  el('sq3ComputedDisplay').textContent = gate.sq3Result ? String(gate.sq3Score) : '—';
-  el('sq3BandChip').textContent = gate.sq3Result ? gate.sq3Band : '—';
-  el('sq3BandChip').className = `text-[8px] font-bold uppercase px-1.5 py-0.5 rounded border ${sq3ChipCls(sq3Key)}`;
+  setElText('sq3ComputedDisplay', gate.sq3Result ? String(gate.sq3Score) : '—');
+  const sq3BandChip = el('sq3BandChip');
+  if (sq3BandChip) {
+    sq3BandChip.textContent = gate.sq3Result ? gate.sq3Band : '—';
+    sq3BandChip.className = `text-[8px] font-bold uppercase px-1.5 py-0.5 rounded border ${sq3ChipCls(sq3Key)}`;
+  }
 
-  el('gateExplainList').innerHTML = gate.explanations.map(e => `<li>${e}</li>`).join('');
-  el('gateUnlockList').innerHTML = gate.unlock.map(u => `<li>${u}</li>`).join('');
-  el('gateHealthSub').textContent = `Transmission Health: ${health.score} (${health.label}) · Weakest: ${health.weakestStage}`;
-  el('gateDetailPanel').classList.toggle('hidden', !appState.ui?.gateDetailOpen);
+  const gateExplainList = el('gateExplainList');
+  if (gateExplainList) gateExplainList.innerHTML = gate.explanations.map(e => `<li>${e}</li>`).join('');
+  const gateUnlockList = el('gateUnlockList');
+  if (gateUnlockList) gateUnlockList.innerHTML = gate.unlock.map(u => `<li>${u}</li>`).join('');
+  setElText('gateHealthSub', `Transmission Health: ${health.score} (${health.label}) · Weakest: ${health.weakestStage}`);
+  el('gateDetailPanel')?.classList.toggle('hidden', !appState.ui?.gateDetailOpen);
 
-  el('scoreZoneChip').textContent = zone.text;
-  el('scoreZoneChip').className = `text-[9px] font-bold uppercase px-2 py-2 rounded border self-center ${zone.key === 'green' ? 'border-wtm-green text-wtm-green bg-emerald-500/10' : zone.key === 'amber' ? 'border-wtm-amber text-wtm-amber bg-amber-500/10' : zone.key === 'red' ? 'border-wtm-red text-wtm-red bg-red-500/10' : 'border-wtm-border text-wtm-muted'}`;
+  const scoreZoneChip = el('scoreZoneChip');
+  if (scoreZoneChip) {
+    scoreZoneChip.textContent = zone.text;
+    scoreZoneChip.className = `text-[9px] font-bold uppercase px-2 py-2 rounded border self-center ${zone.key === 'green' ? 'border-wtm-green text-wtm-green bg-emerald-500/10' : zone.key === 'amber' ? 'border-wtm-amber text-wtm-amber bg-amber-500/10' : zone.key === 'red' ? 'border-wtm-red text-wtm-red bg-red-500/10' : 'border-wtm-border text-wtm-muted'}`;
+  }
 
-  el('gateStatusChip').textContent = gate.displayLabel || gate.label;
-  el('gateStatusChip').className = `mt-1 min-h-[34px] flex items-center justify-center rounded-md border text-xs font-extrabold uppercase ${gate.chipCls}`;
+  const gateStatusChip = el('gateStatusChip');
+  if (gateStatusChip) {
+    gateStatusChip.textContent = gate.displayLabel || gate.label;
+    gateStatusChip.className = `mt-1 min-h-[34px] flex items-center justify-center rounded-md border text-xs font-extrabold uppercase ${gate.chipCls}`;
+  }
 
   const tx = state.intake.transmissionState;
   const tc = el('txChip');
-  if (tx && TX_META[tx]) { tc.textContent = TX_META[tx].label; tc.className = `text-[9px] font-bold uppercase px-2 py-2 rounded border shrink-0 self-center ${TX_META[tx].chip}`; }
-  else { tc.textContent = '—'; tc.className = 'text-[9px] font-bold uppercase px-2 py-2 rounded border border-wtm-border text-wtm-muted shrink-0 self-center'; }
+  if (tc) {
+    if (tx && TX_META[tx]) { tc.textContent = TX_META[tx].label; tc.className = `text-[9px] font-bold uppercase px-2 py-2 rounded border shrink-0 self-center ${TX_META[tx].chip}`; }
+    else { tc.textContent = '—'; tc.className = 'text-[9px] font-bold uppercase px-2 py-2 rounded border border-wtm-border text-wtm-muted shrink-0 self-center'; }
+  }
 
   renderExecutionStatus(gate, state);
   renderOperatorPanel(state, gate);
@@ -6372,16 +6688,19 @@ function renderAll() {
   renderWhyExplanations(state, gate, health);
   [['cardBtcOptions','chipL2','noteL2'],['cardBtcCalendar','chipL3','noteL3']].forEach(([c]) => {
     const card = el(c);
+    if (!card) return;
     card.classList.remove('border-l-wtm-border','border-l-wtm-red','border-l-wtm-amber','border-l-wtm-green','card-blocked');
     card.classList.add(gate.borderAccent);
     card.classList.toggle('card-blocked', gate.blocked);
   });
 
-  el('btnCopyL2').disabled = gate.blocked;
-  el('btnCopyL3').disabled = gate.blocked;
+  const btnCopyL2 = el('btnCopyL2');
+  const btnCopyL3 = el('btnCopyL3');
+  if (btnCopyL2) btnCopyL2.disabled = gate.blocked;
+  if (btnCopyL3) btnCopyL3.disabled = gate.blocked;
 
-  el('urlDisplayKoyfin').textContent = state.urls.koyfin?.trim() || 'No URL saved';
-  el('urlDisplayBarchart').textContent = state.urls.barchart?.trim() || 'No URL saved';
+  setElText('urlDisplayKoyfin', state.urls.koyfin?.trim() || 'No URL saved');
+  setElText('urlDisplayBarchart', state.urls.barchart?.trim() || 'No URL saved');
   syncHeaderSourceLinks(state);
 
   updateGrossDisplay(state, gate);
@@ -6390,13 +6709,37 @@ function renderAll() {
   renderSuggestedTracerPanel();
   renderTracerFlowChrome();
   renderTracerVisual();
-  renderNodeCockpitShell(state);
-  if (typeof WTM_BasisWatch !== 'undefined') {
-    WTM_BasisWatch.refresh(appState, { renderAll });
+  try {
+    renderNodeCockpitShell(state);
+  } catch (cockpitErr) {
+    bootLog('warn', 'renderNodeCockpitShell failed — cockpit zone may be blank', cockpitErr);
   }
-  if (typeof window.renderVisualizationDiagnostics === 'function') {
-    window.renderVisualizationDiagnostics();
+  // Defer BasisWatch + viz diagnostics — keeps command bar / cockpit responsive.
+  scheduleHeavyPanelRefresh();
+}
+
+function renderAll() {
+  if (_renderDepth > 3) {
+    bootLog('warn', 'renderAll recursion capped');
+    return;
   }
+  _renderDepth += 1;
+  const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  try {
+    renderAllCore();
+    const elapsed = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
+    bootLog('debug', `renderAll ok ${elapsed.toFixed(1)}ms`);
+  } catch (err) {
+    console.error('[WTM] renderAll failed', err);
+    signalBootCheck('RENDER ERROR: ' + (err.message || String(err)), true);
+    renderAllFallback(err);
+  } finally {
+    _renderDepth -= 1;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.renderAll = renderAll;
 }
 
 function applyShock(shockId, skipSnapshot) {
@@ -6654,11 +6997,11 @@ el('btnToggleGateDetail').onclick = () => {
 document.querySelectorAll('.track-toggle').forEach(btn => {
   btn.onclick = () => { applyTrackView(btn.dataset.track); markDirty(); };
 });
-el('btnWorkspaceToggle').onclick = () => {
+el('btnWorkspaceToggle')?.addEventListener('click', () => {
   const next = appState.ui?.workspaceView === 'cockpit' ? 'legacy' : 'cockpit';
   applyWorkspaceView(next);
   markDirty();
-};
+});
 el('btnDeskDocs')?.addEventListener('click', () => openDeskDocsPanel());
 el('btnCloseDeskDocs')?.addEventListener('click', () => setDeskDocsOpen(false));
 el('deskDocsBackdrop')?.addEventListener('click', () => setDeskDocsOpen(false));
@@ -6684,43 +7027,106 @@ el('btnShortcutHelp')?.addEventListener('click', () => {
 });
 document.addEventListener('keydown', handleCockpitKeyboard);
 
-const tcBuildBadge = el('tcConsoleBuildBadge');
-if (tcBuildBadge) tcBuildBadge.textContent = TC_CONSOLE_BUILD;
-renderDeskDocsPanel();
-renderPrompts();
-renderShockStageChecks();
-renderTracerHorizonTable();
-initScenarioLoop();
-applyStateToDOM(loadState());
-if (!appState.provenance?.hydratedAt || !appState.hydration?.node_cockpits) {
-  appState.ui = appState.ui || createEmptyState().ui;
-  appState.ui.hydrationBannerDismissed = false;
-}
-applyWorkspaceView(appState.ui?.workspaceView || 'cockpit');
-applyTrackView(appState.ui?.trackView || 'both');
-if (typeof WTM_BasisWatch !== 'undefined') {
-  WTM_BasisWatch.init({ getState: () => appState, renderAll });
+async function runBootSequence() {
+  window.__WTM_CORE_READY = false;
+  window.__WTM_BOOT_COMPLETE = false;
+  window.__WTM_BOOT_FAILED = false;
+  signalBootCheck('BOOT: wiring…');
+  bootLog('info', `runBootSequence safe_boot=${SAFE_BOOT} verbose=${WTM_BOOT_VERBOSE}`);
+
+  try {
+    const tcBuildBadge = el('tcConsoleBuildBadge');
+    if (tcBuildBadge) tcBuildBadge.textContent = TC_CONSOLE_BUILD;
+
+    bootLog('info', 'phase=panels');
+    renderDeskDocsPanel();
+    renderPrompts();
+    renderShockStageChecks();
+    renderTracerHorizonTable();
+    initScenarioLoop();
+
+    bootLog('info', 'phase=state');
+    applyStateToDOM(loadState());
+    if (!appState.provenance?.hydratedAt || !appState.hydration?.node_cockpits) {
+      appState.ui = appState.ui || createEmptyState().ui;
+      appState.ui.hydrationBannerDismissed = false;
+    }
+
+    bootLog('info', 'phase=workspace');
+    applyWorkspaceView(appState.ui?.workspaceView || 'cockpit');
+    applyTrackView(appState.ui?.trackView || 'both');
+
+    window.__WTM_CORE_READY = true;
+    window.renderAll = renderAll;
+
+    bootLog('info', 'phase=basis_watch');
+    if (typeof WTM_BasisWatch !== 'undefined') {
+      try {
+        WTM_BasisWatch.init({ getState: () => appState, renderAll });
+      } catch (bwErr) {
+        bootLog('warn', 'BasisWatch.init skipped', bwErr);
+      }
+    }
+
+    bootLog('info', 'phase=hydrate');
+    let hydrated = false;
+    if (!SAFE_BOOT) {
+      try {
+        hydrated = await tryAutoHydrateFromDeploy();
+      } catch (hErr) {
+        bootLog('warn', 'auto-hydrate error', hErr);
+      }
+    } else {
+      bootLog('info', 'safe_boot — auto-hydrate skipped');
+    }
+
+    bootLog('info', `phase=render hydrated=${hydrated}`);
+    renderAll();
+
+    window.__WTM_BOOTED = true;
+    window.__WTM_BOOT_COMPLETE = true;
+    signalBootCheck('RENDER SUCCESS');
+    bootLog('info', 'boot complete');
+
+    // Post-boot prompts + secondary lists after first paint (dialog stays responsive).
+    scheduleDeferredWork('boot_finish', async () => {
+      await yieldToMain();
+      maybePromptFirstHydrationImport(buildStateFromDOM());
+      if (scenarioLoop.variants[0]) {
+        const s = buildStateFromDOM();
+        scenarioLoop.variants[0].whinfellScore = s.intake.whinfellScore;
+        scenarioLoop.variants[0].transmissionState = s.intake.transmissionState;
+        scenarioLoop.variants[0].regimeTag = s.intake.regimeTag;
+        renderScenarioColumns();
+      }
+      renderSnapshotList();
+    });
+  } catch (bootErr) {
+    window.__WTM_BOOT_FAILED = true;
+    bootLog('error', 'runBootSequence failed', bootErr);
+    signalBootCheck('BOOT ERROR: ' + (bootErr.message || String(bootErr)), true);
+    try { renderAllFallback(bootErr); } catch (_) { /* last resort */ }
+  }
 }
 
-tryAutoHydrateFromDeploy().finally(() => {
-  if (typeof WTM_BasisWatch !== 'undefined') WTM_BasisWatch.refresh(appState, { renderAll });
-  renderAll();
-  maybePromptFirstHydrationImport(buildStateFromDOM());
-  if (scenarioLoop.variants[0]) {
-    const s = buildStateFromDOM();
-    scenarioLoop.variants[0].whinfellScore = s.intake.whinfellScore;
-    scenarioLoop.variants[0].transmissionState = s.intake.transmissionState;
-    scenarioLoop.variants[0].regimeTag = s.intake.regimeTag;
-    renderScenarioColumns();
+runBootSequence();
+
+function ensureCockpitMissionView() {
+  appState.navigation = appState.navigation || createEmptyNavigation();
+  appState.navigation.focus_mode = false;
+  appState.navigation.focus_node_id = null;
+  if (appState.navigation.view_mode === 'compare') {
+    appState.navigation.view_mode = 'flip';
+    appState.navigation.compare_node_ids = [];
   }
-  renderSnapshotList();
-});
+}
 
 function runMissionSurfaceProbe(nodeId, bundle, options = {}) {
   if (!bundle || typeof bundle !== 'object') {
     return { error: 'bundle required' };
   }
   hydrateFromBundle(bundle);
+  ensureCockpitMissionView();
   if (options.chinaInputs) {
     if (el('chinaPolicyStrength')) el('chinaPolicyStrength').value = String(options.chinaInputs.policy ?? '50');
     if (el('chinaStateImpulse')) el('chinaStateImpulse').value = String(options.chinaInputs.state ?? '0');
@@ -6753,6 +7159,8 @@ function runMissionSurfaceProbe(nodeId, bundle, options = {}) {
     missionVisible: !el('basisTacticalBanner')?.classList.contains('zone-hidden'),
   };
 }
+
+window.runMissionSurfaceProbe = runMissionSurfaceProbe;
 
 window.__creditMissionProbe = function creditMissionProbe(bundle) {
   return runMissionSurfaceProbe('credit', bundle, {
@@ -6806,11 +7214,32 @@ window.__uiAuditProbe = function uiAuditProbe(bundle) {
   };
 };
 
+window.__testExports = {
+  resolveRvHorizonValueFallback,
+  buildRvHorizonEvidenceMarkup,
+  prepareHydrationBundle,
+  resolveSafeBoot,
+  renderAll,
+  renderAllCore,
+  renderAllFallback,
+  runBootSequence,
+  bootLog,
+  yieldToMain,
+  scheduleDeferredWork,
+  scheduleHeavyPanelRefresh,
+  renderCommandBar,
+  buildCommandBarKpiContext,
+  SAFE_BOOT,
+  DD_META_POLLING_ENABLED,
+};
+
 window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId = 'credit') {
   if (!bundle || typeof bundle !== 'object') return { error: 'bundle required' };
   hydrateFromBundle(bundle);
   appState.ui = appState.ui || createEmptyState().ui;
   appState.ui.workspaceView = 'cockpit';
+  const prevFocus = appState.navigation?.focus_mode;
+  const prevFocusNode = appState.navigation?.focus_node_id;
   setActiveNode(nodeId);
   toggleFocusMode(true);
   renderNodeCockpitShell(buildStateFromDOM());
@@ -6820,25 +7249,31 @@ window.__rvHorizonEvidenceProbe = function rvHorizonEvidenceProbe(bundle, nodeId
   const series = seriesId ? seriesMap[seriesId] : null;
   const markup = buildRvHorizonEvidenceMarkup(cockpit, series);
   const focusHtml = el('cockpitFocusLayer')?.innerHTML || '';
-  const valueMatches = focusHtml.match(/339\.2 bps/g) || [];
-  return {
+  const spotFormatted = markup.fallback?.mode === 'spot' && Number.isFinite(markup.fallback.spotValue)
+    ? formatChartValue(markup.fallback.spotValue, markup.fallback.unit)
+    : null;
+  const spotValueRepeatCount = spotFormatted
+    ? (focusHtml.split(spotFormatted).length - 1)
+    : 0;
+  const result = {
     nodeId,
     fallbackMode: markup.fallback?.mode || 'none',
+    spotFormatted,
     spotFallbackTable: focusHtml.includes('focus-horizon-table--spot-fallback'),
-    spotValueRepeatCount: valueMatches.length,
+    spotValueRepeatCount,
     hasSpotNote: /Single spot reading/i.test(focusHtml),
     primaryHorizon: markup.fallback?.primaryHorizon || null,
     focusHtml,
   };
+  if (prevFocus) {
+    appState.navigation = appState.navigation || createEmptyNavigation();
+    appState.navigation.focus_mode = true;
+    appState.navigation.focus_node_id = prevFocusNode || nodeId;
+  } else {
+    ensureCockpitMissionView();
+    renderNodeCockpitShell(buildStateFromDOM());
+  }
+  return result;
 };
 
-// Boot confirmation (disaggregated build)
-window.__WTM_BOOTED = true;
-(function () {
-  const check = document.getElementById('js-boot-check');
-  if (check) {
-    check.textContent = 'RENDER SUCCESS';
-    check.style.color = 'lime';
-  }
-  console.log('%c[Whinfell TC] Core init complete', 'color:lime;font-weight:bold');
-})();
+console.log('%c[Whinfell TC] Core parsed — boot sequence async', 'color:lime;font-weight:bold');

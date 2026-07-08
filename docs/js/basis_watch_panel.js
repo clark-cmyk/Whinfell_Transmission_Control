@@ -68,18 +68,56 @@
   let curveCache = null;
   let curveFetchPromise = null;
   let standaloneState = null;
+  let _refreshGen = 0;
+  let _refreshLoop = null;
+  let _pendingRefresh = null;
   const isStandalone = () => document.body?.dataset?.bwLayout === 'standalone';
 
+  function yieldToMain() {
+    if (typeof global.WTM_yieldToMain === 'function') return global.WTM_yieldToMain();
+    return new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => setTimeout(resolve, 0));
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+  }
+
   function el(id) { return document.getElementById(id); }
+
+  function unavailSpan(kind = 'awaiting') {
+    return kind === 'na'
+      ? '<span class="bw-unavail bw-unavail--na">N/A</span>'
+      : '<span class="bw-unavail bw-unavail--awaiting">Awaiting</span>';
+  }
 
   function fmtNum(n, d = 2) {
     if (n == null || !Number.isFinite(n)) return '—';
     return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
   }
 
+  function fmtNumDisplay(n, d = 2, kind = 'awaiting') {
+    if (n == null || !Number.isFinite(n)) return unavailSpan(kind);
+    return fmtNum(n, d);
+  }
+
   function fmtPct(n, d = 2) {
     if (n == null || !Number.isFinite(n)) return '—';
     return `${fmtNum(n, d)}%`;
+  }
+
+  function fmtPctDisplay(n, d = 2, kind = 'awaiting') {
+    if (n == null || !Number.isFinite(n)) return unavailSpan(kind);
+    return fmtPct(n, d);
+  }
+
+  function renderBasisNullState() {
+    return `<div class="bw-null-card" role="status">
+      <p class="bw-null-card__title">No futures curve loaded</p>
+      <p class="bw-null-card__detail">Curve data publishes after the daily hydration chain completes and Barchart desk preview is available.</p>
+      <button type="button" class="bw-btn bw-btn--primary bw-null-card__action" data-bw-null-action="refresh">Refresh curve</button>
+    </div>`;
   }
 
   function parseCmeSymbol(sym) {
@@ -125,7 +163,7 @@
     const cls = A()?.quartileHeatClass(q) || 'bw-quartile--na';
     const text = Number.isFinite(q)
       ? (label ? `Q${q} · ${label}` : `Q${q}`)
-      : '—';
+      : unavailSpan('na');
     return `<span class="bw-quartile ${cls}">${text}</span>`;
   }
 
@@ -230,8 +268,11 @@
     if (credit?.quartile === 4) text += '; credit beta via HYG/LQD is <strong>rich (Q4)</strong>';
     if (cheapPeers.length) text += `; ${cheapPeers.join(', ')} screen <strong>cheap vs history</strong>`;
     if (richPeers.length) text += `; ${richPeers.join(', ')} screen <strong>rich vs history</strong>`;
-    text += '. Use for relative carry context — not prop size-up without gate confirmation.';
-    return text;
+    text += '.';
+    return {
+      guidance: text,
+      support: 'Use for relative carry context — not prop size-up without gate confirmation.',
+    };
   }
 
   function shapeBadgeClass(shape) {
@@ -278,7 +319,9 @@
 
   function applyTheme(theme) {
     const next = theme === 'light' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
+    if (document.documentElement?.setAttribute) {
+      document.documentElement.setAttribute('data-theme', next);
+    }
     const btn = el('btnBwTheme');
     if (btn) {
       const label = btn.querySelector('.bw-theme-label');
@@ -520,6 +563,11 @@
 
     const frontCalendar = calendarPairs[0] || null;
 
+    const taskForceBasis = global.WTM_TaskForceFeed?.basisWatchFeed?.(state.hydration) || null;
+    const deskRead = buildCrossAssetInterpretation({
+      assetKey, front, crossPeers, steepest, flattest,
+    });
+
     return {
       assetKey, asset, spot, spotChg: Number.isFinite(spotChg) ? spotChg : null, asOf,
       contracts, front, calendarPairs, forwards: calendarPairs,
@@ -529,9 +577,9 @@
       rollLabel: rollStateLabel(contracts, front), dataNote,
       refMid: Number(state.hydration?.global?.basis_spread || state.hydration?.execution?.basis_spread || state.hydration?.execution?.ref_mid) || null,
       mode: prefs.mode || 'live', view: prefs.view || 'basis',
-      interpretation: buildCrossAssetInterpretation({
-        assetKey, front, crossPeers, steepest, flattest,
-      }),
+      taskForceBasis,
+      interpretation: deskRead.guidance,
+      interpretationSupport: deskRead.support,
     };
   }
 
@@ -547,7 +595,7 @@
 
   function spotAnnDecomposition(c) {
     const factor = spotAnnFactor(c.dte);
-    if (!Number.isFinite(c.spotBasisPct) || !Number.isFinite(factor)) return '—';
+    if (!Number.isFinite(c.spotBasisPct) || !Number.isFinite(factor)) return unavailSpan('na');
     return `${fmtPct(c.spotBasisPct, 2)} × ${factor.toFixed(2)}`;
   }
 
@@ -557,61 +605,82 @@
     const hi = standalone ? ' bw-card--highlight' : '';
     const rankMeta = front && Number.isFinite(front.basisPercentile)
       ? `${fmtPercentile(front.basisPercentile)} · ${quartileRichnessLabel(front.basisQuartile)}`
-      : (front?.insufficientHistory ? 'History building' : '—');
+      : (front?.insufficientHistory ? 'History building' : unavailSpan('awaiting'));
     return `
-      <div class="bw-card"><span class="bw-card-label">Spot · CF proxy</span><strong class="bw-card-value">${spot > 0 ? '$' + fmtNum(spot, 0) : '—'}</strong><span class="bw-card-meta">${Number.isFinite(model.spotChg) ? fmtPct(model.spotChg) + ' 1d' : '—'}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Front basis ($)</span><strong class="bw-card-value bw-card-value--secondary">${front ? '$' + fmtNum(front.absBasis, 0) : '—'}</strong><span class="bw-card-meta">${front ? front.symbol + ' · ' + front.dte + 'd' : '—'}</span></div>
-      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${front ? fmtPct(front.spotBasisPct) : '—'}</strong><span class="bw-card-meta">${front ? interpretationFromPercentile(front.basisPercentile) : '—'}</span></div>
-      <div class="bw-card${hi}"><span class="bw-card-label">Basis % rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile rank">?</button></span><strong class="bw-card-value">${front?.basisQuartile ? 'Q' + front.basisQuartile : '—'}</strong><span class="bw-card-meta">${rankMeta}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Annualized basis">?</button></span><strong class="bw-card-value">${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</strong><span class="bw-card-meta">${vectorSummary(model.spotCurve)}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Forward curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span><strong class="bw-card-value">${model.steepest ? fmtPct(model.steepest.forwardAnnualizedYield) : '—'}</strong><span class="bw-card-meta">${vectorSummary(model.forwardCurve)}</span></div>`;
+      <div class="bw-card"><span class="bw-card-label">Spot · CF proxy</span><strong class="bw-card-value">${spot > 0 ? '$' + fmtNum(spot, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${Number.isFinite(model.spotChg) ? fmtPct(model.spotChg) + ' 1d' : unavailSpan('na')}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Front basis ($)</span><strong class="bw-card-value bw-card-value--secondary">${front ? '$' + fmtNum(front.absBasis, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${front ? front.symbol + ' · ' + front.dte + 'd' : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${front ? fmtPct(front.spotBasisPct) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${front ? interpretationFromPercentile(front.basisPercentile) : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card${hi}"><span class="bw-card-label">Basis % rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile rank">?</button></span><strong class="bw-card-value">${front?.basisQuartile ? 'Q' + front.basisQuartile : unavailSpan('na')}</strong><span class="bw-card-meta">${rankMeta}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Annualized basis">?</button></span><strong class="bw-card-value">${front ? fmtPct(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.spotCurve.length ? vectorSummary(model.spotCurve) : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Forward curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span><strong class="bw-card-value">${model.steepest ? fmtPct(model.steepest.forwardAnnualizedYield) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.forwardCurve.length ? vectorSummary(model.forwardCurve) : unavailSpan('awaiting')}</span></div>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderTaskForceCallout(model) {
+    const feed = model.taskForceBasis;
+    if (!feed?.signal) return '';
+    const conf = Number.isFinite(feed.confidence) ? ` · conf ${Math.round(feed.confidence * 100)}%` : '';
+    const src = feed.source === 'task_force' ? 'task force' : (feed.source || feed.status || 'feed');
+    const inv = feed.invalidation ? ` · inv: ${escapeHtml(feed.invalidation)}` : '';
+    return `<div class="bw-task-force-callout">
+      <span class="bw-callout-label">Task Force · btc_eth_basis</span>
+      <p class="bw-task-force-signal">${escapeHtml(feed.signal)}</p>
+      <span class="bw-callout-meta">${escapeHtml(src)}${conf}${inv}</span>
+    </div>`;
   }
 
   function renderCallouts(model) {
     const richestMeta = model.richest
-      ? `${fmtPct(model.richest.spotBasisPct)} basis % · ${Number.isFinite(model.richest.basisPercentile) ? fmtPercentile(model.richest.basisPercentile) : '—'}`
-      : '—';
+      ? `${fmtPct(model.richest.spotBasisPct)} basis % · ${Number.isFinite(model.richest.basisPercentile) ? fmtPercentile(model.richest.basisPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
     const steepestMeta = model.steepest
-      ? `${fmtPct(model.steepest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.steepest.forwardPercentile) ? fmtPercentile(model.steepest.forwardPercentile) : '—'}`
-      : '—';
+      ? `${fmtPct(model.steepest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.steepest.forwardPercentile) ? fmtPercentile(model.steepest.forwardPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
     const flattestMeta = model.flattest
-      ? `${fmtPct(model.flattest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.flattest.forwardPercentile) ? fmtPercentile(model.flattest.forwardPercentile) : '—'}`
-      : '—';
-    return `<div class="bw-callout-strip bw-callout-strip--triple">
-      <div class="bw-callout"><span class="bw-callout-label">Richest by basis % rank</span><div class="bw-callout-value">${model.richest?.symbol || '—'}</div><div class="bw-callout-meta">${richestMeta}</div></div>
-      <div class="bw-callout"><span class="bw-callout-label">Steepest calendar</span><div class="bw-callout-value">${model.steepest ? model.steepest.nearSymbol + '→' + model.steepest.farSymbol : '—'}</div><div class="bw-callout-meta">${steepestMeta}</div></div>
-      <div class="bw-callout"><span class="bw-callout-label">Flattest calendar</span><div class="bw-callout-value">${model.flattest ? model.flattest.nearSymbol + '→' + model.flattest.farSymbol : '—'}</div><div class="bw-callout-meta">${flattestMeta}</div></div>
+      ? `${fmtPct(model.flattest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.flattest.forwardPercentile) ? fmtPercentile(model.flattest.forwardPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
+    return `${renderTaskForceCallout(model)}<div class="bw-callout-strip bw-callout-strip--triple">
+      <div class="bw-callout"><span class="bw-callout-label">Richest by basis % rank</span><div class="bw-callout-value">${model.richest?.symbol || unavailSpan('awaiting')}</div><div class="bw-callout-meta">${richestMeta}</div></div>
+      <div class="bw-callout"><span class="bw-callout-label">Steepest calendar</span><div class="bw-callout-value">${model.steepest ? model.steepest.nearSymbol + '→' + model.steepest.farSymbol : unavailSpan('awaiting')}</div><div class="bw-callout-meta">${steepestMeta}</div></div>
+      <div class="bw-callout"><span class="bw-callout-label">Flattest calendar</span><div class="bw-callout-value">${model.flattest ? model.flattest.nearSymbol + '→' + model.flattest.farSymbol : unavailSpan('awaiting')}</div><div class="bw-callout-meta">${flattestMeta}</div></div>
     </div>`;
   }
 
   function histRangeCell(c) {
-    if (!c.basisStats || c.basisStats.n < 2) return '—';
+    if (!c.basisStats || c.basisStats.n < 2) return unavailSpan('awaiting');
     return `${fmtPct(c.histQ1, 2)} / ${fmtPct(c.histMedian, 2)} / ${fmtPct(c.histQ3, 2)}`;
   }
 
   function renderBasisTable(model) {
-    if (!model.contracts.length) return '<p class="bw-empty">No futures curve — run daily chain and publish desk preview.</p>';
+    if (!model.contracts.length) return renderBasisNullState();
     const rows = model.contracts.map(c => `
       <tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}">
         <td>${c.symbol}${c.synthetic ? ' <span title="Synthesized">*</span>' : ''}</td>
         <td>${c.label}</td><td>${c.dte}d</td>
-        <td class="bw-col-secondary">$${fmtNum(c.futuresPrice, 0)}</td>
-        <td class="bw-col-secondary">$${fmtNum(c.absBasis, 0)}</td>
-        <td class="bw-col-primary ${c.basisHeatClass || ''}"><strong>${fmtPct(c.spotBasisPct)}</strong></td>
-        <td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : '—'}</td>
-        <td>${c.basisQuartile ? quartileBadge(c.basisQuartile, quartileRichnessLabel(c.basisQuartile)) : '—'}</td>
+        <td class="bw-col-secondary">$${fmtNumDisplay(c.futuresPrice, 0)}</td>
+        <td class="bw-col-secondary">$${fmtNumDisplay(c.absBasis, 0)}</td>
+        <td class="bw-col-primary ${c.basisHeatClass || ''}"><strong>${fmtPctDisplay(c.spotBasisPct)}</strong></td>
+        <td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : unavailSpan('na')}</td>
+        <td>${c.basisQuartile ? quartileBadge(c.basisQuartile, quartileRichnessLabel(c.basisQuartile)) : unavailSpan('na')}</td>
         <td class="bw-col-hist" title="Q1 / Median / Q3">${histRangeCell(c)}</td>
         <td class="bw-decomp" title="Basis % × (365/DTE)">${spotAnnDecomposition(c)}</td>
-        <td class="${heatClass(c.spotAnnualizedCarry)}" title="${spotAnnDecomposition(c)}">${fmtPct(c.spotAnnualizedCarry)}</td>
-        <td>${Number.isFinite(c.pctChg) ? fmtPct(c.pctChg) : '—'}</td>
+        <td class="${heatClass(c.spotAnnualizedCarry)}" title="${spotAnnDecomposition(c)}">${fmtPctDisplay(c.spotAnnualizedCarry)}</td>
+        <td>${Number.isFinite(c.pctChg) ? fmtPct(c.pctChg) : unavailSpan('na')}</td>
       </tr>`).join('');
     return `<h4 class="bw-subhead">Spot curve · futures vs spot</h4><p class="bw-methodology-inline">Spot Curve % = Basis % × (365 ÷ DTE) · Quartiles from hydrated history</p><div class="bw-table-wrap"><table class="bw-table"><thead><tr><th>Contract</th><th>Expiry</th><th>DTE</th><th>Futures</th><th>Basis ($)</th><th>Basis %</th><th>Rank</th><th>Quartile</th><th>Hist Q1/Med/Q3</th><th>×365/DTE</th><th>Spot Curve % (ann.)</th><th>Chg</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function renderImpliedTable(model) {
-    if (!model.contracts.length) return '<p class="bw-empty">No curve data.</p>';
-    const spotRows = model.contracts.map(c => `<tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}"><td>${c.symbol}</td><td>${c.dte}d</td><td class="bw-col-primary"><strong>${fmtPct(c.spotBasisPct)}</strong></td><td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : '—'}</td><td class="bw-decomp">${spotAnnDecomposition(c)}</td><td class="${heatClass(c.spotAnnualizedCarry)}">${fmtPct(c.spotAnnualizedCarry)}</td></tr>`).join('');
-    const fwdRows = model.calendarPairs.map(p => `<tr><td>${p.nearSymbol} → ${p.farSymbol}</td><td>${p.intervalDays}d</td><td class="${heatClass(p.forwardAnnualizedYield)} ${p.forwardHeatClass || ''}"><strong>${fmtPct(p.forwardAnnualizedYield)}</strong></td><td>${Number.isFinite(p.forwardPercentile) ? fmtPercentile(p.forwardPercentile) : '—'}</td><td>${p.forwardQuartile ? quartileBadge(p.forwardQuartile, quartileRichnessLabel(p.forwardQuartile)) : '—'}</td><td class="bw-col-secondary">$${fmtNum(p.calendarSpread, 0)}</td></tr>`).join('');
+    if (!model.contracts.length) return renderBasisNullState();
+    const spotRows = model.contracts.map(c => `<tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}"><td>${c.symbol}</td><td>${c.dte}d</td><td class="bw-col-primary"><strong>${fmtPctDisplay(c.spotBasisPct)}</strong></td><td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : unavailSpan('na')}</td><td class="bw-decomp">${spotAnnDecomposition(c)}</td><td class="${heatClass(c.spotAnnualizedCarry)}">${fmtPctDisplay(c.spotAnnualizedCarry)}</td></tr>`).join('');
+    const fwdRows = model.calendarPairs.map(p => `<tr><td>${p.nearSymbol} → ${p.farSymbol}</td><td>${p.intervalDays}d</td><td class="${heatClass(p.forwardAnnualizedYield)} ${p.forwardHeatClass || ''}"><strong>${fmtPctDisplay(p.forwardAnnualizedYield)}</strong></td><td>${Number.isFinite(p.forwardPercentile) ? fmtPercentile(p.forwardPercentile) : unavailSpan('na')}</td><td>${p.forwardQuartile ? quartileBadge(p.forwardQuartile, quartileRichnessLabel(p.forwardQuartile)) : unavailSpan('na')}</td><td class="bw-col-secondary">$${fmtNumDisplay(p.calendarSpread, 0)}</td></tr>`).join('');
     return `<div class="bw-implied-grid">
       <div class="bw-panel" style="border:none;box-shadow:none"><h4 class="bw-subhead">Spot curve % (ann.)</h4><p class="bw-methodology-inline">Basis % × (365/DTE) — equivalent to ((F/S)−1)×(365/DTE)</p><div class="bw-table-wrap"><table class="bw-table bw-table--compact"><thead><tr><th>Tenor</th><th>DTE</th><th>Basis %</th><th>Rank</th><th>×365/DTE</th><th>Spot Curve %</th></tr></thead><tbody>${spotRows}</tbody></table></div></div>
       <div class="bw-panel" style="border:none;box-shadow:none"><h4 class="bw-subhead">Forward curve % (ann.)</h4><p class="bw-methodology-inline">Adjacent pairs · ((F_far/F_near)−1)×(365/interval)</p><div class="bw-table-wrap"><table class="bw-table bw-table--compact"><thead><tr><th>Near → Far</th><th>Days Between</th><th>Forward Curve %</th><th>Rank</th><th>Quartile</th><th>Calendar Spread ($)</th></tr></thead><tbody>${fwdRows || '<tr><td colspan="6">—</td></tr>'}</tbody></table></div></div>
@@ -631,13 +700,14 @@
 
   function renderMethodology(model) {
     const viewNote = model.view === 'implied'
-      ? 'Implied Rate view shows both spot curve (futures vs spot) and forward curve (calendar roll yields between adjacent expiries).'
-      : 'Basis Watch view shows spot curve only — basis $, basis %, and annualized spot-to-tenor carry. Forward/calendar roll yields appear in Implied Rate view.';
-    return `<h4 class="bw-subhead">Methodology</h4>
-      <p><strong>Basis Watch</strong> — CME-style futures vs spot: Basis ($) = F − S; Basis % = (F−S)/S; Spot Curve % (ann.) = ((F/S)−1)×(365/DTE).</p>
-      <p><strong>Implied Rate</strong> — Spot curve table (above) plus forward curve for adjacent calendar pairs: Calendar Spread ($) = F_far − F_near; Forward Curve % (ann.) = ((F_far/F_near)−1)×(365/days between expiries).</p>
-      <p class="bw-methodology-view">${viewNote}</p>
-      <p>Historical quartile ranges and percentile ranks help evaluate whether current basis is rich or cheap for each tenor relative to its own history.</p>`;
+      ? 'Implied Rate · spot + forward roll yields.'
+      : 'Basis Watch · spot curve carry only.';
+    return `<ul class="bw-methodology-bullets">
+      <li>Basis $ = F − S</li>
+      <li>Basis % = (F−S)/S</li>
+      <li>Ann carry = ((F/S)−1)×(365/DTE)</li>
+      <li class="bw-methodology-view">${viewNote}</li>
+    </ul>`;
   }
 
   function renderCrossAsset(model) {
@@ -648,28 +718,28 @@
       <article class="bw-xasset-card bw-xasset-card--anchor">
         <div class="bw-xasset-card-top">
           <span class="bw-xasset-symbol">${model.assetKey}</span>
-          <span class="bw-xasset-contract">${front ? front.symbol + ' · ' + front.dte + 'd' : '—'}</span>
+          <span class="bw-xasset-contract">${front ? front.symbol + ' · ' + front.dte + 'd' : unavailSpan('awaiting')}</span>
           ${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : ''}
         </div>
         <div class="bw-xasset-metrics">
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Basis % <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis %">?</button></span>
-            <strong class="bw-xasset-metric-value">${front ? fmtPct(front.spotBasisPct) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${front ? fmtPctDisplay(front.spotBasisPct) : unavailSpan('awaiting')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Ann. basis">?</button></span>
-            <strong class="bw-xasset-metric-value ${heatClass(front?.spotAnnualizedCarry)}">${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</strong>
+            <strong class="bw-xasset-metric-value ${heatClass(front?.spotAnnualizedCarry)}">${front ? fmtPctDisplay(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Calendar fwd % <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span>
-            <strong class="bw-xasset-metric-value">${cal ? fmtPct(cal.forwardAnnualizedYield) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${cal ? fmtPctDisplay(cal.forwardAnnualizedYield) : unavailSpan('na')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Basis rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile">?</button></span>
-            <strong class="bw-xasset-metric-value">${Number.isFinite(front?.basisPercentile) ? fmtPercentile(front.basisPercentile) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${Number.isFinite(front?.basisPercentile) ? fmtPercentile(front.basisPercentile) : unavailSpan('na')}</strong>
           </div>
         </div>
-        <p class="bw-xasset-card-note" title="Hover for dollar detail">Basis ($): ${front ? '$' + fmtNum(front.absBasis, 0) : '—'} · Ann.: ${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</p>
+        <p class="bw-xasset-card-note" title="Hover for dollar detail">Basis ($): ${front ? '$' + fmtNum(front.absBasis, 0) : unavailSpan('awaiting')} · Ann.: ${front ? fmtPctDisplay(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</p>
       </article>`;
 
     const btcCalRow = cal ? `
@@ -677,9 +747,9 @@
         <td><span class="bw-xasset-peer">${model.assetKey}</span> <span class="bw-xasset-peer-sub">${cal.nearSymbol}→${cal.farSymbol}</span></td>
         <td class="bw-xasset-role">Calendar roll</td>
         <td class="bw-xasset-num"><strong>${fmtPct(cal.forwardAnnualizedYield)} fwd</strong></td>
-        <td class="bw-xasset-num">—</td>
-        <td class="bw-xasset-num">—</td>
-        <td>${cal.forwardQuartile ? quartileBadge(cal.forwardQuartile, quartileRichnessLabel(cal.forwardQuartile)) : '—'}</td>
+        <td class="bw-xasset-num">${unavailSpan('na')}</td>
+        <td class="bw-xasset-num">${unavailSpan('na')}</td>
+        <td>${cal.forwardQuartile ? quartileBadge(cal.forwardQuartile, quartileRichnessLabel(cal.forwardQuartile)) : unavailSpan('na')}</td>
       </tr>` : '';
 
     const peerRows = (model.crossPeers || []).map(peer => {
@@ -687,13 +757,14 @@
       const deltaCls = Number.isFinite(peer.deltaVsBtc)
         ? (peer.deltaVsBtc >= 0 ? 'bw-xasset-delta--pos' : 'bw-xasset-delta--neg')
         : '';
+      const metric = peer.metric && peer.metric !== '—' ? peer.metric : unavailSpan('awaiting');
       return `<tr class="${peer.rowClass || ''}">
         <td><span class="bw-xasset-peer">${peer.label.split(' ')[0]}</span> <span class="bw-xasset-peer-sub">${peer.label.replace(/^[^\s]+\s*/, '')}</span></td>
         <td class="bw-xasset-role">${peer.role}</td>
-        <td class="bw-xasset-num"><strong>${peer.metric || '—'}</strong></td>
-        <td class="bw-xasset-num ${chgCls}">${Number.isFinite(peer.chg) ? fmtPct(peer.chg) : '—'}</td>
-        <td class="bw-xasset-num ${deltaCls}">${Number.isFinite(peer.deltaVsBtc) ? fmtNum(peer.deltaVsBtc, 1) : '—'}</td>
-        <td>${peer.quartile ? quartileBadge(peer.quartile, quartileRichnessLabel(peer.quartile)) : '—'}</td>
+        <td class="bw-xasset-num"><strong>${metric}</strong></td>
+        <td class="bw-xasset-num ${chgCls}">${Number.isFinite(peer.chg) ? fmtPct(peer.chg) : unavailSpan('na')}</td>
+        <td class="bw-xasset-num ${deltaCls}">${Number.isFinite(peer.deltaVsBtc) ? fmtNum(peer.deltaVsBtc, 1) : unavailSpan('na')}</td>
+        <td>${peer.quartile ? quartileBadge(peer.quartile, quartileRichnessLabel(peer.quartile)) : unavailSpan('awaiting')}</td>
       </tr>`;
     }).join('');
 
@@ -716,10 +787,10 @@
             <tr>
               <td><span class="bw-xasset-peer">${model.assetKey}</span> <span class="bw-xasset-peer-sub">${front?.symbol || 'front'}</span></td>
               <td class="bw-xasset-role">Spot basis %</td>
-              <td class="bw-xasset-num"><strong>${front ? fmtPct(front.spotBasisPct) + ' basis' : '—'}</strong></td>
-              <td class="bw-xasset-num">—</td>
-              <td class="bw-xasset-num">—</td>
-              <td>${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : '—'}</td>
+              <td class="bw-xasset-num"><strong>${front ? fmtPctDisplay(front.spotBasisPct) + ' basis' : unavailSpan('awaiting')}</strong></td>
+              <td class="bw-xasset-num">${unavailSpan('na')}</td>
+              <td class="bw-xasset-num">${unavailSpan('na')}</td>
+              <td>${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : unavailSpan('na')}</td>
             </tr>
             ${btcCalRow}
             ${peerRows}
@@ -728,7 +799,8 @@
       </div>
       <footer class="bw-xasset-interpret">
         <span class="bw-xasset-interpret-label">Desk read</span>
-        <p class="bw-xasset-interpret-text">${model.interpretation || '—'}</p>
+        <p class="bw-xasset-interpret-text">${model.interpretation || unavailSpan('awaiting')}</p>
+        ${model.interpretationSupport ? `<span class="bw-xasset-interpret-support">${model.interpretationSupport}</span>` : ''}
       </footer>
     </section>`;
   }
@@ -1024,17 +1096,19 @@
     const mode = el('bwModeToggle'); if (mode) mode.value = model.mode;
   }
 
-  function renderPanel(state) {
+  function renderPanelChrome(state, model) {
     const panel = el('basisWatchPanel');
-    if (!panel && !isStandalone()) return;
+    if (!panel && !isStandalone()) return false;
     if (panel) {
       panel.classList.toggle('basis-watch-panel--collapsed', !!state.basisWatch?.collapsed);
     }
-    const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
     const standalone = isStandalone();
 
     const status = el('bwStatusChip');
-    if (status) { status.textContent = model.mode === 'snapshot' ? 'Snapshot' : 'Live'; status.className = `bw-status-chip bw-status-chip--${model.mode}`; }
+    if (status) {
+      status.textContent = model.mode === 'snapshot' ? 'Snapshot' : 'Live';
+      status.className = `bw-status-chip bw-status-chip--${model.mode}`;
+    }
 
     const note = el('bwDataNote');
     if (note) note.textContent = model.dataNote || (model.contracts.length ? `As of ${String(model.asOf).slice(0, 19)}` : '');
@@ -1066,6 +1140,18 @@
     const callouts = el('bwCallouts');
     if (callouts) callouts.innerHTML = renderCallouts(model);
 
+    syncControls(model);
+    state._basisWatchModel = model;
+
+    const buildBadge = el('bwBuildBadge');
+    if (buildBadge) buildBadge.textContent = BW_BUILD;
+
+    const footerStamp = el('bwFooterStamp');
+    if (footerStamp) footerStamp.textContent = BW_BUILD;
+    return true;
+  }
+
+  function renderPanelHeavy(state, model) {
     const main = el('bwMainView');
     if (main) {
       main.innerHTML = model.view === 'implied'
@@ -1081,16 +1167,36 @@
       cross.innerHTML = renderCrossAsset(model);
       cross.className = 'bw-xasset-host';
     }
+  }
 
-    syncControls(model);
+  function renderPanelChart(model) {
     drawBasisChart(model);
-    state._basisWatchModel = model;
+  }
 
-    const buildBadge = el('bwBuildBadge');
-    if (buildBadge) buildBadge.textContent = BW_BUILD;
+  function renderPanel(state) {
+    const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
+    if (!renderPanelChrome(state, model)) return;
+    renderPanelHeavy(state, model);
+    renderPanelChart(model);
+  }
 
-    const footerStamp = el('bwFooterStamp');
-    if (footerStamp) footerStamp.textContent = BW_BUILD;
+  async function renderPanelAsync(state, gen) {
+    const model = state._basisWatchModel;
+    if (!model || gen !== _refreshGen) return;
+    if (!renderPanelChrome(state, model)) return;
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+    renderPanelHeavy(state, model);
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+    await new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(resolve);
+      else setTimeout(resolve, 0);
+    });
+    if (gen !== _refreshGen) return;
+    renderPanelChart(model);
   }
 
   function persistBasisWatchPrefs(state) {
@@ -1103,15 +1209,46 @@
     savePrefs(p);
   }
 
-  async function refresh(state, hooks) {
+  async function refreshOnce(state, hooks, gen) {
     await ensureCurveHistory();
+    if (gen !== _refreshGen) return;
+
     if (state.basisWatch?.mode === 'snapshot' && state.basisWatch.snapshot) {
       curveCache = state.basisWatch.snapshot.curve || curveCache;
     }
-    state._basisWatchModel = buildModel(state, curveCache);
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+
+    state._basisWatchModel = buildModel(state, curveCache || { records: [] });
     persistBasisWatchPrefs(state);
-    renderPanel(state);
-    if (hooks?.renderAll) hooks.renderAll();
+    await renderPanelAsync(state, gen);
+    if (gen !== _refreshGen) return;
+
+    if (hooks?.renderAll && !hooks._fromRenderAll) {
+      hooks.renderAll();
+    }
+  }
+
+  async function drainRefreshQueue() {
+    while (_pendingRefresh) {
+      const job = _pendingRefresh;
+      _pendingRefresh = null;
+      await refreshOnce(job.state, job.hooks, job.gen);
+    }
+    _refreshLoop = null;
+  }
+
+  function refresh(state, hooks) {
+    const gen = ++_refreshGen;
+    _pendingRefresh = { state, hooks, gen };
+    if (!_refreshLoop) {
+      _refreshLoop = drainRefreshQueue().catch((err) => {
+        console.warn('[BasisWatch] refresh failed', err);
+        _refreshLoop = null;
+      });
+    }
+    return _refreshLoop;
   }
 
   function exportCsv(state) {
@@ -1171,6 +1308,13 @@
       window.open(popOutUrl(getState()), '_blank', 'noopener,noreferrer');
     });
 
+    document.getElementById('basisWatchPanel')?.addEventListener('click', (e) => {
+      const btn = e.target.closest?.('[data-bw-null-action="refresh"]');
+      if (!btn) return;
+      e.preventDefault();
+      refresh(getState(), hooks);
+    });
+
     el('btnBwTheme')?.addEventListener('click', () => {
       const cur = document.documentElement.getAttribute('data-theme') || 'dark';
       const next = cur === 'dark' ? 'light' : 'dark';
@@ -1224,7 +1368,18 @@
       const s = getState();
       if (isStandalone() && s.hydration) {
         const bundle = await loadHydrationBundle();
-        if (bundle) s.hydration = { ...s.hydration, ...bundle, crypto_sleeve: bundle.crypto_sleeve, global: bundle.global, execution: bundle.execution, as_of: bundle.as_of };
+        if (bundle) {
+          s.hydration = {
+            ...s.hydration,
+            ...bundle,
+            crypto_sleeve: bundle.crypto_sleeve,
+            global: bundle.global,
+            execution: bundle.execution,
+            as_of: bundle.as_of,
+            task_force_panels: bundle.task_force_panels
+              || global.WTM_TaskForceFeed?.extractTaskForcePanels?.(bundle.task_force),
+          };
+        }
       }
       if (s.basisWatch) s.basisWatch.mode = 'live';
       refresh(s, hooks);
@@ -1244,7 +1399,9 @@
     initTheme();
     initTooltips();
     wireControls(hooks.getState, hooks);
-    ensureCurveHistory().then(() => refresh(hooks.getState(), hooks));
+    ensureCurveHistory().then(() => {
+      try { refresh(hooks.getState(), hooks); } catch (err) { console.warn('[BasisWatch] refresh skipped', err); }
+    });
     window.addEventListener('resize', () => renderPanel(hooks.getState()));
   }
 
@@ -1273,6 +1430,8 @@
         execution: bundle.execution,
         as_of: bundle.as_of,
         node_cockpits: bundle.node_cockpits,
+        task_force_panels: bundle.task_force_panels
+          || global.WTM_TaskForceFeed?.extractTaskForcePanels?.(bundle.task_force),
       };
       standaloneState.provenance = { dataAsOf: bundle.as_of, hydratedAt: new Date().toISOString() };
     }

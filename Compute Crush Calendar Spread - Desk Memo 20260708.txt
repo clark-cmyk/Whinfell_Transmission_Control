@@ -1,0 +1,86 @@
+# Compute Crush Calendar Spread - Desk Memo
+
+**Date:** July 8, 2026  
+**Author:** Clark  
+**Strategy:** GPU Rental Term Structure – Calendar Spread (Focus: H200)  
+**Status:** Active Monitoring / Pilot Ready
+
+## 1. Trade Thesis
+Sell rich front-month GPU rental futures and buy cheaper deferred-month contracts on the same chip (e.g., H200).  
+Profit when the steep backwardation flattens as new GPU supply comes online while near-term demand (especially inference) keeps the front end supported.
+
+This is a **relative value / statistical spread trade**, not purely market neutral. We are structurally short backwardation.
+
+## 2. Current Market Conditions (Architect – July 8, 2026)
+- **July (Front / Spot Month):** $3.20 per GPU-hour  
+- **October (3-month):** $2.80 per GPU-hour  
+- **Spread (July – October):** **40 cents**  
+- **12-month:** $2.30  
+- **24-month:** $2.05  
+
+Front end remains rich due to strong on-demand / short-term needs from hyperscalers and AI labs.
+
+## 3. Entry Rules (Both conditions required)
+1. Long leg (deferred contract) is statistically **cheap** on historical percentile basis (high percentile = inexpensive).
+2. Calendar spread is **wide** relative to its own historical distribution.
+
+## 4. Corporate Litmus Test (CoreWeave + Crusoe)
+Use this as the "pH balance" check against capital markets pricing.
+
+**5-Factor Checklist** (Score 0–10 each, Total /50. Lower score = better for trade)
+
+1. **Backlog Growth** (QoQ) – Rapid growth is negative for the trade.
+2. **Near-term Utilization / Sold-Out Status** – 90%+ sold out for next 12–18 months is negative.
+3. **New Contract Pricing Trend** – Lower $/GPU-hour on new deals is positive.
+4. **Gross Margin on New Business** – Margin compression on fresh contracts is positive.
+5. **Cluster Delivery / Supply Ramp** – Strong guidance on new GPUs coming online is positive.
+
+**Scoring Interpretation:**
+- < 25 → Strongly supportive of trade
+- 25–35 → Neutral / mixed
+- > 35 → Strongly against entering
+
+## 5. Risk & Position Management ($10,000 Risk Allocation)
+- **Profit Target:** Spread narrows to 15–20 cents → exit
+- **Stop Loss:** Spread widens to 60–65 cents → exit
+- **Time Stop:** Exit after 6–8 weeks if neither target/stop hit
+- **Typical Holding Period:** 3–7 weeks
+- Treat like Bitcoin basis: strict quant rules, no "it has to come back" mindset
+
+## 6. Execution Platform
+- **Primary Venue:** Architect (American Innovation Exchange)
+- **Minimum Size:** 8 GPUs (multiples of 8)
+- **Contracts:** Cash-settled H200 GPU-hour futures
+- **Access:**
+  - Production: https://app.architect.exchange/signup → Invite: `ARCH-AXDI`
+  - Sandbox: https://sandbox.architect.exchange/signup → Invite: `DEMO-ARCH-AXDI`
+  - API Docs: https://docs.architect.exchange/
+- Index Providers: Ornn.com (primary), Compute-Desk.com
+
+## 7. Tool Integration Plan (Dig → Iterate → Articulate → Litmus)
+- **Dig Layer:** Track CoreWeave earnings, backlog, utilization, new deals, Crusoe power strategy.
+- **Iterate Layer:** Historical percentile ranks on individual contracts + spread width.
+- **Articulate Layer:** Convert curve shape, spread movement, and corporate signals into plain English narrative.
+- **Litmus Layer:** Run the 5-factor checklist above after every major corporate update.
+- Add Architect API feed for real-time curves and historical data.
+
+## 8. Key Data Sources
+- Architect platform & API
+- CoreWeave earnings calls & presentations
+- Crusoe investor updates (Chase Lochmiller)
+- Ornn Compute Price Index
+- Brett Harrison / Doruk Ismen updates on compute markets
+
+## 9. CME Timeline
+GPU compute futures expected late 2026 (pending CFTC approval). Will eventually enable better liquidity and cross-margining with energy/power products.
+
+## 10. Next Actions
+- Sign up for Architect Sandbox and test curve data pull
+- Build historical percentile tracker for H200 contracts
+- Set up Litmus Test scoring dashboard
+- Monitor next CoreWeave / Crusoe updates
+
+---
+
+**Approved for tool expansion.**  
+This memo can be directly imported into the analytical system.

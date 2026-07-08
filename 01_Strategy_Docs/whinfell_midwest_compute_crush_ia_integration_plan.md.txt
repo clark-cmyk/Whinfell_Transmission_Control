@@ -1,0 +1,97 @@
+# Whinfell Midwest Compute Crush — Full IA Shell Integration Plan
+
+**Objective**  
+Integrate the existing Midwest Compute Crush into the new IA shell as a first-class experience under a **“Specialized Tools”** navigation group. The view should primarily behave as a **Dig-layer** experience while keeping the existing standalone page available.
+
+## 1. Navigation & Placement
+
+- Create a new navigation group in the left rail called **Specialized Tools**.
+- Add **Midwest Compute Crush** as an item under this group.
+- Recommended placement: Near the bottom of the main left navigation (below standard sleeves and layer tabs).
+- The group can start collapsed by default.
+
+## 2. Layer & Shell Behavior
+
+| Layer     | Expected Behavior                                      | Notes |
+|-----------|--------------------------------------------------------|-------|
+| **Scan**  | Not directly accessible (or shown as disabled)        | Keep focus on Radar + cockpit |
+| **Dig**   | Primary experience. Load content into center canvas   | Main target layer |
+| **Iterate** | Optional/secondary support                           | Lower priority |
+
+When **Midwest Compute Crush** is selected:
+- Activate `body.ia-layer-dig`
+- Load content into `.ia-center-canvas` / `#iaDigHost`
+- Keep the right decision rail available for commentary / implications
+
+## 3. Content Scope (Must Include)
+
+- Core Midwest Compute Crush visualization and analytics (reuse from existing standalone page where possible)
+- **Comparative cross-asset “crush” spreads** across the relevant universe
+- **Correlations** between assets in the crush context
+- Keep the existing standalone page (`Whinfell_Midwest_Compute_Crush.html`) fully functional and accessible via direct URL
+
+## 4. Technical Approach
+
+| Area                        | Recommended Approach                                                                 | Rationale |
+|----------------------------|--------------------------------------------------------------------------------------|---------|
+| **Reuse Strategy**         | Reuse existing logic/visuals from `Whinfell_Midwest_Compute_Crush.html` where possible | Minimize duplication and risk |
+| **Integration Method**     | Load content into a dedicated host inside `.ia-center-canvas` (e.g. `#iaMidwestCrushHost`) | Clean separation from other views |
+| **State Management**       | Lightweight handling in `console_ia_shell.js`                                        | Avoid over-engineering |
+| **Zoom Formatting**        | Apply same zoom-safe rules used for Mission Read and Basis Watch                     | Consistency with rest of console |
+| **Right Rail**             | Wire existing `#cockpitDecisionRail` for commentary when active                      | Leverage existing infrastructure |
+| **Styling**                | Inherit from `console_ia.css` + minimal additions                                    | Visual consistency |
+
+## 5. Files Expected to Change
+
+| File                              | Expected Changes                                      | Estimated Size |
+|-----------------------------------|-------------------------------------------------------|----------------|
+| `index.html`                      | Add “Specialized Tools” nav group + menu item         | Small |
+| `js/console_ia_shell.js`          | Handle navigation + Dig layer activation              | Medium |
+| `css/console_ia.css`              | Minor styling for new nav group + layout tweaks       | Small–Medium |
+| `css/main.css`                    | Minor flex/height adjustments if needed               | Small |
+| (Optional) Lightweight module     | Only if significant refactoring of existing logic is required | — |
+
+## 6. Implementation Phases (Recommended Order)
+
+| Phase | Work                                                                 | Deliverable |
+|-------|----------------------------------------------------------------------|-------------|
+| P1    | Add navigation group and item in `index.html`                        | Nav item appears and is clickable |
+| P2    | Update `console_ia_shell.js` to activate Dig layer                   | View switches to Dig layer correctly |
+| P3    | Create host container and load existing Compute Crush content        | Core visualization renders in center |
+| P4    | Enable cross-asset crush spreads and correlations                    | Key analytical features functional |
+| P5    | Apply zoom-safe formatting rules                                     | Usable at 125–175% zoom |
+| P6    | Wire right decision rail (commentary)                                | Commentary support available |
+| P7    | Testing + regression                                                 | All existing tests pass + new view works |
+
+## 7. Acceptance Criteria
+
+- “Midwest Compute Crush” appears under **Specialized Tools** in the left navigation
+- Selecting it activates the **Dig layer** and loads content into the center canvas
+- Cross-asset crush spreads and correlations are visible and functional
+- No large black/empty areas or major layout breakage
+- Right decision rail remains available
+- Existing standalone page (`Whinfell_Midwest_Compute_Crush.html`) remains fully functional
+- Zoom behavior is acceptable and consistent with other Dig-layer views
+- All current regression tests continue to pass
+
+## 8. Out of Scope
+
+- Full redesign or major refactoring of the Compute Crush analytics
+- Making it available as a primary view in the Scan layer
+- Adding new sub-navigation inside Compute Crush (unless requested later)
+- Changes to the standalone `Whinfell_Midwest_Compute_Crush.html`
+
+## 9. Risks & Mitigations
+
+| Risk                                      | Mitigation |
+|-------------------------------------------|------------|
+| Existing Compute Crush layout conflicts with new shell | Load into a contained host with scoped styling |
+| Right-rail commentary not relevant        | Make it optional / collapsible |
+| Performance with large cross-asset datasets | Reuse existing data loading; optimize only if needed later |
+
+## 10. Estimated Effort
+
+- Small to medium (mostly integration + navigation work)
+- Heaviest parts: Navigation wiring + Dig layer activation + content hosting
+
+---

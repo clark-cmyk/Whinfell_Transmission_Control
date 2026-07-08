@@ -1,6 +1,14 @@
 // Safe bootstrap for disaggregated Whinfell Transmission Control
 console.log('%c[Whinfell TC] Bootstrap loaded', 'color:lime;font-weight:bold');
 
+(function initSafeBootFlag() {
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.get('safe_boot') === '1') window.WHINFELL_SAFE_BOOT = true;
+    else if (params.get('safe_boot') === '0') window.WHINFELL_SAFE_BOOT = false;
+  } catch (_) { /* ignore */ }
+})();
+
 window.appState = window.appState || {
   currentView: 'transmissionLadder',
   debug: true,
@@ -26,6 +34,8 @@ window.renderAll = window.renderAll || function stubRenderAll() {
   updateBootCheck('STUB RENDER - loading core...');
 };
 
+window.updateBootCheck = updateBootCheck;
+
 window.addEventListener('error', (event) => {
   console.error('🚨 Boot error:', event.error || event.message);
   updateBootCheck('ERROR: ' + (event.error?.message || event.message), true);
@@ -36,18 +46,21 @@ window.addEventListener('unhandledrejection', (event) => {
   updateBootCheck('ERROR: ' + String(event.reason), true);
 });
 
-// Core.js loads synchronously after this file; confirm boot once renderAll is real.
-(function confirmCoreBoot() {
-  if (window.__WTM_BOOTED) {
+// Core.js runs boot sequence asynchronously; avoid infinite poll on stub renderAll.
+(function confirmCoreBoot(attempt) {
+  const n = attempt || 0;
+  if (window.__WTM_BOOT_COMPLETE) {
     updateBootCheck('RENDER SUCCESS');
     window.appState.booted = true;
     return;
   }
-  if (typeof window.renderAll === 'function' && window.renderAll.name === 'renderAll') {
-    window.__WTM_BOOTED = true;
-    window.appState.booted = true;
-    updateBootCheck('RENDER SUCCESS');
+  if (window.__WTM_BOOT_FAILED) {
     return;
   }
-  setTimeout(confirmCoreBoot, 0);
-})();
+  if (n >= 60) {
+    updateBootCheck('BOOT TIMEOUT — open ?safe_boot=1&boot_log=1', true);
+    window.__WTM_BOOT_FAILED = true;
+    return;
+  }
+  setTimeout(() => confirmCoreBoot(n + 1), 50);
+})(0);

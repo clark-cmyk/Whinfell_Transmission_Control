@@ -42,54 +42,19 @@ window.DICTIONARY_BADGE_DEFAULT = {
     .hidden, .zone-hidden, .panel-hidden { display: none !important; }
   </style>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/console_ia.css">
     <link rel="stylesheet" href="css/ai_compute.css">
     <link rel="stylesheet" href="css/v15_desk.css">
     <link rel="stylesheet" href="css/basis_watch.css">
+    <link rel="stylesheet" href="css/desk_ops.css">
     <link rel="stylesheet" href="css/ui_polish.css">
+    <link rel="stylesheet" href="css/transmission_radar.css">
+    <link rel="stylesheet" href="midwest_compute/wmc.css">
 </head>
-<body class="bg-wtm-bg text-slate-100 font-sans h-screen flex flex-col overflow-hidden">
+<body class="bg-wtm-bg text-slate-100 font-sans h-screen flex flex-col overflow-hidden ia-layer-scan">
 
   <div id="js-boot-check" class="boot-check">BOOTING Whinfell Transmission Control...</div>
 
-<header class="console-topbar" aria-label="Console header">
-    <div class="console-topbar-zone console-topbar-zone--identity">
-      <div class="console-title-row">
-        <h1 class="console-title">Whinfell Transmission Control</h1>
-        <span class="console-phase-badge">Phase 2.2</span>
-      </div>
-      <p id="headerRegimeLine" class="console-regime-line">—</p>
-      <p id="headerRegimeSub" class="console-regime-sub">Import hydration or enter intake to populate regime summary.</p>
-      <div class="console-tech-meta">
-        <span id="tcConsoleBuildBadge" class="header-build-badge text-[8px] font-bold text-wtm-green bg-emerald-500/10 border border-wtm-green/35 px-2 py-0.5 rounded" title="Operator-console build — hard-refresh if stale">—</span>
-        <a id="ddVersionBadge" href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/whinfell_pipeline/data_dictionary.yaml" target="_blank" rel="noopener noreferrer" class="header-dictionary-badge text-[9px] font-bold text-wtm-muted bg-wtm-card border border-wtm-border px-2 py-0.5 rounded"></a>
-        <button type="button" id="btnDeskDocs" class="text-[9px] font-bold text-wtm-accent bg-wtm-accent/10 border border-wtm-accent/35 px-2 py-0.5 rounded hover:bg-wtm-accent/20" title="Open desk documentation links">Docs</button>
-        <a id="headerLinkKoyfin" href="https://app.koyfin.com/" target="_blank" rel="noopener noreferrer" class="header-source-link" title="Open Koyfin desk">Koyfin ↗</a>
-        <a id="headerLinkBarchart" href="https://www.barchart.com/futures/major-commodities" target="_blank" rel="noopener noreferrer" class="header-source-link" title="Open Barchart futures">Barchart ↗</a>
-        <button type="button" id="btnWorkspaceToggle" class="header-workspace-toggle text-[9px] font-bold text-wtm-accent bg-wtm-accent/10 border border-wtm-accent/35 px-2 py-0.5 rounded hover:bg-wtm-accent/20">Node Cockpits</button>
-      </div>
-    </div>
-    <div class="console-topbar-zone console-topbar-zone--status">
-      <div class="console-status-primary">
-        <span id="headerFreshnessDot" class="freshness-dot hidden" aria-hidden="true"></span>
-        <span id="headerFreshnessLabel">Freshness —</span>
-        <span id="cmdHydrationBadge" class="hidden text-[8px] font-semibold px-1.5 py-0.5 rounded border">—</span>
-      </div>
-      <span id="hydrationImportStatus" class="console-import-status">No bundle imported</span>
-      <span id="saveIndicator" class="console-save-state">Unsaved</span>
-      <span id="headerImportTime" class="console-regime-sub"></span>
-    </div>
-    <div class="console-topbar-zone console-topbar-zone--actions">
-      <div class="console-actions-row">
-        <button id="btnImportHydration" type="button" title="Select data/hydration/latest.json after run_csv_download.py daily" class="btn-console btn-console--accent">Import hydration</button>
-        <input id="hydrationFileInput" type="file" accept=".json,application/json" class="hidden" />
-        <button id="btnImport" type="button" class="btn-console btn-console--primary">Import WTM</button>
-        <button id="btnExport" type="button" class="btn-console">Export</button>
-        <button id="btnExportPipeline" type="button" class="btn-console">Pipeline bundle</button>
-        <button id="btnSave" type="button" class="btn-console btn-console--save">Save</button>
-        <button type="button" id="btnTheme" class="btn-console" aria-pressed="false" title="Toggle dark / light console theme">Light mode</button>
-      </div>
-    </div>
-  </header>
   <div id="deskDocsBackdrop" class="desk-docs-backdrop" aria-hidden="true"></div>
   <aside id="deskDocsDrawer" class="desk-docs-drawer" aria-label="Desk documentation" aria-hidden="true">
     <div class="signal-detail-head">
@@ -127,53 +92,504 @@ window.DICTIONARY_BADGE_DEFAULT = {
     </div>
   </section>
 
-  <!-- Command bar: KPI band + ladders -->
-  <section id="commandBar" class="shrink-0 border-b border-wtm-border bg-wtm-surface gate-glow-amber transition-all">
+  <!-- Phase 3 scan layer — compact KPI strip (relocated into Risk Cockpit widget on boot) -->
+  <section id="scanKpiStrip" class="scan-kpi-strip" aria-label="Scan KPIs">
+    <div id="scanKpiTiles" class="scan-kpi-tiles" role="list"></div>
+  </section>
+
+  <!-- Phase 16 + Koyfin widget shell (scan · dig · iterate) -->
+  <div class="wtm-ia-shell" id="wtmIaShell">
+    <div class="ia-top-frame" id="iaTopFrame" data-collapsed="false">
+      <div class="ia-top-frame-bar">
+        <div class="ia-top-pipeline-strip" id="iaTopPipelineStrip" aria-live="polite">
+          <span id="iaTopPipelineLabel" class="ia-top-pipeline-label">Pipeline</span>
+        </div>
+        <button type="button" id="btnIaTopCollapse" class="ia-frame-toggle" aria-label="Collapse top frame" aria-expanded="true">▾</button>
+      </div>
+      <div class="ia-top-body" id="iaTopBody">
+        <header class="console-topbar console-topbar--slim" aria-label="Console header">
+          <div class="console-topbar-zone console-topbar-zone--identity">
+            <div class="console-identity-head">
+              <div class="console-title-row">
+                <h1 class="console-title">Whinfell Transmission Control</h1>
+                <span class="console-phase-badge">Phase 2.3</span>
+              </div>
+              <div class="console-tech-meta" aria-label="Console utilities" data-top-utility-mount></div>
+            </div>
+            <div id="headerRegimeCluster" class="console-regime-cluster">
+              <p id="headerRegimeLine" class="console-regime-line">—</p>
+              <span class="console-regime-sep" aria-hidden="true">·</span>
+              <span id="headerRegimeSub" class="console-regime-sub console-regime-sub--placeholder">Import hydration or enter intake to populate regime summary.</span>
+            </div>
+          </div>
+          <div class="console-topbar-zone console-topbar-zone--status">
+            <div class="console-status-compact">
+              <div class="console-status-primary">
+                <span id="headerFreshnessDot" class="freshness-dot hidden" aria-hidden="true"></span>
+                <span id="headerFreshnessLabel">Freshness —</span>
+                <span id="cmdHydrationBadge" class="hidden console-hydration-badge px-1.5 py-0.5 rounded border">—</span>
+              </div>
+              <div class="console-status-secondary">
+                <span id="hydrationImportStatus" class="console-import-status">No bundle imported</span>
+                <span id="webLastUpdated" class="console-regime-sub console-web-stamp hidden" title="GitHub Pages bundle publish time"></span>
+                <span id="saveIndicator" class="console-save-state">Unsaved</span>
+                <span id="headerImportTime" class="console-regime-sub"></span>
+              </div>
+            </div>
+          </div>
+          <div class="console-topbar-zone console-topbar-zone--actions">
+            <div class="console-actions-row" data-action-chip-mount>
+              <button id="btnImportHydration" type="button" title="Select data/hydration/latest.json after run_csv_download.py daily">Import hydration</button>
+              <input id="hydrationFileInput" type="file" accept=".json,application/json" class="hidden" />
+              <button id="btnImport" type="button">Import WTM</button>
+              <button id="btnExport" type="button">Export</button>
+              <button id="btnExportPipeline" type="button">Pipeline bundle</button>
+              <button id="btnSave" type="button">Save</button>
+              <button type="button" id="btnTheme" aria-pressed="false" title="Toggle dark / light console theme">Light mode</button>
+            </div>
+          </div>
+        </header>
+      </div>
+    </div>
+    <div class="ia-workspace" id="iaWorkspace">
+      <aside class="ia-left-frame wf-rail wf-rail--left" id="iaLeftFrame" aria-label="Navigation and intake">
+        <div class="ia-left-bar">
+          <span>Navigation</span>
+          <button type="button" id="btnIaLeftCollapse" class="ia-frame-toggle" aria-label="Collapse left rail">‹</button>
+        </div>
+        <div class="ia-left-body" id="iaLeftBody">
+          <section class="wf-rail-section">
+            <div class="wf-rail-section__label">Views</div>
+            <nav class="wf-nav-list" id="iaViewShortcuts" aria-label="Dashboard views">
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="risk_cockpit" title="Jump to Risk Cockpit">Risk Cockpit</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="transmission_radar" title="Jump to Transmission Radar">Transmission Radar</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="hy_oas" title="Jump to HY OAS proxy">HY OAS</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="flipchart" title="Jump to Flipchart">Flipcharts</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="depth_ladders" title="Jump to Depth and Ladders">Ladders &amp; Depth</button>
+            </nav>
+          </section>
+          <section class="wf-rail-section">
+            <div class="wf-rail-section__label">Console layer</div>
+            <div class="ia-layer-tabs wf-nav-list" id="iaLayerTabs" role="tablist" aria-label="Console layer">
+              <button type="button" class="ia-layer-tab wf-nav-item ia-layer-tab--active" data-ia-layer="scan" role="tab" aria-selected="true">Scan</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="dig" role="tab" aria-selected="false">Dig</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="iterate" role="tab" aria-selected="false">Iterate</button>
+            </div>
+          </section>
+          <section class="wf-rail-section ia-specialized-tools-section">
+            <div class="wf-rail-section__label">Specialized tools</div>
+            <details class="ia-specialized-tools" id="iaSpecializedTools" open>
+              <nav class="ia-specialized-tools-nav wf-nav-list" aria-label="Specialized tools">
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaBasisWatch" data-ia-dig-view="basis_watch" aria-pressed="false" title="CME-style basis &amp; implied rate · Dig layer">BasisWatch</button>
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaMidwestCrush" data-ia-dig-view="midwest_crush" aria-pressed="false" title="Midwest GPU crush · cross-asset spreads · Dig layer">Midwest Compute Crush</button>
+                <a href="bang_bang_da_machine.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaBangBangDa" target="_blank" rel="noopener noreferrer" title="RV Z-score scanner · Bang Bang Da v1.2">Bang Bang Da ↗</a>
+                <a href="whinfell-transmission-ladder-deep-dive.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaLadderDeepDive" target="_blank" rel="noopener noreferrer" title="Interactive transmission ladder deep dive">Ladder deep dive ↗</a>
+              </nav>
+            </details>
+          </section>
+          <section class="wf-rail-section wf-rail-section--risk-curve">
+            <div class="wf-rail-section__label">Risk curve</div>
+            <button type="button" id="iaRiskCurveSummary" class="wf-nav-item ia-risk-curve-summary" data-ia-view-shortcut="risk_curve" title="Jump to full risk curve">Curve · —</button>
+          </section>
+        </div>
+      </aside>
+      <main class="ia-center-canvas" id="iaCenterCanvas" aria-label="Primary analytical workspace">
+        <div id="iaWidgetGrid" class="wf-panel-grid ia-widget-grid" data-agent-surface="ia-widget-grid">
+          <article id="widgetRiskCockpit" class="wf-panel wf-panel--risk-cockpit" data-widget="risk_cockpit">
+            <header class="wf-panel__header"><span class="wf-panel__title">Risk Cockpit</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCockpitHost"></div>
+          </article>
+          <article id="widgetRiskCurve" class="wf-panel wf-panel--risk-curve" data-widget="risk_curve">
+            <header class="wf-panel__header"><span class="wf-panel__title">Risk Curve</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCurveHost"></div>
+          </article>
+          <article id="widgetTransmissionRadar" class="wf-panel wf-panel--radar" data-widget="transmission_radar">
+            <header class="wf-panel__header"><span class="wf-panel__title">Transmission Signal Radar</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRadarHost"></div>
+          </article>
+          <article id="widgetHyOas" class="wf-panel wf-panel--hy-oas" data-widget="hy_oas">
+            <header class="wf-panel__header"><span class="wf-panel__title">HY OAS Proxy</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaHyOasHost">
+              <div class="hy-oas-widget" id="hyOasWidget">
+                <section class="wf-subframe hy-oas-subsection hy-oas-subsection--numerics" id="hyOasNumerics" aria-label="Numerics">
+                  <header class="wf-subframe__header">Numerics</header>
+                  <div class="wf-subframe__body hy-oas-subsection__body" id="hyOasNumericsBody"></div>
+                </section>
+                <section class="wf-subframe hy-oas-subsection hy-oas-subsection--thesis" id="hyOasThesisHandoff" aria-label="Thesis and handoff">
+                  <header class="wf-subframe__header">Thesis &amp; Handoff</header>
+                  <div class="wf-subframe__body hy-oas-subsection__body" id="hyOasThesisBody"></div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article id="widgetFlipchart" class="wf-panel wf-panel--flipchart" data-widget="flipchart">
+            <header class="wf-panel__header"><span class="wf-panel__title">Flipchart</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaFlipchartHost"></div>
+          </article>
+          <article id="widgetDepth" class="wf-panel wf-panel--depth depth-ladders-widget-card" data-widget="depth_ladders">
+            <header class="wf-panel__header depth-ladders-widget__header">
+              <span class="wf-panel__title depth-ladders-widget__title">
+                <svg class="depth-ladders-plumbing-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" focusable="false">
+                  <path d="M1.5 7h11M7 1.5v4.5M7 9.5v3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+                  <circle cx="7" cy="7" r="1.35" fill="currentColor"/>
+                </svg>
+                Depth · Command bar &amp; Ladders
+              </span>
+            </header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaDepthHost">
+              <div class="depth-ladders-widget" id="depthLaddersWidget">
+                <div class="depth-ladders-status" id="depthLaddersStatus" role="status" aria-live="polite" aria-label="Depth and ladders status">
+                  <span id="depthStatusHydration" class="depth-status-item depth-status-item--hydration">—</span>
+                  <span class="depth-status-sep" aria-hidden="true">·</span>
+                  <span id="depthStatusFreshness" class="depth-status-item depth-status-item--freshness">—</span>
+                  <span class="depth-status-sep depth-status-sep--viz" aria-hidden="true">·</span>
+                  <span id="depthStatusViz" class="depth-status-item depth-status-item--viz">Viz —</span>
+                  <span id="depthStatusWarn" class="depth-status-badge depth-status-badge--hidden" aria-hidden="true">WARN</span>
+                </div>
+                <div class="ladder-viz-region" id="ladderVizRegion" aria-label="Ladder visualization region" data-agent-surface="ladder-viz-region"></div>
+                <div id="depthLaddersContent" class="depth-ladders-content"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div id="iaScanHost" class="ia-scan-host zone-hidden" data-agent-surface="ia-scan-host" aria-hidden="true">
+          <section id="transmissionRadar" class="transmission-radar" aria-label="Transmission Signal Radar" data-agent-surface="transmission-radar">
+            <div id="transmissionRadarMount" class="transmission-radar-mount"></div>
+          </section>
+        </div>
+        <div id="iaCockpitHost" class="ia-cockpit-host zone-hidden" data-agent-surface="ia-cockpit-host" aria-hidden="true">
+  <!-- Phase 2 Node Cockpit Shell (UI-1) -->
+  <section id="nodeCockpitZone" class="flex-1 min-h-0 flex flex-col overflow-hidden" aria-label="Node cockpit workspace">
+    <nav id="nodeRail" class="node-rail" aria-label="Risk curve navigation"></nav>
+    <div id="diagnosticsPanelZone" class="console-panel-zone console-panel-zone--diagnostics zone-hidden">
+      <div class="console-panel-zone-label">Data quality · coverage</div>
+      <div id="nodeCoverageBanner" class="node-coverage-banner zone-hidden" role="status" aria-live="polite" aria-label="Hydration and coverage"></div>
+    </div>
+    <section id="postImportWorkflow" class="post-import-workflow zone-hidden console-panel-zone" aria-label="Post-import workflow">
+      <div class="console-panel-zone-label">Workflow actions</div>
+      <div class="post-import-workflow-inner">
+        <span class="post-import-workflow-title">Desk checklist</span>
+        <ol id="postImportSteps" class="post-import-steps"></ol>
+      </div>
+    </section>
+    <div id="cockpitShell" class="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div class="cockpit-main flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
+        <div id="cockpitChartArea" class="cockpit-chart-area xl:col-span-12 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
+          <div id="basisTacticalBanner" class="basis-tactical-banner zone-hidden" aria-live="polite">
+            <p id="basisTacticalLead" class="basis-tactical-lead">—</p>
+            <details class="mission-read-disclosure" id="basisTacticalDisclosure">
+              <summary>Full read</summary>
+              <p id="basisTacticalSentence" class="basis-tactical-sentence">—</p>
+              <p id="basisTacticalSuffix" class="basis-tactical-suffix zone-hidden">—</p>
+            </details>
+          </div>
+          <div class="cockpit-chart-header cockpit-chart-header--compact px-3 py-1 border-b border-wtm-border bg-wtm-surface">
+            <h2 id="cockpitChartTitle" class="text-[12px] font-bold">Mission read · RV / Basis</h2>
+            <p id="cockpitChartSubtitle" class="text-[9px] text-wtm-muted">—</p>
+          </div>
+          <div id="cockpitHorizonRow" class="cockpit-horizon-row cockpit-horizon-row--compact">
+            <div id="cockpitHorizonPills" role="group" aria-label="RV horizon"></div>
+          </div>
+          <div id="cockpitDataViewport" class="cockpit-data-viewport">
+          <div id="cockpitChartCanvas" class="cockpit-chart-canvas">
+            <canvas id="cockpitRvCanvas" aria-label="RV basis chart"></canvas>
+            <div id="cockpitChartPlaceholder" class="cockpit-chart-placeholder">
+              <p class="text-[10px] text-wtm-muted">Import hydration to populate RV quartiles and basis history.</p>
+              <span id="cockpitChartValue" class="zone-hidden">—</span>
+              <span id="cockpitChartRichness" class="zone-hidden">—</span>
+              <span id="cockpitChartPct" class="zone-hidden">—</span>
+            </div>
+          </div>
+          <div id="cockpitRvTableWrap" class="cockpit-rv-table-wrap" aria-label="RV horizon data table"></div>
+          </div>
+        </div>
+        <aside id="cockpitDecisionRail" class="cockpit-decision-rail bg-wtm-bg min-h-0" aria-label="Decision rail">
+          <div id="cockpitDecisionContent" class="cockpit-decision-content"></div>
+          <details class="ia-commentary-disclosure" id="iaCommentaryDisclosure">
+            <summary>Desk feed</summary>
+            <div id="iaCommentaryFeed" class="ia-commentary-feed ia-commentary-feed--right" role="feed" aria-label="Operator commentary"></div>
+          </details>
+        </aside>
+      </div>
+      <div id="cockpitFocusLayer" class="cockpit-focus-layer zone-hidden" aria-label="Here's Why focus"></div>
+      <div id="cockpitCompareLayer" class="cockpit-compare-layer zone-hidden" aria-label="Compare mode"></div>
+      <div id="basisSummaryStrip" class="basis-summary-strip zone-hidden">
+        <div id="basisSummary" class="basis-summary">
+          <div class="basis-reading-primary">
+            <div id="basisReadingValue" class="basis-reading-value">—</div>
+          </div>
+          <div id="basisReadingLabel" class="basis-reading-label">Current reading</div>
+          <div id="basisStanceRow" class="basis-interpret-row"></div>
+          <div id="basisTradeRow" class="basis-trade-row"></div>
+        </div>
+      </div>
+      <div id="cockpitDetailBand" class="cockpit-detail-band shrink-0" aria-label="Component drivers"></div>
+      <div id="hyOasHandoffActions" class="hy-oas-handoff-actions wf-panel__actions" aria-label="Handoff actions">
+        <div class="operator-actions-primary hy-oas-handoff-actions__row">
+          <button type="button" id="btnHeresWhy" class="operator-action operator-action--why btn btn-primary">
+            <span class="operator-action-label">Here's Why</span>
+            <span class="operator-action-hint">Inspect thesis &amp; drivers</span>
+          </button>
+          <button type="button" id="btnCompareMode" class="operator-action operator-action--compare btn btn-secondary">
+            <span class="operator-action-label">Compare</span>
+            <span class="operator-action-hint">Cross-node scenarios</span>
+          </button>
+          <button type="button" id="btnExportNode" class="operator-action operator-action--export btn btn-ghost">
+            <span class="operator-action-label">Export node</span>
+            <span class="operator-action-hint">Desk handoff bundle</span>
+          </button>
+        </div>
+      </div>
+      <div id="cockpitActions" class="cockpit-actions shrink-0" aria-label="Flipchart navigation">
+        <div class="cockpit-actions-inner">
+          <div id="flipchartState" class="flipchart-state flipchart-header" aria-live="polite" data-agent-surface="flipchart-state">
+            <div class="flipchart-header__brand">
+              <span class="flipchart-mode" id="flipchartMode">Flipchart</span>
+              <div class="flipchart-header__title-group">
+                <strong id="flipchartTitle" class="flipchart-header__asset">—</strong>
+                <span id="flipchartRegimeTag" class="flipchart-regime-tag flipchart-regime-tag--unset" data-agent-field="flip-regime" aria-label="Market regime">—</span>
+              </div>
+            </div>
+            <span id="flipchartSlideIndex" class="flipchart-slide-index" data-agent-field="flip-slide-index">—</span>
+            <span id="flipchartPosition" class="flipchart-position zone-hidden" data-agent-field="flip-index" aria-hidden="true">—</span>
+          </div>
+          <div class="keyboard-hint-group">
+            <button type="button" id="btnFlipPrev" class="flipchart-nav-btn" title="Previous node (←)" aria-label="Previous node">‹</button>
+            <button type="button" id="btnFlipNext" class="flipchart-nav-btn" title="Next node (→)" aria-label="Next node">›</button>
+            <span class="keyboard-hint" id="keyboardHintText">← → flip · 1–5 jump · f focus · c compare</span>
+            <button type="button" id="btnShortcutHelp" class="shortcut-help-btn" title="Shift+click a rail tab (in Compare mode) to add/remove that node from the side-by-side Compare layer without leaving your current view.">?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+        </div>
+        <div id="iaDigHost" class="ia-dig-host" data-agent-surface="ia-dig-host">
+  <section id="basisWatchPanel" class="basis-watch-panel" aria-label="BasisWatch and implied rate">
+    <div class="basis-watch-head">
+      <div class="bw-head-group bw-head-group--title">
+        <div class="basis-watch-head-primary">
+          <span class="basis-watch-title">WTM BasisWatch</span>
+          <span class="basis-watch-sub">TradFi ↔ Crypto bridge</span>
+        </div>
+      </div>
+      <div class="bw-head-group bw-head-group--market" aria-label="Market and state">
+        <div class="bw-chip-row" role="group" aria-label="Asset">
+          <button type="button" class="bw-asset-btn bw-asset-btn--active" data-bw-asset="BTC">BTC</button>
+          <button type="button" class="bw-asset-btn" data-bw-asset="ETH">ETH</button>
+        </div>
+        <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
+        <span id="bwDataNote" class="bw-data-note"></span>
+      </div>
+      <div class="bw-head-group bw-head-group--view" aria-label="View controls">
+        <div class="bw-segment" role="tablist" aria-label="View mode">
+          <button type="button" class="bw-view-tab bw-view-tab--active" data-bw-view="basis" role="tab" aria-selected="true">Basis Watch</button>
+          <button type="button" class="bw-view-tab" data-bw-view="implied" role="tab" aria-selected="false">Implied Rate</button>
+        </div>
+        <div class="bw-view-settings">
+          <label class="bw-field-label">Roll
+            <select id="bwRollLogic">
+              <option value="nearest">Nearest</option>
+              <option value="constant">Constant maturity</option>
+              <option value="manual">Manual (L3)</option>
+            </select>
+          </label>
+          <label class="bw-field-label">Mode
+            <select id="bwModeToggle">
+              <option value="live">Live</option>
+              <option value="snapshot">Snapshot</option>
+            </select>
+          </label>
+          <button type="button" id="btnBwPopOut" class="bw-btn bw-btn--focus" title="Open BasisWatch in a dedicated focus view">
+            <span class="bw-btn-focus-icon" aria-hidden="true">⧉</span>
+            <span class="bw-btn-focus-label">Open in focus view</span>
+          </button>
+        </div>
+      </div>
+      <div class="bw-head-group bw-head-group--utility" aria-label="Utilities">
+        <div class="bw-utility-cluster" role="group" aria-label="Export">
+          <button type="button" id="btnBwExportCsv" class="bw-btn bw-btn--utility" title="Export BasisWatch table CSV">Export CSV</button>
+          <button type="button" id="btnBwExportPng" class="bw-btn bw-btn--utility" title="Export chart PNG">Export PNG</button>
+        </div>
+        <button type="button" id="btnBwCollapse" class="bw-btn bw-btn--utility bw-btn--collapse" title="Collapse panel" aria-label="Collapse panel">▾</button>
+        <details class="bw-external-disclosure">
+          <summary class="bw-external-summary">Sources</summary>
+          <button type="button" id="btnBwBarchart">Barchart ↗</button>
+          <button type="button" id="btnBwKoyfin">Koyfin ↗</button>
+        </details>
+      </div>
+    </div>
+    <div class="basis-watch-body">
+      <div class="basis-watch-main">
+        <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+        <div id="bwMainView"></div>
+        <details class="bw-methodology-disclosure" id="bwMethodologyDisclosure">
+          <summary>Methodology</summary>
+          <aside class="bw-methodology bw-methodology--compact" id="bwMethodology" aria-label="Methodology"></aside>
+        </details>
+      </div>
+      <aside class="basis-watch-rail">
+        <div id="bwSummaryCards" class="bw-summary-grid"></div>
+        <div id="bwCallouts"></div>
+        <div>
+          <p class="bw-subhead">Cross-asset context</p>
+          <div id="bwCrossAsset" class="bw-xasset-host"></div>
+        </div>
+        <div class="bw-links">
+          <span class="bw-links-support">HYG/LQD vs BTC: use Koyfin credit view · USDCNH NDF: wire in ARCH-4</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+  <section id="iaMidwestCrushHost" class="ia-midwest-crush-host zone-hidden" aria-label="Midwest Compute Crush" data-agent-surface="ia-midwest-crush">
+    <header class="ia-midwest-crush-head">
+      <div class="ia-midwest-crush-title-block">
+        <span class="ia-midwest-crush-title">Midwest Compute Crush</span>
+        <span class="ia-midwest-crush-sub">GPU · MISO power · cross-asset crush spreads</span>
+      </div>
+      <div class="ia-midwest-crush-actions">
+        <button type="button" class="ia-midwest-crush-btn" id="btnIaWmcExport" title="Export WMC JSON bundle">Export</button>
+        <a href="Whinfell_Midwest_Compute_Crush.html" class="ia-midwest-crush-btn ia-midwest-crush-btn--link" target="_blank" rel="noopener noreferrer" title="Open full standalone page">Pop out ↗</a>
+      </div>
+    </header>
+    <div class="ia-midwest-crush-viewport" id="iaMidwestCrushViewport">
+      <div class="wmc-page wmc-page--ia-embed">
+        <section id="overview" class="wmc-zone" aria-labelledby="wmc-ia-overview-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-overview-title">Overview</h2>
+            <p class="wmc-zone-desc">Midwest GPU crush posture and desk snapshot</p>
+          </div>
+          <div id="overview-root"></div>
+        </section>
+        <section id="basis" class="wmc-zone" aria-labelledby="wmc-ia-basis-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-basis-title">Basis tracker · crush spreads</h2>
+            <p class="wmc-zone-desc">Click column headers to sort · dislocations color-coded</p>
+          </div>
+          <div class="wmc-panel">
+            <div class="wmc-table-wrap">
+              <table class="wmc-table" id="basisTable">
+                <thead>
+                  <tr>
+                    <th data-sort="leg">Leg <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="compute">Compute <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="miso_power">MISO power <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="hy_gas">HY gas <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="hg_copper">HG copper <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="btc_basis">BTC basis <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="z_score">Z-score <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="dislocation">Dislocation <span class="wmc-sort-icon">↕</span></th>
+                  </tr>
+                </thead>
+                <tbody id="basisBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="risk" class="wmc-zone" aria-labelledby="wmc-ia-risk-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-risk-title">Risk · correlations</h2>
+            <p class="wmc-zone-desc">30-day cross-asset correlations in crush context</p>
+          </div>
+          <div id="risk-corr" class="wmc-subpanel">
+            <h3 class="wmc-subpanel-title">Correlations (30D)</h3>
+            <div class="wmc-heatmap" id="corrHeatmap"></div>
+          </div>
+          <div id="risk-var" class="wmc-subpanel">
+            <h3 class="wmc-subpanel-title">Value at risk (95%, 1D)</h3>
+            <table class="wmc-var-table" id="varTable">
+              <thead>
+                <tr>
+                  <th>Bucket</th>
+                  <th>VaR</th>
+                  <th>CVaR</th>
+                  <th>Limit</th>
+                  <th>Util</th>
+                </tr>
+              </thead>
+              <tbody id="varBody"></tbody>
+            </table>
+          </div>
+        </section>
+        <section id="trades" class="wmc-zone" aria-labelledby="wmc-ia-trades-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-trades-title">Trade ideas</h2>
+            <p class="wmc-zone-desc">Desk expressions by structure type</p>
+          </div>
+          <div class="wmc-panel" id="trades-root"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+        </div>
+      </main>
+      <aside class="ia-right-frame" id="iaRightFrame" aria-label="Decision and commentary rail">
+        <div id="iaRightRailHost" class="ia-right-rail-host" data-agent-surface="ia-right-rail"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Chunk 12 — depth band: command bar + ladders (collapsed by default) -->
+  <details id="consoleDepthDisclosure" class="console-depth-disclosure">
+    <summary class="console-depth-summary">Depth · Command bar &amp; ladders</summary>
+    <section id="commandBar" class="shrink-0 border-b border-wtm-border bg-wtm-surface gate-glow-amber transition-all">
     <div class="kpi-band">
       <div class="kpi-band-toolbar">
         <div class="flex items-center gap-1 shrink-0 border border-wtm-border rounded-md p-0.5 bg-wtm-bg">
-          <button type="button" data-track="both" class="track-toggle track-toggle-active text-[9px] font-bold px-2 py-1 rounded border border-transparent">Both</button>
-          <button type="button" data-track="global" class="track-toggle text-[9px] font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">Global</button>
-          <button type="button" data-track="china" class="track-toggle text-[9px] font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">China</button>
+          <button type="button" data-track="both" class="track-toggle track-toggle-active font-bold px-2 py-1 rounded border border-transparent">Both</button>
+          <button type="button" data-track="global" class="track-toggle font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">Global</button>
+          <button type="button" data-track="china" class="track-toggle font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">China</button>
         </div>
         <div class="kpi-band-meta">
           <span id="cmdTxState" class="hidden">—</span>
           <span id="cmdRegime" class="hidden">—</span>
           <span id="cmdSq3Score" class="tabular-nums">SQ3 —</span>
-          <span id="cmdSq3Band" class="text-[9px] font-semibold px-1.5 py-0.5 rounded border">—</span>
+          <span id="cmdSq3Band" class="kpi-band-chip px-1.5 py-0.5 rounded border">—</span>
           <span id="cmdGrossRisk" class="tabular-nums text-wtm-accent">—</span>
-          <span id="cmdGrossPosture" class="text-[9px]">—</span>
+          <span id="cmdGrossPosture" class="kpi-band-meta-note">—</span>
           <span id="sessionReadyChip" class="session-ready-chip zone-hidden" role="status" aria-live="polite">—</span>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" id="btnSignalDetail" class="btn-signal-detail">Signal detail</button>
-          <button type="button" id="btnToggleGateDetail" class="text-[10px] text-wtm-accent hover:underline font-semibold">Gate detail</button>
-          <a href="whinfell-transmission-ladder-deep-dive.html" target="_blank" rel="noopener" class="text-[10px] text-wtm-muted hover:text-wtm-accent font-semibold">Ladder deep dive</a>
+          <button type="button" id="btnToggleGateDetail" class="kpi-band-inline-link text-wtm-accent hover:underline">Gate detail</button>
+          <a href="whinfell-transmission-ladder-deep-dive.html" target="_blank" rel="noopener" class="kpi-band-inline-link text-wtm-muted hover:text-wtm-accent">Ladder deep dive</a>
         </div>
       </div>
       <section class="decision-strip" aria-label="Primary KPIs">
         <div id="scoreCard" class="metric-card score-card">
-          <span id="tipWhinfellScore" class="label metric-tip" tabindex="0" data-tip="Whinfell Score — import hydration for live metrics.">Whinfell Score</span>
+          <span id="tipWhinfellScore" class="label metric-tip" tabindex="0" data-tip="Risk Score (Whinfell composite 0–100) — import hydration for live metrics.">Risk Score</span>
           <strong id="cmdWhinfellScore">—</strong>
-          <span id="cmdScoreZone" class="meta">—</span>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="cmdScoreZone" class="meta">—</span>
+          </details>
         </div>
         <div class="metric-card">
           <span id="tipTransmission" class="label metric-tip" tabindex="0" data-tip="Transmission health — import hydration for live metrics.">Transmission</span>
           <strong id="txHealthValue">—</strong>
-          <span id="txHealthMeta" class="meta">—</span>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="txHealthMeta" class="meta">—</span>
+          </details>
         </div>
-        <div class="metric-card">
-          <span id="tipGateState" class="label metric-tip" tabindex="0" data-tip="Gate state — import hydration for live metrics.">Gate state</span>
+        <div class="metric-card gate-card">
+          <span id="tipGateState" class="label metric-tip" tabindex="0" data-tip="BTC Gate — sizing permission for BTC modules (not auto-trade). Import hydration for live read.">BTC Gate</span>
           <strong id="gateText">—</strong>
           <span id="cmdGateLabel" class="hidden">—</span>
           <span id="gateChip" class="gate-chip">—</span>
-          <span id="gateHelperText" class="meta">—</span>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="gateHelperText" class="meta">—</span>
+          </details>
           <span id="cmdGateSub" class="hidden">—</span>
         </div>
-        <div class="metric-card">
-          <span id="tipShock" class="label metric-tip" tabindex="0" data-tip="Shock scenario — baseline until tracer arms a shock.">Shock</span>
-          <strong id="shockText">No active shock</strong>
-          <span id="shockMeta" class="meta">Baseline regime</span>
+        <div class="metric-card shock-card">
+          <span id="tipShock" class="label metric-tip" tabindex="0" data-tip="Shock overlay — optional scenario that compresses sizing until cleared.">Shock overlay</span>
+          <strong id="shockText">No scenario</strong>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="shockMeta" class="meta">Baseline — no overlay</span>
+          </details>
         </div>
         <div id="cmdFreshnessCluster" class="metric-card">
           <span id="tipFreshness" class="label metric-tip" tabindex="0" data-tip="Freshness — import hydration for live age.">Freshness</span>
@@ -181,17 +597,25 @@ window.DICTIONARY_BADGE_DEFAULT = {
             <span id="cmdFreshnessDot" class="freshness-dot hidden"></span>
             <strong id="cmdFreshness">—</strong>
           </div>
-          <span id="cmdFreshnessMeta" class="meta" title="">—</span>
-          <div id="cmdFreshnessSubCluster" class="freshness-sub-cluster" aria-label="Source freshness"></div>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="cmdFreshnessMeta" class="meta" title="">—</span>
+          </details>
+          <details class="cmd-meta-disclosure cmd-freshness-disclosure">
+            <summary>Sources</summary>
+            <div id="cmdFreshnessSubCluster" class="freshness-sub-cluster" aria-label="Source freshness"></div>
+          </details>
         </div>
       </section>
     </div>
     <div class="console-panel-zone console-panel-zone--ladders">
-      <div class="console-panel-zone-label">Ladders · Global + China</div>
-      <div id="cmdLadderTracks" class="console-panel-zone-body">
-        <div id="cmdGlobalCluster" class="rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-[10px] text-wtm-muted leading-relaxed"></div>
-        <div id="cmdChinaCluster" class="rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-[10px] text-wtm-muted leading-relaxed"></div>
-      </div>
+      <details class="ladder-cluster-disclosure" id="cmdLadderDisclosure">
+        <summary class="console-panel-zone-label">Ladders · Global + China</summary>
+        <div id="cmdLadderTracks" class="console-panel-zone-body">
+          <div id="cmdGlobalCluster" class="cmd-ladder-cluster rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-wtm-muted leading-relaxed"></div>
+          <div id="cmdChinaCluster" class="cmd-ladder-cluster rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-wtm-muted leading-relaxed"></div>
+        </div>
+      </details>
     </div>
     <div id="gateDetailPanel" class="hidden console-panel-zone">
       <div class="console-panel-zone-label">Gate detail</div>
@@ -222,149 +646,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
     </div>
     <div id="suggestionRows"></div>
   </section>
-
-  <!-- Phase 2 Node Cockpit Shell (UI-1) -->
-  <section id="nodeCockpitZone" class="flex-1 min-h-0 flex flex-col overflow-hidden" aria-label="Node cockpit workspace">
-    <nav id="nodeRail" class="node-rail" aria-label="Risk curve navigation"></nav>
-    <div id="diagnosticsPanelZone" class="console-panel-zone console-panel-zone--diagnostics zone-hidden">
-      <div class="console-panel-zone-label">Data quality · coverage</div>
-      <div id="nodeCoverageBanner" class="node-coverage-banner zone-hidden" role="status" aria-live="polite" aria-label="Hydration and coverage"></div>
-    </div>
-    <section id="postImportWorkflow" class="post-import-workflow zone-hidden console-panel-zone" aria-label="Post-import workflow">
-      <div class="console-panel-zone-label">Workflow actions</div>
-      <div class="post-import-workflow-inner">
-        <span class="post-import-workflow-title">Desk checklist</span>
-        <ol id="postImportSteps" class="post-import-steps"></ol>
-      </div>
-    </section>
-    <div id="cockpitShell" class="flex-1 min-h-0 flex flex-col overflow-hidden">
-      <div class="cockpit-main flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
-        <div id="cockpitChartArea" class="cockpit-chart-area xl:col-span-8 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
-          <div class="console-panel-zone-label console-panel-zone-label--inline">Mission read · RV / Basis</div>
-          <div id="basisTacticalBanner" class="basis-tactical-banner zone-hidden" aria-live="polite">
-            <p class="basis-tactical-eyebrow">Basis mission read</p>
-            <p id="basisTacticalSentence" class="basis-tactical-sentence">—</p>
-            <p id="basisTacticalSuffix" class="basis-tactical-suffix text-[10px] text-wtm-muted mt-0.5 zone-hidden">—</p>
-          </div>
-          <div class="cockpit-chart-header px-3 py-2 border-b border-wtm-border bg-wtm-surface">
-            <h2 id="cockpitChartTitle" class="text-[12px] font-bold">Relative Value · Basis</h2>
-            <p id="cockpitChartSubtitle" class="text-[9px] text-wtm-muted mt-0.5">—</p>
-          </div>
-          <div id="cockpitHorizonRow" class="cockpit-horizon-row">
-            <div id="cockpitHorizonPills" role="group" aria-label="RV horizon"></div>
-          </div>
-          <div id="cockpitChartCanvas" class="cockpit-chart-canvas">
-            <canvas id="cockpitRvCanvas" aria-label="RV basis chart"></canvas>
-            <div id="cockpitChartPlaceholder" class="cockpit-chart-placeholder">
-              <p class="text-[10px] text-wtm-muted">Import hydration to populate RV quartiles and basis history.</p>
-              <span id="cockpitChartValue" class="zone-hidden">—</span>
-              <span id="cockpitChartRichness" class="zone-hidden">—</span>
-              <span id="cockpitChartPct" class="zone-hidden">—</span>
-            </div>
-          </div>
-          <div id="cockpitRvTableWrap" class="cockpit-rv-table-wrap" aria-label="RV horizon data table"></div>
-          <div id="basisSummaryStrip" class="basis-summary-strip zone-hidden">
-            <div id="basisSummary" class="basis-summary">
-              <div class="basis-reading-primary">
-                <div id="basisReadingValue" class="basis-reading-value">—</div>
-              </div>
-              <div id="basisReadingLabel" class="basis-reading-label">Current reading</div>
-              <div id="basisStanceRow" class="basis-interpret-row"></div>
-              <div id="basisTradeRow" class="basis-trade-row"></div>
-            </div>
-          </div>
-        </div>
-        <aside id="cockpitDecisionRail" class="cockpit-decision-rail xl:col-span-4 bg-wtm-bg min-h-0" aria-label="Decision rail"></aside>
-      </div>
-      <div id="cockpitFocusLayer" class="cockpit-focus-layer zone-hidden" aria-label="Here's Why focus"></div>
-      <div id="cockpitCompareLayer" class="cockpit-compare-layer zone-hidden" aria-label="Compare mode"></div>
-      <div id="cockpitDetailBand" class="cockpit-detail-band shrink-0" aria-label="Component drivers"></div>
-      <div id="cockpitActions" class="cockpit-actions shrink-0" aria-label="Cockpit actions">
-        <div class="cockpit-actions-inner">
-          <div class="operator-actions-primary">
-            <button type="button" id="btnHeresWhy" class="operator-action operator-action--why btn btn-primary">
-              <span class="operator-action-label">Here's Why</span>
-              <span class="operator-action-hint">Inspect thesis &amp; drivers</span>
-            </button>
-            <button type="button" id="btnCompareMode" class="operator-action operator-action--compare btn btn-secondary">
-              <span class="operator-action-label">Compare</span>
-              <span class="operator-action-hint">Cross-node scenarios</span>
-            </button>
-            <button type="button" id="btnExportNode" class="operator-action operator-action--export btn btn-ghost">
-              <span class="operator-action-label">Export node</span>
-              <span class="operator-action-hint">Desk handoff bundle</span>
-            </button>
-          </div>
-          <div id="flipchartState" class="flipchart-state" aria-live="polite" data-agent-surface="flipchart-state">
-            <span class="flipchart-mode" id="flipchartMode">Flipchart</span>
-            <strong id="flipchartTitle">—</strong>
-          </div>
-          <div class="keyboard-hint-group">
-            <button type="button" id="btnFlipPrev" class="flipchart-nav-btn" title="Previous node (←)" aria-label="Previous node">‹</button>
-            <span id="flipchartPosition" class="flipchart-position" data-agent-field="flip-index">—</span>
-            <button type="button" id="btnFlipNext" class="flipchart-nav-btn" title="Next node (→)" aria-label="Next node">›</button>
-            <span class="keyboard-hint" id="keyboardHintText">← → flip · 1–5 jump · f focus · c compare</span>
-            <button type="button" id="btnShortcutHelp" class="shortcut-help-btn" title="Shift+click a rail tab (in Compare mode) to add/remove that node from the side-by-side Compare layer without leaving your current view.">?</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-<section id="basisWatchPanel" class="basis-watch-panel" aria-label="BasisWatch and implied rate">
-    <div class="basis-watch-head">
-      <div>
-        <span class="basis-watch-title">WTM BasisWatch</span>
-        <span class="basis-watch-sub"> · TradFi ↔ Crypto bridge</span>
-      </div>
-      <button type="button" class="bw-view-tab bw-view-tab--active" data-bw-view="basis">Basis Watch</button>
-      <button type="button" class="bw-view-tab" data-bw-view="implied">Implied Rate</button>
-      <button type="button" class="bw-asset-btn bw-asset-btn--active" data-bw-asset="BTC">BTC</button>
-      <button type="button" class="bw-asset-btn" data-bw-asset="ETH">ETH</button>
-      <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
-      <span id="bwDataNote"></span>
-      <div class="bw-toolbar">
-        <label class="text-[8px] text-wtm-muted">Roll
-          <select id="bwRollLogic" class="ml-1">
-            <option value="nearest">Nearest</option>
-            <option value="constant">Constant maturity</option>
-            <option value="manual">Manual (L3)</option>
-          </select>
-        </label>
-        <label class="text-[8px] text-wtm-muted">Mode
-          <select id="bwModeToggle" class="ml-1">
-            <option value="live">Live</option>
-            <option value="snapshot">Snapshot</option>
-          </select>
-        </label>
-        <button type="button" id="btnBwPopOut" class="bw-btn bw-btn--popout" title="Open full-screen BasisWatch">Pop out ↗</button>
-        <button type="button" id="btnBwRefresh" title="Refresh curve + sync dashboard">Refresh</button>
-        <button type="button" id="btnBwExportCsv">CSV</button>
-        <button type="button" id="btnBwExportPng">PNG</button>
-        <button type="button" id="btnBwBarchart">Barchart ↗</button>
-        <button type="button" id="btnBwKoyfin">Koyfin ↗</button>
-        <button type="button" id="btnBwCollapse" title="Collapse panel">▾</button>
-      </div>
-    </div>
-    <div class="basis-watch-body">
-      <div class="basis-watch-main">
-        <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
-        <div id="bwMainView"></div>
-        <aside class="bw-methodology bw-methodology--compact" id="bwMethodology" aria-label="Methodology"></aside>
-      </div>
-      <aside class="basis-watch-rail">
-        <div id="bwSummaryCards" class="bw-summary-grid"></div>
-        <div id="bwCallouts"></div>
-        <div>
-          <p class="bw-subhead">Cross-asset context</p>
-          <div id="bwCrossAsset" class="bw-xasset-host"></div>
-        </div>
-        <div class="bw-links text-[9px] text-wtm-muted">
-          <span>HYG/LQD vs BTC: use Koyfin credit view · USDCNH NDF: wire in ARCH-4</span>
-        </div>
-      </aside>
-    </div>
-  </section>
+  </details>
 
   <!-- Legacy Three-Zone Layout -->
   <div id="legacyConsoleZone" class="zone-hidden flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
@@ -831,17 +1113,48 @@ window.DICTIONARY_BADGE_DEFAULT = {
     </aside>
   </div>
 
+  <div id="iaDictionaryBackdrop" class="ia-dictionary-backdrop" aria-hidden="true"></div>
+  <aside id="iaDictionaryDrawer" class="ia-dictionary-drawer" aria-label="Data Dictionary" aria-hidden="true">
+    <div class="ia-dictionary-head">
+      <span>Data Dictionary</span>
+      <button type="button" id="btnCloseIaDictionary" aria-label="Close dictionary">×</button>
+    </div>
+    <div id="iaDictionaryBody" class="ia-dictionary-body"></div>
+  </aside>
+
   <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
 
 <script src="js/desk_china_ladder_models.js"></script>
+  <script src="js/task_force_panel_feed.js"></script>
   <script src="js/basis_watch_analytics.js"></script>
   <script src="js/basis_watch_panel.js"></script>
   <script src="js/bootstrap.js"></script>
+  <script src="js/data_states.js"></script>
+  <script src="js/command_bar_kpis.js"></script>
+  <script src="js/scan_kpi_strip.js"></script>
+  <script src="js/top_utility_registry.js"></script>
+  <script src="js/signal_detail_copy.js"></script>
+  <script src="js/transmission_radar.js"></script>
+  <script src="js/data_dictionary_panel.js"></script>
+  <script src="js/commentary_feed.js"></script>
+  <script src="midwest_compute/wmc-data.js"></script>
+  <script src="midwest_compute/wmc-utils.js"></script>
+  <script src="midwest_compute/wmc-hydrate.js"></script>
+  <script src="midwest_compute/wmc-export.js"></script>
+  <script src="midwest_compute/wmc-overview.js"></script>
+  <script src="midwest_compute/wmc-basis.js"></script>
+  <script src="midwest_compute/wmc-trades.js"></script>
+  <script src="midwest_compute/wmc-risk.js"></script>
+  <script src="js/wmc_ia_panel.js"></script>
+  <script src="js/console_ia_shell.js"></script>
   <script src="js/core.js"></script>
   <script src="js/ai_compute_data.js"></script>
   <script src="js/ai_compute_panel.js"></script>
   <script src="js/v15_desk_data.js"></script>
   <script src="js/v15_desk_panel.js"></script>
   <script src="js/ui_polish.js"></script>
+  <script src="js/desk_data_ops.js"></script>
+  <script src="js/auto_collect_panel.js"></script>
+  <script src="js/publish_web_panel.js"></script>
 </body>
 </html>

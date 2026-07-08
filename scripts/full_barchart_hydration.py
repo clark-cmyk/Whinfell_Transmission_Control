@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Barchart intraday download helper — resilient to flaky Comet browser output.
 
+Desk navigation (easiest path — do not invent alternate flows):
+  Main Watchlist → find ticker → choose CSV:
+  Options: Volatility & Greeks | Options Prices;
+  Futures: Historical Data (system default date range) | Futures Spreads.
+
 Opens download pages with retry/backoff, validates saved CSVs before staging,
 and writes a run manifest with freshness metadata for latest.json consumers.
 """

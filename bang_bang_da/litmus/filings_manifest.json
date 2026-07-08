@@ -1,0 +1,54 @@
+{
+  "schema_version": "2.0.0",
+  "adapter_version": "2.0.0-chunk18",
+  "data_status": "stub",
+  "source": "sec_edgar",
+  "as_of": "2026-07-07T22:20:23+00:00",
+  "export_id": "sec_edgar_filings",
+  "filing_forms": [
+    "10-Q",
+    "10-K",
+    "8-K"
+  ],
+  "watchlists": {
+    "cloud": [
+      "MSFT",
+      "GOOGL",
+      "AMZN",
+      "ORCL",
+      "SMCI",
+      "META",
+      "VST",
+      "CEG",
+      "NVDA"
+    ],
+    "miner": [
+      "MARA",
+      "RIOT",
+      "CLSK",
+      "HUT",
+      "CIFR",
+      "IREN",
+      "BITF"
+    ]
+  },
+  "unprocessed_filing_count": 0,
+  "unprocessed_filings": [],
+  "processed_filings": [],
+  "red_indicator": {
+    "active": false,
+    "trade_ids": [
+      "midwest_basis",
+      "midwest_calendar",
+      "btc_basis",
+      "btc_calendar"
+    ],
+    "reason": null
+  },
+  "lineage": {
+    "scan_mode": "stub",
+    "last_scan_at": null,
+    "fetch_errors": [],
+    "notes": "Run sec_filing_watcher scan to poll EDGAR Atom feeds"
+  }
+}

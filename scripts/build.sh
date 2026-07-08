@@ -12,9 +12,13 @@ mkdir -p "$OUT/css" "$OUT/js" "$OUT/data/hydration"
 
 cp "${ROOT}/index.html" "$OUT/index.html"
 cp "${ROOT}/css/main.css" "$OUT/css/main.css"
+cp "${ROOT}/css/console_ia.css" "$OUT/css/console_ia.css"
+cp "${ROOT}/css/transmission_radar.css" "$OUT/css/transmission_radar.css"
 cp "${ROOT}/js/bootstrap.js" "$OUT/js/bootstrap.js"
 cp "${ROOT}/js/core.js" "$OUT/js/core.js"
 cp "${ROOT}/js/desk_china_ladder_models.js" "$OUT/js/desk_china_ladder_models.js"
+[[ -f "${ROOT}/js/desk_chart_links.js" ]] && cp "${ROOT}/js/desk_chart_links.js" "$OUT/js/desk_chart_links.js"
+[[ -f "${ROOT}/js/desk_china_chart_links.js" ]] && cp "${ROOT}/js/desk_china_chart_links.js" "$OUT/js/desk_china_chart_links.js"
 cp "${ROOT}/css/ai_compute.css" "$OUT/css/ai_compute.css"
 cp "${ROOT}/js/ai_compute_data.js" "$OUT/js/ai_compute_data.js"
 cp "${ROOT}/js/ai_compute_panel.js" "$OUT/js/ai_compute_panel.js"
@@ -23,9 +27,25 @@ cp "${ROOT}/css/v15_desk.css" "$OUT/css/v15_desk.css"
 cp "${ROOT}/js/v15_desk_data.js" "$OUT/js/v15_desk_data.js"
 cp "${ROOT}/js/v15_desk_panel.js" "$OUT/js/v15_desk_panel.js"
 cp "${ROOT}/css/basis_watch.css" "$OUT/css/basis_watch.css"
+cp "${ROOT}/css/desk_ops.css" "$OUT/css/desk_ops.css"
 cp "${ROOT}/js/basis_watch_analytics.js" "$OUT/js/basis_watch_analytics.js"
 cp "${ROOT}/js/basis_watch_panel.js" "$OUT/js/basis_watch_panel.js"
 cp "${ROOT}/js/ui_polish.js" "$OUT/js/ui_polish.js"
+cp "${ROOT}/js/desk_data_ops.js" "$OUT/js/desk_data_ops.js"
+cp "${ROOT}/js/auto_collect_panel.js" "$OUT/js/auto_collect_panel.js"
+cp "${ROOT}/js/data_states.js" "$OUT/js/data_states.js"
+cp "${ROOT}/js/command_bar_kpis.js" "$OUT/js/command_bar_kpis.js"
+cp "${ROOT}/js/scan_kpi_strip.js" "$OUT/js/scan_kpi_strip.js"
+cp "${ROOT}/js/top_utility_registry.js" "$OUT/js/top_utility_registry.js"
+cp "${ROOT}/js/signal_detail_copy.js" "$OUT/js/signal_detail_copy.js"
+cp "${ROOT}/js/transmission_radar.js" "$OUT/js/transmission_radar.js"
+cp "${ROOT}/js/task_force_panel_feed.js" "$OUT/js/task_force_panel_feed.js"
+cp "${ROOT}/js/commentary_feed.js" "$OUT/js/commentary_feed.js"
+cp "${ROOT}/js/data_dictionary_panel.js" "$OUT/js/data_dictionary_panel.js"
+cp "${ROOT}/js/console_ia_shell.js" "$OUT/js/console_ia_shell.js"
+cp "${ROOT}/js/shell_shortcuts.js" "$OUT/js/shell_shortcuts.js"
+cp "${ROOT}/js/wmc_ia_panel.js" "$OUT/js/wmc_ia_panel.js"
+cp "${ROOT}/js/publish_web_panel.js" "$OUT/js/publish_web_panel.js"
 [[ -f "${ROOT}/Whinfell_BasisWatch.html" ]] && cp "${ROOT}/Whinfell_BasisWatch.html" "$OUT/"
 
 touch "$OUT/.nojekyll"
@@ -78,13 +98,46 @@ if [[ ! -f "$OUT/data/hydration/latest.json" ]]; then
   echo "==> WARN: no hydration bundle — UI-only build"
 fi
 
+# Barchart curve for BasisWatch (parity with build_desk_preview.sh)
+BARCHART="${ROOT}/data/barchart/v1/barchart_curve_history.json"
+if [[ -f "$BARCHART" ]]; then
+  mkdir -p "$OUT/data/barchart/v1" "$OUT/data/barchart"
+  cp "$BARCHART" "$OUT/data/barchart/v1/barchart_curve_history.json"
+  cp "$BARCHART" "$OUT/data/barchart/barchart_curve_history.json"
+  echo "==> Copied barchart curve history"
+elif [[ -f "${ARCHIVE}/data/barchart/v1/barchart_curve_history.json" ]]; then
+  mkdir -p "$OUT/data/barchart/v1" "$OUT/data/barchart"
+  cp "${ARCHIVE}/data/barchart/v1/barchart_curve_history.json" "$OUT/data/barchart/v1/"
+  cp "${ARCHIVE}/data/barchart/v1/barchart_curve_history.json" "$OUT/data/barchart/"
+  echo "==> Copied barchart curve from archive"
+elif [[ -f "${ROOT}/docs/data/barchart/v1/barchart_curve_history.json" ]]; then
+  mkdir -p "$OUT/data/barchart/v1" "$OUT/data/barchart"
+  cp "${ROOT}/docs/data/barchart/v1/barchart_curve_history.json" "$OUT/data/barchart/v1/"
+  cp "${ROOT}/docs/data/barchart/v1/barchart_curve_history.json" "$OUT/data/barchart/"
+  echo "==> Copied barchart curve from docs"
+fi
+
 # Post-build verify
 for req in \
   index.html \
   css/main.css \
+  css/console_ia.css \
+  css/transmission_radar.css \
   js/bootstrap.js \
   js/core.js \
   js/desk_china_ladder_models.js \
+  js/data_states.js \
+  js/command_bar_kpis.js \
+  js/scan_kpi_strip.js \
+  js/top_utility_registry.js \
+  js/signal_detail_copy.js \
+  js/transmission_radar.js \
+  js/commentary_feed.js \
+  js/data_dictionary_panel.js \
+  js/console_ia_shell.js \
+  js/shell_shortcuts.js \
+  js/wmc_ia_panel.js \
+  js/publish_web_panel.js \
   css/ai_compute.css \
   js/ai_compute_data.js \
   js/ai_compute_panel.js \
@@ -96,6 +149,8 @@ for req in \
   css/v15_desk.css \
   js/v15_desk_data.js \
   js/v15_desk_panel.js \
+  js/auto_collect_panel.js \
+  js/task_force_panel_feed.js \
   data/hydration/latest.json \
   .nojekyll; do
   if [[ ! -f "$OUT/$req" ]]; then
@@ -111,6 +166,31 @@ grep -q 'function renderAll' "$OUT/js/core.js" || {
 
 grep -q 'Transmission Control' "$OUT/index.html" || {
   echo "build: index.html missing expected content" >&2
+  exit 1
+}
+
+grep -q 'WTM_ScanKpiStrip' "$OUT/js/scan_kpi_strip.js" || {
+  echo "build: WTM_ScanKpiStrip missing" >&2
+  exit 1
+}
+
+grep -q 'WTM_TransmissionRadar' "$OUT/js/transmission_radar.js" || {
+  echo "build: WTM_TransmissionRadar missing" >&2
+  exit 1
+}
+
+grep -q 'WTM_CommentaryFeed' "$OUT/js/commentary_feed.js" || {
+  echo "build: WTM_CommentaryFeed missing" >&2
+  exit 1
+}
+
+grep -q 'WTM_IaShell' "$OUT/js/console_ia_shell.js" || {
+  echo "build: WTM_IaShell missing" >&2
+  exit 1
+}
+
+grep -q 'wtm-ia-shell' "$OUT/index.html" || {
+  echo "build: IA shell markup missing from index.html" >&2
   exit 1
 }
 

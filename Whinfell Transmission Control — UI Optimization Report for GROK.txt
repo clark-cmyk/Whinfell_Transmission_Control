@@ -1,0 +1,363 @@
+
+
+```markdown
+# Whinfell Transmission Control — UI Optimization Report for GROK
+
+## 0. Objective and design north star
+
+Whinfell Transmission Control is a dense multi-asset trading console (crypto basis, HY credit, transmission regimes) that needs to feel as intuitive and polished as Koyfin’s market dashboards while preserving its proprietary semantics and workflows.[page:1][web:22][web:25]
+
+Design north star for GROK:
+
+- Adopt a Koyfin-like shell: shallow, collapsible top frame and shallow, collapsible left navigation with shortcut buttons.[web:22][web:24][web:29]
+- Treat each analytic cluster (Risk cockpit, Radar, HY OAS proxy, Flipchart, Depth/Ladders) as a widget card inside a flexible dashboard grid.[page:1][web:22][web:26]
+- Maintain performance and avoid context window bloat by working in micro-chunks: small, scoped UI changes that GROK can reason about with minimal DOM/CSS payload per step.[web:20][web:26]
+Grok
+---
+
+## 1. Current UI: structure and elements
+
+This section documents the Phase 2.3 Operator Console as rendered in the current `index.html` so GROK has a clear inventory of frames, links, and controls.[page:1]
+
+### 1.1 Global shell and pipeline header
+
+Top of page content (current):[page:1]
+
+- Title: `Whinfell Transmission Control` with `Phase 2.3`.
+- Build controls:
+  - `Build` (pipeline/config build)
+  - `Docs`
+  - `Collect CSVs`
+  - `Refresh`
+  - `Publish`
+  - `Agent ●` indicator
+- External integration shortcuts:
+  - `Open Koyfin  Koyfin ↗ ↗` → links to the Koyfin app.[page:1][web:22]
+  - `Open Barchart  Barchart ↗ ↗` → links to the Barchart futures page.[page:1][web:25]
+- Node Cockpits / `TOOLS` label.
+- Pipeline freshness panel:
+  - `FRESH PIPELINE`
+  - `Imported 6:55:00 PM · Fresh`
+  - `Unsaved changes`
+  - `Import hydration`
+  - `Import WTM`
+  - `Export`
+  - `Pipeline bundle`
+  - `Save`
+  - `Dark mode` toggle.[page:1]
+
+**Observation for GROK:** This is already acting like a top frame but is visually deep and non-collapsible; it also mixes global navigation (Build, Docs, external links) with pipeline state.[page:1][web:29]
+
+### 1.2 Primary risk cockpit block
+
+Central cockpit content:[page:1]
+
+- `RISK SCORE`
+  - Whinfell composite `58`
+  - `Zone Amber` plus ellipsis.
+- `TRANSMISSION`
+  - `65`
+  - `Liquidity & Rates` plus ellipsis.
+- `BTC GATE`
+  - Sizing permission, `CAUTION` banner.
+  - Main label: `Tight + China Caution` with “Half-size BTC …” narrative.[page:1]
+- Freshness and scenario:
+  - `FRESHNESS` → `Fresh 2h …`
+  - `SHOCK` → scenario overlay (`No scenario · Baseline only …`).
+  - `REGIME` → `Constructive / Selective Risk-On · Elevated …`.[page:1]
+
+This whole block is currently a flat sequence of headings and inline text; visually it should be one widget card.[page:1][web:22]
+
+### 1.3 Navigation and specialized tools
+
+Navigation strip around the cockpit:[page:1]
+
+- `NAVIGATION ‹`
+- `CONSOLE LAYER` → `Scan · Dig · Iterate`
+- `SPECIALIZED TOOLS` → `Details`
+- Tool shortcuts:
+  - `BasisWatch`
+  - `Midwest Compute Crush`
+
+These are effectively quick access buttons and mode toggles and should live in a shallow top or left frame similar to Koyfin’s left-side navigation.[page:1][web:29]
+
+### 1.4 Risk Curve and Transmission Signal Radar
+
+Below the cockpit:[page:1]
+
+- `RISK CURVE` list:
+  - `1. Liq 100 UNAVAILABLE`
+  - `2. Credit 38 FALLBACK_1D`
+  - `3. Breadth 72 UNAVAILABLE`
+  - `4. BTC 72 UNAVAILABLE`
+  - `5. Basis 100 UNAVAILABLE`.
+- `Transmission Signal Radar` card:
+  - Header: `CONSTRUCTIVE · 65 Weakest: Liq Scan`.
+  - Items: `LIQUIDITY`, `CREDIT`, `BREADTH`, `BTC`, `BASIS`, each `Not computed · Pending`.
+  - Data quality banner: `DATA QUALITY · COVERAGE Partial`, and feed ID `global-2026-07-07-raw2wtm-01`.[page:1]
+- Narrative diagnostics: hydration, flows, sponsorship, tradability, blocking, quarantine, credit confirmation, and summary of history/coverage (`History ✓ Flows ◐ Signals ◐ Credit ◐ Breadth ✕ BTC ✕ Basis ✕`).[page:1]
+- Output controls: `Export RV PNG`, `Export RV CSV`.[page:1]
+
+### 1.5 HY OAS proxy module
+
+HY OAS wedge:[page:1]
+
+- Narrative header: `HY OAS proxy is cheap vs history`.
+- Control: `▸ FULL READ`.
+- Table:
+  - Header row: `HORIZON | VALUE | PERCENTILE | QUARTILE | RICHNESS`.
+  - Rows for `1M`, `3M`, `6M`, `12M`, `3Y` with values, percentiles, quartiles, richness (cheap).[page:1]
+- Basis structure snippet:
+  - `339.2 bps HY OAS proxy Cheap vs history · Q4 · 90.5th percentile · n=63 Preferred expression: Long spread Tight Risk cap: 0.5×`.
+- Component drivers: `1d → 5d ↓ 20d → 60d → Component feed requires hydration import`.
+- Handoff controls:
+  - `Here's Why Inspect thesis & drivers`
+  - `Compare Cross-node scenarios`
+  - `Export node`
+  - `Desk handoff bundle`.[page:1]
+
+### 1.6 Flipchart and implications
+
+Flipchart:[page:1]
+
+- `FLIPCHART` heading with `Credit`.
+- Pager/navigation: `‹ 2 / 5 › ← → flip · 1–5 jump · f focus · c compare?`.
+- Implications block: `IMPLICATIONS · PREFERRED EXPRESSION`.
+- Labels: `IMPLICATION`, `COMPOSITE FALLBACK`, `LONG SPREAD`, `FLOWS NEUTRAL`, `TIGHT + CHINA CAUTION`, `WEAKEST LINK`.
+- Controls: `▸ FULL DIAGNOSTICS`, `DESK FEED`.[page:1]
+
+### 1.7 Depth, command bar, ladders
+
+Bottom section:[page:1]
+
+- `▸ DEPTH · COMMAND BAR & LADDERS`
+- Status line: `Parquet hydration applied · fresh Viz 9/10 · WARN`.
+
+This forms the foundation for ladder tooling and deep plumbing controls.[page:1]
+
+---
+
+## 2. Target shell: “Koyfin-like” frames
+
+Koyfin’s UI model GROK should emulate:[web:22][web:24][web:25][web:29]
+
+- Shallow top bar containing global functions (account, settings, search, theme toggle, dashboard switcher).
+- Left-side navigation menu, shallow but sticky/collapsible, which organizes sections (My Dashboards, Markets, Screener, News, etc.) with icons and labels.[web:22][web:29]
+- Central dashboard canvas with resizable, draggable widgets (watchlists, charts, news) arranged in grids.[web:22][web:26]
+
+### 2.1 Recommended top frame for Whinfell
+
+Design goals:[web:22][web:24]
+
+- Shallow (minimal vertical height).
+- Collapsible (can be hidden or minimized).
+- Holds global actions and pipeline/meta info only, not analytics.
+
+Suggested contents for top frame:
+
+- Left: branding + phase
+  - `Whinfell Transmission Control` + `Phase 2.3`.
+- Center: pipeline status
+  - `PIPELINE: Fresh · Imported 6:55 PM · Unsaved changes` with icon state.
+- Right: global controls
+  - `Build`, `Docs`, `Collect CSVs`, `Refresh`, `Publish`, `Agent ●`.
+  - Theme toggle (`Dark / Light`), and later profile/settings if needed.
+
+Behavior:
+
+- Collapsible arrow to hide the top shell while leaving a thin pipeline status strip (color-coded pipeline status).[web:22][web:29]
+
+### 2.2 Recommended left frame and shortcut buttons
+
+Left frame acts like Koyfin’s left navigation menu:[web:22][web:24][web:29]
+
+Design goals:
+
+- Shallow width, collapsible.
+- Houses “shortcut buttons” with codes for outputs and console layers.
+
+Suggested sections:
+
+- Views / Cockpits
+  - `Risk Cockpit` (primary risk panel)
+  - `Transmission Radar`
+  - `HY Credit (HY OAS proxy)`
+  - `Flipcharts`
+  - `Ladders & Depth`.
+- Specialized Tools
+  - `BasisWatch`
+  - `Midwest Compute Crush`.
+- Data / Pipeline
+  - `Hydration / WTM Import`
+  - `Diagnostics / Data Quality`.
+
+Each item behaves like a Koyfin dashboard shortcut: clicking loads a variant of the central widget layout or focuses a specific cluster.[web:22][web:26][web:29]
+
+Collapsing behavior:
+
+- When collapsed, show icons-only with tooltips; when expanded, show icon + label.[web:22][web:24]
+
+---
+
+## 3. Widgetization of central content
+
+GROK should refactor the central console into a grid of modular widgets (cards) instead of one long document, aligning with Koyfin dashboard patterns.[web:22][web:26]
+
+### 3.1 Widget inventory
+
+Recommended widgets:[page:1]
+
+- `Risk Cockpit`
+  - RISK SCORE, TRANSMISSION, BTC GATE, Freshness, Shock, Regime.
+- `Risk Curve`
+  - Liq, Credit, Breadth, BTC, Basis metrics + availability status.
+- `Transmission Signal Radar`
+  - Radar header, list items, data quality banner and feed ID.
+- `HY OAS Proxy`
+  - Narrative header, table, basis structure, component drivers, “Here’s Why / Compare / Export node / Desk handoff bundle”.
+- `Flipchart (Credit)`
+  - Current slide, pager, implications, FULL DIAGNOSTICS, DESK FEED.
+- `Depth & Ladders`
+  - Hydration status, Viz score, ladder controls (future).
+
+Each widget should be implemented as a reusable card component with consistent padding, header row, and optional actions row.[web:16][web:22][web:26]
+
+### 3.2 Layout model
+
+Dashboard layout strategy:[web:22][web:26]
+
+- Top row: `Risk Cockpit` (spans full or 2/3 width) + `Risk Curve` (1/3).
+- Middle row: `Transmission Signal Radar` + `HY OAS Proxy`.
+- Bottom row: `Flipchart` + `Depth & Ladders`.
+
+GROK should use a CSS grid or flex layout to support future resizing and reflow, similar to the way Koyfin allows custom dashboards with resizable widgets.[web:22][web:26]
+
+---
+
+## 4. Micro-chunk dev plan (minimize context window bloat)
+
+This section provides a stepwise dev plan where each micro-chunk is small enough for an LLM to reason about without needing the entire app or CSS file in context.[web:20][web:26]
+
+### Chunk 1 — Abstract shell components
+
+Focus: isolate top and left frames as components without changing internals.[page:1][web:22][web:29]
+
+Tasks for GROK:
+
+1. Create `TopShell` component containing: title, phase, pipeline status, global actions (Build, Docs, Collect CSVs, Refresh, Publish, Agent, Dark mode toggle).
+2. Create `LeftNav` component containing: Node Cockpits / `TOOLS` label, plus stubbed navigation items (`Risk Cockpit`, `Transmission Radar`, `HY OAS`, `Flipcharts`, `Ladders`, `BasisWatch`, `Midwest Compute Crush`).
+3. Update `index.html` / main layout to wrap existing content inside a `Shell` layout (`TopShell + LeftNav + MainContent`).
+
+Context discipline:
+
+- GROK only needs the shell-related parts of the DOM and minimal CSS to do this step. Avoid loading all widget markup at once.
+
+### Chunk 2 — Make frames shallow and collapsible
+
+Focus: adjust sizing and add collapse behavior.[web:22][web:24][web:29]
+
+Tasks for GROK:
+
+1. Apply CSS to reduce `TopShell` height (compact toolbar style: single row, small buttons, truncated text).
+2. Add a collapse toggle to `TopShell` that hides non-essential controls and leaves a thin pipeline status strip.
+3. Apply fixed but narrow width to `LeftNav`, with an expand/collapse toggle that switches between icons-only and icon+label.
+
+Context discipline:
+
+- Only shell layout and its CSS; no need to reason about widget content yet.
+
+### Chunk 3 — Extract Risk Cockpit widget
+
+Focus: move RISK SCORE, TRANSMISSION, BTC GATE, Freshness, Shock, Regime into a `RiskCockpit` card.[page:1][web:22][web:26]
+
+Tasks for GROK:
+
+1. Define `WidgetCard` base component (header, body, optional actions).
+2. Implement `RiskCockpit` using `WidgetCard`.
+3. Place `RiskCockpit` in `MainContent` grid with top-left priority.
+
+Context discipline:
+
+- GROK only needs the current markup for the risk block plus the card styles.
+
+### Chunk 4 — Extract Radar + Risk Curve widgets
+
+Focus: build `RiskCurveCard` and `TransmissionRadarCard`.[page:1][web:22][web:26]
+
+Tasks for GROK:
+
+1. Port the `RISK CURVE` list into `RiskCurveCard` with clear list styling and status badges.
+2. Port `Transmission Signal Radar` into `TransmissionRadarCard` with header, item list, data quality banner, and feed ID.
+3. Arrange them adjacent to `RiskCockpit` or in the row below, using the dashboard grid.
+
+Context discipline:
+
+- GROK only needs the radar+curve markup; table and flipchart remain untouched.
+
+### Chunk 5 — Extract HY OAS proxy widget
+
+Focus: wrap HY OAS table and basis structure inside `HyOasWidget`.[page:1][web:18]
+
+Tasks for GROK:
+
+1. Move `HY OAS proxy is cheap vs history` header, `FULL READ` button, and table into a widget card.
+2. Attach basis structure and component drivers as a sub-section within the same widget.
+3. Group `Here's Why / Compare / Export node / Desk handoff bundle` into a consistent actions row.
+
+Context discipline:
+
+- GROK only needs HY OAS markup and card component; keep CSS scope narrow.
+
+### Chunk 6 — Extract Flipchart widget
+
+Focus: `FlipchartWidget` for credit slide and implications.[page:1]
+
+Tasks for GROK:
+
+1. Encapsulate `FLIPCHART Credit`, pagination (`‹2 / 5›` etc.), and navigation hints into a card with top header and bottom navigation row.
+2. Wrap implication labels and `FULL DIAGNOSTICS / DESK FEED` controls inside the same widget.
+
+Context discipline:
+
+- Only flipchart markup and CSS.
+
+### Chunk 7 — Extract Depth & Ladders widget
+
+Focus: `DepthLaddersWidget`.[page:1]
+
+Tasks for GROK:
+
+1. Wrap `DEPTH · COMMAND BAR & LADDERS` and status line (`Parquet hydration applied · fresh Viz 9/10 · WARN`) into a card.
+2. Leave room for future ladder visualizations and controls.
+
+Context discipline:
+
+- Simple widget; minimal context.
+
+### Chunk 8 — Theme alignment and Koyfin-like aesthetics
+
+Focus: refine colors, spacing, and typography to approximate Koyfin.[web:22][web:25][web:31]
+
+Tasks for GROK:
+
+1. Define light and dark theme tokens that produce Koyfin-level clarity: light mode with crisp but soft backgrounds and clear cards; dark mode with appropriate contrast for numbers and status colors.[web:22][web:31]
+2. Apply consistent typography scale and spacing across all widgets and shell components.
+3. Ensure top and left frames visually match Koyfin’s minimal nav bars without copying branding.
+
+Context discipline:
+
+- Only theme token and global style files; widgets already structured.
+
+---
+
+## 5. Notes for GROK: coding and reasoning posture
+
+To keep the context window lean and productive:[web:20][web:26]
+
+- Work per widget or shell component. Do not ingest the entire HTML/CSS tree for small layout changes.
+- Reuse a `WidgetCard` abstraction to avoid repeating styling logic across Risk, Radar, HY OAS, Flipchart, and Depth.
+- Anchor the layout into `Shell (TopShell + LeftNav + MainContentGrid)` early, then swap in widgets progressively.
+- For each micro-chunk, request only the relevant component’s markup and styles plus the shared layout primitives.
+
+This report provides a roadmap to turn Whinfell Transmission Control into a Koyfin-like, professional trading dashboard across all pages, without overwhelming the model or destabilizing the current tool.[page:1][web:22][web:26]
+```

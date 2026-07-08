@@ -244,18 +244,32 @@
     renderCharts();
   }
 
+  function scheduleRefresh() {
+    if (scheduleRefresh._queued) return;
+    scheduleRefresh._queued = true;
+    setTimeout(() => {
+      scheduleRefresh._queued = false;
+      refresh();
+    }, 0);
+  }
+
   function installRenderHook() {
-    if (typeof window.renderAll !== 'function' || window.renderAll.name !== 'renderAll') {
-      setTimeout(installRenderHook, 0);
+    installRenderHook._n = (installRenderHook._n || 0) + 1;
+    if (!window.__WTM_CORE_READY && installRenderHook._n < 300) {
+      setTimeout(installRenderHook, 16);
       return;
     }
+    if (typeof window.renderAll !== 'function') return;
+    if (window.renderAll._wtmAiWrapped) return;
     const orig = window.renderAll;
-    window.renderAll = function () {
+    function wrappedRenderAll() {
       const r = orig.apply(this, arguments);
-      refresh();
+      scheduleRefresh();
       return r;
-    };
-    refresh();
+    }
+    wrappedRenderAll._wtmAiWrapped = true;
+    window.renderAll = wrappedRenderAll;
+    scheduleRefresh();
   }
 
   window.WTM_AICompute = { refresh, getData: () => data, setData: (d) => { data = { ...data, ...d }; refresh(); } };

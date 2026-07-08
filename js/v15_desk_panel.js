@@ -83,11 +83,32 @@
     renderMargin(d);
   }
 
+  function scheduleRefresh() {
+    if (scheduleRefresh._queued) return;
+    scheduleRefresh._queued = true;
+    setTimeout(() => {
+      scheduleRefresh._queued = false;
+      refresh();
+    }, 0);
+  }
+
   function installHook() {
-    if (typeof window.renderAll !== 'function') { setTimeout(installHook, 0); return; }
+    installHook._n = (installHook._n || 0) + 1;
+    if (!window.__WTM_CORE_READY && installHook._n < 300) {
+      setTimeout(installHook, 16);
+      return;
+    }
+    if (typeof window.renderAll !== 'function') return;
+    if (window.renderAll._wtmV15Wrapped) return;
     const orig = window.renderAll;
-    window.renderAll = function () { const r = orig.apply(this, arguments); refresh(); return r; };
-    refresh();
+    function wrappedRenderAll() {
+      const r = orig.apply(this, arguments);
+      scheduleRefresh();
+      return r;
+    }
+    wrappedRenderAll._wtmV15Wrapped = true;
+    window.renderAll = wrappedRenderAll;
+    scheduleRefresh();
   }
 
   window.WTM_V15Desk = { refresh, merge };

@@ -1,0 +1,171 @@
+{
+  "bang_bang_da_version": "2.0.0",
+  "generated_at": "2026-07-07T14:00:00Z",
+  "as_of": "2026-07-06T04:10:25+00:00",
+  "snapshot_id": "global-2026-07-06-raw2wtm-01",
+  "window_days": 60,
+  "gate": {
+    "whinfell_score": 38.0,
+    "transmission_state": "impaired",
+    "regime_tag": "Risk-Off / Credit Stress",
+    "tier": "defensive",
+    "zone": "red",
+    "blocked": true,
+    "block_reason": "Global Whinfell score 38 < 50 — layer2/3 blocked"
+  },
+  "risk_dashboard": {
+    "whinfell_ex_china": 52.0,
+    "sq3": 61.0,
+    "combined": 38.0,
+    "zones": {
+      "whinfell_ex_china": "green",
+      "sq3": "green",
+      "combined": "red"
+    },
+    "sources": {
+      "whinfell_ex_china": "task_force.specialists.global_transmission.global_only_score",
+      "sq3": "china.sq3_score",
+      "combined": "global.whinfell_score"
+    }
+  },
+  "summary": {
+    "trade_count": 8,
+    "bucket_counts": {
+      "PASS": 1,
+      "1x": 1,
+      "2x": 1,
+      "3x": 1,
+      "BLOCKED": 3,
+      "DATA_GAP": 1
+    },
+    "top_signal": "midwest_calendar",
+    "top_z": 5.49,
+    "top_sizing_bucket": "3x"
+  },
+  "trades": [
+    {
+      "id": "midwest_calendar",
+      "label": "Midwest Compute Calendar (1m vs 3m)",
+      "structure_type": "calendar",
+      "trade_type": "compute",
+      "structure": "Long 3M H200 fwd · Short 1M fwd",
+      "current_value": 0.66,
+      "unit": "$/hr spread",
+      "z_score": 5.49,
+      "z_abs": 5.49,
+      "dislocation": "extreme",
+      "verdict": "BLOCKED",
+      "window_days": 60,
+      "recommendation": {
+        "direction": "buy_spread",
+        "sizing_bucket": "3x",
+        "sizing_multiplier": 3,
+        "structure": "Long 3M H200 fwd / short 1M fwd"
+      },
+      "data_status": "rv_history",
+      "blocked": true,
+      "block_reason": "Global Whinfell score 38 < 50 — layer2/3 blocked",
+      "gate_zone": "red",
+      "node_id": "aicompute",
+      "series_id": "gpu_crush_calendar_spread"
+    }
+  ],
+  "litmus": {
+    "tables": [
+      {
+        "id": "midwest_calendar_primary",
+        "trade_id": "midwest_calendar",
+        "title": "Midwest Compute — Primary",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": []
+      },
+      {
+        "id": "midwest_basis_primary",
+        "trade_id": "midwest_basis",
+        "title": "Midwest Compute — Primary",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": []
+      }
+    ],
+    "by_trade": {
+      "midwest_calendar": {
+        "alignment": "neutral",
+        "table_ids": ["midwest_calendar_primary"],
+        "headline": null
+      },
+      "midwest_basis": {
+        "alignment": "neutral",
+        "table_ids": ["midwest_basis_primary"],
+        "headline": null
+      }
+    },
+    "unprocessed_filing_count": 0
+  },
+  "articulator": {
+    "source": "stub",
+    "generated_at": null,
+    "by_trade": {
+      "midwest_calendar": {
+        "headline": null,
+        "body": null,
+        "prompt_version": null
+      }
+    }
+  },
+  "inspection": {
+    "pass": false,
+    "fail_count": 2,
+    "checks": [
+      {
+        "id": "scores_present",
+        "label": "Three-score risk dashboard present",
+        "pass": true,
+        "hint": null
+      },
+      {
+        "id": "z_computed",
+        "label": "Z-score computed for active trade",
+        "pass": true,
+        "hint": null
+      },
+      {
+        "id": "data_live",
+        "label": "Primary series marked live or rv_history",
+        "pass": true,
+        "hint": null
+      },
+      {
+        "id": "litmus_loaded",
+        "label": "Litmus tables loaded for active trade",
+        "pass": false,
+        "hint": "Populate litmus rows after Koyfin GM adapter (Chunk 16)"
+      },
+      {
+        "id": "articulator_fresh",
+        "label": "Articulator commentary generated",
+        "pass": false,
+        "hint": "Run articulator refresh after Grok path ships (Chunk 34)"
+      }
+    ]
+  }
+}

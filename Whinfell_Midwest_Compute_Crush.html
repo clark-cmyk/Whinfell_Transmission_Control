@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Whinfell Midwest Compute Crush Analysis — basis dislocations across GPU compute, MISO power, HY gas, copper, and BTC." />
+  <meta name="theme-color" content="#090d12" />
+  <title>Midwest Compute Crush — Whinfell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="midwest_compute/wmc.css" />
+  <link rel="stylesheet" href="css/desk_ops.css" />
+</head>
+<body>
+
+  <header id="nav-root" class="wmc-nav" aria-label="Page navigation"></header>
+
+  <main class="wmc-page">
+
+    <section id="overview" class="wmc-zone" aria-labelledby="overview-title">
+      <div class="wmc-zone-head">
+        <h1 class="wmc-zone-title" id="overview-title">Overview</h1>
+        <p class="wmc-zone-desc">Midwest GPU crush posture and desk snapshot</p>
+      </div>
+      <div id="overview-root"></div>
+    </section>
+
+    <details id="crush-reference" class="wmc-disclosure">
+      <summary class="wmc-disclosure-summary">Reference · Explainer &amp; Corporate Comps</summary>
+      <div class="wmc-disclosure-body">
+        <div id="explainer-root"></div>
+        <div id="comps-root"></div>
+      </div>
+    </details>
+
+    <section id="basis" class="wmc-zone" aria-labelledby="basis-title">
+      <div class="wmc-zone-head">
+        <h2 class="wmc-zone-title" id="basis-title">Basis tracker</h2>
+        <p class="wmc-zone-desc">Click column headers to sort · dislocations color-coded</p>
+      </div>
+      <div class="wmc-panel">
+        <div class="wmc-table-wrap">
+          <table class="wmc-table" id="basisTable">
+            <thead>
+              <tr>
+                <th data-sort="leg">Leg <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="compute">Compute <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="miso_power">MISO power <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="hy_gas">HY gas <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="hg_copper">HG copper <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="btc_basis">BTC basis <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="z_score">Z-score <span class="wmc-sort-icon">↕</span></th>
+                <th data-sort="dislocation">Dislocation <span class="wmc-sort-icon">↕</span></th>
+              </tr>
+            </thead>
+            <tbody id="basisBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="trades" class="wmc-zone" aria-labelledby="trades-title">
+      <div class="wmc-zone-head">
+        <h2 class="wmc-zone-title" id="trades-title">Trade ideas</h2>
+        <p class="wmc-zone-desc">Desk expressions by structure type</p>
+      </div>
+      <div class="wmc-panel" id="trades-root"></div>
+    </section>
+
+    <section id="risk" class="wmc-zone" aria-labelledby="risk-title">
+      <div class="wmc-zone-head">
+        <h2 class="wmc-zone-title" id="risk-title">Risk</h2>
+        <p class="wmc-zone-desc">30-day correlations · 95% VaR · net book exposure</p>
+      </div>
+
+      <div id="risk-corr" class="wmc-subpanel" style="scroll-margin-top:calc(var(--wmc-nav-h) + 16px)">
+        <h3 class="wmc-subpanel-title">Correlations (30D)</h3>
+        <div class="wmc-heatmap" id="corrHeatmap"></div>
+      </div>
+
+      <div id="risk-var" class="wmc-subpanel" style="scroll-margin-top:calc(var(--wmc-nav-h) + 16px)">
+        <h3 class="wmc-subpanel-title">Value at risk (95%, 1D)</h3>
+        <table class="wmc-var-table" id="varTable">
+          <thead>
+            <tr>
+              <th>Bucket</th>
+              <th>VaR</th>
+              <th>CVaR</th>
+              <th>Limit</th>
+              <th>Util</th>
+            </tr>
+          </thead>
+          <tbody id="varBody"></tbody>
+        </table>
+      </div>
+
+      <div id="risk-exposure" class="wmc-subpanel" style="scroll-margin-top:calc(var(--wmc-nav-h) + 16px)">
+        <h3 class="wmc-subpanel-title">Net exposure by leg</h3>
+        <div id="netExposure"></div>
+      </div>
+    </section>
+
+    <section id="charts" class="wmc-zone" aria-labelledby="charts-title">
+      <div class="wmc-zone-head">
+        <h2 class="wmc-zone-title" id="charts-title">Charts</h2>
+        <p class="wmc-zone-desc">Deep-link to WTC panels for live rendering</p>
+      </div>
+      <div class="wmc-charts-grid" id="chartPlaceholders"></div>
+    </section>
+
+    <section id="sources" class="wmc-zone" aria-labelledby="sources-title">
+      <div class="wmc-zone-head">
+        <h2 class="wmc-zone-title" id="sources-title">Sources</h2>
+        <p class="wmc-zone-desc">Data dictionary URLs for desk hydration</p>
+      </div>
+      <div class="wmc-panel">
+        <p class="wmc-sources-note">
+          Update <code>WMC_DATA.sources</code> with live Barchart / Koyfin / API endpoints before desk hydration.
+          Align with <code>DATA_DICTIONARY_v1.5.md</code> · <code>ai_compute</code> block · Corporate Comps – Crush Analogs.
+        </p>
+        <div class="wmc-dict-grid" id="dictGrid"></div>
+        <p class="wmc-footer-note">
+          Whinfell Transmission Control · BUILD Cousins · TeamLibby ·
+          Registry: <code>whinfell_pipeline/data_dictionary.yaml</code> ·
+          Hydration: <code>data/hydration/latest.json</code>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="wmc-toast" id="wmcToast" role="status" aria-live="polite"></div>
+
+  <script src="js/task_force_panel_feed.js"></script>
+  <script src="midwest_compute/wmc-data.js"></script>
+  <script src="midwest_compute/wmc-utils.js"></script>
+  <script src="midwest_compute/wmc-hydrate.js"></script>
+  <script src="midwest_compute/wmc-export.js"></script>
+  <script src="midwest_compute/wmc-nav.js"></script>
+  <script src="midwest_compute/wmc-overview.js"></script>
+  <script src="midwest_compute/wmc-explainer.js"></script>
+  <script src="midwest_compute/wmc-basis.js"></script>
+  <script src="midwest_compute/wmc-trades.js"></script>
+  <script src="midwest_compute/wmc-risk.js"></script>
+  <script src="midwest_compute/wmc-charts.js"></script>
+  <script src="midwest_compute/wmc-sources.js"></script>
+  <script src="js/desk_data_ops.js"></script>
+  <script src="js/auto_collect_panel.js"></script>
+  <script src="midwest_compute/wmc-boot.js"></script>
+</body>
+</html>

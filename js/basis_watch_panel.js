@@ -20,12 +20,14 @@
 (function basisWatchPanel(global) {
   'use strict';
 
-  const BW_BUILD = '3.0-BASISWATCH-QUARTILES-2026-07-01';
+  const BW_BUILD = '3.3-BASISWATCH-SOURCE-ALIGN-2026-07-08';
   const THEME_COLORS = { dark: '#090d12', light: '#eef1f5' };
   const PREFS_KEY = 'whinfell_basiswatch_prefs';
   const THEME_KEY = 'whinfell_tc_theme';
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
+  /** CME-style floor — do not annualize ultra-short DTE (avoids 500%+ noise on 1d front). */
+  const MIN_ANN_DTE = 7;
 
   /** Clark desk shortcuts — saved Barchart watchlist + Koyfin MYD */
   const DESK_LINKS = {
@@ -68,18 +70,86 @@
   let curveCache = null;
   let curveFetchPromise = null;
   let standaloneState = null;
+  let stateGetter = null;
+  let _refreshGen = 0;
+  let _refreshLoop = null;
+  let _pendingRefresh = null;
   const isStandalone = () => document.body?.dataset?.bwLayout === 'standalone';
 
+  function getState() {
+    if (typeof stateGetter === 'function') {
+      const s = stateGetter();
+      if (s && typeof s === 'object') return s;
+    }
+    if (isStandalone() && standaloneState) return standaloneState;
+    return global.appState || {};
+  }
+
+  function mergeHydrationBundle(state, bundle) {
+    if (!state || !bundle) return false;
+    state.hydration = {
+      ...state.hydration,
+      crypto_sleeve: bundle.crypto_sleeve,
+      global: bundle.global,
+      execution: bundle.execution,
+      as_of: bundle.as_of,
+      node_cockpits: bundle.node_cockpits,
+      task_force_panels: bundle.task_force_panels
+        || global.WTM_TaskForceFeed?.extractTaskForcePanels?.(bundle.task_force),
+    };
+    state.provenance = {
+      ...state.provenance,
+      dataAsOf: bundle.as_of,
+      hydratedAt: new Date().toISOString(),
+    };
+    return true;
+  }
+
+  function yieldToMain() {
+    if (typeof global.WTM_yieldToMain === 'function') return global.WTM_yieldToMain();
+    return new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => setTimeout(resolve, 0));
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+  }
+
   function el(id) { return document.getElementById(id); }
+
+  function unavailSpan(kind = 'awaiting') {
+    return kind === 'na'
+      ? '<span class="bw-unavail bw-unavail--na">N/A</span>'
+      : '<span class="bw-unavail bw-unavail--awaiting">Awaiting</span>';
+  }
 
   function fmtNum(n, d = 2) {
     if (n == null || !Number.isFinite(n)) return '—';
     return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
   }
 
+  function fmtNumDisplay(n, d = 2, kind = 'awaiting') {
+    if (n == null || !Number.isFinite(n)) return unavailSpan(kind);
+    return fmtNum(n, d);
+  }
+
   function fmtPct(n, d = 2) {
     if (n == null || !Number.isFinite(n)) return '—';
     return `${fmtNum(n, d)}%`;
+  }
+
+  function fmtPctDisplay(n, d = 2, kind = 'awaiting') {
+    if (n == null || !Number.isFinite(n)) return unavailSpan(kind);
+    return fmtPct(n, d);
+  }
+
+  function renderBasisNullState() {
+    return `<div class="bw-null-card" role="status">
+      <p class="bw-null-card__title">No futures curve loaded</p>
+      <p class="bw-null-card__detail">Curve data publishes after the daily hydration chain completes and Barchart desk preview is available.</p>
+      <button type="button" class="bw-btn bw-btn--primary bw-null-card__action" data-bw-null-action="refresh">Refresh curve</button>
+    </div>`;
   }
 
   function parseCmeSymbol(sym) {
@@ -97,8 +167,18 @@
     return d;
   }
 
-  function daysBetween(a, b) { return Math.max(1, Math.round((b - a) / 86400000)); }
+  function daysBetween(a, b) { return Math.max(0, Math.round((b - a) / 86400000)); }
   function daysToExpiry(expiry, asOf = new Date()) { return daysBetween(asOf, expiry); }
+
+  function computeSpotAnnualizedCarry(futuresPrice, spot, dte) {
+    const f = Number(futuresPrice);
+    const s = Number(spot);
+    const d = Number(dte);
+    if (!Number.isFinite(f) || !Number.isFinite(s) || s <= 0 || !Number.isFinite(d) || d < MIN_ANN_DTE) {
+      return null;
+    }
+    return ((f / s) - 1) * (365 / d) * 100;
+  }
 
   function heatClass(ann) {
     if (!Number.isFinite(ann)) return 'bw-heat--na';
@@ -125,7 +205,7 @@
     const cls = A()?.quartileHeatClass(q) || 'bw-quartile--na';
     const text = Number.isFinite(q)
       ? (label ? `Q${q} · ${label}` : `Q${q}`)
-      : '—';
+      : unavailSpan('na');
     return `<span class="bw-quartile ${cls}">${text}</span>`;
   }
 
@@ -149,6 +229,128 @@
   function rvHorizon(hydration, nodeKey, seriesId, horizon = '3m') {
     const series = hydration?.node_cockpits?.[nodeKey]?.rv_basis?.series?.[seriesId];
     return series?.horizons?.[horizon] || null;
+  }
+
+  function basisSpotSeriesId(assetKey) {
+    return assetKey === 'ETH' ? 'eth_basis_spot_1m' : 'btc_basis_spot_1m';
+  }
+
+  function hydrationBasisSpot(hydration, assetKey, horizon = '1m') {
+    return rvHorizon(hydration, 'basis', basisSpotSeriesId(assetKey), horizon);
+  }
+
+  function parseQuoteDate(raw) {
+    const s = String(raw || '').slice(0, 10);
+    return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
+  }
+
+  function quoteDateGapDays(a, b) {
+    if (!a || !b) return null;
+    const da = Date.parse(`${a}T12:00:00Z`);
+    const db = Date.parse(`${b}T12:00:00Z`);
+    if (!Number.isFinite(da) || !Number.isFinite(db)) return null;
+    return Math.round(Math.abs(db - da) / 86400000);
+  }
+
+  function maxRootQuoteDate(records, root) {
+    let max = '';
+    recordsForRoot(records, root).forEach((r) => {
+      const d = parseQuoteDate(r.latest?.date);
+      if (d && d >= max) max = d;
+    });
+    return max || null;
+  }
+
+  function impliedSpotFromBasis(futuresPrice, basisPct) {
+    const f = Number(futuresPrice);
+    const b = Number(basisPct);
+    if (!Number.isFinite(f) || f <= 0 || !Number.isFinite(b)) return null;
+    return f / (1 + b / 100);
+  }
+
+  function resolveBasisValuation(state, curveData, assetKey) {
+    const records = curveData?.records || [];
+    const sleeve = state.hydration?.crypto_sleeve?.assets || {};
+    const asset = ASSETS[assetKey] || ASSETS.BTC;
+    const curveQuoteDate = maxRootQuoteDate(records, 'BT')
+      || parseQuoteDate(curveData?.as_of)
+      || parseQuoteDate(state.hydration?.as_of);
+    const hydrationDate = parseQuoteDate(state.hydration?.as_of)
+      || parseQuoteDate(state.hydration?.crypto_sleeve?.as_of);
+    const gap = quoteDateGapDays(curveQuoteDate, hydrationDate);
+    const koyfinSpot = Number(sleeve[asset.spotKey]?.last_price);
+    const basisH = hydrationBasisSpot(state.hydration, assetKey, '1m');
+    const basisPct = Number(basisH?.current_value);
+
+    const btRecords = recordsForRoot(records, 'BT');
+    const btm = btRecords.find((r) => String(r.raw_symbol || '').toUpperCase() === 'BTM26')
+      || btRecords.find((r) => /^BT[MNUQ]/i.test(String(r.raw_symbol || '')));
+    const refFuture = Number(btm?.latest?.close);
+    const refQuoteDate = parseQuoteDate(btm?.latest?.date);
+
+    let spotForBasis = koyfinSpot;
+    let spotSource = 'koyfin_desk';
+    const aligned = gap != null && gap <= 1;
+
+    if (assetKey === 'BTC' && Number.isFinite(refFuture) && Number.isFinite(basisPct)) {
+      const implied = impliedSpotFromBasis(refFuture, basisPct);
+      if (Number.isFinite(implied) && implied > 0 && (!aligned || !Number.isFinite(koyfinSpot))) {
+        spotForBasis = implied;
+        spotSource = 'barchart_basis_implied';
+      } else if (!aligned && Number.isFinite(implied) && implied > 0) {
+        spotForBasis = implied;
+        spotSource = 'barchart_basis_implied';
+      }
+    }
+
+    if (assetKey === 'ETH') {
+      const btcBasis = hydrationBasisSpot(state.hydration, 'BTC', '1m');
+      const btcImplied = Number.isFinite(refFuture) && Number.isFinite(btcBasis?.current_value)
+        ? impliedSpotFromBasis(refFuture, btcBasis.current_value)
+        : null;
+      const ethKoyfin = Number(sleeve.eth_spot_usd?.last_price);
+      const ratio = Number.isFinite(btcImplied) && btcImplied > 0 && Number.isFinite(ethKoyfin)
+        ? ethKoyfin / btcImplied
+        : null;
+      const ethRefF = Number.isFinite(refFuture) && Number.isFinite(ratio) ? refFuture * ratio : null;
+      if (Number.isFinite(ethRefF) && Number.isFinite(basisPct)) {
+        const ethImplied = impliedSpotFromBasis(ethRefF, basisPct);
+        if (Number.isFinite(ethImplied) && ethImplied > 0) {
+          spotForBasis = ethImplied;
+          spotSource = 'barchart_eth_basis_implied';
+        }
+      } else if (Number.isFinite(ethKoyfin)) {
+        spotForBasis = ethKoyfin;
+        spotSource = aligned ? 'koyfin_desk' : 'koyfin_desk_misaligned';
+      }
+    }
+
+    const asOfDate = curveQuoteDate
+      ? new Date(`${curveQuoteDate}T12:00:00Z`)
+      : new Date();
+
+    let dataNote = '';
+    if (curveQuoteDate && hydrationDate && gap != null && gap > 1) {
+      dataNote = `Futures ${curveQuoteDate} · desk spot ${hydrationDate} (${gap}d skew) · basis spot from Barchart ${basisSpotSeriesId(assetKey)}`;
+    } else if (curveQuoteDate) {
+      dataNote = `Curve ${curveQuoteDate} · ${spotSource === 'koyfin_desk' ? 'Koyfin' : 'Barchart'} spot`;
+    }
+
+    return {
+      curveQuoteDate,
+      hydrationDate,
+      gap,
+      asOfDate,
+      spotForBasis,
+      spotSource,
+      koyfinSpot: Number.isFinite(koyfinSpot) ? koyfinSpot : null,
+      hydrationBasisPct: Number.isFinite(basisPct) ? basisPct : null,
+      basisHorizon: basisH,
+      refFutureSymbol: btm?.raw_symbol || null,
+      refQuoteDate,
+      dataNote,
+      aligned,
+    };
   }
 
   function applyHydrationQuartileFallback(contracts, front, hydration) {
@@ -230,8 +432,11 @@
     if (credit?.quartile === 4) text += '; credit beta via HYG/LQD is <strong>rich (Q4)</strong>';
     if (cheapPeers.length) text += `; ${cheapPeers.join(', ')} screen <strong>cheap vs history</strong>`;
     if (richPeers.length) text += `; ${richPeers.join(', ')} screen <strong>rich vs history</strong>`;
-    text += '. Use for relative carry context — not prop size-up without gate confirmation.';
-    return text;
+    text += '.';
+    return {
+      guidance: text,
+      support: 'Use for relative carry context — not prop size-up without gate confirmation.',
+    };
   }
 
   function shapeBadgeClass(shape) {
@@ -278,7 +483,9 @@
 
   function applyTheme(theme) {
     const next = theme === 'light' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
+    if (document.documentElement?.setAttribute) {
+      document.documentElement.setAttribute('data-theme', next);
+    }
     const btn = el('btnBwTheme');
     if (btn) {
       const label = btn.querySelector('.bw-theme-label');
@@ -315,6 +522,30 @@
       theme,
     });
     return `${base}?${q.toString()}`;
+  }
+
+  function invalidateCurveCache() {
+    curveCache = null;
+    curveFetchPromise = null;
+  }
+
+  async function reloadHydration(state) {
+    const target = state || getState();
+    if (location.protocol === 'file:') return false;
+    const bundle = await loadHydrationBundle();
+    if (!bundle) return false;
+    return mergeHydrationBundle(target, bundle);
+  }
+
+  async function reloadCurve(state, hooks) {
+    const target = state || getState();
+    invalidateCurveCache();
+    if (isStandalone()) {
+      await reloadHydration(target);
+    }
+    target.basisWatch = target.basisWatch || {};
+    target.basisWatch.mode = 'live';
+    return refresh(target, hooks || {});
   }
 
   async function ensureCurveHistory() {
@@ -358,10 +589,11 @@
       if (dte < 0) return null;
       const absBasis = futuresPrice - spot;
       const spotBasisPct = spot > 0 ? (absBasis / spot) * 100 : null;
-      const spotAnnualizedCarry = spot > 0 && dte > 0 ? ((futuresPrice / spot) - 1) * (365 / dte) * 100 : null;
+      const spotAnnualizedCarry = computeSpotAnnualizedCarry(futuresPrice, spot, dte);
+      const quoteDate = parseQuoteDate(r.latest?.date);
       return {
         symbol: r.raw_symbol, label: parsed.label, expiry: parsed.expiry, dte,
-        futuresPrice, spotPrice: spot,
+        futuresPrice, spotPrice: spot, quoteDate,
         absBasis, spotBasisPct, spotAnnualizedCarry,
         price: futuresPrice, pctBasis: spotBasisPct, annBasis: spotAnnualizedCarry,
         chg: Number(r.latest?.change), pctChg: Number(r.latest?.pct_change),
@@ -376,11 +608,13 @@
       const futuresPrice = c.futuresPrice * ratio;
       const absBasis = futuresPrice - ethSpot;
       const spotBasisPct = (absBasis / ethSpot) * 100;
+      const spotAnnualizedCarry = computeSpotAnnualizedCarry(futuresPrice, ethSpot, c.dte);
       return {
         ...c, symbol: c.symbol.replace(/^BT/, 'ETH'),
+        label: c.label,
         futuresPrice, spotPrice: ethSpot, price: futuresPrice,
         absBasis, spotBasisPct, pctBasis: spotBasisPct,
-        spotAnnualizedCarry: c.spotAnnualizedCarry, annBasis: c.spotAnnualizedCarry,
+        spotAnnualizedCarry, annBasis: spotAnnualizedCarry,
         synthetic: true,
       };
     });
@@ -474,18 +708,39 @@
     const records = curveData?.records || [];
     const sleeve = state.hydration?.crypto_sleeve?.assets || {};
     const spotRec = sleeve[asset.spotKey];
-    const spot = Number(spotRec?.last_price);
     const spotChg = Number(spotRec?.chg_1d ?? spotRec?.['1_day']) * 100;
-    const asOf = state.hydration?.as_of || state.provenance?.dataAsOf || new Date().toISOString();
+
+    const valuation = resolveBasisValuation(state, curveData, assetKey);
+    const spot = valuation.spotForBasis;
+    const asOf = valuation.asOfDate;
+    const koyfinSpot = valuation.koyfinSpot;
 
     let contracts = buildContracts(recordsForRoot(records, asset.root), spot, asOf);
-    let dataNote = '';
-    if (!contracts.length && assetKey === 'ETH' && spot > 0) {
-      const btcSpot = Number(sleeve.btc_spot_usd?.last_price);
-      contracts = synthesizeEthCurve(buildContracts(recordsForRoot(records, 'BT'), btcSpot, asOf), spot, btcSpot);
-      dataNote = 'ETH curve synthesized from BTC term structure · wire CME ETH futures for live curve';
-    } else if (!contracts.length) {
+    let dataNote = valuation.dataNote || '';
+    let syntheticCurve = false;
+
+    if (assetKey === 'ETH') {
+      const btcVal = resolveBasisValuation(state, curveData, 'BTC');
+      const btcContracts = buildContracts(recordsForRoot(records, 'BT'), btcVal.spotForBasis, btcVal.asOfDate);
+      if (btcContracts.length && Number.isFinite(spot) && spot > 0 && Number.isFinite(btcVal.spotForBasis)) {
+        contracts = synthesizeEthCurve(btcContracts, spot, btcVal.spotForBasis);
+        syntheticCurve = true;
+        if (!dataNote) {
+          dataNote = `ETH curve proxied from BTC futures · basis from Barchart ${basisSpotSeriesId('ETH')}`;
+        }
+      }
+    }
+
+    if (!contracts.length) {
       dataNote = isStandalone() ? 'Loading hydration bundle…' : 'Import hydration + publish desk preview for Barchart curve JSON';
+    }
+
+    if (valuation.curveQuoteDate && contracts.length) {
+      contracts.forEach((c) => {
+        c.quoteStaleDays = c.quoteDate && valuation.curveQuoteDate
+          ? quoteDateGapDays(c.quoteDate, valuation.curveQuoteDate)
+          : null;
+      });
     }
 
     const rollLogic = prefs.rollLogic || 'nearest';
@@ -520,8 +775,26 @@
 
     const frontCalendar = calendarPairs[0] || null;
 
+    const taskForceBasis = global.WTM_TaskForceFeed?.basisWatchFeed?.(state.hydration) || null;
+    const deskRead = buildCrossAssetInterpretation({
+      assetKey, front, crossPeers, steepest, flattest,
+    });
+
     return {
-      assetKey, asset, spot, spotChg: Number.isFinite(spotChg) ? spotChg : null, asOf,
+      assetKey, asset,
+      spot,
+      spotDesk: koyfinSpot,
+      spotSource: valuation.spotSource,
+      spotChg: Number.isFinite(spotChg) ? spotChg : null,
+      asOf: valuation.curveQuoteDate || state.hydration?.as_of || state.provenance?.dataAsOf,
+      curveQuoteDate: valuation.curveQuoteDate,
+      hydrationDate: valuation.hydrationDate,
+      quoteGapDays: valuation.gap,
+      hydrationBasisPct: valuation.hydrationBasisPct,
+      frontBasisPct: Number.isFinite(valuation.hydrationBasisPct)
+        ? valuation.hydrationBasisPct
+        : (pickFrontContract(contracts, rollLogic, state.btcL3?.nearMonth || '')?.spotBasisPct ?? null),
+      syntheticCurve,
       contracts, front, calendarPairs, forwards: calendarPairs,
       spotCurve: spotCurveVector(contracts), forwardCurve: forwardCurveVector(calendarPairs),
       cross: crossAssetStrip(records), crossPeers,
@@ -529,9 +802,9 @@
       rollLabel: rollStateLabel(contracts, front), dataNote,
       refMid: Number(state.hydration?.global?.basis_spread || state.hydration?.execution?.basis_spread || state.hydration?.execution?.ref_mid) || null,
       mode: prefs.mode || 'live', view: prefs.view || 'basis',
-      interpretation: buildCrossAssetInterpretation({
-        assetKey, front, crossPeers, steepest, flattest,
-      }),
+      taskForceBasis,
+      interpretation: deskRead.guidance,
+      interpretationSupport: deskRead.support,
     };
   }
 
@@ -542,78 +815,106 @@
   }
 
   function spotAnnFactor(dte) {
-    return dte > 0 ? 365 / dte : null;
+    const d = Number(dte);
+    if (!Number.isFinite(d) || d < MIN_ANN_DTE) return null;
+    return 365 / d;
   }
 
   function spotAnnDecomposition(c) {
+    if (!Number.isFinite(c.spotBasisPct)) return unavailSpan('na');
+    if (Number(c.dte) < MIN_ANN_DTE) {
+      return `<span class="bw-decomp-short" title="Spot curve % not annualized below ${MIN_ANN_DTE}d DTE">&lt;${MIN_ANN_DTE}d</span>`;
+    }
     const factor = spotAnnFactor(c.dte);
-    if (!Number.isFinite(c.spotBasisPct) || !Number.isFinite(factor)) return '—';
-    return `${fmtPct(c.spotBasisPct, 2)} × ${factor.toFixed(2)}`;
+    if (!Number.isFinite(factor) || !Number.isFinite(c.spotAnnualizedCarry)) return unavailSpan('na');
+    return `((F/S)−1) × ${factor.toFixed(2)}`;
   }
 
   function renderSummaryCards(model, standalone) {
     const front = model.front;
     const spot = model.spot;
+    const frontBasisPct = Number.isFinite(model.frontBasisPct) ? model.frontBasisPct : front?.spotBasisPct;
     const hi = standalone ? ' bw-card--highlight' : '';
     const rankMeta = front && Number.isFinite(front.basisPercentile)
       ? `${fmtPercentile(front.basisPercentile)} · ${quartileRichnessLabel(front.basisQuartile)}`
-      : (front?.insufficientHistory ? 'History building' : '—');
+      : (front?.insufficientHistory ? 'History building' : unavailSpan('awaiting'));
     return `
-      <div class="bw-card"><span class="bw-card-label">Spot · CF proxy</span><strong class="bw-card-value">${spot > 0 ? '$' + fmtNum(spot, 0) : '—'}</strong><span class="bw-card-meta">${Number.isFinite(model.spotChg) ? fmtPct(model.spotChg) + ' 1d' : '—'}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Front basis ($)</span><strong class="bw-card-value bw-card-value--secondary">${front ? '$' + fmtNum(front.absBasis, 0) : '—'}</strong><span class="bw-card-meta">${front ? front.symbol + ' · ' + front.dte + 'd' : '—'}</span></div>
-      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${front ? fmtPct(front.spotBasisPct) : '—'}</strong><span class="bw-card-meta">${front ? interpretationFromPercentile(front.basisPercentile) : '—'}</span></div>
-      <div class="bw-card${hi}"><span class="bw-card-label">Basis % rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile rank">?</button></span><strong class="bw-card-value">${front?.basisQuartile ? 'Q' + front.basisQuartile : '—'}</strong><span class="bw-card-meta">${rankMeta}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Annualized basis">?</button></span><strong class="bw-card-value">${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</strong><span class="bw-card-meta">${vectorSummary(model.spotCurve)}</span></div>
-      <div class="bw-card"><span class="bw-card-label">Forward curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span><strong class="bw-card-value">${model.steepest ? fmtPct(model.steepest.forwardAnnualizedYield) : '—'}</strong><span class="bw-card-meta">${vectorSummary(model.forwardCurve)}</span></div>`;
+      <div class="bw-card"><span class="bw-card-label">${model.asset.label} basis spot${model.spotSource?.includes('barchart') ? ' · Barchart' : ' · CF proxy'}${model.syntheticCurve ? ' · BTC curve' : ''}</span><strong class="bw-card-value">${spot > 0 ? '$' + fmtNum(spot, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${Number.isFinite(model.spotDesk) && model.spotDesk !== spot ? `Desk $${fmtNum(model.spotDesk, 0)} · ` : ''}${Number.isFinite(model.spotChg) ? fmtPct(model.spotChg) + ' 1d' : (model.curveQuoteDate || unavailSpan('na'))}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Front basis ($)</span><strong class="bw-card-value bw-card-value--secondary">${front ? '$' + fmtNum(front.absBasis, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${front ? front.symbol + ' · ' + front.dte + 'd' : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${Number.isFinite(frontBasisPct) ? fmtPct(frontBasisPct) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${Number.isFinite(model.hydrationBasisPct) ? 'Barchart spot vs 1m · ' : ''}${front ? interpretationFromPercentile(front.basisPercentile) : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card${hi}"><span class="bw-card-label">Basis % rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile rank">?</button></span><strong class="bw-card-value">${front?.basisQuartile ? 'Q' + front.basisQuartile : unavailSpan('na')}</strong><span class="bw-card-meta">${rankMeta}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Annualized basis">?</button></span><strong class="bw-card-value">${front ? fmtPct(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.spotCurve.length ? vectorSummary(model.spotCurve) : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card"><span class="bw-card-label">Forward curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span><strong class="bw-card-value">${model.steepest ? fmtPct(model.steepest.forwardAnnualizedYield) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.forwardCurve.length ? vectorSummary(model.forwardCurve) : unavailSpan('awaiting')}</span></div>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderTaskForceCallout(model) {
+    const feed = model.taskForceBasis;
+    if (!feed?.signal) return '';
+    const conf = Number.isFinite(feed.confidence) ? ` · conf ${Math.round(feed.confidence * 100)}%` : '';
+    const src = feed.source === 'task_force' ? 'task force' : (feed.source || feed.status || 'feed');
+    const inv = feed.invalidation ? ` · inv: ${escapeHtml(feed.invalidation)}` : '';
+    return `<div class="bw-task-force-callout">
+      <span class="bw-callout-label">Task Force · btc_eth_basis</span>
+      <p class="bw-task-force-signal">${escapeHtml(feed.signal)}</p>
+      <span class="bw-callout-meta">${escapeHtml(src)}${conf}${inv}</span>
+    </div>`;
   }
 
   function renderCallouts(model) {
     const richestMeta = model.richest
-      ? `${fmtPct(model.richest.spotBasisPct)} basis % · ${Number.isFinite(model.richest.basisPercentile) ? fmtPercentile(model.richest.basisPercentile) : '—'}`
-      : '—';
+      ? `${fmtPct(model.richest.spotBasisPct)} basis % · ${Number.isFinite(model.richest.basisPercentile) ? fmtPercentile(model.richest.basisPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
     const steepestMeta = model.steepest
-      ? `${fmtPct(model.steepest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.steepest.forwardPercentile) ? fmtPercentile(model.steepest.forwardPercentile) : '—'}`
-      : '—';
+      ? `${fmtPct(model.steepest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.steepest.forwardPercentile) ? fmtPercentile(model.steepest.forwardPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
     const flattestMeta = model.flattest
-      ? `${fmtPct(model.flattest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.flattest.forwardPercentile) ? fmtPercentile(model.flattest.forwardPercentile) : '—'}`
-      : '—';
-    return `<div class="bw-callout-strip bw-callout-strip--triple">
-      <div class="bw-callout"><span class="bw-callout-label">Richest by basis % rank</span><div class="bw-callout-value">${model.richest?.symbol || '—'}</div><div class="bw-callout-meta">${richestMeta}</div></div>
-      <div class="bw-callout"><span class="bw-callout-label">Steepest calendar</span><div class="bw-callout-value">${model.steepest ? model.steepest.nearSymbol + '→' + model.steepest.farSymbol : '—'}</div><div class="bw-callout-meta">${steepestMeta}</div></div>
-      <div class="bw-callout"><span class="bw-callout-label">Flattest calendar</span><div class="bw-callout-value">${model.flattest ? model.flattest.nearSymbol + '→' + model.flattest.farSymbol : '—'}</div><div class="bw-callout-meta">${flattestMeta}</div></div>
+      ? `${fmtPct(model.flattest.forwardAnnualizedYield)} fwd · ${Number.isFinite(model.flattest.forwardPercentile) ? fmtPercentile(model.flattest.forwardPercentile) : unavailSpan('na')}`
+      : unavailSpan('awaiting');
+    return `${renderTaskForceCallout(model)}<div class="bw-callout-strip bw-callout-strip--triple">
+      <div class="bw-callout"><span class="bw-callout-label">Richest by basis % rank</span><div class="bw-callout-value">${model.richest?.symbol || unavailSpan('awaiting')}</div><div class="bw-callout-meta">${richestMeta}</div></div>
+      <div class="bw-callout"><span class="bw-callout-label">Steepest calendar</span><div class="bw-callout-value">${model.steepest ? model.steepest.nearSymbol + '→' + model.steepest.farSymbol : unavailSpan('awaiting')}</div><div class="bw-callout-meta">${steepestMeta}</div></div>
+      <div class="bw-callout"><span class="bw-callout-label">Flattest calendar</span><div class="bw-callout-value">${model.flattest ? model.flattest.nearSymbol + '→' + model.flattest.farSymbol : unavailSpan('awaiting')}</div><div class="bw-callout-meta">${flattestMeta}</div></div>
     </div>`;
   }
 
   function histRangeCell(c) {
-    if (!c.basisStats || c.basisStats.n < 2) return '—';
+    if (!c.basisStats || c.basisStats.n < 2) return unavailSpan('awaiting');
     return `${fmtPct(c.histQ1, 2)} / ${fmtPct(c.histMedian, 2)} / ${fmtPct(c.histQ3, 2)}`;
   }
 
   function renderBasisTable(model) {
-    if (!model.contracts.length) return '<p class="bw-empty">No futures curve — run daily chain and publish desk preview.</p>';
+    if (!model.contracts.length) return renderBasisNullState();
     const rows = model.contracts.map(c => `
       <tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}">
         <td>${c.symbol}${c.synthetic ? ' <span title="Synthesized">*</span>' : ''}</td>
         <td>${c.label}</td><td>${c.dte}d</td>
-        <td class="bw-col-secondary">$${fmtNum(c.futuresPrice, 0)}</td>
-        <td class="bw-col-secondary">$${fmtNum(c.absBasis, 0)}</td>
-        <td class="bw-col-primary ${c.basisHeatClass || ''}"><strong>${fmtPct(c.spotBasisPct)}</strong></td>
-        <td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : '—'}</td>
-        <td>${c.basisQuartile ? quartileBadge(c.basisQuartile, quartileRichnessLabel(c.basisQuartile)) : '—'}</td>
+        <td class="bw-col-secondary">$${fmtNumDisplay(c.futuresPrice, 0)}</td>
+        <td class="bw-col-secondary">$${fmtNumDisplay(c.absBasis, 0)}</td>
+        <td class="bw-col-primary ${c.basisHeatClass || ''}"><strong>${fmtPctDisplay(c.spotBasisPct)}</strong></td>
+        <td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : unavailSpan('na')}</td>
+        <td>${c.basisQuartile ? quartileBadge(c.basisQuartile, quartileRichnessLabel(c.basisQuartile)) : unavailSpan('na')}</td>
         <td class="bw-col-hist" title="Q1 / Median / Q3">${histRangeCell(c)}</td>
         <td class="bw-decomp" title="Basis % × (365/DTE)">${spotAnnDecomposition(c)}</td>
-        <td class="${heatClass(c.spotAnnualizedCarry)}" title="${spotAnnDecomposition(c)}">${fmtPct(c.spotAnnualizedCarry)}</td>
-        <td>${Number.isFinite(c.pctChg) ? fmtPct(c.pctChg) : '—'}</td>
+        <td class="${heatClass(c.spotAnnualizedCarry)}" title="${spotAnnDecomposition(c)}">${fmtPctDisplay(c.spotAnnualizedCarry)}</td>
+        <td>${Number.isFinite(c.pctChg) ? fmtPct(c.pctChg) : unavailSpan('na')}</td>
       </tr>`).join('');
-    return `<h4 class="bw-subhead">Spot curve · futures vs spot</h4><p class="bw-methodology-inline">Spot Curve % = Basis % × (365 ÷ DTE) · Quartiles from hydrated history</p><div class="bw-table-wrap"><table class="bw-table"><thead><tr><th>Contract</th><th>Expiry</th><th>DTE</th><th>Futures</th><th>Basis ($)</th><th>Basis %</th><th>Rank</th><th>Quartile</th><th>Hist Q1/Med/Q3</th><th>×365/DTE</th><th>Spot Curve % (ann.)</th><th>Chg</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<h4 class="bw-subhead">Spot curve · futures vs spot</h4><p class="bw-methodology-inline">Spot Curve % (ann.) = ((F/S)−1) × (365 ÷ DTE) · suppressed below ${MIN_ANN_DTE}d DTE · Quartiles from hydrated history</p><div class="bw-table-wrap"><table class="bw-table"><thead><tr><th>Contract</th><th>Expiry</th><th>DTE</th><th>Futures</th><th>Basis ($)</th><th>Basis %</th><th>Rank</th><th>Quartile</th><th>Hist Q1/Med/Q3</th><th>×365/DTE</th><th>Spot Curve % (ann.)</th><th>Chg</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function renderImpliedTable(model) {
-    if (!model.contracts.length) return '<p class="bw-empty">No curve data.</p>';
-    const spotRows = model.contracts.map(c => `<tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}"><td>${c.symbol}</td><td>${c.dte}d</td><td class="bw-col-primary"><strong>${fmtPct(c.spotBasisPct)}</strong></td><td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : '—'}</td><td class="bw-decomp">${spotAnnDecomposition(c)}</td><td class="${heatClass(c.spotAnnualizedCarry)}">${fmtPct(c.spotAnnualizedCarry)}</td></tr>`).join('');
-    const fwdRows = model.calendarPairs.map(p => `<tr><td>${p.nearSymbol} → ${p.farSymbol}</td><td>${p.intervalDays}d</td><td class="${heatClass(p.forwardAnnualizedYield)} ${p.forwardHeatClass || ''}"><strong>${fmtPct(p.forwardAnnualizedYield)}</strong></td><td>${Number.isFinite(p.forwardPercentile) ? fmtPercentile(p.forwardPercentile) : '—'}</td><td>${p.forwardQuartile ? quartileBadge(p.forwardQuartile, quartileRichnessLabel(p.forwardQuartile)) : '—'}</td><td class="bw-col-secondary">$${fmtNum(p.calendarSpread, 0)}</td></tr>`).join('');
+    if (!model.contracts.length) return renderBasisNullState();
+    const spotRows = model.contracts.map(c => `<tr class="${model.front && c.symbol === model.front.symbol ? 'bw-row-front' : ''}"><td>${c.symbol}</td><td>${c.dte}d</td><td class="bw-col-primary"><strong>${fmtPctDisplay(c.spotBasisPct)}</strong></td><td>${Number.isFinite(c.basisPercentile) ? fmtPercentile(c.basisPercentile) : unavailSpan('na')}</td><td class="bw-decomp">${spotAnnDecomposition(c)}</td><td class="${heatClass(c.spotAnnualizedCarry)}">${fmtPctDisplay(c.spotAnnualizedCarry)}</td></tr>`).join('');
+    const fwdRows = model.calendarPairs.map(p => `<tr><td>${p.nearSymbol} → ${p.farSymbol}</td><td>${p.intervalDays}d</td><td class="${heatClass(p.forwardAnnualizedYield)} ${p.forwardHeatClass || ''}"><strong>${fmtPctDisplay(p.forwardAnnualizedYield)}</strong></td><td>${Number.isFinite(p.forwardPercentile) ? fmtPercentile(p.forwardPercentile) : unavailSpan('na')}</td><td>${p.forwardQuartile ? quartileBadge(p.forwardQuartile, quartileRichnessLabel(p.forwardQuartile)) : unavailSpan('na')}</td><td class="bw-col-secondary">$${fmtNumDisplay(p.calendarSpread, 0)}</td></tr>`).join('');
     return `<div class="bw-implied-grid">
-      <div class="bw-panel" style="border:none;box-shadow:none"><h4 class="bw-subhead">Spot curve % (ann.)</h4><p class="bw-methodology-inline">Basis % × (365/DTE) — equivalent to ((F/S)−1)×(365/DTE)</p><div class="bw-table-wrap"><table class="bw-table bw-table--compact"><thead><tr><th>Tenor</th><th>DTE</th><th>Basis %</th><th>Rank</th><th>×365/DTE</th><th>Spot Curve %</th></tr></thead><tbody>${spotRows}</tbody></table></div></div>
+      <div class="bw-panel" style="border:none;box-shadow:none"><h4 class="bw-subhead">Spot curve % (ann.)</h4><p class="bw-methodology-inline">((F/S)−1) × (365/DTE) · not shown below ${MIN_ANN_DTE}d DTE</p><div class="bw-table-wrap"><table class="bw-table bw-table--compact"><thead><tr><th>Tenor</th><th>DTE</th><th>Basis %</th><th>Rank</th><th>×365/DTE</th><th>Spot Curve %</th></tr></thead><tbody>${spotRows}</tbody></table></div></div>
       <div class="bw-panel" style="border:none;box-shadow:none"><h4 class="bw-subhead">Forward curve % (ann.)</h4><p class="bw-methodology-inline">Adjacent pairs · ((F_far/F_near)−1)×(365/interval)</p><div class="bw-table-wrap"><table class="bw-table bw-table--compact"><thead><tr><th>Near → Far</th><th>Days Between</th><th>Forward Curve %</th><th>Rank</th><th>Quartile</th><th>Calendar Spread ($)</th></tr></thead><tbody>${fwdRows || '<tr><td colspan="6">—</td></tr>'}</tbody></table></div></div>
     </div>`;
   }
@@ -631,13 +932,14 @@
 
   function renderMethodology(model) {
     const viewNote = model.view === 'implied'
-      ? 'Implied Rate view shows both spot curve (futures vs spot) and forward curve (calendar roll yields between adjacent expiries).'
-      : 'Basis Watch view shows spot curve only — basis $, basis %, and annualized spot-to-tenor carry. Forward/calendar roll yields appear in Implied Rate view.';
-    return `<h4 class="bw-subhead">Methodology</h4>
-      <p><strong>Basis Watch</strong> — CME-style futures vs spot: Basis ($) = F − S; Basis % = (F−S)/S; Spot Curve % (ann.) = ((F/S)−1)×(365/DTE).</p>
-      <p><strong>Implied Rate</strong> — Spot curve table (above) plus forward curve for adjacent calendar pairs: Calendar Spread ($) = F_far − F_near; Forward Curve % (ann.) = ((F_far/F_near)−1)×(365/days between expiries).</p>
-      <p class="bw-methodology-view">${viewNote}</p>
-      <p>Historical quartile ranges and percentile ranks help evaluate whether current basis is rich or cheap for each tenor relative to its own history.</p>`;
+      ? 'Implied Rate · spot + forward roll yields.'
+      : 'Basis Watch · spot curve carry only.';
+    return `<ul class="bw-methodology-bullets">
+      <li>Basis $ = F − S</li>
+      <li>Basis % = (F−S)/S</li>
+      <li>Ann carry = ((F/S)−1)×(365/DTE)</li>
+      <li class="bw-methodology-view">${viewNote}</li>
+    </ul>`;
   }
 
   function renderCrossAsset(model) {
@@ -648,28 +950,28 @@
       <article class="bw-xasset-card bw-xasset-card--anchor">
         <div class="bw-xasset-card-top">
           <span class="bw-xasset-symbol">${model.assetKey}</span>
-          <span class="bw-xasset-contract">${front ? front.symbol + ' · ' + front.dte + 'd' : '—'}</span>
+          <span class="bw-xasset-contract">${front ? front.symbol + ' · ' + front.dte + 'd' : unavailSpan('awaiting')}</span>
           ${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : ''}
         </div>
         <div class="bw-xasset-metrics">
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Basis % <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis %">?</button></span>
-            <strong class="bw-xasset-metric-value">${front ? fmtPct(front.spotBasisPct) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${front ? fmtPctDisplay(front.spotBasisPct) : unavailSpan('awaiting')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Ann. basis">?</button></span>
-            <strong class="bw-xasset-metric-value ${heatClass(front?.spotAnnualizedCarry)}">${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</strong>
+            <strong class="bw-xasset-metric-value ${heatClass(front?.spotAnnualizedCarry)}">${front ? fmtPctDisplay(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Calendar fwd % <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span>
-            <strong class="bw-xasset-metric-value">${cal ? fmtPct(cal.forwardAnnualizedYield) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${cal ? fmtPctDisplay(cal.forwardAnnualizedYield) : unavailSpan('na')}</strong>
           </div>
           <div class="bw-xasset-metric">
             <span class="bw-xasset-metric-label">Basis rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile">?</button></span>
-            <strong class="bw-xasset-metric-value">${Number.isFinite(front?.basisPercentile) ? fmtPercentile(front.basisPercentile) : '—'}</strong>
+            <strong class="bw-xasset-metric-value">${Number.isFinite(front?.basisPercentile) ? fmtPercentile(front.basisPercentile) : unavailSpan('na')}</strong>
           </div>
         </div>
-        <p class="bw-xasset-card-note" title="Hover for dollar detail">Basis ($): ${front ? '$' + fmtNum(front.absBasis, 0) : '—'} · Ann.: ${front ? fmtPct(front.spotAnnualizedCarry) : '—'}</p>
+        <p class="bw-xasset-card-note" title="Hover for dollar detail">Basis ($): ${front ? '$' + fmtNum(front.absBasis, 0) : unavailSpan('awaiting')} · Ann.: ${front ? fmtPctDisplay(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</p>
       </article>`;
 
     const btcCalRow = cal ? `
@@ -677,9 +979,9 @@
         <td><span class="bw-xasset-peer">${model.assetKey}</span> <span class="bw-xasset-peer-sub">${cal.nearSymbol}→${cal.farSymbol}</span></td>
         <td class="bw-xasset-role">Calendar roll</td>
         <td class="bw-xasset-num"><strong>${fmtPct(cal.forwardAnnualizedYield)} fwd</strong></td>
-        <td class="bw-xasset-num">—</td>
-        <td class="bw-xasset-num">—</td>
-        <td>${cal.forwardQuartile ? quartileBadge(cal.forwardQuartile, quartileRichnessLabel(cal.forwardQuartile)) : '—'}</td>
+        <td class="bw-xasset-num">${unavailSpan('na')}</td>
+        <td class="bw-xasset-num">${unavailSpan('na')}</td>
+        <td>${cal.forwardQuartile ? quartileBadge(cal.forwardQuartile, quartileRichnessLabel(cal.forwardQuartile)) : unavailSpan('na')}</td>
       </tr>` : '';
 
     const peerRows = (model.crossPeers || []).map(peer => {
@@ -687,13 +989,14 @@
       const deltaCls = Number.isFinite(peer.deltaVsBtc)
         ? (peer.deltaVsBtc >= 0 ? 'bw-xasset-delta--pos' : 'bw-xasset-delta--neg')
         : '';
+      const metric = peer.metric && peer.metric !== '—' ? peer.metric : unavailSpan('awaiting');
       return `<tr class="${peer.rowClass || ''}">
         <td><span class="bw-xasset-peer">${peer.label.split(' ')[0]}</span> <span class="bw-xasset-peer-sub">${peer.label.replace(/^[^\s]+\s*/, '')}</span></td>
         <td class="bw-xasset-role">${peer.role}</td>
-        <td class="bw-xasset-num"><strong>${peer.metric || '—'}</strong></td>
-        <td class="bw-xasset-num ${chgCls}">${Number.isFinite(peer.chg) ? fmtPct(peer.chg) : '—'}</td>
-        <td class="bw-xasset-num ${deltaCls}">${Number.isFinite(peer.deltaVsBtc) ? fmtNum(peer.deltaVsBtc, 1) : '—'}</td>
-        <td>${peer.quartile ? quartileBadge(peer.quartile, quartileRichnessLabel(peer.quartile)) : '—'}</td>
+        <td class="bw-xasset-num"><strong>${metric}</strong></td>
+        <td class="bw-xasset-num ${chgCls}">${Number.isFinite(peer.chg) ? fmtPct(peer.chg) : unavailSpan('na')}</td>
+        <td class="bw-xasset-num ${deltaCls}">${Number.isFinite(peer.deltaVsBtc) ? fmtNum(peer.deltaVsBtc, 1) : unavailSpan('na')}</td>
+        <td>${peer.quartile ? quartileBadge(peer.quartile, quartileRichnessLabel(peer.quartile)) : unavailSpan('awaiting')}</td>
       </tr>`;
     }).join('');
 
@@ -716,10 +1019,10 @@
             <tr>
               <td><span class="bw-xasset-peer">${model.assetKey}</span> <span class="bw-xasset-peer-sub">${front?.symbol || 'front'}</span></td>
               <td class="bw-xasset-role">Spot basis %</td>
-              <td class="bw-xasset-num"><strong>${front ? fmtPct(front.spotBasisPct) + ' basis' : '—'}</strong></td>
-              <td class="bw-xasset-num">—</td>
-              <td class="bw-xasset-num">—</td>
-              <td>${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : '—'}</td>
+              <td class="bw-xasset-num"><strong>${front ? fmtPctDisplay(front.spotBasisPct) + ' basis' : unavailSpan('awaiting')}</strong></td>
+              <td class="bw-xasset-num">${unavailSpan('na')}</td>
+              <td class="bw-xasset-num">${unavailSpan('na')}</td>
+              <td>${front?.basisQuartile ? quartileBadge(front.basisQuartile, quartileRichnessLabel(front.basisQuartile)) : unavailSpan('na')}</td>
             </tr>
             ${btcCalRow}
             ${peerRows}
@@ -728,7 +1031,8 @@
       </div>
       <footer class="bw-xasset-interpret">
         <span class="bw-xasset-interpret-label">Desk read</span>
-        <p class="bw-xasset-interpret-text">${model.interpretation || '—'}</p>
+        <p class="bw-xasset-interpret-text">${model.interpretation || unavailSpan('awaiting')}</p>
+        ${model.interpretationSupport ? `<span class="bw-xasset-interpret-support">${model.interpretationSupport}</span>` : ''}
       </footer>
     </section>`;
   }
@@ -823,20 +1127,27 @@
     });
   }
 
-  function drawBasisChart(model) {
-    const canvas = el('bwCurveCanvas');
-    if (!canvas) return;
-    const theme = getChartTheme();
-    const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    const h = isStandalone() ? 280 : Math.max(110, rect.height);
-    canvas.width = Math.max(280, rect.width) * dpr;
-    canvas.height = h * dpr;
-    ctx.scale(dpr, dpr);
-    const w = rect.width;
+  function contractChartLabel(symbol) {
+    const m = String(symbol || '').match(/([FGHJKMNQUVXZ]\d{2})$/);
+    return m ? m[1] : String(symbol || '').slice(-3);
+  }
+
+  function drawYAxisPriceLabels(ctx, pad, plotH, yAt, minP, maxP, theme) {
+    ctx.fillStyle = theme.axis;
+    ctx.font = '9px system-ui,sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= 4; i++) {
+      const p = minP + ((maxP - minP) * i) / 4;
+      ctx.fillText(`$${fmtNum(p, 0)}`, pad.l - 6, yAt(p));
+    }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function paintBasisChart(ctx, w, h, model, theme) {
     ctx.clearRect(0, 0, w, h);
-    const contracts = model.contracts;
+    const contracts = model.contracts || [];
     if (!contracts.length || !(model.spot > 0)) {
       ctx.fillStyle = theme.empty;
       ctx.font = '12px system-ui,sans-serif';
@@ -844,22 +1155,28 @@
       return;
     }
 
-    const legend = el('bwChartLegend');
     if (model.view === 'implied') {
-      if (legend) legend.innerHTML = `
-        <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-curve)"></i>Spot curve % (ann.)</span>
-        <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-front)"></i>Forward curve % (ann.)</span>`;
-      const spotDtes = contracts.map(c => c.dte);
-      const spotRates = contracts.map(c => c.spotAnnualizedCarry ?? 0);
-      const fwdDtes = model.calendarPairs.map(p => (p.nearDte + p.farDte) / 2);
-      const fwdRates = model.calendarPairs.map(p => p.forwardAnnualizedYield ?? 0);
+      const spotPts = contracts.filter(c => Number.isFinite(c.spotAnnualizedCarry));
+      const spotDtes = spotPts.map(c => c.dte);
+      const spotRates = spotPts.map(c => c.spotAnnualizedCarry);
+      const fwdPts = (model.calendarPairs || []).filter(p => Number.isFinite(p.forwardAnnualizedYield));
+      const fwdDtes = fwdPts.map(p => (p.nearDte + p.farDte) / 2);
+      const fwdRates = fwdPts.map(p => p.forwardAnnualizedYield);
       const allRates = [...spotRates, ...fwdRates].filter(Number.isFinite);
+      if (!allRates.length) {
+        ctx.fillStyle = theme.empty;
+        ctx.font = '12px system-ui,sans-serif';
+        ctx.fillText(`No annualized tenors ≥ ${MIN_ANN_DTE}d DTE`, 16, h / 2);
+        return;
+      }
       const yMin = Math.min(0, ...allRates) - 1;
       const yMax = Math.max(...allRates, 1) + 1;
-      const maxDte = Math.max(...spotDtes, ...model.calendarPairs.map(p => p.farDte), 1);
-      const pad = { l: 48, r: 16, t: 18, b: 32 };
-      const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+      const maxDte = Math.max(...spotDtes, ...fwdPts.map(p => p.farDte), 1);
+      const pad = { l: 48, r: 16, t: 18, b: 40 };
+      const plotW = w - pad.l - pad.r;
+      const plotH = h - pad.t - pad.b;
       const yAt = r => pad.t + plotH - ((r - yMin) / (yMax - yMin || 1)) * plotH;
+      const xAtDte = d => pad.l + (d / maxDte) * plotW;
 
       ctx.strokeStyle = theme.grid;
       for (let i = 0; i <= 4; i++) {
@@ -878,7 +1195,12 @@
       drawRateSeries(ctx, pad, plotW, plotH, w, h, fwdDtes, fwdRates, theme.front, yMin, yMax, 0, maxDte);
 
       ctx.fillStyle = theme.axis;
-      ctx.font = '9px system-ui';
+      ctx.font = '9px system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      spotPts.forEach((c) => {
+        ctx.fillText(contractChartLabel(c.symbol), xAtDte(c.dte), h - pad.b + 14);
+      });
+      ctx.textAlign = 'left';
       ctx.fillText('DTE →', w - pad.r - 36, h - 8);
       ctx.save();
       ctx.translate(12, pad.t + plotH / 2);
@@ -888,15 +1210,12 @@
       return;
     }
 
-    if (legend) legend.innerHTML = `
-      <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>Spot (CF proxy)</span>
-      <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>Futures curve</span>
-      <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front contract</span>`;
-
     const prices = [model.spot, ...contracts.map(c => c.futuresPrice)];
-    const minP = Math.min(...prices) * 0.998, maxP = Math.max(...prices) * 1.002;
-    const pad = { l: 52, r: 16, t: 18, b: 32 };
-    const plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+    const minP = Math.min(...prices) * 0.998;
+    const maxP = Math.max(...prices) * 1.002;
+    const pad = { l: 58, r: 16, t: 18, b: 40 };
+    const plotW = w - pad.l - pad.r;
+    const plotH = h - pad.t - pad.b;
     const xAt = i => pad.l + (i / Math.max(1, contracts.length)) * plotW;
     const yAt = p => pad.t + plotH - ((p - minP) / (maxP - minP || 1)) * plotH;
 
@@ -906,6 +1225,7 @@
       ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
     }
     ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
+    drawYAxisPriceLabels(ctx, pad, plotH, yAt, minP, maxP, theme);
 
     ctx.setLineDash([5, 4]);
     ctx.strokeStyle = theme.spotLine;
@@ -913,7 +1233,7 @@
     ctx.setLineDash([]);
     ctx.fillStyle = theme.spotLabel;
     ctx.font = '10px system-ui,sans-serif';
-    ctx.fillText(`Spot $${fmtNum(model.spot, 0)}`, pad.l + 6, yAt(model.spot) - 6);
+    ctx.fillText(`${model.assetKey} spot $${fmtNum(model.spot, 0)}`, pad.l + 6, Math.max(pad.t + 10, yAt(model.spot) - 6));
 
     const grad = ctx.createLinearGradient(pad.l, 0, w - pad.r, 0);
     grad.addColorStop(0, theme.curve);
@@ -921,19 +1241,68 @@
     ctx.strokeStyle = grad;
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    contracts.forEach((c, i) => { const x = xAt(i + 1), y = yAt(c.futuresPrice); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+    contracts.forEach((c, i) => {
+      const x = xAt(i + 1);
+      const y = yAt(c.futuresPrice);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
     ctx.stroke();
     ctx.lineWidth = 1;
 
+    const labelY = h - pad.b + 14;
+    ctx.font = '9px system-ui,sans-serif';
+    ctx.textAlign = 'center';
     contracts.forEach((c, i) => {
-      const x = xAt(i + 1), y = yAt(c.futuresPrice);
+      const x = xAt(i + 1);
+      const y = yAt(c.futuresPrice);
       const isFront = model.front && c.symbol === model.front.symbol;
       ctx.fillStyle = isFront ? theme.front : theme.node;
       ctx.beginPath(); ctx.arc(x, y, isFront ? 5 : 3.5, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = theme.axis;
-      ctx.font = '9px system-ui';
-      ctx.fillText(c.symbol.replace(/\d{2}$/, ''), x - 10, h - 10);
+      ctx.fillText(contractChartLabel(c.symbol), x, labelY);
     });
+    ctx.textAlign = 'left';
+    ctx.fillText('Tenor →', w - pad.r - 44, h - 8);
+  }
+
+  function drawBasisChart(model) {
+    const canvas = el('bwCurveCanvas');
+    if (!canvas) return;
+    const theme = getChartTheme();
+    const legend = el('bwChartLegend');
+
+    const paint = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width < 8) {
+        requestAnimationFrame(paint);
+        return;
+      }
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(280, rect.width);
+      const h = isStandalone() ? 280 : Math.max(110, rect.height || 110);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      paintBasisChart(ctx, w, h, model, theme);
+      if (legend) {
+        if (model.view === 'implied') {
+          legend.innerHTML = `
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-curve)"></i>Spot curve % (ann.)</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-front)"></i>Forward curve % (ann.)</span>`;
+        } else {
+          legend.innerHTML = `
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>${model.assetKey} spot (CF proxy)</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>Futures curve</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front contract</span>`;
+        }
+      }
+    };
+    paint();
   }
 
   function approxEq(a, b, tol = 0.01) {
@@ -1020,21 +1389,23 @@
   function syncControls(model) {
     document.querySelectorAll('.bw-view-tab').forEach(btn => btn.classList.toggle('bw-view-tab--active', btn.dataset.bwView === model.view));
     document.querySelectorAll('.bw-asset-btn').forEach(btn => btn.classList.toggle('bw-asset-btn--active', btn.dataset.bwAsset === model.assetKey));
-    const roll = el('bwRollLogic'); if (roll) roll.value = (standaloneState || {}).basisWatch?.rollLogic || loadPrefs().rollLogic || 'nearest';
+    const roll = el('bwRollLogic'); if (roll) roll.value = getState().basisWatch?.rollLogic || loadPrefs().rollLogic || 'nearest';
     const mode = el('bwModeToggle'); if (mode) mode.value = model.mode;
   }
 
-  function renderPanel(state) {
+  function renderPanelChrome(state, model) {
     const panel = el('basisWatchPanel');
-    if (!panel && !isStandalone()) return;
+    if (!panel && !isStandalone()) return false;
     if (panel) {
       panel.classList.toggle('basis-watch-panel--collapsed', !!state.basisWatch?.collapsed);
     }
-    const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
     const standalone = isStandalone();
 
     const status = el('bwStatusChip');
-    if (status) { status.textContent = model.mode === 'snapshot' ? 'Snapshot' : 'Live'; status.className = `bw-status-chip bw-status-chip--${model.mode}`; }
+    if (status) {
+      status.textContent = model.mode === 'snapshot' ? 'Snapshot' : 'Live';
+      status.className = `bw-status-chip bw-status-chip--${model.mode}`;
+    }
 
     const note = el('bwDataNote');
     if (note) note.textContent = model.dataNote || (model.contracts.length ? `As of ${String(model.asOf).slice(0, 19)}` : '');
@@ -1066,6 +1437,18 @@
     const callouts = el('bwCallouts');
     if (callouts) callouts.innerHTML = renderCallouts(model);
 
+    syncControls(model);
+    state._basisWatchModel = model;
+
+    const buildBadge = el('bwBuildBadge');
+    if (buildBadge) buildBadge.textContent = BW_BUILD;
+
+    const footerStamp = el('bwFooterStamp');
+    if (footerStamp) footerStamp.textContent = BW_BUILD;
+    return true;
+  }
+
+  function renderPanelHeavy(state, model) {
     const main = el('bwMainView');
     if (main) {
       main.innerHTML = model.view === 'implied'
@@ -1081,16 +1464,36 @@
       cross.innerHTML = renderCrossAsset(model);
       cross.className = 'bw-xasset-host';
     }
+  }
 
-    syncControls(model);
+  function renderPanelChart(model) {
     drawBasisChart(model);
-    state._basisWatchModel = model;
+  }
 
-    const buildBadge = el('bwBuildBadge');
-    if (buildBadge) buildBadge.textContent = BW_BUILD;
+  function renderPanel(state) {
+    const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
+    if (!renderPanelChrome(state, model)) return;
+    renderPanelHeavy(state, model);
+    renderPanelChart(model);
+  }
 
-    const footerStamp = el('bwFooterStamp');
-    if (footerStamp) footerStamp.textContent = BW_BUILD;
+  async function renderPanelAsync(state, gen) {
+    const model = state._basisWatchModel;
+    if (!model || gen !== _refreshGen) return;
+    if (!renderPanelChrome(state, model)) return;
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+    renderPanelHeavy(state, model);
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+    await new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(resolve);
+      else setTimeout(resolve, 0);
+    });
+    if (gen !== _refreshGen) return;
+    renderPanelChart(model);
   }
 
   function persistBasisWatchPrefs(state) {
@@ -1103,15 +1506,46 @@
     savePrefs(p);
   }
 
-  async function refresh(state, hooks) {
+  async function refreshOnce(state, hooks, gen) {
     await ensureCurveHistory();
+    if (gen !== _refreshGen) return;
+
     if (state.basisWatch?.mode === 'snapshot' && state.basisWatch.snapshot) {
       curveCache = state.basisWatch.snapshot.curve || curveCache;
     }
-    state._basisWatchModel = buildModel(state, curveCache);
+
+    await yieldToMain();
+    if (gen !== _refreshGen) return;
+
+    state._basisWatchModel = buildModel(state, curveCache || { records: [] });
     persistBasisWatchPrefs(state);
-    renderPanel(state);
-    if (hooks?.renderAll) hooks.renderAll();
+    await renderPanelAsync(state, gen);
+    if (gen !== _refreshGen) return;
+
+    if (hooks?.renderAll && !hooks._fromRenderAll) {
+      hooks.renderAll();
+    }
+  }
+
+  async function drainRefreshQueue() {
+    while (_pendingRefresh) {
+      const job = _pendingRefresh;
+      _pendingRefresh = null;
+      await refreshOnce(job.state, job.hooks, job.gen);
+    }
+    _refreshLoop = null;
+  }
+
+  function refresh(state, hooks) {
+    const gen = ++_refreshGen;
+    _pendingRefresh = { state, hooks, gen };
+    if (!_refreshLoop) {
+      _refreshLoop = drainRefreshQueue().catch((err) => {
+        console.warn('[BasisWatch] refresh failed', err);
+        _refreshLoop = null;
+      });
+    }
+    return _refreshLoop;
   }
 
   function exportCsv(state) {
@@ -1142,12 +1576,34 @@
   }
 
   function exportPng(state) {
-    const canvas = el('bwCurveCanvas');
-    if (!canvas) return;
+    const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
+    const theme = getChartTheme();
+    const exportW = 960;
+    const exportH = isStandalone() ? 360 : 280;
+    const off = document.createElement('canvas');
+    const dpr = 2;
+    off.width = exportW * dpr;
+    off.height = exportH * dpr;
+    const ctx = off.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    paintBasisChart(ctx, exportW, exportH, model, theme);
+
     const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
-    a.download = `wtm_basiswatch_curve_${new Date().toISOString().slice(0, 10)}.png`;
+    a.href = off.toDataURL('image/png');
+    a.download = `wtm_basiswatch_${model.assetKey || 'curve'}_${new Date().toISOString().slice(0, 10)}.png`;
     a.click();
+
+    const btn = el('btnBwExportPng');
+    if (btn) {
+      if (!btn.dataset.bwLabel) btn.dataset.bwLabel = btn.textContent || 'Export PNG';
+      btn.textContent = 'Saved';
+      btn.classList.add('bw-btn--saved');
+      setTimeout(() => {
+        btn.textContent = btn.dataset.bwLabel;
+        btn.classList.remove('bw-btn--saved');
+      }, 1400);
+    }
   }
 
   function captureSnapshot(state) {
@@ -1169,6 +1625,17 @@
 
     el('btnBwPopOut')?.addEventListener('click', () => {
       window.open(popOutUrl(getState()), '_blank', 'noopener,noreferrer');
+    });
+
+    document.getElementById('basisWatchPanel')?.addEventListener('click', (e) => {
+      const btn = e.target.closest?.('[data-bw-null-action="refresh"]');
+      if (!btn) return;
+      e.preventDefault();
+      if (typeof global.WTM_DeskOps?.triggerDeskRefresh === 'function') {
+        global.WTM_DeskOps.triggerDeskRefresh();
+        return;
+      }
+      reloadCurve(getState(), hooks);
     });
 
     el('btnBwTheme')?.addEventListener('click', () => {
@@ -1196,6 +1663,7 @@
         const s = getState();
         s.basisWatch = s.basisWatch || {};
         s.basisWatch.asset = btn.dataset.bwAsset || 'BTC';
+        savePrefs({ asset: s.basisWatch.asset, view: s.basisWatch.view, rollLogic: s.basisWatch.rollLogic, mode: s.basisWatch.mode });
         refresh(s, hooks);
         markDirty();
       });
@@ -1219,15 +1687,12 @@
       markDirty();
     });
 
-    el('btnBwRefresh')?.addEventListener('click', async () => {
-      curveCache = null; curveFetchPromise = null;
-      const s = getState();
-      if (isStandalone() && s.hydration) {
-        const bundle = await loadHydrationBundle();
-        if (bundle) s.hydration = { ...s.hydration, ...bundle, crypto_sleeve: bundle.crypto_sleeve, global: bundle.global, execution: bundle.execution, as_of: bundle.as_of };
+    el('btnBwRefresh')?.addEventListener('click', () => {
+      if (typeof global.WTM_DeskOps?.triggerDeskRefresh === 'function') {
+        global.WTM_DeskOps.triggerDeskRefresh();
+        return;
       }
-      if (s.basisWatch) s.basisWatch.mode = 'live';
-      refresh(s, hooks);
+      reloadCurve(getState(), hooks);
     });
 
     el('btnBwExportCsv')?.addEventListener('click', () => exportCsv(getState()));
@@ -1241,10 +1706,13 @@
   }
 
   function init(hooks) {
+    stateGetter = hooks?.getState || null;
     initTheme();
     initTooltips();
     wireControls(hooks.getState, hooks);
-    ensureCurveHistory().then(() => refresh(hooks.getState(), hooks));
+    ensureCurveHistory().then(() => {
+      try { refresh(hooks.getState(), hooks); } catch (err) { console.warn('[BasisWatch] refresh skipped', err); }
+    });
     window.addEventListener('resize', () => renderPanel(hooks.getState()));
   }
 
@@ -1266,22 +1734,20 @@
     };
 
     const bundle = await loadHydrationBundle();
-    if (bundle) {
-      standaloneState.hydration = {
-        crypto_sleeve: bundle.crypto_sleeve,
-        global: bundle.global,
-        execution: bundle.execution,
-        as_of: bundle.as_of,
-        node_cockpits: bundle.node_cockpits,
-      };
-      standaloneState.provenance = { dataAsOf: bundle.as_of, hydratedAt: new Date().toISOString() };
-    }
+    if (bundle) mergeHydrationBundle(standaloneState, bundle);
 
+    stateGetter = () => standaloneState;
     initTooltips();
     wireControls(() => standaloneState, {});
     await ensureCurveHistory();
     await refresh(standaloneState, {});
     window.addEventListener('resize', () => renderPanel(standaloneState));
+
+    window.addEventListener('whinfell-desk-refresh', () => {
+      reloadCurve(standaloneState, {}).catch((err) => {
+        console.warn('[BasisWatch] desk refresh failed', err);
+      });
+    });
 
     window.addEventListener('storage', e => {
       if (e.key === PREFS_KEY || e.key === THEME_KEY) {
@@ -1294,9 +1760,11 @@
   }
 
   global.WTM_BasisWatch = {
-    init, initStandalone, render: renderPanel, refresh, exportCsv, exportPng,
-    buildModel, buildContracts, buildCalendarPairs, ensureCurveHistory, popOutUrl, applyTheme,
-    runBasisWatchValidation, DESK_LINKS, BW_BUILD,
+    init, initStandalone, getState, render: renderPanel, refresh, reloadCurve, reloadHydration,
+    invalidateCurveCache, exportCsv, exportPng,
+    buildModel, buildContracts, buildCalendarPairs, computeSpotAnnualizedCarry, resolveBasisValuation,
+    hydrationBasisSpot, ensureCurveHistory,
+    popOutUrl, applyTheme, runBasisWatchValidation, DESK_LINKS, BW_BUILD, MIN_ANN_DTE,
   };
 
   if (document.body?.dataset?.bwLayout === 'standalone') {

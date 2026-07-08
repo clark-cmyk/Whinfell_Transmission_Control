@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="basis_watch.css" />
+  <link rel="stylesheet" href="css/basis_watch.css" />
 </head>
 <body class="bw-standalone" data-bw-layout="standalone">
 
@@ -59,6 +59,9 @@
         <button type="button" id="btnBwRefresh" class="bw-btn bw-btn--primary">Refresh</button>
         <button type="button" id="btnBwExportCsv" class="bw-btn">CSV</button>
         <button type="button" id="btnBwExportPng" class="bw-btn">PNG</button>
+        <button type="button" id="btnBwCollect" class="bw-btn bw-btn--collect" title="Fetch Barchart + Koyfin CSVs → whinfell_drop → chain">Collect ↓</button>
+        <button type="button" id="btnBwBarchartCollect" class="bw-btn" title="Auto-fetch Barchart intraday watchlist CSV">BC ↓</button>
+        <button type="button" id="btnBwKoyfinCollect" class="bw-btn" title="Auto-fetch Koyfin rates watchlist CSV">KF ↓</button>
         <button type="button" id="btnBwBarchart" class="bw-btn" title="Open Clark Barchart watchlist">Barchart ↗</button>
         <button type="button" id="btnBwKoyfin" class="bw-btn" title="Open Clark Koyfin MYD">Koyfin ↗</button>
       </div>
@@ -105,7 +108,9 @@
     <span>CME-inspired basis &amp; implied rate · desk hydration</span>
   </footer>
 
-  <script src="basis_watch_analytics.js"></script>
-  <script src="basis_watch_panel.js"></script>
+  <script src="js/task_force_panel_feed.js"></script>
+  <script src="js/basis_watch_analytics.js"></script>
+  <script src="js/basis_watch_panel.js"></script>
+  <script src="js/auto_collect_panel.js"></script>
 </body>
 </html>

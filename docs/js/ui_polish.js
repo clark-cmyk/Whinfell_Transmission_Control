@@ -100,6 +100,7 @@
     badge.className = `viz-diagnostics ${report.ok ? 'viz-diagnostics--ok' : 'viz-diagnostics--warn'}`;
     badge.textContent = `Viz ${passed}/${checks.length} · ${report.ok ? 'OK' : 'WARN'}`;
     badge.title = checks.map(c => `${c.pass ? '✓' : '✗'} ${c.name}: ${c.detail}`).join('\n');
+    global.WTM_IaShell?.syncDepthLaddersStatus?.();
     return report;
   };
 
@@ -107,23 +108,34 @@
     enhanceRvCanvas();
     addChartExportButtons();
     fixWorkspaceToggle();
-    if (typeof window.renderVisualizationDiagnostics === 'function') {
-      window.renderVisualizationDiagnostics();
-    }
+  }
+
+  function schedulePolishPass() {
+    if (schedulePolishPass._queued) return;
+    schedulePolishPass._queued = true;
+    setTimeout(() => {
+      schedulePolishPass._queued = false;
+      polishPass();
+    }, 0);
   }
 
   function installHook() {
-    if (typeof window.renderAll !== 'function' || window.renderAll.name !== 'renderAll') {
-      setTimeout(installHook, 0);
+    installHook._n = (installHook._n || 0) + 1;
+    if (!window.__WTM_CORE_READY && installHook._n < 300) {
+      setTimeout(installHook, 16);
       return;
     }
+    if (typeof window.renderAll !== 'function') return;
+    if (window.renderAll._wtmPolishWrapped) return;
     const orig = window.renderAll;
-    window.renderAll = function () {
+    function wrappedRenderAll() {
       const r = orig.apply(this, arguments);
-      polishPass();
+      schedulePolishPass();
       return r;
-    };
-    polishPass();
+    }
+    wrappedRenderAll._wtmPolishWrapped = true;
+    window.renderAll = wrappedRenderAll;
+    schedulePolishPass();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installHook);

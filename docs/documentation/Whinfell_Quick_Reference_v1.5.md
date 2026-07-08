@@ -1,6 +1,48 @@
 # Whinfell Quick Reference v1.5
 
-**Build:** `1.5-BUILD-COUSINS-2026-07-03` · **Hydration:** `1.3.0` · **Date:** July 3, 2026
+**Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Phase:** 2.3 · **Hydration:** `1.3.0` · **BBDM:** `1.2.0` · **Desk ops:** `1.0` · **Date:** July 7, 2026
+
+---
+
+## Keyboard shortcuts
+
+| Scope | Windows/Linux | macOS |
+|-------|---------------|-------|
+| **Top utilities** (Alt+Shift) | **B** Build · **D** Docs · **C** Collect · **R** Refresh · **P** Publish · **A** Agent | **⌃⌥⇧** + same keys |
+| **Views** (Alt) | **R** Risk · **T** Radar · **H** HY OAS · **F** Flipchart · **L** Ladders | **⌃⌥** + same keys |
+| **Tools** (Alt) | **B** BasisWatch · **M** Midwest Crush | **⌃⌥** + same keys |
+
+Disabled while typing in inputs. Tooltips show platform-specific chords.
+
+---
+
+## TopShell utilities
+
+Build · DD · Docs · **Collect CSVs** · **Refresh** · **Publish** · Agent ●/○ · Koyfin ↗ · Barchart ↗
+
+**Action row:** Import hydration · Import WTM · Export · Pipeline bundle · Save · Light/Dark mode
+
+**Collapse:** ▾ top bar · ‹ left rail (session-persisted)
+
+---
+
+## Desk data ops (all tools)
+
+| Button | Action |
+|--------|--------|
+| **Collect CSVs** | Barchart + Koyfin → drop → hydrate (`:8767` agent) |
+| **Refresh data** | Reload hydration + curve + all panels |
+
+**TC:** TopShell utility strip · **Standalone:** ops bar under title  
+**Agent:** `python3 scripts/whinfell_collect_agent.py`
+
+---
+
+## Left nav
+
+**Views:** Risk Cockpit · Transmission Radar · HY OAS · Flipcharts · Ladders & Depth  
+**Layers:** Scan · Dig · Iterate  
+**Tools:** BasisWatch · Midwest Compute Crush · Bang Bang Da ↗ · Ladder deep dive ↗
 
 ---
 
@@ -18,13 +60,49 @@ bash scripts/build_desk_preview.sh && cd dist && python3 -m http.server 8765
 
 ## Morning chain
 
+1. Start agent → **Collect CSVs** → **Refresh data** → Accept tracer → Save  
+2. Optional: **Publish** (local) or `bash scripts/publish_ghpages.sh`
+
 ```bash
 cd ~/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE
 bash scripts/normalize_whinfell_drop.sh ~/Downloads/whinfell_drop
 python3 -m whinfell_pipeline.hydrate -o data/hydration/latest.json
+bash ~/Desktop/Whinfell_Transmission_Control/scripts/sync_live_desk_data.sh
 ```
 
-Then in TC: Import → confirm `lineage_hash` → Accept tracer → Save State.
+**After hydrate (BBDM):** `python3 scripts/enrich_hydration_rv.py`
+
+---
+
+## Publish
+
+| Method | Command / action |
+|--------|------------------|
+| One-click | **Publish** in header (agent on `:8767`) |
+| Terminal | `bash scripts/publish_ghpages.sh` |
+| Collect + publish | `WHINFELL_PUBLISH_COLLECT=1 bash scripts/publish_ghpages.sh` |
+
+---
+
+## Bang Bang Da Machine
+
+RV dislocation scanner — five trades, BANG/WATCH/PASS verdicts from `rv_history` Z-scores.
+
+```bash
+open scripts/Bang_Bang_Da.command
+```
+
+| Trade | Series |
+|-------|--------|
+| Midwest Compute Crush | `gpu_crush_spread` |
+| BTC Calendar | `btc_calendar_bt_near_deferred` |
+| ETH Calendar | `eth_calendar_et_near_deferred` |
+| SOFR vs Fed Funds | `sofr_ois_spread` |
+| 2s10s Curve | `usgg2y10y` |
+
+- **UI:** `http://127.0.0.1:8765/bang_bang_da_machine.html`
+- **API:** `http://127.0.0.1:8766/api/report?window=30|60|90`
+- **Doc:** `bang_bang_da/README.md`
 
 ---
 

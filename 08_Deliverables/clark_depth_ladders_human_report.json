@@ -1,0 +1,30 @@
+{
+  "at": "2026-07-08T01:27:06.109Z",
+  "operator": "Clark",
+  "surface": "depth_ladders_widget",
+  "preflight": "PASS",
+  "checklist": [
+    "Widget header shows pipe icon + \"Depth · Command bar & Ladders\".",
+    "Status row under header: hydration · freshness · Viz score (e.g. Viz 9/10).",
+    "WARN chip hidden when all viz checks pass; visible amber pill when any fail.",
+    "Dashed ladder viz placeholder (~72px) sits above command bar content.",
+    "Command bar KPIs visible after expanding depth band (Gate detail link works).",
+    "Ladder clusters still render; IDs preserved (cmdWhinfellScore, gateText, suggestionTray).",
+    "Alt+L (Ladders & Depth nav) scrolls/highlights the Depth widget.",
+    "After Import hydration, status row updates (not stuck on em-dash)."
+  ],
+  "url": "http://127.0.0.1:8765/?safe_boot=1#widgetDepth",
+  "evidence": {
+    "booted": true,
+    "header": "Depth · Command bar & Ladders",
+    "disclosureInContent": true,
+    "commandBarPresent": true,
+    "hydration": "Parquet hydration pending",
+    "freshness": "—",
+    "viz": "Viz —",
+    "warnVisible": false,
+    "statusText": "Parquet hydration pending · — · Viz — WARN"
+  },
+  "screenshot": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/08_Deliverables/clark_depth_ladders_human_2026-07-08T01-27-05-994Z.png",
+  "humanStatus": "pending"
+}

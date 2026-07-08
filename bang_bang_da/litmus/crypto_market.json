@@ -1,0 +1,335 @@
+{
+  "schema_version": "2.0.0",
+  "adapter_version": "2.0.0-chunk17",
+  "data_status": "stub",
+  "source": "coinglass",
+  "as_of": "2026-07-07T22:17:53+00:00",
+  "export_id": "coinglass_perp_market",
+  "trade_ids": [
+    "btc_basis",
+    "btc_calendar",
+    "eth_basis",
+    "eth_calendar"
+  ],
+  "tables": [
+    {
+      "id": "btc_basis_market",
+      "trade_id": "btc_basis",
+      "title": "Bitcoin \u2014 Market Signals",
+      "columns": [
+        "signal",
+        "venue",
+        "funding_rate",
+        "open_interest_usd",
+        "status"
+      ],
+      "rows": [
+        {
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external"
+        },
+        {
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin"
+        }
+      ]
+    },
+    {
+      "id": "btc_calendar_market",
+      "trade_id": "btc_calendar",
+      "title": "Bitcoin \u2014 Market Signals",
+      "columns": [
+        "signal",
+        "venue",
+        "funding_rate",
+        "open_interest_usd",
+        "status"
+      ],
+      "rows": [
+        {
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external"
+        },
+        {
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin"
+        }
+      ]
+    },
+    {
+      "id": "eth_basis_market",
+      "trade_id": "eth_basis",
+      "title": "Ethereum \u2014 Market Signals",
+      "columns": [
+        "signal",
+        "venue",
+        "funding_rate",
+        "open_interest_usd",
+        "status"
+      ],
+      "rows": [
+        {
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external"
+        },
+        {
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin"
+        }
+      ]
+    },
+    {
+      "id": "eth_calendar_market",
+      "trade_id": "eth_calendar",
+      "title": "Ethereum \u2014 Market Signals",
+      "columns": [
+        "signal",
+        "venue",
+        "funding_rate",
+        "open_interest_usd",
+        "status"
+      ],
+      "rows": [
+        {
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass"
+        },
+        {
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external"
+        },
+        {
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin"
+        }
+      ]
+    }
+  ],
+  "assets": {
+    "BTC": {
+      "symbol": "BTC",
+      "pair": "BTCUSDT",
+      "label": "Bitcoin",
+      "signals": [
+        {
+          "signal_id": "perp_funding_aggregate",
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "BTC"
+        },
+        {
+          "signal_id": "deribit",
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "BTC"
+        },
+        {
+          "signal_id": "hyperliquid",
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "BTC"
+        },
+        {
+          "signal_id": "cf_benchmark",
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external",
+          "source": "external",
+          "asset": "BTC"
+        },
+        {
+          "signal_id": "etf_flows",
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin",
+          "source": "koyfin",
+          "asset": "BTC"
+        }
+      ]
+    },
+    "ETH": {
+      "symbol": "ETH",
+      "pair": "ETHUSDT",
+      "label": "Ethereum",
+      "signals": [
+        {
+          "signal_id": "perp_funding_aggregate",
+          "signal": "Perp Funding (Aggregate)",
+          "venue": "aggregate",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "ETH"
+        },
+        {
+          "signal_id": "deribit",
+          "signal": "Deribit",
+          "venue": "deribit",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "ETH"
+        },
+        {
+          "signal_id": "hyperliquid",
+          "signal": "Hyperliquid",
+          "venue": "hyperliquid",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_coinglass",
+          "source": "coinglass",
+          "asset": "ETH"
+        },
+        {
+          "signal_id": "cf_benchmark",
+          "signal": "CF Benchmark",
+          "venue": "cf_benchmark",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_external",
+          "source": "external",
+          "asset": "ETH"
+        },
+        {
+          "signal_id": "etf_flows",
+          "signal": "ETF Flows",
+          "venue": "etf",
+          "funding_rate": null,
+          "open_interest_usd": null,
+          "status": "pending_koyfin",
+          "source": "koyfin",
+          "asset": "ETH"
+        }
+      ]
+    }
+  },
+  "lineage": {
+    "api_base": "https://open-api-v4.coinglass.com",
+    "api_key_configured": false,
+    "fetched_at": null,
+    "fetch_errors": [],
+    "notes": "Set COINGLASS_API_KEY to enable live funding/OI fetch"
+  }
+}

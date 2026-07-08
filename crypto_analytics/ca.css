@@ -1,0 +1,350 @@
+/* CME Crypto Analytics — institutional light theme */
+
+:root {
+  --bg-app: #f3f3f3;
+  --bg-panel: #ffffff;
+  --border-subtle: #d9d9d9;
+  --nav-active: #dcdcdc;
+  --text-primary: #222222;
+  --text-secondary: #555555;
+  --series-basis: #4c8db8;
+  --series-future: #c58e62;
+  --series-spot: #78a88a;
+  --summary-highlight: #ece8b4;
+  --rail-w: 158px;
+  --summary-h: 82px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-app);
+}
+
+.ca-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.ca-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.ca-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ca-asset-select {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+/* ── Workspace ── */
+.ca-workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Left nav ── */
+.ca-nav {
+  width: var(--rail-w);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.ca-nav-group {
+  margin-bottom: 10px;
+}
+
+.ca-nav-group-label {
+  display: block;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.ca-nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px 6px 20px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.ca-nav-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.ca-nav-item--active {
+  background: var(--nav-active);
+  font-weight: 600;
+}
+
+/* ── Main panel ── */
+.ca-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-subtle);
+}
+
+/* ── Summary strip ── */
+.ca-summary {
+  flex-shrink: 0;
+  min-height: var(--summary-h);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+}
+
+.ca-summary-title {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.ca-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ca-summary-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 3px 10px 3px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ca-summary-table td {
+  font-size: 13px;
+  padding: 5px 10px 5px 0;
+  color: var(--text-primary);
+}
+
+.ca-summary-table td.ca-summary-highlight {
+  background: var(--summary-highlight);
+  font-weight: 700;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* ── View controls ── */
+.ca-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+.ca-controls--hidden {
+  display: none;
+}
+
+.ca-chart-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1 1 200px;
+}
+
+.ca-zoom-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.ca-zoom-btn {
+  font-size: 11px;
+  padding: 3px 7px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.ca-zoom-btn:hover {
+  border-color: #aaa;
+}
+
+.ca-zoom-btn--active {
+  background: var(--nav-active);
+  font-weight: 600;
+}
+
+.ca-date-input {
+  font-size: 11px;
+  padding: 3px 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+}
+
+.ca-date-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ── Chart area ── */
+.ca-viz {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 10px;
+  position: relative;
+}
+
+.ca-viz-panel {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.ca-viz-panel--active {
+  display: flex;
+}
+
+.ca-chart-wrap {
+  flex: 1;
+  min-height: 320px;
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+}
+
+.ca-chart-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.ca-navigator-wrap {
+  flex-shrink: 0;
+  height: 44px;
+  margin-top: 6px;
+  border: 1px solid var(--border-subtle);
+  background: #fafafa;
+  position: relative;
+}
+
+.ca-navigator-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.ca-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 6px 0 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.ca-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ca-legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 1px;
+}
+
+.ca-legend-swatch--basis { background: var(--series-basis); }
+.ca-legend-swatch--future { background: var(--series-future); }
+.ca-legend-swatch--spot { background: var(--series-spot); }
+
+/* ── Tooltip ── */
+.ca-tooltip {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  display: none;
+  min-width: 160px;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ca-tooltip--visible {
+  display: block;
+}
+
+.ca-tooltip dt {
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.ca-tooltip dt:first-child { margin-top: 0; }
+
+.ca-tooltip dd {
+  margin: 0 0 2px;
+  color: var(--text-primary);
+}
+
+/* ── Curve views ── */
+.ca-curve-y-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+}
