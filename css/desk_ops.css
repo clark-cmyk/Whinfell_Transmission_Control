@@ -1,0 +1,60 @@
+/* Shared desk ops bar — Collect CSVs + Refresh data (all tools) */
+.desk-ops-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);
+}
+.desk-ops-back {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b9aab;
+  text-decoration: none;
+}
+.desk-ops-back:hover { color: #e8eef5; }
+.desk-ops-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.desk-ops-btn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e8eef5;
+  cursor: pointer;
+  text-decoration: none;
+}
+.desk-ops-btn:hover:not(:disabled) {
+  border-color: rgba(94, 179, 255, 0.45);
+  background: rgba(94, 179, 255, 0.1);
+}
+.desk-ops-btn--primary {
+  border-color: rgba(94, 179, 255, 0.5);
+  background: rgba(94, 179, 255, 0.16);
+  color: #b8dcff;
+}
+.desk-ops-btn--accent {
+  border-color: rgba(79, 179, 122, 0.45);
+  background: rgba(79, 179, 122, 0.12);
+  color: #9ee0b8;
+}
+.desk-ops-btn--meta {
+  font-size: 10px;
+  color: #8b9aab;
+}
+.desk-ops-btn:disabled,
+.desk-ops--busy {
+  opacity: 0.65;
+  cursor: wait;
+}

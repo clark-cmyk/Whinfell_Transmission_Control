@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CME Cryptocurrency BasisWatch and Implied Rate Tool — Crypto Analytics replica." />
+  <title>Crypto Analytics — BasisWatch &amp; Implied Rate</title>
+  <link rel="stylesheet" href="crypto_analytics/ca.css" />
+  <link rel="stylesheet" href="css/desk_ops.css" />
+</head>
+<body>
+  <div class="ca-app">
+    <div id="deskOpsMount"></div>
+    <header class="ca-header">
+      <h1 class="ca-title">Crypto Analytics</h1>
+      <select id="caAsset" class="ca-asset-select" aria-label="Asset">
+        <option value="BTC" selected>BTC</option>
+        <option value="ETH">ETH</option>
+        <option value="SOL">SOL</option>
+        <option value="XRP">XRP</option>
+      </select>
+    </header>
+
+    <div class="ca-workspace">
+      <nav class="ca-nav" aria-label="Analytics navigation">
+        <div class="ca-nav-group">
+          <span class="ca-nav-group-label">BasisWatch</span>
+          <button type="button" class="ca-nav-item ca-nav-item--active" data-ca-view="chart">Chart</button>
+        </div>
+        <div class="ca-nav-group">
+          <span class="ca-nav-group-label">Implied Rate</span>
+          <button type="button" class="ca-nav-item" data-ca-view="forwardCurve">Forward Curve</button>
+          <button type="button" class="ca-nav-item" data-ca-view="spotCurve">Spot Curve</button>
+        </div>
+      </nav>
+
+      <main class="ca-main">
+        <section class="ca-summary" aria-label="Latest annualized basis">
+          <h2 class="ca-summary-title" id="caSummaryTitle">LATEST ANNUALIZED BASIS FOR BTC</h2>
+          <table class="ca-summary-table" aria-label="Basis summary">
+            <thead>
+              <tr>
+                <th scope="col">Future</th>
+                <th scope="col">Expires</th>
+                <th scope="col">DTE</th>
+                <th scope="col">Price</th>
+                <th scope="col">Spot Marker</th>
+                <th scope="col">Annualized Basis</th>
+              </tr>
+            </thead>
+            <tbody id="caSummaryBody">
+              <tr><td colspan="6">Loading…</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div id="caChartControls" class="ca-controls">
+          <h2 class="ca-chart-title" id="caChartTitle">BTC Annualized Daily Basis</h2>
+          <div class="ca-zoom-group" role="group" aria-label="Zoom presets">
+            <button type="button" class="ca-zoom-btn" data-zoom="1M">1M</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="3M">3M</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="6M">6M</button>
+            <button type="button" class="ca-zoom-btn ca-zoom-btn--active" data-zoom="1Y">1Y</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="3Y">3Y</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="5Y">5Y</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="YTD">YTD</button>
+            <button type="button" class="ca-zoom-btn" data-zoom="All">All</button>
+          </div>
+          <label class="ca-date-label">Start <input type="date" id="caStartDate" class="ca-date-input" /></label>
+          <label class="ca-date-label">End <input type="date" id="caEndDate" class="ca-date-input" /></label>
+        </div>
+
+        <div id="caCurveControls" class="ca-controls ca-controls--hidden">
+          <h2 class="ca-chart-title" id="caCurveTitle">BTC Implied Curve</h2>
+          <label class="ca-date-label">Valuation date <input type="date" id="caValuationDate" class="ca-date-input" /></label>
+        </div>
+
+        <div class="ca-viz">
+          <section id="caPanelChart" class="ca-viz-panel ca-viz-panel--active" aria-label="BasisWatch chart">
+            <div class="ca-legend">
+              <span class="ca-legend-item"><span class="ca-legend-swatch ca-legend-swatch--basis"></span>Annualized Basis</span>
+              <span class="ca-legend-item"><span class="ca-legend-swatch ca-legend-swatch--future"></span>Future</span>
+              <span class="ca-legend-item"><span class="ca-legend-swatch ca-legend-swatch--spot"></span>Spot Marker</span>
+            </div>
+            <div class="ca-chart-wrap">
+              <canvas class="ca-chart-canvas" aria-label="BasisWatch historical chart"></canvas>
+              <div class="ca-tooltip" role="tooltip"></div>
+            </div>
+            <div class="ca-navigator-wrap">
+              <canvas class="ca-navigator-canvas" aria-label="Chart range navigator"></canvas>
+            </div>
+          </section>
+
+          <section id="caPanelForward" class="ca-viz-panel" aria-label="Forward curve">
+            <p class="ca-curve-y-label" id="caCurveYLabel">Annualized Implied Forward Rate (%)</p>
+            <div class="ca-chart-wrap">
+              <canvas class="ca-chart-canvas" aria-label="Forward curve chart"></canvas>
+              <div class="ca-tooltip" role="tooltip"></div>
+            </div>
+          </section>
+
+          <section id="caPanelSpot" class="ca-viz-panel" aria-label="Spot curve">
+            <p class="ca-curve-y-label">Annualized Spot Rate (%)</p>
+            <div class="ca-chart-wrap">
+              <canvas class="ca-chart-canvas" aria-label="Spot curve chart"></canvas>
+              <div class="ca-tooltip" role="tooltip"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="crypto_analytics/ca-models.js"></script>
+  <script src="crypto_analytics/ca-data.js"></script>
+  <script src="crypto_analytics/ca-summary.js"></script>
+  <script src="crypto_analytics/ca-basis-chart.js"></script>
+  <script src="crypto_analytics/ca-forward-curve.js"></script>
+  <script src="crypto_analytics/ca-spot-curve.js"></script>
+  <script src="crypto_analytics/ca-app.js"></script>
+  <script src="js/desk_data_ops.js"></script>
+  <script src="js/auto_collect_panel.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.WTM_DeskOps?.mountDeskOpsBar) {
+        WTM_DeskOps.mountDeskOpsBar('#deskOpsMount', { backHref: './index.html' });
+      }
+      window.addEventListener('whinfell-desk-refresh', function () {
+        if (window.CAApp?.refreshActiveView) window.CAApp.refreshActiveView();
+      });
+    });
+  </script>
+</body>
+</html>

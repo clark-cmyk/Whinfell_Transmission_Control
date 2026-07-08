@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whinfell Transmission Control — Phase 2.3 Operator Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- DD_BADGE_SYNC_START -->
+<script>
+window.DICTIONARY_BADGE_DEFAULT = {
+  "version": "1.0",
+  "date": "2026-06-29",
+  "status": "Locked",
+  "alignment": "Aligned",
+  "source": "whinfell_pipeline/data_dictionary.yaml",
+  "loadingLabel": "Loading dictionary\u2026"
+};
+</script>
+<!-- DD_BADGE_SYNC_END -->
+
+  <script>
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              wtm: {
+                bg: '#0b0f14', surface: '#141b24', card: '#1a2332', border: '#2a3548',
+                muted: '#8b9cb3', accent: '#3d8bfd', green: '#3dd68c', amber: '#f5a623', red: '#f56565',
+              },
+            },
+            fontFamily: { sans: ['"Segoe UI"', 'system-ui', 'sans-serif'] },
+          },
+        },
+      };
+    }
+  </script>
+  <style id="tailwind-fallback">
+    html, body { background: #0b0f14; color: #e8eef5; margin: 0; min-height: 100%; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; }
+    .hidden, .zone-hidden, .panel-hidden { display: none !important; }
+  </style>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/console_ia.css">
+    <link rel="stylesheet" href="css/ai_compute.css">
+    <link rel="stylesheet" href="css/v15_desk.css">
+    <link rel="stylesheet" href="css/basis_watch.css">
+    <link rel="stylesheet" href="css/desk_ops.css">
+    <link rel="stylesheet" href="css/ui_polish.css">
+    <link rel="stylesheet" href="css/transmission_radar.css">
+    <link rel="stylesheet" href="midwest_compute/wmc.css">
+</head>
+<body class="bg-wtm-bg text-slate-100 font-sans h-screen flex flex-col overflow-hidden ia-layer-scan">
+
+  <div id="js-boot-check" class="boot-check">BOOTING Whinfell Transmission Control...</div>
+
+  <div id="deskDocsBackdrop" class="desk-docs-backdrop" aria-hidden="true"></div>
+  <aside id="deskDocsDrawer" class="desk-docs-drawer" aria-label="Desk documentation" aria-hidden="true">
+    <div class="signal-detail-head">
+      <span class="signal-detail-title">Desk documentation</span>
+      <button type="button" id="btnCloseDeskDocs" class="signal-detail-close" aria-label="Close documentation">×</button>
+    </div>
+    <div class="signal-detail-body" id="deskDocsDrawerList" data-agent-surface="desk-docs-drawer"></div>
+  </aside>
+  <div id="signalDetailBackdrop" class="signal-detail-backdrop" aria-hidden="true"></div>
+  <aside id="signalDetailDrawer" class="signal-detail-drawer zone-hidden" aria-label="Signal explanations" aria-hidden="true">
+    <div class="signal-detail-head">
+      <span class="signal-detail-title">Signal detail</span>
+      <button type="button" id="btnCloseSignalDetail" class="signal-detail-close" aria-label="Close signal detail">×</button>
+    </div>
+    <div class="signal-detail-body">
+      <section class="signal-detail-section"><h3>Whinfell Score</h3><div id="whyWhinfellScore" class="why-body"></div></section>
+      <section class="signal-detail-section"><h3>Transmission</h3><div id="whyTransmission" class="why-body"></div></section>
+      <section class="signal-detail-section"><h3>Gate state</h3><div id="whyGateState" class="why-body"></div></section>
+      <section class="signal-detail-section"><h3>Shock</h3><div id="whyShock" class="why-body"></div></section>
+      <section class="signal-detail-section"><h3>Freshness</h3><div id="whyFreshness" class="why-body"></div></section>
+      <section class="signal-detail-section"><h3>Desk documentation</h3><div id="signalDetailDocs" class="why-body desk-docs-compact"></div></section>
+      <section class="signal-detail-section"><h3>Ingest audit</h3><div id="ingestProvenanceAudit" class="why-body signal-ingest-audit"></div></section>
+      <section class="signal-detail-section"><h3>Hydration field log</h3><div id="hydrationFieldLog" class="why-body" data-agent-surface="hydration-field-log"></div></section>
+      <section class="signal-detail-section"><h3>Data dictionary audit</h3><div id="dataDictionaryAudit" class="why-body" data-agent-surface="dd-audit"></div><div id="ddAuditDetail" class="dd-audit-detail zone-hidden" data-agent-surface="dd-audit-detail"></div></section>
+      <div id="signalDetailTech" class="signal-detail-tech"></div>
+    </div>
+  </aside>
+
+  <section id="hydrationBanner" class="hydration-banner zone-hidden" role="alert" aria-live="polite" aria-label="Hydration status">
+    <div class="hydration-banner-inner">
+      <span id="hydrationBannerTitle" class="hydration-banner-title">Hydration required</span>
+      <p id="hydrationBannerBody" class="hydration-banner-body">Import a v1.2.0 hydration bundle to load RV quartiles, CURRENT READING, and funds flow.</p>
+      <button type="button" id="btnHydrationBannerImport" class="text-xs px-3 py-1.5 rounded-md border border-wtm-accent/60 text-wtm-accent bg-wtm-accent/20 hover:bg-wtm-accent/30 font-bold">Import Now</button>
+      <button type="button" id="btnHydrationBannerDismiss" class="text-[10px] px-2 py-1 rounded text-wtm-muted hover:text-wtm-text">Dismiss</button>
+    </div>
+  </section>
+
+  <!-- Phase 3 scan layer — compact KPI strip (relocated into Risk Cockpit widget on boot) -->
+  <section id="scanKpiStrip" class="scan-kpi-strip" aria-label="Scan KPIs">
+    <div id="scanKpiTiles" class="scan-kpi-tiles" role="list"></div>
+  </section>
+
+  <!-- Phase 16 + Koyfin widget shell (scan · dig · iterate) -->
+  <div class="wtm-ia-shell" id="wtmIaShell">
+    <div class="ia-top-frame" id="iaTopFrame" data-collapsed="false">
+      <div class="ia-top-frame-bar">
+        <div class="ia-top-pipeline-strip" id="iaTopPipelineStrip" aria-live="polite">
+          <span id="iaTopPipelineLabel" class="ia-top-pipeline-label">Pipeline</span>
+        </div>
+        <button type="button" id="btnIaTopCollapse" class="ia-frame-toggle" aria-label="Collapse top frame" aria-expanded="true">▾</button>
+      </div>
+      <div class="ia-top-body" id="iaTopBody">
+        <header class="console-topbar console-topbar--slim" aria-label="Console header">
+          <div class="console-topbar-zone console-topbar-zone--identity">
+            <div class="console-identity-head">
+              <div class="console-title-row">
+                <h1 class="console-title">Whinfell Transmission Control</h1>
+                <span class="console-phase-badge">Phase 2.3</span>
+              </div>
+              <div class="console-tech-meta" aria-label="Console utilities" data-top-utility-mount></div>
+            </div>
+            <div id="headerRegimeCluster" class="console-regime-cluster">
+              <p id="headerRegimeLine" class="console-regime-line">—</p>
+              <span class="console-regime-sep" aria-hidden="true">·</span>
+              <span id="headerRegimeSub" class="console-regime-sub console-regime-sub--placeholder">Import hydration or enter intake to populate regime summary.</span>
+            </div>
+          </div>
+          <div class="console-topbar-zone console-topbar-zone--status">
+            <div class="console-status-compact">
+              <div class="console-status-primary">
+                <span id="headerFreshnessDot" class="freshness-dot hidden" aria-hidden="true"></span>
+                <span id="headerFreshnessLabel">Freshness —</span>
+                <span id="cmdHydrationBadge" class="hidden console-hydration-badge px-1.5 py-0.5 rounded border">—</span>
+              </div>
+              <div class="console-status-secondary">
+                <span id="hydrationImportStatus" class="console-import-status">No bundle imported</span>
+                <span id="webLastUpdated" class="console-regime-sub console-web-stamp hidden" title="GitHub Pages bundle publish time"></span>
+                <span id="saveIndicator" class="console-save-state">Unsaved</span>
+                <span id="headerImportTime" class="console-regime-sub"></span>
+              </div>
+            </div>
+          </div>
+          <div class="console-topbar-zone console-topbar-zone--actions">
+            <div class="console-actions-row" data-action-chip-mount>
+              <button id="btnImportHydration" type="button" title="Select data/hydration/latest.json after run_csv_download.py daily">Import hydration</button>
+              <input id="hydrationFileInput" type="file" accept=".json,application/json" class="hidden" />
+              <button id="btnImport" type="button">Import WTM</button>
+              <button id="btnExport" type="button">Export</button>
+              <button id="btnExportPipeline" type="button">Pipeline bundle</button>
+              <button id="btnSave" type="button">Save</button>
+              <button type="button" id="btnTheme" aria-pressed="false" title="Toggle dark / light console theme">Light mode</button>
+            </div>
+          </div>
+        </header>
+      </div>
+    </div>
+    <div class="ia-workspace" id="iaWorkspace">
+      <aside class="ia-left-frame wf-rail wf-rail--left" id="iaLeftFrame" aria-label="Navigation and intake">
+        <div class="ia-left-bar">
+          <span>Navigation</span>
+          <button type="button" id="btnIaLeftCollapse" class="ia-frame-toggle" aria-label="Collapse left rail">‹</button>
+        </div>
+        <div class="ia-left-body" id="iaLeftBody">
+          <section class="wf-rail-section">
+            <div class="wf-rail-section__label">Views</div>
+            <nav class="wf-nav-list" id="iaViewShortcuts" aria-label="Dashboard views">
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="risk_cockpit" title="Jump to Risk Cockpit">Risk Cockpit</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="transmission_radar" title="Jump to Transmission Radar">Transmission Radar</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="hy_oas" title="Jump to HY OAS proxy">HY OAS</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="flipchart" title="Jump to Flipchart">Flipcharts</button>
+              <button type="button" class="wf-nav-item ia-view-shortcut" data-ia-view-shortcut="depth_ladders" title="Jump to Depth and Ladders">Ladders &amp; Depth</button>
+            </nav>
+          </section>
+          <section class="wf-rail-section">
+            <div class="wf-rail-section__label">Console layer</div>
+            <div class="ia-layer-tabs wf-nav-list" id="iaLayerTabs" role="tablist" aria-label="Console layer">
+              <button type="button" class="ia-layer-tab wf-nav-item ia-layer-tab--active" data-ia-layer="scan" role="tab" aria-selected="true">Scan</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="dig" role="tab" aria-selected="false">Dig</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="iterate" role="tab" aria-selected="false">Iterate</button>
+            </div>
+          </section>
+          <section class="wf-rail-section ia-specialized-tools-section">
+            <div class="wf-rail-section__label">Specialized tools</div>
+            <details class="ia-specialized-tools" id="iaSpecializedTools" open>
+              <nav class="ia-specialized-tools-nav wf-nav-list" aria-label="Specialized tools">
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaBasisWatch" data-ia-dig-view="basis_watch" aria-pressed="false" title="CME-style basis &amp; implied rate · Dig layer">BasisWatch</button>
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaMidwestCrush" data-ia-dig-view="midwest_crush" aria-pressed="false" title="Midwest GPU crush · cross-asset spreads · Dig layer">Midwest Compute Crush</button>
+                <a href="bang_bang_da_machine.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaBangBangDa" target="_blank" rel="noopener noreferrer" title="RV Z-score scanner · Bang Bang Da v1.2">Bang Bang Da ↗</a>
+                <a href="whinfell-transmission-ladder-deep-dive.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaLadderDeepDive" target="_blank" rel="noopener noreferrer" title="Interactive transmission ladder deep dive">Ladder deep dive ↗</a>
+              </nav>
+            </details>
+          </section>
+          <section class="wf-rail-section wf-rail-section--risk-curve">
+            <div class="wf-rail-section__label">Risk curve</div>
+            <button type="button" id="iaRiskCurveSummary" class="wf-nav-item ia-risk-curve-summary" data-ia-view-shortcut="risk_curve" title="Jump to full risk curve">Curve · —</button>
+          </section>
+        </div>
+      </aside>
+      <main class="ia-center-canvas" id="iaCenterCanvas" aria-label="Primary analytical workspace">
+        <div id="iaWidgetGrid" class="wf-panel-grid ia-widget-grid" data-agent-surface="ia-widget-grid">
+          <article id="widgetRiskCockpit" class="wf-panel wf-panel--risk-cockpit" data-widget="risk_cockpit">
+            <header class="wf-panel__header"><span class="wf-panel__title">Risk Cockpit</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCockpitHost"></div>
+          </article>
+          <article id="widgetRiskCurve" class="wf-panel wf-panel--risk-curve" data-widget="risk_curve">
+            <header class="wf-panel__header"><span class="wf-panel__title">Risk Curve</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCurveHost"></div>
+          </article>
+          <article id="widgetTransmissionRadar" class="wf-panel wf-panel--radar" data-widget="transmission_radar">
+            <header class="wf-panel__header"><span class="wf-panel__title">Transmission Signal Radar</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaRadarHost"></div>
+          </article>
+          <article id="widgetHyOas" class="wf-panel wf-panel--hy-oas" data-widget="hy_oas">
+            <header class="wf-panel__header"><span class="wf-panel__title">HY OAS Proxy</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaHyOasHost"></div>
+          </article>
+          <article id="widgetFlipchart" class="wf-panel wf-panel--flipchart" data-widget="flipchart">
+            <header class="wf-panel__header"><span class="wf-panel__title">Flipchart</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaFlipchartHost"></div>
+          </article>
+          <article id="widgetDepth" class="wf-panel wf-panel--depth" data-widget="depth_ladders">
+            <header class="wf-panel__header"><span class="wf-panel__title">Depth · Command bar &amp; Ladders</span></header>
+            <div class="wf-panel__body wf-panel__body--flush" id="iaDepthHost"></div>
+          </article>
+        </div>
+        <div id="iaScanHost" class="ia-scan-host zone-hidden" data-agent-surface="ia-scan-host" aria-hidden="true">
+          <section id="transmissionRadar" class="transmission-radar" aria-label="Transmission Signal Radar" data-agent-surface="transmission-radar">
+            <div id="transmissionRadarMount" class="transmission-radar-mount"></div>
+          </section>
+        </div>
+        <div id="iaCockpitHost" class="ia-cockpit-host zone-hidden" data-agent-surface="ia-cockpit-host" aria-hidden="true">
+  <!-- Phase 2 Node Cockpit Shell (UI-1) -->
+  <section id="nodeCockpitZone" class="flex-1 min-h-0 flex flex-col overflow-hidden" aria-label="Node cockpit workspace">
+    <nav id="nodeRail" class="node-rail" aria-label="Risk curve navigation"></nav>
+    <div id="diagnosticsPanelZone" class="console-panel-zone console-panel-zone--diagnostics zone-hidden">
+      <div class="console-panel-zone-label">Data quality · coverage</div>
+      <div id="nodeCoverageBanner" class="node-coverage-banner zone-hidden" role="status" aria-live="polite" aria-label="Hydration and coverage"></div>
+    </div>
+    <section id="postImportWorkflow" class="post-import-workflow zone-hidden console-panel-zone" aria-label="Post-import workflow">
+      <div class="console-panel-zone-label">Workflow actions</div>
+      <div class="post-import-workflow-inner">
+        <span class="post-import-workflow-title">Desk checklist</span>
+        <ol id="postImportSteps" class="post-import-steps"></ol>
+      </div>
+    </section>
+    <div id="cockpitShell" class="flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div class="cockpit-main flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
+        <div id="cockpitChartArea" class="cockpit-chart-area xl:col-span-12 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
+          <div id="basisTacticalBanner" class="basis-tactical-banner zone-hidden" aria-live="polite">
+            <p id="basisTacticalLead" class="basis-tactical-lead">—</p>
+            <details class="mission-read-disclosure" id="basisTacticalDisclosure">
+              <summary>Full read</summary>
+              <p id="basisTacticalSentence" class="basis-tactical-sentence">—</p>
+              <p id="basisTacticalSuffix" class="basis-tactical-suffix zone-hidden">—</p>
+            </details>
+          </div>
+          <div class="cockpit-chart-header cockpit-chart-header--compact px-3 py-1 border-b border-wtm-border bg-wtm-surface">
+            <h2 id="cockpitChartTitle" class="text-[12px] font-bold">Mission read · RV / Basis</h2>
+            <p id="cockpitChartSubtitle" class="text-[9px] text-wtm-muted">—</p>
+          </div>
+          <div id="cockpitHorizonRow" class="cockpit-horizon-row cockpit-horizon-row--compact">
+            <div id="cockpitHorizonPills" role="group" aria-label="RV horizon"></div>
+          </div>
+          <div id="cockpitDataViewport" class="cockpit-data-viewport">
+          <div id="cockpitChartCanvas" class="cockpit-chart-canvas">
+            <canvas id="cockpitRvCanvas" aria-label="RV basis chart"></canvas>
+            <div id="cockpitChartPlaceholder" class="cockpit-chart-placeholder">
+              <p class="text-[10px] text-wtm-muted">Import hydration to populate RV quartiles and basis history.</p>
+              <span id="cockpitChartValue" class="zone-hidden">—</span>
+              <span id="cockpitChartRichness" class="zone-hidden">—</span>
+              <span id="cockpitChartPct" class="zone-hidden">—</span>
+            </div>
+          </div>
+          <div id="cockpitRvTableWrap" class="cockpit-rv-table-wrap" aria-label="RV horizon data table"></div>
+          </div>
+          <div id="basisSummaryStrip" class="basis-summary-strip zone-hidden">
+            <div id="basisSummary" class="basis-summary">
+              <div class="basis-reading-primary">
+                <div id="basisReadingValue" class="basis-reading-value">—</div>
+              </div>
+              <div id="basisReadingLabel" class="basis-reading-label">Current reading</div>
+              <div id="basisStanceRow" class="basis-interpret-row"></div>
+              <div id="basisTradeRow" class="basis-trade-row"></div>
+            </div>
+          </div>
+        </div>
+        <aside id="cockpitDecisionRail" class="cockpit-decision-rail bg-wtm-bg min-h-0" aria-label="Decision rail">
+          <div id="cockpitDecisionContent" class="cockpit-decision-content"></div>
+          <details class="ia-commentary-disclosure" id="iaCommentaryDisclosure">
+            <summary>Desk feed</summary>
+            <div id="iaCommentaryFeed" class="ia-commentary-feed ia-commentary-feed--right" role="feed" aria-label="Operator commentary"></div>
+          </details>
+        </aside>
+      </div>
+      <div id="cockpitFocusLayer" class="cockpit-focus-layer zone-hidden" aria-label="Here's Why focus"></div>
+      <div id="cockpitCompareLayer" class="cockpit-compare-layer zone-hidden" aria-label="Compare mode"></div>
+      <div id="cockpitDetailBand" class="cockpit-detail-band shrink-0" aria-label="Component drivers"></div>
+      <div id="cockpitActions" class="cockpit-actions shrink-0" aria-label="Cockpit actions">
+        <div class="cockpit-actions-inner">
+          <div class="operator-actions-primary">
+            <button type="button" id="btnHeresWhy" class="operator-action operator-action--why btn btn-primary">
+              <span class="operator-action-label">Here's Why</span>
+              <span class="operator-action-hint">Inspect thesis &amp; drivers</span>
+            </button>
+            <button type="button" id="btnCompareMode" class="operator-action operator-action--compare btn btn-secondary">
+              <span class="operator-action-label">Compare</span>
+              <span class="operator-action-hint">Cross-node scenarios</span>
+            </button>
+            <button type="button" id="btnExportNode" class="operator-action operator-action--export btn btn-ghost">
+              <span class="operator-action-label">Export node</span>
+              <span class="operator-action-hint">Desk handoff bundle</span>
+            </button>
+          </div>
+          <div id="flipchartState" class="flipchart-state" aria-live="polite" data-agent-surface="flipchart-state">
+            <span class="flipchart-mode" id="flipchartMode">Flipchart</span>
+            <strong id="flipchartTitle">—</strong>
+          </div>
+          <div class="keyboard-hint-group">
+            <button type="button" id="btnFlipPrev" class="flipchart-nav-btn" title="Previous node (←)" aria-label="Previous node">‹</button>
+            <span id="flipchartPosition" class="flipchart-position" data-agent-field="flip-index">—</span>
+            <button type="button" id="btnFlipNext" class="flipchart-nav-btn" title="Next node (→)" aria-label="Next node">›</button>
+            <span class="keyboard-hint" id="keyboardHintText">← → flip · 1–5 jump · f focus · c compare</span>
+            <button type="button" id="btnShortcutHelp" class="shortcut-help-btn" title="Shift+click a rail tab (in Compare mode) to add/remove that node from the side-by-side Compare layer without leaving your current view.">?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+        </div>
+        <div id="iaDigHost" class="ia-dig-host" data-agent-surface="ia-dig-host">
+  <section id="basisWatchPanel" class="basis-watch-panel" aria-label="BasisWatch and implied rate">
+    <div class="basis-watch-head">
+      <div class="bw-head-group bw-head-group--title">
+        <div class="basis-watch-head-primary">
+          <span class="basis-watch-title">WTM BasisWatch</span>
+          <span class="basis-watch-sub">TradFi ↔ Crypto bridge</span>
+        </div>
+      </div>
+      <div class="bw-head-group bw-head-group--market" aria-label="Market and state">
+        <div class="bw-chip-row" role="group" aria-label="Asset">
+          <button type="button" class="bw-asset-btn bw-asset-btn--active" data-bw-asset="BTC">BTC</button>
+          <button type="button" class="bw-asset-btn" data-bw-asset="ETH">ETH</button>
+        </div>
+        <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
+        <span id="bwDataNote" class="bw-data-note"></span>
+      </div>
+      <div class="bw-head-group bw-head-group--view" aria-label="View controls">
+        <div class="bw-segment" role="tablist" aria-label="View mode">
+          <button type="button" class="bw-view-tab bw-view-tab--active" data-bw-view="basis" role="tab" aria-selected="true">Basis Watch</button>
+          <button type="button" class="bw-view-tab" data-bw-view="implied" role="tab" aria-selected="false">Implied Rate</button>
+        </div>
+        <div class="bw-view-settings">
+          <label class="bw-field-label">Roll
+            <select id="bwRollLogic">
+              <option value="nearest">Nearest</option>
+              <option value="constant">Constant maturity</option>
+              <option value="manual">Manual (L3)</option>
+            </select>
+          </label>
+          <label class="bw-field-label">Mode
+            <select id="bwModeToggle">
+              <option value="live">Live</option>
+              <option value="snapshot">Snapshot</option>
+            </select>
+          </label>
+          <button type="button" id="btnBwPopOut" class="bw-btn bw-btn--focus" title="Open BasisWatch in a dedicated focus view">
+            <span class="bw-btn-focus-icon" aria-hidden="true">⧉</span>
+            <span class="bw-btn-focus-label">Open in focus view</span>
+          </button>
+        </div>
+      </div>
+      <div class="bw-head-group bw-head-group--utility" aria-label="Utilities">
+        <div class="bw-utility-cluster" role="group" aria-label="Export">
+          <button type="button" id="btnBwExportCsv" class="bw-btn bw-btn--utility" title="Export BasisWatch table CSV">Export CSV</button>
+          <button type="button" id="btnBwExportPng" class="bw-btn bw-btn--utility" title="Export chart PNG">Export PNG</button>
+        </div>
+        <button type="button" id="btnBwCollapse" class="bw-btn bw-btn--utility bw-btn--collapse" title="Collapse panel" aria-label="Collapse panel">▾</button>
+        <details class="bw-external-disclosure">
+          <summary class="bw-external-summary">Sources</summary>
+          <button type="button" id="btnBwBarchart">Barchart ↗</button>
+          <button type="button" id="btnBwKoyfin">Koyfin ↗</button>
+        </details>
+      </div>
+    </div>
+    <div class="basis-watch-body">
+      <div class="basis-watch-main">
+        <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+        <div id="bwMainView"></div>
+        <details class="bw-methodology-disclosure" id="bwMethodologyDisclosure">
+          <summary>Methodology</summary>
+          <aside class="bw-methodology bw-methodology--compact" id="bwMethodology" aria-label="Methodology"></aside>
+        </details>
+      </div>
+      <aside class="basis-watch-rail">
+        <div id="bwSummaryCards" class="bw-summary-grid"></div>
+        <div id="bwCallouts"></div>
+        <div>
+          <p class="bw-subhead">Cross-asset context</p>
+          <div id="bwCrossAsset" class="bw-xasset-host"></div>
+        </div>
+        <div class="bw-links">
+          <span class="bw-links-support">HYG/LQD vs BTC: use Koyfin credit view · USDCNH NDF: wire in ARCH-4</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+  <section id="iaMidwestCrushHost" class="ia-midwest-crush-host zone-hidden" aria-label="Midwest Compute Crush" data-agent-surface="ia-midwest-crush">
+    <header class="ia-midwest-crush-head">
+      <div class="ia-midwest-crush-title-block">
+        <span class="ia-midwest-crush-title">Midwest Compute Crush</span>
+        <span class="ia-midwest-crush-sub">GPU · MISO power · cross-asset crush spreads</span>
+      </div>
+      <div class="ia-midwest-crush-actions">
+        <button type="button" class="ia-midwest-crush-btn" id="btnIaWmcExport" title="Export WMC JSON bundle">Export</button>
+        <a href="Whinfell_Midwest_Compute_Crush.html" class="ia-midwest-crush-btn ia-midwest-crush-btn--link" target="_blank" rel="noopener noreferrer" title="Open full standalone page">Pop out ↗</a>
+      </div>
+    </header>
+    <div class="ia-midwest-crush-viewport" id="iaMidwestCrushViewport">
+      <div class="wmc-page wmc-page--ia-embed">
+        <section id="overview" class="wmc-zone" aria-labelledby="wmc-ia-overview-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-overview-title">Overview</h2>
+            <p class="wmc-zone-desc">Midwest GPU crush posture and desk snapshot</p>
+          </div>
+          <div id="overview-root"></div>
+        </section>
+        <section id="basis" class="wmc-zone" aria-labelledby="wmc-ia-basis-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-basis-title">Basis tracker · crush spreads</h2>
+            <p class="wmc-zone-desc">Click column headers to sort · dislocations color-coded</p>
+          </div>
+          <div class="wmc-panel">
+            <div class="wmc-table-wrap">
+              <table class="wmc-table" id="basisTable">
+                <thead>
+                  <tr>
+                    <th data-sort="leg">Leg <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="compute">Compute <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="miso_power">MISO power <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="hy_gas">HY gas <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="hg_copper">HG copper <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="btc_basis">BTC basis <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="z_score">Z-score <span class="wmc-sort-icon">↕</span></th>
+                    <th data-sort="dislocation">Dislocation <span class="wmc-sort-icon">↕</span></th>
+                  </tr>
+                </thead>
+                <tbody id="basisBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="risk" class="wmc-zone" aria-labelledby="wmc-ia-risk-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-risk-title">Risk · correlations</h2>
+            <p class="wmc-zone-desc">30-day cross-asset correlations in crush context</p>
+          </div>
+          <div id="risk-corr" class="wmc-subpanel">
+            <h3 class="wmc-subpanel-title">Correlations (30D)</h3>
+            <div class="wmc-heatmap" id="corrHeatmap"></div>
+          </div>
+          <div id="risk-var" class="wmc-subpanel">
+            <h3 class="wmc-subpanel-title">Value at risk (95%, 1D)</h3>
+            <table class="wmc-var-table" id="varTable">
+              <thead>
+                <tr>
+                  <th>Bucket</th>
+                  <th>VaR</th>
+                  <th>CVaR</th>
+                  <th>Limit</th>
+                  <th>Util</th>
+                </tr>
+              </thead>
+              <tbody id="varBody"></tbody>
+            </table>
+          </div>
+        </section>
+        <section id="trades" class="wmc-zone" aria-labelledby="wmc-ia-trades-title">
+          <div class="wmc-zone-head">
+            <h2 class="wmc-zone-title" id="wmc-ia-trades-title">Trade ideas</h2>
+            <p class="wmc-zone-desc">Desk expressions by structure type</p>
+          </div>
+          <div class="wmc-panel" id="trades-root"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+        </div>
+      </main>
+      <aside class="ia-right-frame" id="iaRightFrame" aria-label="Decision and commentary rail">
+        <div id="iaRightRailHost" class="ia-right-rail-host" data-agent-surface="ia-right-rail"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Chunk 12 — depth band: command bar + ladders (collapsed by default) -->
+  <details id="consoleDepthDisclosure" class="console-depth-disclosure">
+    <summary class="console-depth-summary">Depth · Command bar &amp; ladders</summary>
+    <section id="commandBar" class="shrink-0 border-b border-wtm-border bg-wtm-surface gate-glow-amber transition-all">
+    <div class="kpi-band">
+      <div class="kpi-band-toolbar">
+        <div class="flex items-center gap-1 shrink-0 border border-wtm-border rounded-md p-0.5 bg-wtm-bg">
+          <button type="button" data-track="both" class="track-toggle track-toggle-active font-bold px-2 py-1 rounded border border-transparent">Both</button>
+          <button type="button" data-track="global" class="track-toggle font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">Global</button>
+          <button type="button" data-track="china" class="track-toggle font-bold px-2 py-1 rounded border border-transparent text-wtm-muted">China</button>
+        </div>
+        <div class="kpi-band-meta">
+          <span id="cmdTxState" class="hidden">—</span>
+          <span id="cmdRegime" class="hidden">—</span>
+          <span id="cmdSq3Score" class="tabular-nums">SQ3 —</span>
+          <span id="cmdSq3Band" class="kpi-band-chip px-1.5 py-0.5 rounded border">—</span>
+          <span id="cmdGrossRisk" class="tabular-nums text-wtm-accent">—</span>
+          <span id="cmdGrossPosture" class="kpi-band-meta-note">—</span>
+          <span id="sessionReadyChip" class="session-ready-chip zone-hidden" role="status" aria-live="polite">—</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnSignalDetail" class="btn-signal-detail">Signal detail</button>
+          <button type="button" id="btnToggleGateDetail" class="kpi-band-inline-link text-wtm-accent hover:underline">Gate detail</button>
+          <a href="whinfell-transmission-ladder-deep-dive.html" target="_blank" rel="noopener" class="kpi-band-inline-link text-wtm-muted hover:text-wtm-accent">Ladder deep dive</a>
+        </div>
+      </div>
+      <section class="decision-strip" aria-label="Primary KPIs">
+        <div id="scoreCard" class="metric-card score-card">
+          <span id="tipWhinfellScore" class="label metric-tip" tabindex="0" data-tip="Risk Score (Whinfell composite 0–100) — import hydration for live metrics.">Risk Score</span>
+          <strong id="cmdWhinfellScore">—</strong>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="cmdScoreZone" class="meta">—</span>
+          </details>
+        </div>
+        <div class="metric-card">
+          <span id="tipTransmission" class="label metric-tip" tabindex="0" data-tip="Transmission health — import hydration for live metrics.">Transmission</span>
+          <strong id="txHealthValue">—</strong>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="txHealthMeta" class="meta">—</span>
+          </details>
+        </div>
+        <div class="metric-card gate-card">
+          <span id="tipGateState" class="label metric-tip" tabindex="0" data-tip="BTC Gate — sizing permission for BTC modules (not auto-trade). Import hydration for live read.">BTC Gate</span>
+          <strong id="gateText">—</strong>
+          <span id="cmdGateLabel" class="hidden">—</span>
+          <span id="gateChip" class="gate-chip">—</span>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="gateHelperText" class="meta">—</span>
+          </details>
+          <span id="cmdGateSub" class="hidden">—</span>
+        </div>
+        <div class="metric-card shock-card">
+          <span id="tipShock" class="label metric-tip" tabindex="0" data-tip="Shock overlay — optional scenario that compresses sizing until cleared.">Shock overlay</span>
+          <strong id="shockText">No scenario</strong>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="shockMeta" class="meta">Baseline — no overlay</span>
+          </details>
+        </div>
+        <div id="cmdFreshnessCluster" class="metric-card">
+          <span id="tipFreshness" class="label metric-tip" tabindex="0" data-tip="Freshness — import hydration for live age.">Freshness</span>
+          <div class="flex items-center gap-2">
+            <span id="cmdFreshnessDot" class="freshness-dot hidden"></span>
+            <strong id="cmdFreshness">—</strong>
+          </div>
+          <details class="cmd-meta-disclosure">
+            <summary>Rationale</summary>
+            <span id="cmdFreshnessMeta" class="meta" title="">—</span>
+          </details>
+          <details class="cmd-meta-disclosure cmd-freshness-disclosure">
+            <summary>Sources</summary>
+            <div id="cmdFreshnessSubCluster" class="freshness-sub-cluster" aria-label="Source freshness"></div>
+          </details>
+        </div>
+      </section>
+    </div>
+    <div class="console-panel-zone console-panel-zone--ladders">
+      <details class="ladder-cluster-disclosure" id="cmdLadderDisclosure">
+        <summary class="console-panel-zone-label">Ladders · Global + China</summary>
+        <div id="cmdLadderTracks" class="console-panel-zone-body">
+          <div id="cmdGlobalCluster" class="cmd-ladder-cluster rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-wtm-muted leading-relaxed"></div>
+          <div id="cmdChinaCluster" class="cmd-ladder-cluster rounded border border-wtm-border bg-wtm-bg/60 px-2.5 py-1.5 text-wtm-muted leading-relaxed"></div>
+        </div>
+      </details>
+    </div>
+    <div id="gateDetailPanel" class="hidden console-panel-zone">
+      <div class="console-panel-zone-label">Gate detail</div>
+      <div class="px-3 py-2.5 bg-black/25">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-[10px]">
+          <div>
+            <p class="font-semibold text-wtm-accent mb-1">Gate explanation</p>
+            <ul id="gateExplainList" class="list-disc list-inside text-wtm-muted space-y-0.5"></ul>
+          </div>
+          <div>
+            <p class="font-semibold text-wtm-accent mb-1">Unlock conditions</p>
+            <ul id="gateUnlockList" class="list-disc list-inside text-wtm-muted space-y-0.5"></ul>
+          </div>
+        </div>
+        <p id="gateHealthSub" class="text-[9px] text-wtm-muted mt-2"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="suggestionTray" class="suggestion-tray hidden shrink-0 mx-4 mt-2" aria-label="Tracer suggestions">
+    <div class="tray-head">
+      <h3>Suggested tracer marks</h3>
+      <div class="tray-actions">
+        <button type="button" id="btnAcceptTracer" class="btn btn-primary">Apply all</button>
+        <button type="button" id="btnDismissTracer" class="btn btn-secondary">Dismiss</button>
+        <button type="button" id="btnManualOverrideTracer" class="btn btn-ghost">Manual override</button>
+      </div>
+    </div>
+    <div id="suggestionRows"></div>
+  </section>
+  </details>
+
+  <!-- Legacy Three-Zone Layout -->
+  <div id="legacyConsoleZone" class="zone-hidden flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-px bg-wtm-border overflow-hidden">
+
+    <!-- LEFT: Intake & State -->
+    <aside id="zoneLeft" class="xl:col-span-3 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
+      <div class="px-3 py-2 border-b border-wtm-border bg-wtm-surface shrink-0">
+        <h2 class="text-[12px] font-bold">Intake &amp; State</h2>
+        <p class="text-[9px] text-wtm-muted">Global WTM + China SQ3 inputs</p>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        <div id="intakeGlobal" class="space-y-2">
+          <p class="text-[9px] font-bold uppercase tracking-widest text-wtm-accent">Global Track</p>
+          <label class="block">
+            <span class="text-[10px] font-semibold text-wtm-muted uppercase">Whinfell Score</span>
+            <div class="flex gap-2 mt-1">
+              <input id="whinfellScore" type="number" min="0" max="100" placeholder="58" class="flex-1 bg-wtm-bg border border-wtm-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-wtm-accent" />
+              <span id="scoreZoneChip" class="text-[9px] font-bold uppercase px-2 py-2 rounded border border-wtm-border text-wtm-muted self-center">—</span>
+            </div>
+          </label>
+          <label class="block">
+            <span class="text-[10px] font-semibold text-wtm-muted uppercase">Transmission State</span>
+            <div class="flex gap-2 mt-1">
+              <select id="transmissionState" class="flex-1 min-w-0 bg-wtm-bg border border-wtm-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-wtm-accent">
+                <option value="">— Select —</option>
+                <option value="normal">Normal</option>
+                <option value="stressed">Stressed</option>
+                <option value="disorderly">Disorderly</option>
+                <option value="crisis">Crisis</option>
+              </select>
+              <span id="txChip" class="text-[9px] font-bold uppercase px-2 py-2 rounded border border-wtm-border text-wtm-muted shrink-0 self-center">—</span>
+            </div>
+            <p id="txMappingNote" class="tx-mapping-note">—</p>
+            <details class="why-details why-details--secondary" data-why-signal="transmission-state-intake"><summary>Explain</summary><div id="whyTransmissionState" class="why-body"></div></details>
+          </label>
+          <label class="block">
+            <span class="text-[10px] font-semibold text-wtm-muted uppercase">Regime Tag</span>
+            <input id="regimeTag" type="text" list="regimePresets" placeholder="e.g. Fragile Risk-On" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-wtm-accent" />
+            <details class="why-details why-details--secondary" data-why-signal="regime-tag"><summary>Explain</summary><div id="whyRegimeTag" class="why-body"></div></details>
+            <datalist id="regimePresets">
+              <option value="Risk-On / Constructive"></option><option value="Fragile Risk-On"></option>
+              <option value="Neutral / Range"></option><option value="Risk-Off / Compression"></option><option value="Crisis"></option>
+            </datalist>
+          </label>
+          <div>
+            <span class="text-[10px] font-semibold text-wtm-muted uppercase">Gate Status</span>
+            <div id="gateStatusChip" class="mt-1 min-h-[34px] flex items-center justify-center rounded-md border border-wtm-border bg-wtm-bg text-xs font-extrabold uppercase text-wtm-muted">—</div>
+          </div>
+        </div>
+        <div id="intakeChina" class="space-y-2 pt-2 border-t border-wtm-border">
+          <p class="text-[9px] font-bold uppercase tracking-widest text-wtm-accent">China Track · SQ3</p>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Policy Str.</span>
+              <input id="chinaPolicyStrength" type="number" min="0" max="100" placeholder="74" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1.5 text-sm" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">State Imp.</span>
+              <input id="chinaStateImpulse" type="number" min="-100" max="100" placeholder="38" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1.5 text-sm" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Growth Imp.</span>
+              <input id="chinaGrowthImpulse" type="number" min="0" max="100" placeholder="61" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1.5 text-sm" /></label>
+          </div>
+          <div class="flex items-center justify-between gap-2 p-2 rounded-md border border-wtm-border bg-wtm-card">
+            <span class="text-[9px] text-wtm-muted uppercase font-bold">Computed SQ3</span>
+            <span id="sq3ComputedDisplay" class="text-sm font-extrabold tabular-nums">—</span>
+            <span id="sq3BandChip" class="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded border border-wtm-border text-wtm-muted">—</span>
+          </div>
+          <details class="why-details why-details--secondary" data-why-signal="china-sq3"><summary>Explain</summary><div id="whyChinaSq3" class="why-body"></div></details>
+          <label class="block"><span class="text-[9px] text-wtm-muted uppercase">China Regime Tag</span>
+            <input id="chinaRegimeTag" type="text" placeholder="optional" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1.5 text-sm" /></label>
+        </div>
+        <div class="pt-2 border-t border-wtm-border space-y-2">
+          <label class="block"><span class="text-[10px] text-wtm-muted font-semibold">Koyfin URL</span>
+            <input id="urlKoyfin" type="url" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-3 py-1.5 text-[11px] text-blue-300 focus:outline-none focus:border-wtm-accent" /></label>
+          <label class="block"><span class="text-[10px] text-wtm-muted font-semibold">Barchart URL</span>
+            <input id="urlBarchart" type="url" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-3 py-1.5 text-[11px] text-blue-300 focus:outline-none focus:border-wtm-accent" /></label>
+          <div class="bg-wtm-card border border-wtm-border rounded-lg p-2 text-center">
+            <p id="urlDisplayKoyfin" class="text-[9px] break-all text-wtm-muted italic mb-1 text-left">No URL saved</p>
+            <p class="text-[9px] text-wtm-muted mb-1">Koyfin: <strong id="lastKoyfin" class="text-slate-200">Never</strong></p>
+            <button id="btnKoyfin" type="button" class="w-full py-1.5 rounded bg-gradient-to-b from-wtm-accent to-blue-700 text-[11px] font-bold hover:brightness-110">Open Koyfin ↗</button>
+          </div>
+        </div>
+        <div id="provenancePanel" class="hidden p-2 rounded-md border border-wtm-border bg-wtm-card text-[9px]">
+          <span class="font-bold text-wtm-accent uppercase">Data Provenance</span>
+          <p id="provenanceDisplay" class="text-wtm-muted mt-1 leading-relaxed"></p>
+        </div>
+        <div id="suggestedTracerPanel" class="hidden" aria-hidden="true">
+          <span id="suggestedTracerBadge" class="hidden">Pending</span>
+          <p id="suggestedTracerSummary" class="hidden"></p>
+        </div>
+        <div id="researchReadout" class="hidden p-2 rounded-md border border-wtm-accent/30 bg-wtm-accent/5 text-[10px]">
+          <span class="font-bold text-wtm-accent uppercase">Research Import · Provenance</span>
+          <p id="btcBiasDisplay" class="text-wtm-muted mt-1"></p>
+          <p id="importedObservationDisplay" class="research-provenance-only hidden"></p>
+          <p class="text-[9px] text-wtm-muted mt-1">Does not overwrite Key Observation — enter your desk read in Operator precision.</p>
+        </div>
+        <details id="operatorGuide" class="rounded-lg border border-wtm-border bg-wtm-card/50 text-[10px]">
+          <summary class="px-3 py-2 font-bold uppercase text-wtm-accent cursor-pointer">Operator Guide · Phase 2.2</summary>
+          <div class="px-3 pb-3 text-wtm-muted space-y-2">
+            <p><strong class="text-slate-200">Authoritative command bar (2.2):</strong> After <strong>Import Parquet Hydration</strong> or WTM EXPORT v2.1 import, the top bar shows pipeline-trusted Whinfell Score, SQ3, Gate, Gross Risk, and Freshness. A blue <strong>Pipeline</strong> badge confirms authority. Manual intake edits switch to amber <strong>Override</strong> until you re-import.</p>
+            <p><strong class="text-slate-200">Freshness indicators:</strong> Colored dot + label (Fresh &lt;4h · Aging 4–24h · Stale &gt;24h) with source channel, snapshot ID, and data as-of under the chip. Data Provenance panel in the left rail carries full lineage detail.</p>
+            <p><strong class="text-slate-200">Dual-track flow:</strong> Enter Global intake (left) from Koyfin / Prompt A. Enter China SQ3 dimensions or import <code class="text-[9px]">CHINA POLICY EXPORT v1.0</code>. Command bar shows both scores; gate considers Global for BTC access and SQ3 for China caution.</p>
+            <p><strong class="text-slate-200">Track toggle:</strong> Both · Global · China filters visible clusters without hiding intake fields.</p>
+            <p><strong class="text-slate-200">WTM EXPORT v2.1 (locked):</strong> Canonical handshake — Global core + China SQ3 + optional Signal Tracer lines + provenance (Snapshot ID, Lineage Hash, Data As Of, Freshness). Spec: <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/whinfell_pipeline/WTM_EXPORT_v2.1_SPEC.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">WTM_EXPORT_v2.1_SPEC.md</a> · <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/whinfell_pipeline/WTM_EXPORT_v2.2_SPEC.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">v2.2</a>.</p>
+            <p><strong class="text-slate-200">SQ3 (China track):</strong> Policy STR. (35%) + State IMP. (35%) + Growth IMP. (30%). Full math + dual-track gate: <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Whinfell_SQ3_Reference_v1.0.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">SQ3 Reference v1.0</a>.</p>
+            <p><strong class="text-slate-200">Daily CSV chain (Comet runbook):</strong> <code class="text-[9px]">python3 run_csv_download.py daily --operator desk --window 24h --hydrate-output data/hydration/latest.json</code> — copies Downloads → <code class="text-[9px]">staged_raw/</code> (never moves), writes <code class="text-[9px]">.meta.json</code> sidecars, quarantines bad files, emits manifests, then <code class="text-[9px]">collect</code> → Parquet and <code class="text-[9px]">hydrate</code>. Runbooks: <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Whinfell_Data_Update_Simple_Guide.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Simple data update</a> · <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Perplexity_Comet_Collection_Instructions.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Comet collection</a> · <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Fast_CSV_Collect_Guide.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Fast CSV collect</a>.</p>
+            <p><strong class="text-slate-200">Daily hydration (Comet runbook):</strong> <code class="text-[9px]">python3 run_csv_download.py daily --hydrate-output data/hydration/latest.json</code> then <strong>Import Latest Hydration Bundle</strong> (select that file). Status chip under the button confirms last import. Auto-populates Global intake, China policy, BTC bias + L3 basis when present, and tracer <em>suggestions</em> — never written to the horizon matrix until you Accept. Field audit: header <strong>Explain</strong> → Hydration field log · <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Desk User Manual §3</a>.</p>
+            <p><strong class="text-slate-200">Hybrid Signal Tracer (2.2b):</strong> Import surfaces amber <strong>Suggestions Pending</strong> panel — <strong>Accept</strong> writes marks and shows green <strong>Operator Confirmed</strong>; <strong>Dismiss</strong> clears suggestions only. <strong>Manual Override</strong> or horizon edits after hydration set amber matrix chrome, command bar <strong>Override</strong>, and provenance <strong>Manual override active</strong>. Intake/gross/L3-only edits flip command bar <strong>Override</strong> without changing tracer flow. Matrix never auto-fills on import (<code class="text-[9px]">confirm_required</code>). Spec: <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Whinfell_Phase2_Signal_Intelligence_Spec.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Phase 2 signal intelligence</a>.</p>
+            <p><strong class="text-slate-200">Progressive disclosure:</strong> Center pane keeps prompts collapsed until expanded; Gross Risk posture/capital/handover, shock config, and snapshots are in collapsible panels to reduce default density.</p>
+            <p><strong class="text-slate-200">Freshness &amp; provenance:</strong> Command-bar chip + Data Provenance panel show snapshot ID, lineage hash, source channel, data as-of, and freshness (fresh &lt;4h · aging 4–24h · stale &gt;24h). Manual edits flag override until re-import.</p>
+            <p><strong class="text-slate-200">Gate:</strong> Global &lt;50 blocks BTC. SQ3 &lt;50 flags dual-track impairment. See <a href="https://github.com/clark-cmyk/Whinfell_BUILD_Cousins/blob/main/08_Deliverables/Whinfell_Desk_User_Manual_v1.0.md" target="_blank" rel="noopener noreferrer" class="desk-doc-link">Desk User Manual</a>.</p>
+            <p><strong class="text-slate-200">All desk docs:</strong> Expand <strong>Desk documentation</strong> below or click header <strong>Docs</strong>.</p>
+          </div>
+        </details>
+        <details id="deskDocsPanel" class="rounded-lg border border-wtm-border bg-wtm-card/50 text-[10px] mt-2">
+          <summary class="px-3 py-2 font-bold uppercase text-wtm-accent cursor-pointer">Desk documentation</summary>
+          <div id="deskDocsList" class="px-3 pb-3 text-wtm-muted" data-agent-surface="desk-docs"></div>
+        </details>
+      </div>
+    </aside>
+
+    <!-- CENTER: Analysis & Prompts -->
+    <main id="zoneCenter" class="xl:col-span-5 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
+      <div class="px-3 py-2 border-b border-wtm-border bg-wtm-surface shrink-0">
+        <h2 class="text-[12px] font-bold">Analysis &amp; Prompts</h2>
+        <p class="text-[9px] text-wtm-muted">WTM prompts · gross risk · signal tracer · scenarios</p>
+      </div>
+      <div class="flex border-b border-wtm-border overflow-x-auto shrink-0" id="tabBar">
+      <button type="button" data-tab="prompts" class="tab-btn tab-active px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">WTM Prompts A–E</button>
+      <button type="button" data-tab="risk" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Gross Risk</button>
+      <button type="button" data-tab="tracer" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Signal Tracer</button>
+      <button type="button" data-tab="scenario" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">Scenario Loop</button>
+      <button type="button" data-tab="aicompute" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">AI Compute</button>
+      <button type="button" data-tab="v15desk" class="tab-btn px-4 py-2.5 text-[11px] font-medium text-wtm-muted whitespace-nowrap">v1.5 Desk</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4">
+      <div id="panel-prompts" class="space-y-2" data-panel="prompts"></div>
+      <div id="panel-risk" class="panel-hidden progressive-disclosure" data-panel="risk">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-2">
+          <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Book A Gross (%)</span>
+            <input id="grossA" type="number" step="0.1" min="0" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded px-3 py-2 text-sm" /></label>
+          <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Book B Gross (%)</span>
+            <input id="grossB" type="number" step="0.1" min="0" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded px-3 py-2 text-sm" /></label>
+          <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Total Gross (%)</span>
+            <input id="grossTotal" type="text" readonly class="w-full mt-1 bg-wtm-card border border-wtm-border rounded px-3 py-2 text-sm text-wtm-accent font-bold" /></label>
+        </div>
+        <p id="postureHint" class="text-[10px] text-wtm-muted mb-2">Posture links to Whinfell Score zone and gate status.</p>
+        <p id="postureWarning" class="hidden text-[10px] font-semibold text-wtm-amber bg-amber-500/10 border border-wtm-amber/40 rounded px-2 py-1 mb-2">Posture exceeds gate band — confirm intentional.</p>
+        <details class="disclosure-panel rounded-lg border border-wtm-border bg-wtm-card/40 px-3 py-2 mb-2" id="grossRiskAdvanced">
+          <summary class="text-[10px] font-bold uppercase text-wtm-accent py-1">Posture · Capital · Handover</summary>
+          <div class="pt-2 space-y-2">
+            <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Approved Posture</span>
+              <select id="posture" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded px-3 py-2 text-sm">
+                <option value="">— Auto from Score —</option>
+                <option value="full">Full Gross (80+)</option>
+                <option value="selective">Selective (65–79)</option>
+                <option value="light">Light Gross (50–64)</option>
+                <option value="defensive">Defensive (&lt;50)</option>
+                <option value="flat">Flat / No New Risk</option>
+              </select></label>
+            <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Capital Base ($mm)</span>
+              <input id="capitalBaseMm" type="number" step="0.1" min="0" placeholder="optional" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded px-3 py-2 text-sm" /></label>
+            <p id="grossMmHint" class="text-[10px] text-wtm-muted">—</p>
+            <label class="block"><span class="text-[10px] text-wtm-muted uppercase font-semibold">Handover / Watch Items</span>
+              <textarea id="handoverNote" rows="2" placeholder="Gate, regime, risks…" class="w-full mt-1 bg-wtm-bg border border-wtm-border rounded px-3 py-2 text-sm resize-y"></textarea></label>
+          </div>
+        </details>
+      </div>
+      <div id="panel-tracer" class="panel-hidden progressive-disclosure" data-panel="tracer">
+        <details class="disclosure-panel mb-3 rounded-lg border border-wtm-border bg-wtm-card/50 px-2.5 py-2" id="shockConfigPanel">
+          <summary class="text-[10px] font-bold uppercase text-wtm-muted py-1">Shock Configuration</summary>
+          <div class="pt-2">
+            <div class="flex flex-wrap gap-3 items-center mb-2">
+              <span class="text-[10px] font-bold uppercase text-wtm-muted">Shock Intensity</span>
+              <label class="flex items-center gap-1 text-[10px] cursor-pointer"><input type="radio" name="shockIntensity" value="mild" class="accent-wtm-accent" /> Mild (1d only)</label>
+              <label class="flex items-center gap-1 text-[10px] cursor-pointer"><input type="radio" name="shockIntensity" value="full" checked class="accent-wtm-accent" /> Full (all horizons)</label>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <span class="text-[10px] font-bold uppercase text-wtm-muted">Enabled Stages</span>
+              <div id="shockStageChecks" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+        </details>
+        <div class="flex flex-wrap gap-2 mb-3 items-center">
+          <span class="text-[10px] font-bold uppercase text-wtm-accent">Shock Scenarios</span>
+          <button type="button" data-shock="creditWidening" class="shock-btn text-[10px] px-2 py-1 rounded border border-wtm-border bg-wtm-card hover:bg-wtm-border">Credit Widening</button>
+          <button type="button" data-shock="curveInversion" class="shock-btn text-[10px] px-2 py-1 rounded border border-wtm-border bg-wtm-card hover:bg-wtm-border">Curve Inversion</button>
+          <button type="button" data-shock="btcDecoupling" class="shock-btn text-[10px] px-2 py-1 rounded border border-wtm-border bg-wtm-card hover:bg-wtm-border">BTC Decoupling</button>
+          <button type="button" data-shock="volSpike" class="shock-btn text-[10px] px-2 py-1 rounded border border-wtm-border bg-wtm-card hover:bg-wtm-border">Vol Spike</button>
+          <button type="button" id="btnClearShock" class="text-[10px] px-2 py-1 rounded border border-wtm-red/50 text-wtm-red bg-red-500/10 hover:bg-red-500/20">Clear Shock</button>
+          <button type="button" id="btnReevaluate" class="text-[10px] px-2 py-1 rounded border border-wtm-accent/50 text-wtm-accent bg-wtm-accent/10 hover:bg-wtm-accent/20 font-semibold">Re-evaluate</button>
+          <span id="activeShockLabel" class="text-[10px] text-wtm-muted ml-auto">No active shock</span>
+        </div>
+        <details class="disclosure-panel mb-3 rounded-lg border border-wtm-border bg-wtm-card/40 px-2.5 py-2" id="snapshotPanel">
+          <summary class="text-[10px] font-bold uppercase text-wtm-accent py-1">Tracer Snapshots <span class="text-wtm-muted font-normal normal-case">(max 12)</span></summary>
+          <div class="pt-2">
+            <div class="flex flex-wrap gap-2 items-center mb-2">
+              <input id="snapshotName" type="text" placeholder="Snapshot name…" class="flex-1 min-w-[120px] bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" />
+              <button type="button" id="btnSaveSnapshot" class="text-[10px] px-2 py-1 rounded border border-wtm-green/50 text-wtm-green bg-emerald-500/10 hover:bg-emerald-500/20">Save</button>
+            </div>
+            <div id="snapshotList" class="flex flex-wrap gap-1.5 min-h-[28px]"></div>
+            <div id="snapshotCompare" class="hidden mt-2 p-2 rounded border border-wtm-accent/30 bg-wtm-accent/5 text-[10px]"></div>
+          </div>
+        </details>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <div class="xl:col-span-2 overflow-x-auto">
+            <div id="tracerLadderTracks" class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div id="tracerGlobalCol" data-tracer-col="global" class="overflow-x-auto">
+                <div id="tracerMatrixHeader" class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <p id="tracerMatrixTitle" class="text-[10px] font-bold uppercase text-wtm-accent">Global · Horizon Matrix</p>
+                  <span id="tracerFlowBadge" class="tracer-status-chip border-wtm-border text-wtm-muted">—</span>
+                </div>
+                <table id="tracerHorizonTable" class="w-full text-[10px] border border-wtm-border rounded-lg overflow-hidden min-w-[240px]">
+                  <thead class="bg-wtm-card text-wtm-muted uppercase text-[9px]">
+                    <tr><th class="text-left p-2">Stage</th><th class="p-2">1d</th><th class="p-2">5d</th><th class="p-2">20d</th><th class="p-2">60d</th><th class="p-2">Net</th></tr>
+                  </thead>
+                  <tbody id="tracerHorizonBody" class="divide-y divide-wtm-border"></tbody>
+                </table>
+                <p class="text-[9px] text-wtm-muted mt-1">↑ confirming · → neutral · ↓ impairing · operator-marked horizons</p>
+              </div>
+              <div id="tracerChinaCol" data-tracer-col="china" class="overflow-x-auto">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <p class="text-[10px] font-bold uppercase text-wtm-accent">China · Ladder Overlay</p>
+                  <span id="chinaLadderBadge" class="tracer-status-chip border-wtm-border text-wtm-muted">—</span>
+                </div>
+                <table id="chinaTracerHorizonTable" class="w-full text-[10px] border border-wtm-border rounded-lg overflow-hidden min-w-[240px]">
+                  <thead class="bg-wtm-card text-wtm-muted uppercase text-[9px]">
+                    <tr><th class="text-left p-2">Stage</th><th class="p-2">1d</th><th class="p-2">5d</th><th class="p-2">20d</th><th class="p-2">60d</th><th class="p-2">Net</th></tr>
+                  </thead>
+                  <tbody id="chinaTracerHorizonBody" class="divide-y divide-wtm-border"></tbody>
+                </table>
+                <p id="chinaLadderSummary" class="text-[9px] text-wtm-muted mt-1">Hydrate from bundle · SQ3 handicaps final score</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase text-wtm-accent mb-2">Transmission Chain</p>
+            <div class="bg-wtm-card border border-wtm-border rounded-lg p-3 mb-3">
+              <div id="tracerChain" class="flex items-center justify-between gap-1 text-[9px] flex-wrap"></div>
+              <p id="tracerOverall" class="text-[10px] text-wtm-muted mt-2 text-center">Overall health: —</p>
+            </div>
+            <p class="text-[10px] font-bold uppercase text-wtm-accent mb-2">Whinfell Score</p>
+            <div class="bg-wtm-card border border-wtm-border rounded-lg p-3">
+              <div class="flex justify-between text-[10px] text-wtm-muted mb-1"><span>Score</span><span id="tracerScoreLabel">—</span></div>
+              <div class="h-3 bg-wtm-bg rounded-full overflow-hidden border border-wtm-border mb-1 relative">
+                <div id="tracerScoreBar" class="h-full bg-wtm-accent tracer-bar" style="width:0%"></div>
+                <div class="absolute top-0 bottom-0 w-px bg-wtm-red/60" style="left:50%"></div>
+                <div class="absolute top-0 bottom-0 w-px bg-wtm-amber/60" style="left:65%"></div>
+              </div>
+              <div class="flex justify-between text-[8px] text-wtm-muted"><span>0</span><span>50</span><span>65</span><span>100</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="panel-scenario" class="panel-hidden" data-panel="scenario">
+        <p class="text-[10px] text-wtm-muted mb-3">Session-only what-if intake variants — compare gate and transmission health side-by-side without overwriting live intake.</p>
+        <div id="scenarioColumns" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+        <button type="button" id="btnRunScenarioLoop" class="mt-3 text-[10px] px-3 py-1.5 rounded border border-wtm-accent/50 text-wtm-accent bg-wtm-accent/10 hover:bg-wtm-accent/20">Run Comparison</button>
+      </div>
+      <div id="panel-aicompute" class="panel-hidden ai-compute-panel" data-panel="aicompute">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+          <h3 class="text-[11px] font-bold text-wtm-accent">Architect Exchange Monitor</h3>
+          <span id="aiComputeHydrationBadge" class="ai-hydration-badge">—</span>
+        </div>
+        <p id="aiComputeThesis" class="ai-compute-thesis mb-2">—</p>
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <span class="text-[9px] font-bold uppercase text-wtm-muted">Transmission ladder overlay</span>
+          <span id="aiLadderChip" class="ai-ladder-chip">—</span>
+          <span id="aiLadderNote" class="text-[9px] text-wtm-muted">—</span>
+        </div>
+        <div class="ai-compute-card mb-2">
+          <h3>Top 10 Players · Expected Returns</h3>
+          <table class="ai-table">
+            <thead><tr><th>#</th><th>Player</th><th>Exp Ret</th><th>Risk</th><th>Note</th></tr></thead>
+            <tbody id="aiComputePlayersBody"></tbody>
+          </table>
+        </div>
+        <div class="ai-compute-grid">
+          <div class="ai-compute-card">
+            <h3>GPU Forward Curve ($/GPU-hr)</h3>
+            <canvas id="aiChartGpuFwd" class="ai-chart" aria-label="GPU forward curve"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Basis vs BTC (%)</h3>
+            <canvas id="aiChartBasisBtc" class="ai-chart" aria-label="GPU basis vs BTC returns"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Volatility Surface (GPU vol %)</h3>
+            <canvas id="aiChartVolSurface" class="ai-chart" aria-label="GPU volatility surface"></canvas>
+          </div>
+          <div class="ai-compute-card">
+            <h3>Crush Trade · GPU Futures vs BTC Basis</h3>
+            <canvas id="aiChartCrushTrade" class="ai-chart" aria-label="Crush trade GPU futures vs BTC basis"></canvas>
+            <div id="aiCrushOutput"></div>
+            <label class="block mt-2 text-[9px] text-wtm-muted">Basis shock slider
+              <input id="aiCrushSimSlider" type="range" min="-50" max="50" value="0" class="w-full accent-wtm-accent" />
+            </label>
+            <p id="aiCrushSimResult" class="text-[9px] text-wtm-muted mt-1">Sim crush P&amp;L: +0.0%</p>
+          </div>
+        </div>
+        <div class="ai-compute-card mt-1">
+          <h3>Key Risks</h3>
+          <ul id="aiComputeRisks" class="text-[10px] text-wtm-muted list-disc pl-4 space-y-1"></ul>
+        </div>
+      </div>
+      <div id="panel-v15desk" class="panel-hidden v15-desk-panel" data-panel="v15desk">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <h3 class="text-[11px] font-bold text-wtm-accent">v1.5 Desk Modules</h3>
+          <span id="v15HydrationBadge" class="v15-badge">—</span>
+        </div>
+        <div class="v15-grid">
+          <div class="v15-card">
+            <h4>Corporate Credit</h4>
+            <div id="v15CreditBody">—</div>
+          </div>
+          <div class="v15-card">
+            <h4>Unified Trade Tracker</h4>
+            <table class="v15-table"><thead><tr><th>Book</th><th>Structure</th><th>Status</th><th>P&amp;L</th><th>Cap</th></tr></thead>
+            <tbody id="v15TradesBody"></tbody></table>
+          </div>
+          <div class="v15-card">
+            <h4>BTC Attribution</h4>
+            <div id="v15AttributionBody">—</div>
+          </div>
+          <div class="v15-card">
+            <h4>Margin Rules</h4>
+            <div id="v15MarginBody">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </main>
+
+    <!-- RIGHT: Execution / BTC -->
+    <aside id="zoneRight" class="xl:col-span-4 bg-wtm-bg flex flex-col min-h-0 overflow-hidden">
+      <div class="px-3 py-2 border-b border-wtm-border bg-wtm-surface shrink-0">
+        <h2 class="text-[12px] font-bold">Execution · BTC Modules</h2>
+        <p class="text-[9px] text-wtm-muted">Barchart · Layer 2 &amp; 3 · gate-enforced</p>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-3">
+        <section class="execution-status" aria-label="Execution permission">
+          <article class="exec-card" data-module="layer2">
+            <header>
+              <h3>Layer 2 · BTC Options Workflow</h3>
+              <span class="gate-chip" id="layer2Chip">—</span>
+            </header>
+            <p id="layer2Rule">Vol surface + structure evaluation. Gated by Global Whinfell intake.</p>
+          </article>
+          <article class="exec-card" data-module="layer3">
+            <header>
+              <h3>Layer 3 · BTC Calendar Arb Agent</h3>
+              <span class="gate-chip" id="layer3Chip">—</span>
+            </header>
+            <p id="layer3Rule">Calendar spread arb agent. Blocked when Global Score &lt; 50.</p>
+          </article>
+        </section>
+        <section class="operator-inputs" aria-label="Operator inputs">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <h3>Operator precision</h3>
+            <button type="button" id="btnCopyGrokPrompt" class="btn btn-ghost text-[10px] !h-8">Copy Grok prompt</button>
+          </div>
+          <label>
+            Operator confidence
+            <div class="confidence-row">
+              <input id="operatorConfidence" type="range" min="0" max="100" value="58" />
+              <span id="operatorConfidenceValue">58</span>
+            </div>
+            <details class="why-details" data-why-signal="operator-confidence"><summary>Explain</summary><div id="whyOperatorConfidence" class="why-body"></div></details>
+          </label>
+          <label>
+            Execution intent
+            <select id="executionIntent">
+              <option value="observe">observe</option>
+              <option value="client_only" selected>client_only</option>
+              <option value="reduced_probe">reduced_probe</option>
+              <option value="full_risk">full_risk</option>
+            </select>
+            <span id="executionIntentHint">—</span>
+            <details class="why-details" data-why-signal="execution-intent"><summary>Explain</summary><div id="whyExecutionIntent" class="why-body"></div></details>
+          </label>
+          <div class="operator-grid-2">
+            <label>
+              Shock probability
+              <input id="shockProbability" type="number" min="0" max="100" value="35" />
+            </label>
+            <label>
+              Shock horizon
+              <select id="shockHorizon">
+                <option value="1D">1D</option>
+                <option value="5D" selected>5D</option>
+                <option value="20D">20D</option>
+                <option value="60D">60D</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Basis regime label
+            <select id="basisRegimeLabel">
+              <option value="flat">flat</option>
+              <option value="normal contango" selected>normal contango</option>
+              <option value="steep contango">steep contango</option>
+              <option value="stress backwardation">stress backwardation</option>
+            </select>
+            <details class="why-details" data-why-signal="basis-regime"><summary>Explain</summary><div id="whyBasisRegime" class="why-body"></div></details>
+          </label>
+          <label>
+            Key observation
+            <textarea id="keyObservation" rows="2" placeholder="State the main market takeaway in one sentence."></textarea>
+          </label>
+          <label>
+            Evidence note
+            <textarea id="evidenceNote" rows="2" placeholder="Optional: tape, catalyst, client context, or reason for caution."></textarea>
+          </label>
+        </section>
+        <div class="bg-wtm-card border border-wtm-border rounded-lg p-3 text-center">
+          <p id="urlDisplayBarchart" class="text-[9px] break-all text-wtm-muted italic mb-1 text-left">No URL saved</p>
+          <p class="text-[9px] text-wtm-muted mb-1">Barchart: <strong id="lastBarchart" class="text-slate-200">Never</strong></p>
+          <button id="btnBarchart" type="button" class="w-full py-1.5 rounded bg-gradient-to-b from-wtm-accent to-blue-700 text-[11px] font-bold hover:brightness-110">Open Barchart ↗</button>
+        </div>
+        <div id="cardBtcOptions" class="bg-wtm-card border border-wtm-border border-l-4 border-l-wtm-border rounded-lg p-4">
+          <span id="chipL2" class="hidden">—</span>
+          <p id="noteL2" class="hidden"></p>
+          <button id="btnCopyL2" type="button" class="text-xs px-3 py-1.5 rounded border border-wtm-border bg-wtm-bg hover:bg-wtm-border w-full">Copy Layer 2 Prompt</button>
+        </div>
+        <section id="plainEnglishCard" class="plain-english-card" aria-label="Plain English summary">
+          <h3>What this means</h3>
+          <p id="plainEnglishBody">—</p>
+          <p id="plainEnglishL3">—</p>
+          <span id="plainEnglishAction" class="plain-english-action plain-english-action-watch">WATCH</span>
+        </section>
+        <div id="cardBtcCalendar" class="bg-wtm-card border border-wtm-border border-l-4 border-l-wtm-border rounded-lg p-4">
+          <span id="chipL3" class="hidden">—</span>
+          <p id="noteL3" class="hidden"></p>
+          <p class="text-[9px] font-bold uppercase text-wtm-accent mb-1">Layer 3 · Calendar arb</p>
+          <section class="l3-action-surface" aria-label="Layer 3 operator action">
+            <div><span class="l3-action-label">Action</span><div id="l3ActionCode" class="l3-action-value">—</div></div>
+            <div><span class="l3-action-label">Size posture</span><div id="l3ActionPosture" class="l3-action-value">—</div></div>
+            <div class="l3-action-full"><span class="l3-action-label">Reason</span><div id="l3ActionReason" class="l3-action-value">—</div></div>
+            <div class="l3-action-full"><span class="l3-action-label">Key risk</span><div id="l3ActionKeyRisk" class="l3-action-value">—</div></div>
+          </section>
+          <details class="why-details mb-2" data-why-signal="layer3-calendar-arb"><summary>Explain</summary><div id="whyLayer3Spread" class="why-body"></div></details>
+          <p id="layer3ActionHint" class="hidden">—</p>
+          <p class="text-[9px] font-bold uppercase text-wtm-muted mb-1">Spread inputs</p>
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Near Month</span>
+              <input id="l3NearMonth" type="text" placeholder="e.g. Jul" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Far Month</span>
+              <input id="l3FarMonth" type="text" placeholder="e.g. Dec" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Basis Spread</span>
+              <input id="l3BasisSpread" type="text" placeholder="manual" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Ref Low</span>
+              <input id="l3RefLow" type="text" placeholder="cheap floor" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Ref Mid</span>
+              <input id="l3RefMid" type="text" placeholder="neutral" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+            <label class="block"><span class="text-[9px] text-wtm-muted uppercase">Ref High</span>
+              <input id="l3RefHigh" type="text" placeholder="rich ceiling" class="w-full mt-0.5 bg-wtm-bg border border-wtm-border rounded px-2 py-1 text-[10px]" /></label>
+          </div>
+          <div id="l3ScanResult" class="hidden mb-2 p-2 rounded border text-[10px]"></div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btnScanL3" type="button" class="text-xs px-3 py-1.5 rounded border border-wtm-accent/50 bg-wtm-accent/10 text-wtm-accent hover:bg-wtm-accent/20">Scan for Opportunities</button>
+            <button id="btnCopyL3" type="button" class="text-xs px-3 py-1.5 rounded border border-wtm-border bg-wtm-bg hover:bg-wtm-border">Copy Layer 3 Prompt</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="iaDictionaryBackdrop" class="ia-dictionary-backdrop" aria-hidden="true"></div>
+  <aside id="iaDictionaryDrawer" class="ia-dictionary-drawer" aria-label="Data Dictionary" aria-hidden="true">
+    <div class="ia-dictionary-head">
+      <span>Data Dictionary</span>
+      <button type="button" id="btnCloseIaDictionary" aria-label="Close dictionary">×</button>
+    </div>
+    <div id="iaDictionaryBody" class="ia-dictionary-body"></div>
+  </aside>
+
+  <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
+
+<script src="js/desk_china_ladder_models.js"></script>
+  <script src="js/task_force_panel_feed.js"></script>
+  <script src="js/basis_watch_analytics.js"></script>
+  <script src="js/basis_watch_panel.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/data_states.js"></script>
+  <script src="js/command_bar_kpis.js"></script>
+  <script src="js/scan_kpi_strip.js"></script>
+  <script src="js/top_utility_registry.js"></script>
+  <script src="js/signal_detail_copy.js"></script>
+  <script src="js/transmission_radar.js"></script>
+  <script src="js/data_dictionary_panel.js"></script>
+  <script src="js/commentary_feed.js"></script>
+  <script src="midwest_compute/wmc-data.js"></script>
+  <script src="midwest_compute/wmc-utils.js"></script>
+  <script src="midwest_compute/wmc-hydrate.js"></script>
+  <script src="midwest_compute/wmc-export.js"></script>
+  <script src="midwest_compute/wmc-overview.js"></script>
+  <script src="midwest_compute/wmc-basis.js"></script>
+  <script src="midwest_compute/wmc-trades.js"></script>
+  <script src="midwest_compute/wmc-risk.js"></script>
+  <script src="js/wmc_ia_panel.js"></script>
+  <script src="js/console_ia_shell.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/ai_compute_data.js"></script>
+  <script src="js/ai_compute_panel.js"></script>
+  <script src="js/v15_desk_data.js"></script>
+  <script src="js/v15_desk_panel.js"></script>
+  <script src="js/ui_polish.js"></script>
+  <script src="js/desk_data_ops.js"></script>
+  <script src="js/auto_collect_panel.js"></script>
+  <script src="js/publish_web_panel.js"></script>
+</body>
+</html>

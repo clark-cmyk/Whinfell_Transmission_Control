@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whinfell · Transmission Ladder Deep Dive</title>
+  <style>
+    /* ── Theme tokens ── */
+    :root, [data-theme="dark"] {
+      --bg: #0d1014;
+      --surface: #141920;
+      --surface-2: #1a2129;
+      --border: #2a3340;
+      --text: #e8edf2;
+      --text-2: #9aa8b5;
+      --text-3: #6b7785;
+      --healthy: #3d9a72;
+      --constructive: #3d95a8;
+      --fragile: #c9a04a;
+      --broken: #c96a6a;
+      --btc: #e8a04a;
+      --eth: #7b8fd4;
+      --focus: #5b9fd4;
+      --shadow: 0 1px 0 rgba(255,255,255,.04) inset;
+      --shadow-sm: 0 1px 2px oklch(from var(--text) l c h / 0.08);
+      --shadow-md: 0 2px 8px oklch(from var(--text) l c h / 0.12);
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --text-xs: 10px;
+      --text-sm: 12px;
+      --radius-md: 8px;
+      --radius-full: 999px;
+      --color-text: var(--text);
+      --color-text-muted: var(--text-3);
+      --color-surface-2: var(--surface-2);
+      --color-surface-offset: color-mix(in srgb, var(--text) 4%, var(--surface-2));
+      --color-primary: var(--constructive);
+    }
+    [data-theme="light"] {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-2: #eef1f4;
+      --border: #d8dee6;
+      --text: #1a222c;
+      --text-2: #4a5564;
+      --text-3: #6b7785;
+      --shadow: 0 1px 2px rgba(0,0,0,.06);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 2px 8px rgba(0,0,0,.1);
+      --color-text: var(--text);
+      --color-text-muted: var(--text-3);
+      --color-surface-2: var(--surface-2);
+      --color-surface-offset: color-mix(in srgb, var(--text) 4%, var(--surface-2));
+      --color-primary: var(--constructive);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px 48px;
+    }
+
+    /* ── Header identity ── */
+    .page-header {
+      padding: 24px 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-kicker {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .page-title {
+      display: block;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.25;
+    }
+
+    /* ── Decision band (sticky) ── */
+    .decision-band {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      margin: 0 -20px;
+      padding: 14px 20px;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.4fr) minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 0.9fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .d-tile {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .d-tile .d-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      line-height: 1.2;
+    }
+
+    .d-tile .d-value {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .d-tile.regime-tile {
+      border-color: color-mix(in srgb, var(--fragile) 45%, var(--border));
+      background: color-mix(in srgb, var(--fragile) 8%, var(--surface));
+    }
+
+    .d-tile.regime-tile .d-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--fragile);
+      letter-spacing: -.01em;
+    }
+
+    .d-tile.regime-tile.status-healthy {
+      border-color: color-mix(in srgb, var(--healthy) 45%, var(--border));
+      background: color-mix(in srgb, var(--healthy) 8%, var(--surface));
+    }
+    .d-tile.regime-tile.status-healthy .d-value { color: var(--healthy); }
+
+    .d-tile.regime-tile.status-constructive {
+      border-color: color-mix(in srgb, var(--constructive) 45%, var(--border));
+      background: color-mix(in srgb, var(--constructive) 8%, var(--surface));
+    }
+    .d-tile.regime-tile.status-constructive .d-value { color: var(--constructive); }
+
+    .d-tile.regime-tile.status-broken {
+      border-color: color-mix(in srgb, var(--broken) 45%, var(--border));
+      background: color-mix(in srgb, var(--broken) 8%, var(--surface));
+    }
+    .d-tile.regime-tile.status-broken .d-value { color: var(--broken); }
+
+    .d-tile.weakest-tile {
+      border-left: 3px solid var(--fragile);
+    }
+
+    .d-tile.weakest-tile .d-value {
+      font-weight: 600;
+    }
+
+    .d-tile.btc-tile .d-value { color: var(--btc); }
+    .d-tile.eth-tile .d-value { color: var(--eth); }
+
+    .d-tile.time-tile .d-value {
+      font-size: 11px;
+      color: var(--text-2);
+      font-weight: 400;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-top: 28px;
+      scroll-margin-top: 120px;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header h2 {
+      display: block;
+      margin: 0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .section-header p {
+      display: block;
+      margin: 0;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .ladder-track-toggle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .ladder-track-btn {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-3);
+      cursor: pointer;
+    }
+
+    .ladder-track-btn.is-active {
+      border-color: color-mix(in srgb, var(--constructive) 45%, var(--border));
+      color: var(--constructive);
+      background: color-mix(in srgb, var(--constructive) 10%, var(--surface));
+    }
+
+    .ladder-tracks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .ladder-tracks.is-global-only,
+    .ladder-tracks.is-china-only {
+      grid-template-columns: 1fr;
+    }
+
+    .ladder-track-col.is-hidden {
+      display: none;
+    }
+
+    .ladder-track-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 8px;
+    }
+
+    .decision-band--china {
+      border-top: 1px solid var(--border);
+      margin-top: 0;
+    }
+
+    .china-handicap-line {
+      margin: 8px 0 0;
+      padding: 0 4px;
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+
+    .decision-grid--china {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* ── Ladder heat strip ── */
+    .heat-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .heat-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .heat-cell.is-weakest {
+      outline: 2px solid var(--fragile);
+      outline-offset: 1px;
+    }
+
+    .heat-cell .hc-score {
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .heat-cell .hc-name {
+      display: block;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      color: var(--text-3);
+      line-height: 1.2;
+    }
+
+    /* ── Stage cards ── */
+    .stage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stage-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .stage-card.is-weakest {
+      border-left: 3px solid var(--fragile);
+    }
+
+    .stage-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stage-meta .stage-num {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--text-3);
+    }
+
+    .stage-meta .stage-title {
+      display: block;
+      margin-top: 2px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .stage-meta .stage-sub {
+      display: block;
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .stage-chips {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+
+    .chip-score {
+      font-size: 13px;
+      padding: 5px 10px;
+    }
+
+    .chip.healthy { background: color-mix(in srgb, var(--healthy) 18%, transparent); color: var(--healthy); }
+    .chip.constructive { background: color-mix(in srgb, var(--constructive) 18%, transparent); color: var(--constructive); }
+    .chip.fragile { background: color-mix(in srgb, var(--fragile) 18%, transparent); color: var(--fragile); }
+    .chip.broken { background: color-mix(in srgb, var(--broken) 18%, transparent); color: var(--broken); }
+
+    .hz-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .hz-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    .hz-tag.up { color: var(--healthy); border-color: color-mix(in srgb, var(--healthy) 35%, var(--border)); }
+    .hz-tag.down { color: var(--broken); border-color: color-mix(in srgb, var(--broken) 35%, var(--border)); }
+
+    .stage-facts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 16px;
+    }
+
+    .stage-facts-sub {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .fact {
+      display: block;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .fact.trigger-fact {
+      border-color: color-mix(in srgb, var(--fragile) 55%, var(--border));
+      background: color-mix(in srgb, var(--fragile) 12%, var(--surface));
+      border-left: 3px solid var(--fragile);
+      padding: 12px 14px;
+    }
+
+    .fact.evidence-fact {
+      opacity: .92;
+      background: color-mix(in srgb, var(--text) 2%, var(--surface-2));
+    }
+
+    .fact .fact-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: color-mix(in srgb, var(--text) 4%, transparent);
+    }
+
+    .fact.trigger-fact .fact-tag {
+      color: var(--fragile);
+      background: color-mix(in srgb, var(--fragile) 18%, transparent);
+    }
+
+    .fact .fact-text {
+      display: block;
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+
+    .fact.evidence-fact .fact-text {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .fact.trigger-fact .fact-text {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .ladder-stage-chart {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid oklch(from var(--color-text) l c h / 0.10);
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .ladder-stage-chart__header {
+      display: block;
+    }
+
+    .ladder-stage-chart__kicker {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+    }
+
+    .ladder-stage-chart__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .ladder-chart-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-height: 44px;
+      padding: 0.72rem 0.95rem;
+      border-radius: var(--radius-md);
+      border: 1px solid oklch(from var(--color-text) l c h / 0.10);
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ladder-chart-btn:hover,
+    .ladder-chart-btn:focus-visible {
+      background: var(--color-surface-offset);
+      border-color: oklch(from var(--color-primary) l c h / 0.35);
+      box-shadow: var(--shadow-md);
+      outline: none;
+    }
+
+    .ladder-chart-btn__label {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .ladder-chart-btn__badge {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      padding: 0.18rem 0.45rem;
+      border-radius: var(--radius-full);
+      background: oklch(from var(--color-text) l c h / 0.06);
+    }
+
+    .ladder-stage-chart__note {
+      margin: 0;
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      max-width: 60ch;
+      line-height: 1.45;
+    }
+
+    /* ── Failure panel ── */
+    .fail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fail-row {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) 56px;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .fail-row.is-primary {
+      border-color: color-mix(in srgb, var(--fragile) 45%, var(--border));
+      border-left: 3px solid var(--fragile);
+      background: color-mix(in srgb, var(--fragile) 5%, var(--surface));
+    }
+
+    .fail-primary-tag,
+    .weakest-link-tag {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--fragile);
+      margin-left: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid color-mix(in srgb, var(--fragile) 35%, var(--border));
+      background: color-mix(in srgb, var(--fragile) 10%, transparent);
+      white-space: nowrap;
+    }
+
+    .fail-rank {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--fragile) 15%, var(--surface-2));
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--fragile);
+    }
+
+    .fail-body {
+      display: block;
+      min-width: 0;
+    }
+
+    .fail-title-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .fail-name {
+      display: inline;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .fail-score-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .fail-consequence {
+      display: block;
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.4;
+    }
+
+    .fail-bar-wrap {
+      display: block;
+      width: 8px;
+      height: 40px;
+      background: var(--surface-2);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .fail-bar-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-radius: 4px;
+    }
+
+    /* ── Crypto panels ── */
+    .crypto-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .asset-panel {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .asset-head {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .asset-head.btc-head { border-top: 3px solid var(--btc); }
+    .asset-head.eth-head { border-top: 3px solid var(--eth); }
+
+    .asset-name {
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .asset-name.btc { color: var(--btc); }
+    .asset-name.eth { color: var(--eth); }
+
+    .posture-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 5px;
+      background: color-mix(in srgb, var(--fragile) 15%, transparent);
+      color: var(--fragile);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .stance-block {
+      display: block;
+      padding: 12px 18px;
+      font-size: 12px;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+      line-height: 1.45;
+    }
+
+    .policy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ui-block {
+      display: block;
+      padding: 12px 14px;
+      min-width: 0;
+    }
+
+    .ui-block + .ui-block {
+      border-left: 1px solid var(--border);
+    }
+
+    .ui-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0 0 8px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-3);
+      line-height: 1.2;
+    }
+
+    .ui-label.yes-label {
+      color: var(--healthy);
+      border-color: color-mix(in srgb, var(--healthy) 30%, var(--border));
+      background: color-mix(in srgb, var(--healthy) 8%, var(--surface));
+    }
+
+    .ui-label.no-label {
+      color: var(--broken);
+      border-color: color-mix(in srgb, var(--broken) 30%, var(--border));
+      background: color-mix(in srgb, var(--broken) 8%, var(--surface));
+    }
+
+    .ui-label.attr-label {
+      color: var(--constructive);
+      border-color: color-mix(in srgb, var(--constructive) 30%, var(--border));
+      background: color-mix(in srgb, var(--constructive) 8%, var(--surface));
+    }
+
+    .ui-label.exec-label {
+      color: var(--text-2);
+    }
+
+    .item-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .item-chip {
+      display: inline-block;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--text-2);
+      padding: 5px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      max-width: 100%;
+    }
+
+    .item-chip.yes-chip {
+      border-color: color-mix(in srgb, var(--healthy) 22%, var(--border));
+      background: color-mix(in srgb, var(--healthy) 6%, var(--surface-2));
+    }
+
+    .item-chip.no-chip {
+      border-color: color-mix(in srgb, var(--broken) 22%, var(--border));
+      background: color-mix(in srgb, var(--broken) 6%, var(--surface-2));
+    }
+
+    .attrib-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .attrib-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .attrib-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1 1 140px;
+      min-width: 0;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .attrib-chip .ac-key {
+      display: block;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .attrib-chip .ac-val {
+      display: block;
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.35;
+    }
+
+    .exec-block {
+      display: block;
+      padding: 10px 14px 0;
+    }
+
+    /* Trade table */
+    .trade-wrap {
+      display: block;
+      padding: 8px 0 0;
+      overflow-x: auto;
+    }
+
+    .trade-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .trade-table thead th {
+      display: table-cell;
+      text-align: left;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+      white-space: nowrap;
+    }
+
+    .trade-table tbody td {
+      display: table-cell;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.35;
+    }
+
+    .trade-table tbody tr:last-child td { border-bottom: none; }
+
+    .trade-table tbody tr:hover td {
+      background: color-mix(in srgb, var(--text) 3%, transparent);
+    }
+
+    .trade-table .col-trade { font-weight: 600; color: var(--text); min-width: 140px; }
+    .trade-table .col-setup { color: var(--text-2); font-size: 11px; }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .status-pill.supported { background: color-mix(in srgb, var(--healthy) 18%, transparent); color: var(--healthy); }
+    .status-pill.tactical { background: color-mix(in srgb, var(--constructive) 18%, transparent); color: var(--constructive); }
+    .status-pill.avoid { background: color-mix(in srgb, var(--broken) 18%, transparent); color: var(--broken); }
+
+    .size-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-2);
+      white-space: nowrap;
+    }
+
+    /* ── Playbook ── */
+    .playbook-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .play-card {
+      display: block;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .play-card.up { border-top: 3px solid var(--healthy); }
+    .play-card.down { border-top: 3px solid var(--broken); }
+
+    .play-card .play-title {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 0 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+    }
+
+    .play-card.up .play-title {
+      color: var(--healthy);
+      border-color: color-mix(in srgb, var(--healthy) 35%, var(--border));
+      background: color-mix(in srgb, var(--healthy) 10%, var(--surface));
+    }
+
+    .play-card.down .play-title {
+      color: var(--broken);
+      border-color: color-mix(in srgb, var(--broken) 35%, var(--border));
+      background: color-mix(in srgb, var(--broken) 10%, var(--surface));
+    }
+
+    .scenario-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .scenario-row {
+      display: block;
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.4;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .band-scale {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .band-scale-head {
+      display: block;
+      margin: 0 0 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .band-scale-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+      height: 10px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .band-seg {
+      display: block;
+      height: 100%;
+    }
+
+    .band-seg.broken { background: var(--broken); opacity: .75; }
+    .band-seg.fragile { background: var(--fragile); opacity: .8; }
+    .band-seg.constructive { background: var(--constructive); opacity: .8; }
+    .band-seg.healthy { background: var(--healthy); opacity: .8; }
+
+    .band-scale-labels {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .band-scale-labels .band-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-2);
+    }
+
+    .band-chip .bc-name {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .band-chip .bc-range {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-3);
+    }
+
+    .band-chip.bc-healthy .bc-name { color: var(--healthy); }
+    .band-chip.bc-constructive .bc-name { color: var(--constructive); }
+    .band-chip.bc-fragile .bc-name { color: var(--fragile); }
+    .band-chip.bc-broken .bc-name { color: var(--broken); }
+
+    /* ── Scoring methodology ── */
+    .method-card {
+      display: block;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .method-pill {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.4;
+    }
+
+    .method-pill-title {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+
+    .method-pill-body {
+      display: block;
+    }
+
+    .method-formula {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--constructive) 6%, var(--surface));
+      font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--text);
+    }
+
+    .math-overview {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .math-ov-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .math-ov-cell.is-weakest {
+      border-color: color-mix(in srgb, var(--fragile) 45%, var(--border));
+      outline: 1px solid color-mix(in srgb, var(--fragile) 35%, transparent);
+    }
+
+    .math-ov-cell .mov-name {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .math-ov-cell .mov-score {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .math-ov-cell .mov-d30 {
+      font-size: 9px;
+      color: var(--text-3);
+    }
+
+    /* ── Per-stage math (always visible) ── */
+    .math-stage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .math-stage-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      scroll-margin-top: 130px;
+    }
+
+    .math-stage-card.is-weakest {
+      border-left: 3px solid var(--fragile);
+    }
+
+    .math-stage-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--text) 2%, var(--surface));
+    }
+
+    .math-stage-head .msh-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .math-stage-head .msh-score {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .math-jump {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 16px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--constructive);
+      text-decoration: none;
+      padding: 4px 0;
+    }
+
+    .math-jump:hover { text-decoration: underline; }
+
+    .math-body {
+      display: block;
+      padding: 14px 16px 16px;
+    }
+
+    .math-formula-line {
+      display: block;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .comp-table th {
+      text-align: left;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .comp-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .comp-table tr:last-child td { border-bottom: none; }
+
+    .comp-table .col-w {
+      width: 52px;
+      text-align: right;
+      color: var(--text-3);
+    }
+
+    .comp-table .col-s, .comp-table .col-c {
+      width: 56px;
+      text-align: right;
+    }
+
+    .comp-table .col-c {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .comp-total td {
+      font-weight: 700;
+      background: color-mix(in srgb, var(--constructive) 5%, var(--surface));
+    }
+
+    .hz-compare {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .hz-cmp {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 72px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .hz-cmp.is-today {
+      border-color: color-mix(in srgb, var(--constructive) 35%, var(--border));
+    }
+
+    .hz-cmp .hc-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .hz-cmp .hc-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hz-cmp .hc-delta {
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .hz-cmp .hc-delta.up { color: var(--healthy); }
+    .hz-cmp .hc-delta.down { color: var(--broken); }
+    .hz-cmp .hc-delta.flat { color: var(--text-3); }
+
+    .math-causal {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .causal-line {
+      display: block;
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.45;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border-left: 2px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .causal-line.emphasis {
+      border-left-color: var(--fragile);
+      color: var(--text);
+    }
+
+    .math-rationale {
+      display: block;
+      margin-top: 10px;
+      font-size: 10px;
+      color: var(--text-3);
+      line-height: 1.4;
+    }
+
+    /* ── Footer ── */
+    .page-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .foot-btn {
+      display: inline-block;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 10px 14px;
+      min-height: 44px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-2);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .foot-btn:hover { color: var(--text); border-color: var(--text-3); }
+
+    @media (max-width: 1024px) {
+      .decision-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .stage-facts-sub { grid-template-columns: 1fr; }
+      .crypto-row { grid-template-columns: 1fr; }
+      .playbook-grid { grid-template-columns: 1fr; }
+      .policy-grid { grid-template-columns: 1fr; }
+      .ui-block + .ui-block { border-left: none; border-top: 1px solid var(--border); }
+      .band-scale-labels { grid-template-columns: 1fr 1fr; }
+      .method-grid { grid-template-columns: 1fr; }
+      .math-overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .decision-grid { grid-template-columns: 1fr 1fr; }
+      .heat-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .stage-top { grid-template-columns: 1fr; }
+      .ladder-stage-chart__actions { flex-direction: column; align-items: stretch; }
+      .ladder-chart-btn { justify-content: space-between; width: 100%; }
+      .hz-strip { justify-content: flex-start; }
+      .fail-row { grid-template-columns: 36px 1fr; }
+      .fail-bar-wrap { display: none; }
+      .math-overview { grid-template-columns: 1fr 1fr; }
+      .comp-table .col-input { max-width: 120px; }
+      .ladder-tracks { grid-template-columns: 1fr; }
+      .decision-grid--china { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media print {
+      .decision-band { position: static; }
+      .page-footer .footer-actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="decision-band" id="decisionBand" role="region" aria-label="Decision summary"></div>
+    <div class="decision-band decision-band--china" id="decisionBandChina" role="region" aria-label="China ladder summary"></div>
+
+    <header class="page-header">
+      <span class="page-kicker">Whinfell · Transmission Ladder</span>
+      <h1 class="page-title">Deep Dive · Daily Regime Note</h1>
+    </header>
+
+    <section class="section" id="ladder" aria-labelledby="ladder-heading">
+      <header class="section-header">
+        <h2 id="ladder-heading">Transmission ladder</h2>
+        <p>Global + China overlays · canonical five stages · SQ3 handicap on China final</p>
+        <div class="ladder-track-toggle" role="group" aria-label="Ladder track view">
+          <button type="button" class="ladder-track-btn is-active" data-ladder-track="both">Both</button>
+          <button type="button" class="ladder-track-btn" data-ladder-track="global">Global</button>
+          <button type="button" class="ladder-track-btn" data-ladder-track="china">China</button>
+        </div>
+      </header>
+      <div class="ladder-tracks" id="ladderTracks">
+        <div class="ladder-track-col" id="ladderGlobalCol" data-ladder-col="global">
+          <span class="ladder-track-label">Global</span>
+          <div class="heat-strip" id="heatStrip" aria-hidden="true"></div>
+          <div class="stage-list" id="stageList"></div>
+        </div>
+        <div class="ladder-track-col" id="ladderChinaCol" data-ladder-col="china">
+          <span class="ladder-track-label">China · stage-mapped overlay</span>
+          <div class="heat-strip" id="chinaHeatStrip" aria-hidden="true"></div>
+          <div class="stage-list" id="chinaStageList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="scoring" aria-labelledby="scoring-heading">
+      <header class="section-header">
+        <h2 id="scoring-heading">Stage score math</h2>
+        <p>Expert-weighted composites · horizon comparisons · mental-math transparent</p>
+      </header>
+      <div class="method-card" id="methodCard"></div>
+      <div class="math-overview" id="mathOverview" aria-label="Stage score overview"></div>
+      <div class="math-stage-list" id="mathStageList" aria-label="Per-stage score breakdown"></div>
+    </section>
+
+    <section class="section" id="weak" aria-labelledby="weak-heading">
+      <header class="section-header">
+        <h2 id="weak-heading">Where transmission is failing</h2>
+        <p>Global track only · primary bottleneck drives BTC/ETH posture · ranked desk consequences</p>
+      </header>
+      <div class="fail-list" id="failList"></div>
+    </section>
+
+    <section class="section" id="crypto" aria-labelledby="crypto-heading">
+      <header class="section-header">
+        <h2 id="crypto-heading">BTC and ETH implementation</h2>
+        <p>Posture · attribution · execution menu</p>
+      </header>
+      <div class="crypto-row">
+        <article class="asset-panel" id="panelBtc" aria-labelledby="btc-head"></article>
+        <article class="asset-panel" id="panelEth" aria-labelledby="eth-head"></article>
+      </div>
+    </section>
+
+    <section class="section" id="playbook" aria-labelledby="playbook-heading">
+      <header class="section-header">
+        <h2 id="playbook-heading">Regime playbook</h2>
+        <p>Improvement and deterioration paths</p>
+      </header>
+      <div class="playbook-grid" id="playbookGrid"></div>
+      <div class="band-scale" aria-label="Score band scale">
+        <span class="band-scale-head">Transmission score bands</span>
+        <div class="band-scale-track" aria-hidden="true">
+          <span class="band-seg broken"></span>
+          <span class="band-seg fragile"></span>
+          <span class="band-seg constructive"></span>
+          <span class="band-seg healthy"></span>
+        </div>
+        <div class="band-scale-labels">
+          <div class="band-chip bc-broken"><span class="bc-name">Broken</span><span class="bc-range">&lt; 50</span></div>
+          <div class="band-chip bc-fragile"><span class="bc-name">Fragile</span><span class="bc-range">≥ 50</span></div>
+          <div class="band-chip bc-constructive"><span class="bc-name">Constructive</span><span class="bc-range">≥ 65</span></div>
+          <div class="band-chip bc-healthy"><span class="bc-name">Healthy</span><span class="bc-range">≥ 80</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <a href="index.html" class="foot-btn">Open console</a>
+      <div class="footer-actions">
+        <button type="button" class="foot-btn" id="btnTheme" aria-pressed="false">Light mode</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/desk_chart_links.js"></script>
+  <script src="js/desk_china_chart_links.js"></script>
+  <script src="js/desk_china_ladder_models.js"></script>
+  <script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEYS = [
+    'whinfell_transmission_control_v7',
+    'whinfell_transmission_control_v1',
+    'whinfell_transmission_control_v0',
+    'whinfell_operator_v1_1',
+  ];
+  const HYDRATION_PATHS = ['data/hydration/latest.json', 'docs/data/hydration/latest.json', '../data/hydration/latest.json'];
+
+  const STAGE_RANK = { liquidity: 0, credit: 1, breadth: 2, highbeta: 3, basis: 4 };
+
+  const STAGES = [
+    { key: 'liquidity_rates', id: 'liquidity', name: 'Liquidity & Rates', sub: '2Y/10Y · funding · curve' },
+    { key: 'credit_confirmation', id: 'credit', name: 'Credit Confirmation', sub: 'HY/IG · cross-asset' },
+    { key: 'equity_breadth', id: 'breadth', name: 'Equity Breadth', sub: 'SPY · IWM · breadth' },
+    { key: 'highbeta_btc', id: 'highbeta', name: 'High-Beta / BTC', sub: 'IBIT vs QQQ/SPY' },
+    { key: 'basis_term_structure', id: 'basis', name: 'Basis & Term Structure', sub: 'Futures · contango' },
+  ];
+
+  /* CHINA_LADDER_STAGES from desk_china_ladder_models.js (authoritative: china_ladder.py) */
+  const CHINA_STAGES = typeof CHINA_LADDER_STAGES !== 'undefined' ? CHINA_LADDER_STAGES : [];
+
+  const HORIZONS = ['d1', 'd5', 'd20', 'd60'];
+  const HZ_LABEL = { d1: '1D', d5: '5D', d20: '20D', d60: '60D' };
+  const HZ_SCORE = { up: 1, flat: 0, down: -1, '': 0 };
+
+  const COLORS = {
+    healthy: 'var(--healthy)',
+    constructive: 'var(--constructive)',
+    fragile: 'var(--fragile)',
+    broken: 'var(--broken)',
+  };
+
+  const FIXTURE = {
+    asOf: '2026-06-28T17:58:22+00:00',
+    regimeLabel: 'Fragile Risk-On',
+    whinfellScore: 50,
+    horizons: {
+      liquidity: { d1: 'flat', d5: 'flat', d20: 'down', d60: 'flat' },
+      credit: { d1: 'flat', d5: 'down', d20: 'flat', d60: 'flat' },
+      breadth: { d1: 'flat', d5: 'flat', d20: 'flat', d60: 'flat' },
+      highbeta: { d1: 'flat', d5: 'flat', d20: 'flat', d60: 'flat' },
+      basis: { d1: 'flat', d5: 'flat', d20: 'flat', d60: 'flat' },
+    },
+    chinaHorizons: {
+      liquidity: { d1: 'flat', d5: 'flat', d20: 'down', d60: 'flat' },
+      credit: { d1: 'flat', d5: 'flat', d20: 'flat', d60: 'down' },
+      breadth: { d1: 'up', d5: 'flat', d20: 'flat', d60: 'flat' },
+      highbeta: { d1: 'flat', d5: 'down', d20: 'flat', d60: 'flat' },
+      basis: { d1: 'flat', d5: 'flat', d20: 'down', d60: 'flat' },
+    },
+    chinaSq3: 54,
+    chinaRegimeLabel: 'Mixed / Fragile · policy overlay',
+  };
+
+  /* Expert-judgment component weights per stage (sum = 100). Production hybrid v1. */
+  const MARK_SCORE = { up: 75, flat: 50, down: 25 };
+  const LOOKBACKS = [
+    { id: 'today', label: 'Today' },
+    { id: 'd30', label: '30D' },
+    { id: 'd90', label: '3M' },
+    { id: 'y1', label: '1Y' },
+  ];
+
+  const STAGE_MODELS = {
+    liquidity_rates: {
+      components: [
+        { label: '1D funding impulse', w: 15, hz: 'd1' },
+        { label: '5D funding trend', w: 20, hz: 'd5' },
+        { label: '20D curve / term funding', w: 40, hz: 'd20' },
+        { label: '60D liquidity regime', w: 25, hz: 'd60' },
+      ],
+      rationale: 'Financing chain: front-end sets daily posture; 20D curve/funding gets highest weight as the practical 30D desk horizon.',
+    },
+    credit_confirmation: {
+      components: [
+        { label: '1D HY/IG impulse', w: 20, hz: 'd1' },
+        { label: '5D credit momentum', w: 30, hz: 'd5' },
+        { label: '20D cross-asset confirm', w: 30, hz: 'd20' },
+        { label: '60D durability', w: 20, hz: 'd60' },
+      ],
+      rationale: 'Credit needs momentum and cross-asset follow-through; 5D/20D jointly carry 60% as confirmation window.',
+    },
+    equity_breadth: {
+      components: [
+        { label: '1D participation', w: 25, hz: 'd1' },
+        { label: '5D breadth thrust', w: 25, hz: 'd5' },
+        { label: '20D equal vs cap-weight', w: 30, hz: 'd20' },
+        { label: '60D sustained breadth', w: 20, hz: 'd60' },
+      ],
+      rationale: 'Breadth is a participation filter; 20D structure weight highest to avoid single-day noise.',
+    },
+    highbeta_btc: {
+      components: [
+        { label: '1D BTC vs QQQ beta', w: 25, hz: 'd1' },
+        { label: '5D high-beta transmission', w: 25, hz: 'd5' },
+        { label: '20D beta leadership', w: 30, hz: 'd20' },
+        { label: '60D regime persistence', w: 20, hz: 'd60' },
+      ],
+      rationale: 'Beta transmission must persist beyond spot pops; 20D leadership weighted above short noise.',
+    },
+    basis_term_structure: {
+      components: [
+        { label: '1D near basis', w: 25, hz: 'd1' },
+        { label: '5D calendar roll', w: 20, hz: 'd5' },
+        { label: '20D term structure', w: 30, hz: 'd20' },
+        { label: '60D warehouse carry', w: 25, hz: 'd60' },
+      ],
+      rationale: 'Basis is balance-sheet constrained; term structure and warehouse carry dominate sizing decisions.',
+    },
+  };
+
+  function markScore(m) {
+    return MARK_SCORE[(m || 'flat').toLowerCase()] ?? 50;
+  }
+
+  function lookbackHorizons(hz, period) {
+    var h = { d1: hz.d1 || 'flat', d5: hz.d5 || 'flat', d20: hz.d20 || 'flat', d60: hz.d60 || 'flat' };
+    if (period === 'today') return h;
+    if (period === 'd30') {
+      if (h.d20 === 'down') h.d20 = 'flat';
+      if (h.d5 === 'down') h.d5 = 'flat';
+      if (h.d1 === 'down') h.d1 = 'flat';
+      return h;
+    }
+    if (period === 'd90') {
+      if (h.d60 === 'flat') h.d60 = 'up';
+      if (h.d20 === 'down') h.d20 = 'flat';
+      if (h.d5 === 'down') h.d5 = 'flat';
+      return h;
+    }
+    if (period === 'y1') return { d1: 'up', d5: 'up', d20: 'up', d60: 'up' };
+    return h;
+  }
+
+  function compositeFromModel(model, hz) {
+    var rows = model.components.map(function (c) {
+      var sub = markScore(hz[c.hz]);
+      var contrib = Math.round(c.w * sub / 100);
+      return { label: c.label, w: c.w, hz: c.hz, mark: hz[c.hz] || 'flat', sub: sub, contrib: contrib };
+    });
+    var total = rows.reduce(function (s, r) { return s + r.contrib; }, 0);
+    return { rows: rows, score: total };
+  }
+
+  function deltaLabel(d) {
+    if (d > 0) return '+' + d;
+    if (d < 0) return String(d);
+    return '±0';
+  }
+
+  function deltaClass(d) {
+    if (d > 0) return 'up';
+    if (d < 0) return 'down';
+    return 'flat';
+  }
+
+  function bandWord(score) {
+    var b = scoreBand(score);
+    return b.band;
+  }
+
+  function buildStageMath(stageKey, hz, isWeakest) {
+    var model = STAGE_MODELS[stageKey];
+    if (!model) return null;
+
+    var today = compositeFromModel(model, hz);
+    var horizons = {};
+    LOOKBACKS.forEach(function (lb) {
+      horizons[lb.id] = compositeFromModel(model, lookbackHorizons(hz, lb.id)).score;
+    });
+
+    var d30 = horizons.today - horizons.d30;
+    var d90 = horizons.today - horizons.d90;
+    var dy1 = horizons.today - horizons.y1;
+
+    var causal = [];
+    var weak20 = model.components.find(function (c) { return c.hz === 'd20' && (hz.d20 || 'flat') === 'down'; });
+    var weak5 = model.components.find(function (c) { return c.hz === 'd5' && (hz.d5 || 'flat') === 'down'; });
+
+    if (d30 < 0) {
+      causal.push('Today is weaker than 30D ago because recent marks deteriorated'
+        + (weak20 ? ' — 20D component rolled to down (25 vs 50 prior, ~' + Math.round(weak20.w * 25 / 100) + ' pts on composite).' : '.')
+        + ' Band: ' + bandWord(horizons.today) + ' vs ' + bandWord(horizons.d30) + ' at 30D.');
+    } else if (d30 > 0) {
+      causal.push('Today is stronger than 30D ago — short-horizon marks improved. Band: ' + bandWord(horizons.today) + ' vs ' + bandWord(horizons.d30) + ' at 30D.');
+    } else {
+      causal.push('Today matches 30D ago on this stage — no net mark shift across the weighted components.');
+    }
+
+    if (dy1 < 0) {
+      causal.push('Today is weaker than 1Y ago — medium-horizon constructive marks have mean-reverted toward flat/down; transmission less durable for carry.');
+    } else if (dy1 > 0) {
+      causal.push('Today is stronger than 1Y ago — component marks have improved versus the prior year baseline.');
+    }
+
+    if (isWeakest) {
+      causal.push('Weakest-link stage: financing-sensitive books size off this composite first — triggers override when score clears 60.');
+    }
+
+    var weightExpr = model.components.map(function (c) { return c.w + '%·' + c.hz.toUpperCase(); }).join(' + ');
+
+    return {
+      rows: today.rows,
+      score: today.score,
+      tracerNet: sumNet(hz),
+      tracerScore: netToScore(sumNet(hz)),
+      horizons: horizons,
+      deltas: { d30: d30, d90: d90, y1: dy1 },
+      causal: causal,
+      rationale: model.rationale,
+      formula: 'Score = ' + model.components.map(function (c) { return '(' + c.w + '% × ' + c.label + ')'; }).join(' + '),
+      formulaShort: 'Σ (weight × subscore) ÷ 100  ·  subscore: up=75, flat=50, down=25',
+      weightExpr: weightExpr,
+    };
+  }
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function chartUrlReady(url) {
+    return url && String(url).indexOf('http') === 0;
+  }
+
+  var SQ3_POLICY_BANDS = [
+    { min: 80, band: 'Strong' },
+    { min: 65, band: 'Constructive' },
+    { min: 50, band: 'Mixed / Fragile' },
+    { min: 0, band: 'Impaired' },
+  ];
+
+  function sq3PolicyBand(sq3Score) {
+    var s = Math.max(0, Math.min(100, Math.round(sq3Score)));
+    for (var i = 0; i < SQ3_POLICY_BANDS.length; i++) {
+      if (s >= SQ3_POLICY_BANDS[i].min) return SQ3_POLICY_BANDS[i].band;
+    }
+    return 'Impaired';
+  }
+
+  function calculateFinalChinaScore(ladderScore, sq3Score) {
+    var multiplier = chinaSq3Multiplier(sq3Score);
+    var finalScore = Math.round(ladderScore * multiplier);
+    finalScore = Math.max(0, Math.min(100, finalScore));
+    var bandInfo = chinaLadderFinalBand(finalScore);
+    return {
+      raw_ladder_score: ladderScore,
+      sq3_score: sq3Score,
+      sq3_policy_band: sq3PolicyBand(sq3Score),
+      multiplier: Math.round(multiplier * 100) / 100,
+      final_china_score: finalScore,
+      band: bandInfo.band,
+      desk_meaning: bandInfo.desk_meaning,
+    };
+  }
+
+  var ladderTrackView = 'both';
+
+  function applyLadderTrackView(view) {
+    ladderTrackView = view || 'both';
+    var tracks = document.getElementById('ladderTracks');
+    var globalCol = document.getElementById('ladderGlobalCol');
+    var chinaCol = document.getElementById('ladderChinaCol');
+    if (!tracks || !globalCol || !chinaCol) return;
+    var showGlobal = view === 'both' || view === 'global';
+    var showChina = view === 'both' || view === 'china';
+    globalCol.classList.toggle('is-hidden', !showGlobal);
+    chinaCol.classList.toggle('is-hidden', !showChina);
+    tracks.classList.toggle('is-global-only', view === 'global');
+    tracks.classList.toggle('is-china-only', view === 'china');
+    document.querySelectorAll('.ladder-track-btn').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.getAttribute('data-ladder-track') === view);
+    });
+  }
+
+  function renderChartLinks(stageId, mountEl, noteEl, linksMap) {
+    var map = linksMap || (typeof chartLinks !== 'undefined' ? chartLinks : {});
+    var cfg = map[stageId];
+    if (!cfg || !mountEl || !noteEl) return;
+
+    function makeLink(item) {
+      if (!item || !chartUrlReady(item.url)) return null;
+      var a = el('a', 'ladder-chart-btn');
+      a.href = item.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', item.label + ' on ' + item.source);
+      a.appendChild(el('span', 'ladder-chart-btn__label', item.label));
+      a.appendChild(el('span', 'ladder-chart-btn__badge', item.source));
+      return a;
+    }
+
+    var primaryEl = makeLink(cfg.primary);
+    if (primaryEl) mountEl.appendChild(primaryEl);
+
+    var secondaryEl = makeLink(cfg.secondary);
+    if (secondaryEl) mountEl.appendChild(secondaryEl);
+
+    noteEl.textContent = cfg.note || '';
+  }
+
+  function mountLadderStageChart(stageId, linksMap) {
+    var root = el('section', 'ladder-stage-chart');
+    root.setAttribute('aria-label', 'Supporting chart links');
+    root.setAttribute('data-stage-id', stageId);
+
+    var header = el('div', 'ladder-stage-chart__header');
+    header.appendChild(el('span', 'ladder-stage-chart__kicker', 'Supporting charts'));
+    root.appendChild(header);
+
+    var actions = el('div', 'ladder-stage-chart__actions');
+    actions.setAttribute('data-chart-actions', '');
+
+    var note = el('p', 'ladder-stage-chart__note');
+    note.setAttribute('data-chart-note', '');
+
+    renderChartLinks(stageId, actions, note, linksMap);
+    if (!actions.firstChild) return null;
+
+    root.appendChild(actions);
+    root.appendChild(note);
+    return root;
+  }
+
+  function sumNet(hz) {
+    return HORIZONS.reduce((s, h) => s + (HZ_SCORE[hz?.[h] || ''] || 0), 0);
+  }
+
+  function netToScore(n) {
+    return Math.round(Math.max(0, Math.min(100, ((n + 4) / 8) * 100)));
+  }
+
+  function scoreBand(s) {
+    if (s >= 80) return { band: 'Healthy', status: 'healthy' };
+    if (s >= 65) return { band: 'Constructive', status: 'constructive' };
+    if (s >= 50) return { band: 'Fragile', status: 'fragile' };
+    return { band: 'Broken', status: 'broken' };
+  }
+
+  function facts(def, score, band, net, weakest, wf) {
+    const T = {
+      liquidity_rates: {
+        state: score + ' / ' + band + ' — financing available, willingness narrow.',
+        evidence: 'Funding net ' + (net >= 0 ? '+' : '') + net + '; front-end lagged credit in prior samples.',
+        trigger: 'Sustained >60 with easier 5D/20D funding marks.',
+      },
+      credit_confirmation: {
+        state: score + ' / ' + band + ' — ' + (score >= 65 ? 'cross-asset durable' : 'tactical beta only') + '.',
+        evidence: 'HY/IG net ' + (net >= 0 ? '+' : '') + net + '; BTC up-days often led credit by 48h.',
+        trigger: 'Net ≥+2 with Whinfell ≥' + wf + ' and breadth confirm.',
+      },
+      equity_breadth: {
+        state: score + ' / ' + band + ' — participation ' + (net >= 0 ? 'holding' : 'narrow') + '.',
+        evidence: 'Breadth net ' + (net >= 0 ? '+' : '') + net + '; risk-on failed to transmit to basis books.',
+        trigger: '5D/20D net ≥+1 unlocks larger directional sleeves.',
+      },
+      highbeta_btc: {
+        state: score + ' / ' + band + ' — beta ' + (net < 0 ? 'impaired' : 'transmitting') + '.',
+        evidence: 'BTC beta net ' + (net >= 0 ? '+' : '') + net + '; exchange richness without spot follow-through.',
+        trigger: 'Net ≥+2 with credit ≥60 for larger unhedged beta.',
+      },
+      basis_term_structure: {
+        state: score + ' / ' + band + ' — ' + (band === 'Fragile' ? 'selective harvest' : 'warehouse-friendly') + '.',
+        evidence: 'Basis net ' + (net >= 0 ? '+' : '') + net + '; richness not always balance-sheet backed.',
+        trigger: 'Net ≥+1 and transmission ≥70 for aggressive warehousing.',
+      },
+    };
+    const f = T[def.key] || T.liquidity_rates;
+    if (def.name === weakest) f.evidence += ' Weakest link — size financing books first.';
+    return f;
+  }
+
+  function weakLine(name) {
+    return {
+      'Liquidity & Rates': 'Leverage and carry quality degrade first.',
+      'Credit Confirmation': 'Cross-asset confirmation missing — risk appetite less durable.',
+      'Equity Breadth': 'Tactical longs OK; extension risk elevated.',
+      'High-Beta / BTC': 'Do not warehouse isolated exchange strength.',
+      'High-Beta / China Cyclical Transmission': 'Cyclical beta not transmitting — copper/ore lag.',
+      'Basis & Term Structure': 'Harvest futures richness selectively.',
+    }[name] || 'Reduce size on linked structures.';
+  }
+
+  function buildGlobalStagePayload(raw) {
+    return buildStagePayload(raw, STAGES, 'horizons', 'global');
+  }
+
+  function buildChinaStagePayload(raw) {
+    var hz = raw.chinaHorizons || {};
+    var sq3 = raw.chinaSq3 ?? 50;
+    var stages = CHINA_STAGES.map(function (d, i) {
+      var stageHz = hz[d.id] || {};
+      var net = chinaHorizonNet(stageHz);
+      var score = compositeChinaStageScore(d.id, hz);
+      var hb = stageHealthBand(score);
+      return Object.assign({}, d, {
+        i: i,
+        net: net,
+        score: score,
+        band: hb.band,
+        status: hb.status,
+        horizons: stageHz,
+        math: null,
+        tracerScore: netToScore(net),
+      });
+    });
+    var weakest = weakestStage(stages, 'composite');
+    var weakestName = weakest.name;
+    stages.forEach(function (s) {
+      s.isWeakest = s.name === weakestName;
+      s.facts = chinaStageFacts(s.id, s.name, s.score, s.band, s.net, weakestName, sq3);
+    });
+    var ranked = stages.slice().sort(function (a, b) {
+      return a.score - b.score || (STAGE_TIE_RANK[a.id] || 99) - (STAGE_TIE_RANK[b.id] || 99);
+    });
+    var avg = Math.round(stages.reduce(function (a, s) { return a + s.score; }, 0) / stages.length);
+    return {
+      stages: stages,
+      ranked: ranked,
+      avgScore: avg,
+      weak: ranked.slice(0, 3).map(function (s, i) {
+        return { rank: i + 1, name: s.name, score: s.score, status: s.status, line: weakLine(s.name) };
+      }),
+    };
+  }
+
+  function buildStagePayload(raw, stageDefs, horizonKey, track) {
+    if (track === 'china') return buildChinaStagePayload(raw);
+    var hz = raw[horizonKey] || {};
+    var wf = raw.whinfellScore ?? 50;
+    var stages = stageDefs.map(function (d, i) {
+      var stageHz = hz[d.id] || {};
+      var net = sumNet(stageHz);
+      var math = buildStageMath(d.key, stageHz, false);
+      var score = math ? math.score : netToScore(net);
+      var b = scoreBand(score);
+      return Object.assign({}, d, {
+        i: i, net: net, score: score, band: b.band, status: b.status, horizons: stageHz,
+        math: math,
+        tracerScore: netToScore(net),
+      });
+    });
+    var ranked = stages.slice().sort(function (a, b) {
+      return a.score - b.score || STAGE_RANK[a.id] - STAGE_RANK[b.id];
+    });
+    var weakestName = ranked[0].name;
+    stages.forEach(function (s) {
+      s.isWeakest = s.name === weakestName;
+      if (s.math) s.math = buildStageMath(s.key, s.horizons, s.isWeakest);
+      s.facts = facts(s, s.score, s.band, s.net, weakestName, wf);
+    });
+    var avg = Math.round(stages.reduce(function (a, s) { return a + s.score; }, 0) / 5);
+    return {
+      stages: stages,
+      ranked: ranked,
+      avgScore: avg,
+      weak: ranked.slice(0, 3).map(function (s, i) {
+        return { rank: i + 1, name: s.name, score: s.score, status: s.status, line: weakLine(s.name) };
+      }),
+    };
+  }
+
+  function buildChinaPayload(raw) {
+    var base = buildChinaStagePayload(raw);
+    var sq3 = raw.chinaSq3 ?? 50;
+    var overlay = calculateFinalChinaScore(base.avgScore, sq3);
+    var handicapLine = formatChinaHandicapLine(
+      overlay.raw_ladder_score,
+      overlay.sq3_score,
+      overlay.multiplier,
+      overlay.final_china_score,
+      overlay.band,
+      overlay.desk_meaning,
+      overlay.sq3_policy_band
+    );
+    return Object.assign({}, base, {
+      regimeLabel: raw.chinaRegimeLabel || 'China overlay',
+      sq3Score: sq3,
+      sq3PolicyBand: overlay.sq3_policy_band,
+      overlay: overlay,
+      finalScore: overlay.final_china_score,
+      rawScore: overlay.raw_ladder_score,
+      multiplier: overlay.multiplier,
+      finalBand: overlay.band,
+      deskMeaning: overlay.desk_meaning,
+      handicapLine: handicapLine,
+    });
+  }
+
+  function buildPayload(raw) {
+    var ladder = buildGlobalStagePayload(raw);
+    const stages = ladder.stages;
+    const ranked = ladder.ranked;
+    const weakest = ranked[0];
+    const weakestName = weakest.name;
+    const avg = ladder.avgScore;
+    const fragile = avg < 65 || ranked[0].score < 55;
+
+    const btcPosture = fragile ? 'Reduced carry · tactical only' : 'Carry and beta within policy';
+    const ethPosture = fragile ? 'More selective than BTC' : 'Selective — cleaner ladder required';
+
+    function menu(eth) {
+      const r = fragile;
+      return [
+        { trade: 'Front vs next calendar', setup: 'Front-curve carry', status: r ? 'Supported' : 'Tactical', size: r ? 'Reduced' : 'Full' },
+        { trade: 'Cash-and-carry basis', setup: 'Balance-sheet recycle', status: (eth || r) ? 'Tactical' : 'Supported', size: eth ? 'Minimal' : 'Reduced' },
+        { trade: 'Outright directional long', setup: 'Breadth must confirm', status: 'Tactical', size: 'Reduced' },
+        { trade: 'Short squeeze chase', setup: 'No credit sponsorship', status: 'Avoid', size: 'None' },
+        { trade: 'Levered basis warehouse', setup: 'Liquidity-sensitive', status: 'Avoid', size: 'None' },
+        { trade: 'Convex overlays', setup: 'Hedges over carry', status: r ? 'Tactical' : 'Supported', size: 'Reduced' },
+      ];
+    }
+
+    function asset(eth) {
+      return {
+        posture: eth ? ethPosture : btcPosture,
+        stance: eth
+          ? 'More selective than BTC — client-led RV only; basis less durable.'
+          : 'Reduced-risk tradable — client facilitation and front-curve carry; no prop warehousing.',
+        yes: eth
+          ? ['Client calendar rolls · tight exits', 'ETH/BTC RV · credit confirm', 'Convex overlays · not core carry']
+          : ['Front-mid calendar · reduced', 'Client basis · fast recycle', 'Tactical longs · breadth confirm'],
+        no: eth
+          ? ['Basis warehousing', 'Prop parity with BTC', 'Levered carry · weak liq/credit']
+          : ['Prop basis books', 'Far-dated carry', 'Exchange richness chase'],
+        links: [
+          { key: 'Weakest', val: weakestName + ' · ' + ranked[0].score + '/100 — financing first' },
+          { key: 'Credit', val: stages.find(function (s) { return s.id === 'credit'; }).band + ' — tactical beta' },
+          { key: 'Basis', val: stages.find(function (s) { return s.id === 'basis'; }).band + ' — selective harvest' },
+        ],
+        menu: menu(eth),
+      };
+    }
+
+    const regimeStatus = scoreBand(avg).status;
+
+    return {
+      asOf: raw.asOf,
+      regimeLabel: raw.regimeLabel || 'Fragile Risk-On',
+      regimeStatus: regimeStatus,
+      whinfellScore: wf,
+      avgScore: avg,
+      stages: stages,
+      weak: ladder.weak,
+      btc: asset(false),
+      eth: asset(true),
+      up: [
+        weakestName + ' above 60 with net ≥+1 on 5D/20D.',
+        'Ladder average above 65 with Whinfell ≥65.',
+        'Credit ≥65 and breadth ≥55 — larger beta permitted.',
+        'Basis ≥60 — validate calendar warehousing.',
+      ],
+      down: [
+        weakestName + ' below 45 or net ≤−2 — client-only posture.',
+        'Whinfell below 50 — block new calendar risk.',
+        'Credit and breadth both below 50 — convexity only.',
+        'Basis below 45 — mean-revert, not carry.',
+      ],
+    };
+  }
+
+  function normalizeHorizonsFor(source, defs, fallback) {
+    var src = source || {};
+    var fb = fallback || {};
+    var out = {};
+    defs.forEach(function (s) {
+      var h = src[s.id] || fb[s.id] || {};
+      out[s.id] = {
+        d1: (h.d1 || 'flat').toLowerCase(),
+        d5: (h.d5 || 'flat').toLowerCase(),
+        d20: (h.d20 || 'flat').toLowerCase(),
+        d60: (h.d60 || 'flat').toLowerCase(),
+      };
+    });
+    return out;
+  }
+
+  function normalizeHorizons(source) {
+    return normalizeHorizonsFor(source, STAGES, FIXTURE.horizons);
+  }
+
+  function readSavedState() {
+    for (var k = 0; k < STORAGE_KEYS.length; k++) {
+      try {
+        var saved = localStorage.getItem(STORAGE_KEYS[k]);
+        if (!saved) continue;
+        var state = JSON.parse(saved);
+        if ((state.tracer && state.tracer.horizons) || (state.intake && state.intake.whinfellScore)) {
+          return state;
+        }
+      } catch (e) { /* ignore */ }
+    }
+    return null;
+  }
+
+  async function loadRaw() {
+    var payload = null;
+    try {
+      var state = readSavedState();
+      if (state) {
+        payload = {
+          asOf: (state.provenance && state.provenance.dataAsOf) || (state.provenance && state.provenance.hydratedAt),
+          regimeLabel: state.intake && state.intake.regimeTag,
+          whinfellScore: parseInt(state.intake && state.intake.whinfellScore, 10) || 50,
+          horizons: state.tracer && state.tracer.horizons,
+        };
+      }
+    } catch (e) { /* ignore */ }
+
+    if (!payload) {
+      for (var i = 0; i < HYDRATION_PATHS.length; i++) {
+        try {
+          var res = await fetch(HYDRATION_PATHS[i]);
+          if (!res.ok) continue;
+          var bundle = await res.json();
+          payload = {
+            asOf: bundle.as_of,
+            regimeLabel: bundle.global && bundle.global.regime_tag,
+            whinfellScore: bundle.global && bundle.global.whinfell_score,
+            horizons: bundle.suggested_tracer,
+            chinaHorizons: bundle.china_ladder && bundle.china_ladder.horizons,
+            chinaSq3: (bundle.china_ladder && bundle.china_ladder.sq3_score) || (bundle.china && bundle.china.sq3_score),
+            chinaRegimeLabel: (bundle.china && bundle.china.sq3_band) || 'China overlay',
+          };
+          break;
+        } catch (e) { /* ignore */ }
+      }
+    }
+
+    if (!payload) payload = Object.assign({}, FIXTURE);
+    payload.horizons = normalizeHorizons(payload.horizons || FIXTURE.horizons);
+    payload.chinaHorizons = normalizeHorizonsFor(payload.chinaHorizons || FIXTURE.chinaHorizons, CHINA_STAGES, FIXTURE.chinaHorizons);
+    if (payload.chinaSq3 == null) payload.chinaSq3 = FIXTURE.chinaSq3;
+    if (!payload.chinaRegimeLabel) payload.chinaRegimeLabel = FIXTURE.chinaRegimeLabel;
+    if (!payload.asOf) payload.asOf = FIXTURE.asOf;
+    if (!payload.regimeLabel) payload.regimeLabel = FIXTURE.regimeLabel;
+    if (!payload.whinfellScore) payload.whinfellScore = FIXTURE.whinfellScore;
+    return payload;
+  }
+
+  function tile(label, value, extra) {
+    var t = el('div', 'd-tile' + (extra ? ' ' + extra : ''));
+    t.appendChild(el('span', 'd-label', label));
+    t.appendChild(el('span', 'd-value', value));
+    return t;
+  }
+
+  function renderDecision(p) {
+    var root = document.getElementById('decisionBand');
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    var grid = el('div', 'decision-grid');
+    var dt = p.asOf ? new Date(p.asOf) : new Date();
+    var timeStr = dt.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+
+    grid.appendChild(tile('Regime', p.regimeLabel, 'regime-tile status-' + (p.regimeStatus || 'fragile')));
+    grid.appendChild(tile('Weakest link', p.weak[0].name + ' · ' + p.weak[0].score + ' / 100', 'weakest-tile'));
+    grid.appendChild(tile('BTC posture', p.btc.posture, 'btc-tile'));
+    grid.appendChild(tile('ETH posture', p.eth.posture, 'eth-tile'));
+    grid.appendChild(tile('Ladder avg', String(p.avgScore) + ' / 100', ''));
+    grid.appendChild(tile('As of', timeStr, 'time-tile'));
+    root.appendChild(grid);
+  }
+
+  function renderChinaDecision(cp) {
+    var root = document.getElementById('decisionBandChina');
+    if (!root) return;
+    while (root.firstChild) root.removeChild(root.firstChild);
+    var grid = el('div', 'decision-grid decision-grid--china');
+    grid.appendChild(tile('China track', cp.regimeLabel, 'regime-tile'));
+    grid.appendChild(tile('China weakest', cp.weak[0].name + ' · ' + cp.weak[0].score + ' / 100', 'weakest-tile'));
+    grid.appendChild(tile('Ladder raw', String(cp.rawScore) + ' / 100', ''));
+    grid.appendChild(tile('China final (adj.)', String(cp.finalScore) + ' / 100 · ' + (cp.finalBand || '—'), 'btc-tile'));
+    grid.appendChild(tile('Desk meaning', cp.deskMeaning || '—', ''));
+    grid.appendChild(tile('SQ3 policy', String(cp.sq3Score) + ' / 100 · ' + (cp.sq3PolicyBand || '—') + ' · ×' + cp.multiplier, ''));
+    root.appendChild(grid);
+    if (cp.handicapLine) {
+      var summary = el('p', 'china-handicap-line', cp.handicapLine);
+      root.appendChild(summary);
+    }
+  }
+
+  function renderHeat(p, heatId) {
+    var root = document.getElementById(heatId || 'heatStrip');
+    if (!root) return;
+    while (root.firstChild) root.removeChild(root.firstChild);
+    p.stages.forEach(function (s) {
+      var c = el('div', 'heat-cell' + (s.isWeakest ? ' is-weakest' : ''));
+      var sc = el('span', 'hc-score tnum', String(s.score));
+      sc.style.color = COLORS[s.status];
+      c.appendChild(sc);
+      c.appendChild(el('span', 'hc-name', s.name.split('/')[0].trim()));
+      c.appendChild(el('span', 'chip chip-score ' + s.status, s.band));
+      root.appendChild(c);
+    });
+  }
+
+  function renderStages(p, opts) {
+    opts = opts || {};
+    var root = document.getElementById(opts.listId || 'stageList');
+    if (!root) return;
+    var linksMap = opts.linksMap || (typeof chartLinks !== 'undefined' ? chartLinks : {});
+    var showMathJump = opts.showMathJump !== false;
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    p.stages.forEach(function (s, idx) {
+      var card = el('article', 'stage-card' + (s.isWeakest ? ' is-weakest' : ''));
+      card.setAttribute('data-stage-id', s.id);
+
+      var top = el('div', 'stage-top');
+      var meta = el('div', 'stage-meta');
+      meta.appendChild(el('span', 'stage-num', 'Stage ' + (idx + 1)));
+      meta.appendChild(el('span', 'stage-title', s.name));
+      meta.appendChild(el('span', 'stage-sub', s.sub));
+      top.appendChild(meta);
+
+      var chips = el('div', 'stage-chips');
+      chips.appendChild(el('span', 'chip chip-score ' + s.status, String(s.score)));
+      chips.appendChild(el('span', 'chip ' + s.status, s.band));
+      top.appendChild(chips);
+
+      var hzStrip = el('div', 'hz-strip');
+      HORIZONS.forEach(function (h) {
+        var v = (s.horizons[h] || 'flat').toLowerCase();
+        hzStrip.appendChild(el('span', 'hz-tag' + (v === 'up' ? ' up' : v === 'down' ? ' down' : ''), HZ_LABEL[h] + ' ' + v.toUpperCase()));
+      });
+      top.appendChild(hzStrip);
+      card.appendChild(top);
+
+      var factsRow = el('div', 'stage-facts');
+
+      var triggerBox = el('div', 'fact trigger-fact');
+      triggerBox.appendChild(el('span', 'fact-tag', 'Trigger'));
+      triggerBox.appendChild(el('p', 'fact-text', s.facts.trigger));
+      factsRow.appendChild(triggerBox);
+
+      var chartAccess = mountLadderStageChart(s.id, linksMap);
+      if (chartAccess) factsRow.appendChild(chartAccess);
+
+      var subRow = el('div', 'stage-facts-sub');
+      var stateBox = el('div', 'fact');
+      stateBox.appendChild(el('span', 'fact-tag', 'State'));
+      stateBox.appendChild(el('p', 'fact-text', s.facts.state));
+      subRow.appendChild(stateBox);
+
+      var evBox = el('div', 'fact evidence-fact');
+      evBox.appendChild(el('span', 'fact-tag', 'Evidence'));
+      evBox.appendChild(el('p', 'fact-text', s.facts.evidence));
+      subRow.appendChild(evBox);
+
+      factsRow.appendChild(subRow);
+      card.appendChild(factsRow);
+
+      if (showMathJump && s.math) {
+        var jump = el('a', 'math-jump', 'Score math breakdown →');
+        jump.href = '#math-' + s.id;
+        card.appendChild(jump);
+      }
+      card.id = (opts.cardPrefix || 'stage-') + s.id;
+      root.appendChild(card);
+    });
+  }
+
+  function appendMathBody(parent, s, m) {
+    parent.appendChild(el('span', 'math-formula-line', m.formulaShort));
+    parent.appendChild(el('span', 'math-formula-line', m.formula));
+
+    var table = el('table', 'comp-table');
+    table.setAttribute('role', 'table');
+    var thead = el('thead');
+    var hr = el('tr');
+    ['Input', 'Wt', 'Mark', 'Sub', 'Contrib'].forEach(function (h, i) {
+      var th = el('th', i === 1 || i === 3 || i === 4 ? 'col-w' : (i === 2 ? 'col-s' : ''), h);
+      if (i === 0) th.className = 'col-input';
+      hr.appendChild(th);
+    });
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    var tbody = el('tbody');
+    m.rows.forEach(function (r) {
+      var tr = el('tr');
+      tr.appendChild(el('td', 'col-input', r.label));
+      tr.appendChild(el('td', 'col-w tnum', r.w + '%'));
+      tr.appendChild(el('td', 'col-s', r.mark.toUpperCase()));
+      tr.appendChild(el('td', 'col-s tnum', String(r.sub)));
+      tr.appendChild(el('td', 'col-c tnum', String(r.contrib)));
+      tbody.appendChild(tr);
+    });
+    var totalTr = el('tr', 'comp-total');
+    totalTr.appendChild(el('td', '', 'Weighted total'));
+    totalTr.appendChild(el('td', 'col-w tnum', '100%'));
+    totalTr.appendChild(el('td', '', ''));
+    totalTr.appendChild(el('td', '', ''));
+    totalTr.appendChild(el('td', 'col-c tnum', String(m.score)));
+    tbody.appendChild(totalTr);
+    table.appendChild(tbody);
+    parent.appendChild(table);
+
+    var cmpWrap = el('div', 'hz-compare');
+    LOOKBACKS.forEach(function (lb) {
+      var sc = m.horizons[lb.id];
+      var chip = el('div', 'hz-cmp' + (lb.id === 'today' ? ' is-today' : ''));
+      chip.appendChild(el('span', 'hc-label', lb.label));
+      chip.appendChild(el('span', 'hc-val tnum', String(sc)));
+      if (lb.id !== 'today') {
+        var d = m.score - sc;
+        chip.appendChild(el('span', 'hc-delta ' + deltaClass(d) + ' tnum', deltaLabel(d) + ' vs now'));
+      } else {
+        chip.appendChild(el('span', 'hc-delta flat', bandWord(sc)));
+      }
+      cmpWrap.appendChild(chip);
+    });
+    parent.appendChild(cmpWrap);
+
+    var causalWrap = el('div', 'math-causal');
+    m.causal.forEach(function (line, i) {
+      var emph = i === 0 || (s.isWeakest && i === m.causal.length - 1);
+      causalWrap.appendChild(el('span', 'causal-line' + (emph ? ' emphasis' : ''), line));
+    });
+    parent.appendChild(causalWrap);
+
+    parent.appendChild(el('span', 'math-rationale', m.rationale + ' Tracer cross-check: net ' + (m.tracerNet >= 0 ? '+' : '') + m.tracerNet + ' → ' + m.tracerScore + '/100.'));
+  }
+
+  function renderMathStageList(p) {
+    var root = document.getElementById('mathStageList');
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    p.stages.forEach(function (s, idx) {
+      if (!s.math) return;
+      var m = s.math;
+      var card = el('article', 'math-stage-card' + (s.isWeakest ? ' is-weakest' : ''));
+      card.id = 'math-' + s.id;
+
+      var head = el('header', 'math-stage-head');
+      head.appendChild(el('span', 'ui-label', 'Stage ' + (idx + 1)));
+      head.appendChild(el('span', 'msh-title', s.name));
+      var sc = el('span', 'msh-score tnum', 'Today ' + m.score + ' / 100 · ' + s.band);
+      sc.style.color = COLORS[s.status];
+      head.appendChild(sc);
+      if (s.isWeakest) head.appendChild(el('span', 'weakest-link-tag', 'Weakest link'));
+      card.appendChild(head);
+
+      var body = el('div', 'math-body');
+      appendMathBody(body, s, m);
+      card.appendChild(body);
+      root.appendChild(card);
+    });
+  }
+
+  function renderMethodology(p) {
+    var root = document.getElementById('methodCard');
+    var weakest = p.weak[0];
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    var lead = el('p', '', '');
+    lead.style.fontSize = '12px';
+    lead.style.color = 'var(--text-2)';
+    lead.style.margin = '0 0 8px';
+    lead.textContent = 'Production approach: fixed expert-judgment weights per stage (hybrid v1). Not equal-weighted — weights follow transmission theory. Statistical or regime-adaptive weights reserved for post-live validation.';
+    root.appendChild(lead);
+
+    var grid = el('div', 'method-grid');
+    [
+      { t: 'Chosen', b: 'Expert weights by stage · marks map to 75, 50, 25 · transparent weighted sum' },
+      { t: 'Not now', b: 'Equal weights across financing chain, pure ML fits, regime-adaptive without history' },
+      { t: 'Future', b: 'Backtested statistical weights as validation overlay after 60+ desk sessions' },
+    ].forEach(function (item) {
+      var p = el('div', 'method-pill');
+      p.appendChild(el('span', 'method-pill-title', item.t));
+      p.appendChild(el('span', 'method-pill-body', item.b));
+      grid.appendChild(p);
+    });
+    root.appendChild(grid);
+    root.appendChild(el('span', 'method-formula', 'Stage score = Σ (weightᵢ × subscoreᵢ)   where   subscore: up→75 · flat→50 · down→25'));
+
+    var note = el('p', 'method-weakest-note', '');
+    note.style.margin = '10px 0 0';
+    note.style.fontSize = '11px';
+    note.style.color = 'var(--text-2)';
+    note.textContent = 'Current weakest link: ' + weakest.name + ' at ' + weakest.score + '/100 — tie-break priority favors financing chain when scores are equal.';
+    root.appendChild(note);
+  }
+
+  function renderMathOverview(p) {
+    var root = document.getElementById('mathOverview');
+    while (root.firstChild) root.removeChild(root.firstChild);
+    p.stages.forEach(function (s) {
+      if (!s.math) return;
+      var a = el('a', 'math-ov-cell' + (s.isWeakest ? ' is-weakest' : ''));
+      a.href = '#math-' + s.id;
+      a.appendChild(el('span', 'mov-name', s.name.split('/')[0].trim()));
+      var sc = el('span', 'mov-score tnum', String(s.math.score));
+      sc.style.color = COLORS[s.status];
+      a.appendChild(sc);
+      var d30 = s.math.deltas.d30;
+      a.appendChild(el('span', 'mov-d30 tnum', '30D ' + deltaLabel(d30)));
+      root.appendChild(a);
+    });
+  }
+
+  function renderFail(p) {
+    var root = document.getElementById('failList');
+    while (root.firstChild) root.removeChild(root.firstChild);
+    p.weak.forEach(function (w) {
+      var row = el('div', 'fail-row' + (w.rank === 1 ? ' is-primary' : ''));
+      row.appendChild(el('div', 'fail-rank tnum', String(w.rank)));
+
+      var body = el('div', 'fail-body');
+      var titleLine = el('div', 'fail-title-line');
+      titleLine.appendChild(el('span', 'fail-name', w.name));
+      if (w.rank === 1) titleLine.appendChild(el('span', 'fail-primary-tag', 'Primary bottleneck'));
+      titleLine.appendChild(el('span', 'fail-score-label tnum', w.score + ' / 100'));
+      body.appendChild(titleLine);
+      body.appendChild(el('p', 'fail-consequence', w.line));
+      row.appendChild(body);
+
+      var barWrap = el('div', 'fail-bar-wrap');
+      var fill = el('div', 'fail-bar-fill');
+      fill.style.height = w.score + '%';
+      fill.style.background = COLORS[w.status];
+      barWrap.appendChild(fill);
+      row.appendChild(barWrap);
+
+      root.appendChild(row);
+    });
+  }
+
+  function statusClass(st) {
+    if (st === 'Supported') return 'supported';
+    if (st === 'Avoid') return 'avoid';
+    return 'tactical';
+  }
+
+  function renderTradeTable(menu) {
+    var wrap = el('div', 'trade-wrap');
+    var table = el('table', 'trade-table');
+    table.setAttribute('role', 'table');
+
+    var thead = el('thead');
+    var hr = el('tr');
+    ['Trade', 'Setup', 'Status', 'Sizing'].forEach(function (h) {
+      hr.appendChild(el('th', '', h));
+    });
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    var tbody = el('tbody');
+    menu.forEach(function (row) {
+      var tr = el('tr');
+      var tdTrade = el('td', 'col-trade', row.trade);
+      var tdSetup = el('td', 'col-setup', row.setup);
+      var tdStatus = el('td');
+      tdStatus.appendChild(el('span', 'status-pill ' + statusClass(row.status), row.status));
+      var tdSize = el('td');
+      tdSize.appendChild(el('span', 'size-pill tnum', row.size));
+      tr.appendChild(tdTrade);
+      tr.appendChild(tdSetup);
+      tr.appendChild(tdStatus);
+      tr.appendChild(tdSize);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  function renderChipGrid(items, variant) {
+    var grid = el('div', 'item-grid');
+    items.forEach(function (t) {
+      grid.appendChild(el('span', 'item-chip ' + variant + '-chip', t));
+    });
+    return grid;
+  }
+
+  function renderPolicyBlock(label, labelClass, items, chipVariant) {
+    var block = el('div', 'ui-block');
+    block.appendChild(el('span', 'ui-label ' + labelClass, label));
+    block.appendChild(renderChipGrid(items, chipVariant));
+    return block;
+  }
+
+  function renderAttribChips(links) {
+    var wrap = el('div', 'attrib-grid');
+    wrap.appendChild(el('span', 'ui-label attr-label', 'Ladder attribution'));
+    var row = el('div', 'attrib-chips-row');
+    links.forEach(function (link) {
+      var chip = el('div', 'attrib-chip');
+      chip.appendChild(el('span', 'ac-key', link.key));
+      chip.appendChild(el('span', 'ac-val', link.val));
+      row.appendChild(chip);
+    });
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function renderAsset(panelId, sym, data, headClass) {
+    var panel = document.getElementById(panelId);
+    while (panel.firstChild) panel.removeChild(panel.firstChild);
+
+    var head = el('header', 'asset-head ' + headClass);
+    head.id = sym.toLowerCase() + '-head';
+    head.appendChild(el('span', 'asset-name ' + sym.toLowerCase(), sym));
+    head.appendChild(el('span', 'posture-tag', data.posture));
+    panel.appendChild(head);
+
+    panel.appendChild(el('p', 'stance-block', data.stance));
+
+    var policy = el('div', 'policy-grid');
+    policy.appendChild(renderPolicyBlock('Supported now', 'yes-label', data.yes, 'yes'));
+    policy.appendChild(renderPolicyBlock('Not supported', 'no-label', data.no, 'no'));
+    panel.appendChild(policy);
+
+    panel.appendChild(renderAttribChips(data.links));
+
+    var execBlock = el('div', 'exec-block');
+    execBlock.appendChild(el('span', 'ui-label exec-label', 'Execution · trade menu'));
+    execBlock.appendChild(renderTradeTable(data.menu));
+    panel.appendChild(execBlock);
+  }
+
+  function renderPlaybook(p) {
+    var root = document.getElementById('playbookGrid');
+    while (root.firstChild) root.removeChild(root.firstChild);
+
+    var up = el('div', 'play-card up');
+    up.appendChild(el('span', 'play-title', 'If ladder improves'));
+    var upList = el('div', 'scenario-list');
+    p.up.forEach(function (t) { upList.appendChild(el('div', 'scenario-row', t)); });
+    up.appendChild(upList);
+
+    var down = el('div', 'play-card down');
+    down.appendChild(el('span', 'play-title', 'If ladder deteriorates'));
+    var downList = el('div', 'scenario-list');
+    p.down.forEach(function (t) { downList.appendChild(el('div', 'scenario-row', t)); });
+    down.appendChild(downList);
+
+    root.appendChild(up);
+    root.appendChild(down);
+  }
+
+  function render(p, chinaP) {
+    renderDecision(p);
+    if (chinaP) renderChinaDecision(chinaP);
+    renderHeat(p, 'heatStrip');
+    renderStages(p, { listId: 'stageList', linksMap: typeof chartLinks !== 'undefined' ? chartLinks : {}, showMathJump: true });
+    if (chinaP) {
+      renderHeat(chinaP, 'chinaHeatStrip');
+      renderStages(chinaP, {
+        listId: 'chinaStageList',
+        linksMap: typeof chinaChartLinks !== 'undefined' ? chinaChartLinks : {},
+        showMathJump: false,
+        cardPrefix: 'china-stage-',
+      });
+    }
+    applyLadderTrackView(ladderTrackView);
+    renderMethodology(p);
+    renderMathOverview(p);
+    renderMathStageList(p);
+    renderFail(p);
+    renderAsset('panelBtc', 'BTC', p.btc, 'btc-head');
+    renderAsset('panelEth', 'ETH', p.eth, 'eth-head');
+    renderPlaybook(p);
+  }
+
+  /* Theme toggle — session only, no localStorage */
+  var btnTheme = document.getElementById('btnTheme');
+  btnTheme.addEventListener('click', function () {
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    btnTheme.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
+    btnTheme.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
+  });
+
+  document.querySelectorAll('.ladder-track-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      applyLadderTrackView(btn.getAttribute('data-ladder-track'));
+    });
+  });
+
+  loadRaw().then(function (raw) {
+    render(buildPayload(raw), buildChinaPayload(raw));
+  });
+})();
+  </script>
+</body>
+</html>

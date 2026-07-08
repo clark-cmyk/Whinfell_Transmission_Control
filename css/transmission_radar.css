@@ -1,0 +1,151 @@
+/* Transmission Signal Radar — hero shell (Chunk 10) */
+
+.transmission-radar {
+  flex-shrink: 0;
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--border-strong, var(--border));
+  background: var(--surface);
+}
+
+.transmission-radar-mount {
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(61, 139, 253, 0.06) 0%, transparent 42%),
+    var(--surface-2, rgba(0, 0, 0, 0.14));
+  padding: 12px 14px 14px;
+  min-height: 120px;
+}
+
+.radar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-bottom: 10px;
+}
+
+.radar-title {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: var(--type-title-size, 15px);
+  font-weight: 600;
+  line-height: var(--type-title-lh, 1.25);
+  letter-spacing: 0.01em;
+}
+
+.radar-summary-face {
+  font-size: var(--type-body-size, 13px);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.radar-weakest {
+  font-size: var(--type-label-size, 12px);
+  color: var(--muted-tertiary, var(--muted));
+}
+
+.radar-weakest-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.radar-sleeves {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.radar-sleeve {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.16);
+  font-variant-numeric: tabular-nums;
+}
+
+.radar-sleeve-label {
+  font-size: var(--type-label-size, 12px);
+  font-weight: var(--type-label-weight, 500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  line-height: var(--type-label-lh, 1.3);
+}
+
+.radar-sleeve-value {
+  font-size: var(--type-metric-size, 15px);
+  font-weight: var(--type-metric-weight, 600);
+  line-height: var(--type-metric-lh, 1.2);
+  color: var(--text);
+}
+
+.radar-sleeve-cue {
+  font-size: var(--type-label-size, 12px);
+  color: var(--muted-tertiary, var(--muted));
+  line-height: var(--type-label-lh, 1.3);
+}
+
+.radar-sleeve--weakest {
+  border-color: var(--wtm-red, #ef4444);
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+.radar-sleeve--weakest .radar-sleeve-label,
+.radar-sleeve--weakest .radar-sleeve-value {
+  color: var(--wtm-red, #ef4444);
+}
+
+.radar-sleeve.ds--healthy .radar-sleeve-value {
+  color: var(--text);
+}
+
+.radar-sleeve.ds--partial .radar-sleeve-cue,
+.radar-sleeve.ds--stale .radar-sleeve-cue {
+  color: var(--wtm-amber, #f59e0b);
+}
+
+.radar-sleeve.ds--not_computed .radar-sleeve-value,
+.radar-sleeve.ds--unavailable .radar-sleeve-value {
+  color: var(--muted);
+  font-size: var(--type-label-size, 12px);
+  font-weight: 500;
+}
+
+[data-theme="light"] .radar-sleeve--weakest {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: #dc2626;
+}
+
+@media (max-width: 960px) {
+  .radar-sleeves {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .radar-sleeves {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+[data-theme="light"] .transmission-radar {
+  border-bottom-color: var(--border-strong);
+}
+
+[data-theme="light"] .transmission-radar-mount {
+  background:
+    linear-gradient(180deg, rgba(30, 90, 150, 0.05) 0%, transparent 42%),
+    var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .radar-sleeve {
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
