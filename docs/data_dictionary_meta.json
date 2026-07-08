@@ -8,6 +8,8 @@
   "tc_console_build": "1.5-BUILD-COUSINS-2026-07-03",
   "repo_root": "~/Desktop/Whinfell_Transmission_Control",
   "pipeline_repo": "~/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE",
+  "manifest_repo": "~/Desktop/Whinfell_Transmission_Control",
+  "manifest_path": "whinfell_pipeline/collection_manifest.yaml",
   "pipeline_repo_github": "https://github.com/clark-cmyk/Whinfell_BUILD_Cousins_v2",
   "desk_pages_url": "https://clark-cmyk.github.io/Whinfell_Transmission_Control/",
   "desk_pages_url_public_fallback": "https://clark-cmyk.github.io/Whinfell_BUILD_Cousins_v2/",
@@ -38,7 +40,23 @@
     "corporate_credit",
     "trade_tracker",
     "btc_attribution",
-    "margin_rules"
+    "margin_rules",
+    "task_force"
+  ],
+  "task_force_version": "1.1.0",
+  "task_force_specialists": [
+    "data_gatherer",
+    "btc_eth_basis",
+    "btc_eth_vol_arb",
+    "compute_gpu",
+    "power_nat_gas",
+    "metals_debt",
+    "china_sq3_deep",
+    "sofr_fedfunds",
+    "hy_vs_ig",
+    "global_transmission",
+    "master_sizing",
+    "tx_integrator"
   ],
   "tc_asset_paths": {
     "index": "index.html",
@@ -50,5 +68,41 @@
     "publish_script": "scripts/publish.sh"
   },
   "validated": true,
-  "source": "Whinfell_Transmission_Control/documentation/DATA_DICTIONARY_v1.5.md"
+  "source": "Whinfell_Transmission_Control/documentation/DATA_DICTIONARY_v1.5.md",
+  "bbdm_report": {
+    "version": "2.0.0",
+    "locked_chunk": "05",
+    "schema_module": "bang_bang_da/bbdm_report_schema.py",
+    "registry_module": "whinfell_pipeline/bbdm_registry.py",
+    "registry_version": "2.0.0-chunk03",
+    "sizing_module": "whinfell_pipeline/bbdm_z_sizing.py",
+    "sizing_version": "2.0.0-chunk04",
+    "risk_dashboard_module": "whinfell_pipeline/bbdm_risk_dashboard.py",
+    "risk_dashboard_version": "2.0.0-chunk05",
+    "trade_ids": [
+      "btc_basis",
+      "btc_calendar",
+      "eth_basis",
+      "eth_calendar",
+      "midwest_basis",
+      "midwest_calendar",
+      "sofr_fed_funds",
+      "curve_2s10s"
+    ],
+    "fixture": "tests/fixtures/bbdm_report_v2_min.json",
+    "report_path": "bang_bang_da/bang_bang_da_report.json",
+    "master_spec": "01_Strategy_Docs/BBDM_v2_Master_Spec.md",
+    "development_plan": "01_Strategy_Docs/BBDM_v2_Development_Plan.md",
+    "trade_count": 8,
+    "sizing_buckets": ["PASS", "1x", "2x", "3x", "BLOCKED", "DATA_GAP"],
+    "risk_dashboard_scores": ["whinfell_ex_china", "sq3", "combined"],
+    "modules": ["Scan", "D.I.G.", "Litmus", "Iterate", "Articulator"],
+    "inspection_checks": [
+      "data_live",
+      "z_computed",
+      "litmus_loaded",
+      "articulator_fresh",
+      "scores_present"
+    ]
+  }
 }
