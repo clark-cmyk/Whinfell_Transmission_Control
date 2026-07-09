@@ -30,6 +30,7 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
+- [x] committed in 4dae71f
 - [ ] browser-verify collapsed strip 24px · chip variants · regime pills · dark + light
 
 NEXT SESSION
