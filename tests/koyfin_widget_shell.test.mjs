@@ -120,6 +120,20 @@ function runShellJsChecks() {
     /\.ia-widget-grid\s*\{[^}]*gap:\s*var\(--wf-gap-3\)/s.test(css),
     'COMET C1 widget grid gap uses --wf-gap-3'
   );
+  // COMET C2 — nav hover/active (slate tokens; no .wtc-nav fork)
+  assert(
+    /\.wf-nav-item:hover\s*\{[^}]*background:\s*var\(--wf-control-bg\)/s.test(css),
+    'COMET C2 nav hover uses --wf-control-bg'
+  );
+  assert(
+    /\.wf-nav-item\.is-active[\s\S]{0,280}background:\s*var\(--wf-panel-bg-3\)/s.test(css),
+    'COMET C2 nav active uses --wf-panel-bg-3 slate'
+  );
+  assert(
+    /\.wf-nav-item\s*\{[^}]*border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C2 nav radius uses --wf-radius-control'
+  );
+  assert(!css.includes('.wtc-nav-item'), 'COMET C2 must not introduce .wtc-nav-item class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

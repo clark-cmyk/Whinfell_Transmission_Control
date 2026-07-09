@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (COMET C1 density shipped · next C2)  
+**Last updated:** July 9, 2026 (COMET C2 nav shipped · next C3)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`13f97b0`** · C1 code **`a69ad00`** · tree clean (noise untracked only)
+**HEAD:** `main` tip — run `git log -1 --oneline` · C2 code **`C2_SHA`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,16 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C1)
+## NEW SESSION — start here (Jul 9 · after COMET C2)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 13f97b0 · C1 a69ad00 · working tree clean
+Repo: Whinfell_Transmission_Control · main tip C2_SHA · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C1 entry)
-Shipped: Koyfin PR-1…7 + COMET C0 (tokens) + C1 (shell density applied).
-Next: COMET C2 — nav hover/active only (.wf-nav-item / .ia-left-frame). Use --wf-* only.
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C2 entry)
+Shipped: Koyfin PR-1…7 + COMET C0–C2 (tokens · density · nav hover/active).
+Next: COMET C3 — widget card chrome lock (.wf-panel* only). radius 8 · border · header/body gap via --wf-*.
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -41,8 +41,8 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`13f97b0`** |
-| Last UI commit | `feat(ui): COMET C1 shell density` |
+| Branch | `main` tip **`C2_SHA`** |
+| Last UI commit | `feat(ui): COMET C2 nav hover/active` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
@@ -58,21 +58,22 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **7** | Depth polish | `#depthPanelMeta` · status/viz/disclosure card | `38f23a3` |
 | **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
 | **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
+| **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `C2_SHA` |
 
-**Tests at C1 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
+**Tests at C2 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
 ### Next action for new session
 
-**→ COMET C2 — nav hover/active** (left rail chrome only)
+**→ COMET C3 — widget card chrome lock** (`.wf-panel*` only)
 
 | Goal | Detail |
 |------|--------|
-| **C2 (do this)** | Nav item hover/active density + COMET slate active state via `--wf-*` only |
-| Primary file | `css/console_ia.css` · `.wf-nav-item` / `.ia-left-frame` |
-| After C2 | C3 card chrome lock · C4 controls · C5 chips · C6 links |
-| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · chart canvas |
+| **C3 (do this)** | Card radius **8** (`--wf-radius-widget`) · border · header/body gap consistency |
+| Primary file | `css/console_ia.css` · `.wf-panel` / `__header` / `__body` / panel variants |
+| After C3 | C4 controls · C5 chips · C6 links |
+| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · chart canvas · nav rework |
 
-**C2 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced
+**C3 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced
 
 **Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
 
@@ -88,7 +89,7 @@ cd dist && python3 -m http.server 8765
 node tests/koyfin_widget_shell.test.mjs
 ```
 
-Browser checklist: dark slate shell · denser 44px header · Flipchart/Depth meta · left **DP/FL/RC…** · light theme · no layout thrash.
+Browser checklist: dark slate · left nav hover/active · icons-only **DP/FL/RC…** · denser 44px header · Flipchart/Depth meta · light theme · no layout thrash.
 
 ---
 
@@ -108,7 +109,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | PR-8 | 8 | Light theme unify (`--wf-*` vs `main.css` dual system) | Partial — C0 bridges `--ia-*`; main.css dual remains |
 | **COMET** | C0 | Token bridge | **Done** Jul 9 |
 | **COMET** | C1 | Shell density (header/padding tokens) | **Done** Jul 9 |
-| **COMET** | C2–C6 | Nav · cards · controls · chips · links | **Next** — C2 nav hover/active |
+| **COMET** | C2 | Nav hover/active | **Done** Jul 9 |
+| **COMET** | C3–C6 | Cards · controls · chips · links | **Next** — C3 card chrome lock |
 
 ### Known gaps (do not re-break)
 
@@ -159,9 +161,9 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | Chunk | Goal | Primary touch | Depends |
 |-------|------|---------------|---------|
 | **C0** | Token bridge: map COMET palette → `--wf-*` / light | `css/console_ia.css` `:root` + `[data-theme="light"]` | **Done** Jul 9 |
-| **C1** | Shell density: header 44px feel · rail/canvas gap/padding | top frame · left frame · canvas padding | **Next** — tokens ready |
-| **C2** | Nav item + section title polish (hover/active) | left nav list · view shortcuts | C0/C1 |
-| **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | PR-3…7 structure |
+| **C1** | Shell density: header 44px feel · rail/canvas gap/padding | top frame · left frame · canvas padding | **Done** Jul 9 |
+| **C2** | Nav item + section title polish (hover/active) | left nav list · view shortcuts | **Done** Jul 9 |
+| **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | **Next** · PR-3…7 structure |
 | **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | C0 |
 | **C5** | Chip variants ok/warn/risk + status strip height | chips · pipeline strip · regime pills | C0 |
 | **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | C3–C5 |
@@ -223,14 +225,16 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0e | **COMET C1** — shell density (apply `--wf-header-h` / padding) | **High · next UI track** | BUILD | Use C0 tokens only · no `.wtc-*` · tests |
+| 0f | **COMET C3** — widget card chrome lock (`.wf-panel*`) | **High · next UI track** | BUILD | radius-widget · border · header/body gap · no `.wtc-*` |
+| 0e | **COMET C2** — nav hover/active | **Done** | BUILD | control-bg hover · panel-bg-3 active · tests PASS |
+| 0d2 | **COMET C1** — shell density | **Done** `a69ad00` | BUILD | header-h applied · tests PASS |
 | 0d | **COMET CSS C0** — token bridge | **Done** | BUILD | `--wf-*` slate + `--ia-*` bridge · tests PASS |
 | 0 | **Koyfin Chunk 7** — Depth panel meta | **Done** | BUILD | `#depthPanelMeta` · min-height · tests PASS |
 | 0c | **Koyfin Chunk 6** — Flipchart panel meta | **Done** | BUILD | meta · pager+implications · keyboard OK |
 | 0a | **Koyfin Chunks 4–5** — Radar + HY OAS panel meta | **Done** `9cca83a` | BUILD | meta lines · tests PASS |
 | 0b | **Koyfin Chunks 1–3** | **Done** `825d9f4` | BUILD | Committed on `main` |
 | 1 | **Live desk walk-through** — ratings in `Desk_Feedback_Log.md` | **High · go-live gate** | Clark · Wes | All 5 nodes + UI/docs rated |
-| 2 | **Push / desk stack** when ready | **Medium** | Clark | `38f23a3` on remote if desired · no thrash |
+| 2 | **Push / desk stack** when ready | **Medium** | Clark | tip on remote if desired · no thrash |
 | 3 | **Task Force live Grok chain** | **Medium** | BUILD | Manual 12-step run → `--merge` → replace specialist stubs with live TxIntegrator |
 | 4 | **Collect agent auto-start** — LaunchAgent on login | **Medium** | BUILD | Agent on `:8767` without manual Terminal tab |
 | 5 | **Post-collect hydration** — auto `copy_hydration_bundle.sh` + import prompt | **Medium** | BUILD | Collect button → fresh bundle → WTC import nudge |

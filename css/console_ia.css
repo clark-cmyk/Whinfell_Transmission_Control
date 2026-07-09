@@ -1,7 +1,8 @@
 /* Phase 2.3 IA shell — calm neutral workstation (scan · dig · iterate)
  *
  * COMET C0 — token bridge: COMET slate → --wf-*; --ia-* aliases; no .wtc-* fork.
- * COMET C1 — shell density: apply --wf-header-h / rail-canvas gap-padding via .ia-* /.wf-* only.
+ * COMET C1 — shell density: --wf-header-h / rail-canvas gap-padding via .ia-* /.wf-* only.
+ * COMET C2 — nav hover/active: .wf-nav-item slate states via --wf-* (no .wtc-* fork).
  */
 
 :root {
@@ -467,7 +468,7 @@ body.ia-left-collapsed .wf-nav-list {
   min-width: 0;
 }
 
-/* Chunk A — left rail sections */
+/* Chunk A — left rail sections · COMET C2 nav chrome */
 .wf-rail-section {
   border: 1px solid var(--wf-border);
   border-radius: var(--wf-radius-md);
@@ -476,33 +477,35 @@ body.ia-left-collapsed .wf-nav-list {
   min-width: 0;
 }
 .wf-rail-section__label {
-  height: 32px;
+  height: 28px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 var(--wf-gap-2);
   border-bottom: 1px solid var(--wf-divider);
   font-size: var(--wf-text-xxs);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--wf-text-3);
   background: rgba(255, 255, 255, 0.02);
 }
 .wf-nav-list {
-  padding: 6px;
+  padding: var(--wf-gap-1);
   display: grid;
   gap: var(--wf-gap-1);
   min-width: 0;
 }
 .wf-nav-item {
-  min-height: 36px;
+  min-height: 28px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  justify-content: space-between;
+  padding: var(--wf-gap-1) var(--wf-gap-2);
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--wf-radius-control);
+  background: transparent;
   color: var(--wf-text-2);
-  font-size: var(--wf-text-xs);
+  font-size: var(--wf-text-xxs);
   font-weight: 500;
   line-height: var(--wf-lh-ui, 1.35);
   text-align: left;
@@ -512,17 +515,21 @@ body.ia-left-collapsed .wf-nav-list {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
 }
+/* COMET §5 — hover: control surface; active: panel-bg-3 slate (not accent fill) */
 .wf-nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--wf-border);
+  background: var(--wf-control-bg);
+  border-color: transparent;
+  color: var(--wf-text);
 }
 .wf-nav-item.is-active,
 .ia-left-body .wf-nav-item.ia-layer-tab--active,
 .ia-left-body .wf-nav-item.ia-specialized-tool-btn--active {
-  background: var(--wf-accent-soft);
-  border-color: rgba(103, 167, 255, 0.32);
+  background: var(--wf-panel-bg-3);
+  border-color: var(--wf-border-strong);
   color: var(--wf-text);
+  font-weight: 600;
 }
 
 .ia-layer-tabs {
@@ -810,15 +817,17 @@ body.ia-left-collapsed .wf-nav-list {
 .wf-decision-card__header {
   min-width: 0;
 }
+/* C2 density floor for rail nav; tools keep readable hit targets */
 .wf-nav-item,
-.ia-layer-tab,
+.ia-layer-tab {
+  min-height: 28px;
+}
 .ia-specialized-tool-btn,
 .wf-tool-link {
   min-height: 34px;
 }
-.ia-layer-tab,
 .ia-left-nav-host .node-rail-tab {
-  min-height: 36px;
+  min-height: 28px;
 }
 .ia-right-frame,
 .ia-right-rail-host,
@@ -3644,11 +3653,13 @@ body.ia-layer-dig .ia-center-canvas {
   border: 1px solid transparent;
   cursor: pointer;
 }
+/* C2 — left-rail active parity (slate, not accent island) */
 .ia-view-shortcut.is-active,
 .ia-risk-curve-summary.is-active {
-  background: var(--wf-accent-soft);
-  border-color: rgba(103, 167, 255, 0.32);
+  background: var(--wf-panel-bg-3);
+  border-color: var(--wf-border-strong);
   color: var(--wf-text);
+  font-weight: 600;
 }
 
 .shell-shortcut-focus,
@@ -3813,6 +3824,17 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
 }
 :root[data-theme="light"] .wf-nav-item:hover {
   background: var(--wf-bg-subtle);
+  color: var(--wf-text-primary);
+  border-color: transparent;
+}
+:root[data-theme="light"] .wf-nav-item.is-active,
+:root[data-theme="light"] .ia-left-body .wf-nav-item.ia-layer-tab--active,
+:root[data-theme="light"] .ia-left-body .wf-nav-item.ia-specialized-tool-btn--active,
+:root[data-theme="light"] .ia-view-shortcut.is-active,
+:root[data-theme="light"] .ia-risk-curve-summary.is-active {
+  background: var(--wf-bg-subtle);
+  border-color: var(--wf-border-subtle);
+  color: var(--wf-text-primary);
 }
 :root[data-theme="light"] .whinfell-logo-text {
   color: var(--wf-accent-green);

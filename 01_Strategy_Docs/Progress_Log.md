@@ -1,7 +1,39 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C1 density · next C2)
+**Last updated:** July 9, 2026 (COMET C2 nav · next C3)
+
+---
+
+## July 9, 2026 — COMET CSS C2 (nav hover/active)
+
+```text
+CHUNK ID: COMET-C2
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Left-rail nav hover/active slate via --wf-*; denser items; no .wtc-* fork
+
+CONTEXT
+- Spec §5 nav items (design language only)
+- C1 density done; C2 is rail chrome only
+
+CHANGES
+- css/console_ia.css
+  · .wf-rail-section__label denser (28px · letter-spacing 0.08em · gap tokens)
+  · .wf-nav-item: radius-control · text-xxs · min-height 28 · gap padding
+  · hover → --wf-control-bg; active → --wf-panel-bg-3 + --wf-border-strong
+  · .ia-view-shortcut / .ia-risk-curve-summary.is-active slate parity
+  · light theme active/hover tokenized
+- tests/koyfin_widget_shell.test.mjs — C2 hover/active/radius + no .wtc-nav-item asserts
+
+QA
+- [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [x] committed in C2_SHA
+- [ ] browser-verify nav hover/active + icons-only codes + light theme
+
+NEXT SESSION
+- COMET C3 card chrome lock (.wf-panel*) — see BUILD_TODO handoff
+```
 
 ---
 
