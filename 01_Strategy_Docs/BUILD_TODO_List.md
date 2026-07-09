@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (COMET C7 responsive @900px shipped · COMET track complete)  
+**Last updated:** July 9, 2026 (hard-refresh RENDER FALLBACK guard fixed · uncommitted)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`4895c0f`** · C7 code **`3ecf23d`** · tree clean (noise untracked only)
+**HEAD:** `main` tip **`4895c0f`** · C7 code **`3ecf23d`** · **dirty:** `js/bootstrap.js` · `js/core.js` · `tests/refresh_render_guard.test.mjs` · `Refresh Bug.txt`
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,16 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C7)
+## NEW SESSION — start here (Jul 9 · after refresh guard)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 4895c0f · C7 3ecf23d · working tree clean
+Repo: Whinfell_Transmission_Control · main tip 4895c0f · refresh guard UNCOMMITTED
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C7 entry)
-Shipped: Koyfin PR-1…7 + COMET C0–C7 (tokens · density · nav · panel · control · chips · links/forms · responsive@900).
-Next: PR-8 light unify / live desk walk-through as needed.
+Also: Refresh Bug.txt · Progress_Log.md (refresh-guard entry)
+Shipped (uncommitted): sticky RENDER FALLBACK fix · bootstrap 30s poll · null-safe command bar · refresh_render_guard test
+Next: (1) commit refresh guard (2) build_web.sh + hard-refresh smoke (3) live desk walk-through / operator ratings
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -43,9 +43,10 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 |------|--------|
 | Branch | `main` tip **`4895c0f`** |
 | Last UI commit | `feat(ui): COMET C7 optional responsive @900px` |
-| Working tree | **Clean** (source) |
-| `dist/` | **gitignored** — always rebuild after source changes |
-| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
+| Working tree | **Dirty** — refresh guard not committed |
+| Pending paths | `js/bootstrap.js` · `js/core.js` · `tests/refresh_render_guard.test.mjs` · `Refresh Bug.txt` · TODO/Progress log |
+| `dist/` | **gitignored** — rebuild required before desk smoke |
+| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` |
 | Remote | Not pushed this session — push only if Clark asks |
 
 ### Shipped
@@ -64,20 +65,26 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C5** | Chip variants + strip height | `.console-chip--ok/warn/risk` · pipeline strip 24px · regime pills | `4dae71f` |
 | **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | `cf5c57e` |
 | **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | `3ecf23d` |
+| **Refresh guard** | Sticky FALLBACK + boot poll | `logConsoleGuard` · recover SUCCESS · 30s poll · null-safe cmd bar | **uncommitted** |
 
-**Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
+**Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK  
+**Tests at refresh guard:** `safe_boot_render` · `refresh_render_guard` — PASS (browser recovery also PASS)
 
 ### Next action for new session
 
-**→ COMET track complete · desk / light unify**
+**→ Commit refresh guard · rebuild dist · live desk walk-through**
 
-| Goal | Detail |
-|------|--------|
-| **Done** | C0–C7 COMET CSS map complete |
-| **Next** | Live desk walk-through · PR-8 light unify as needed · optional boot fix |
+| Priority | Goal | Detail |
+|----------|------|--------|
+| **1 (now)** | Commit refresh guard | `js/bootstrap.js` · `js/core.js` · `tests/refresh_render_guard.test.mjs` · `Refresh Bug.txt` · strategy docs |
+| **2** | Rebuild + smoke | `bash scripts/build_web.sh` · serve `dist/` · hard-refresh ×5 · badge = SUCCESS only |
+| **3** | Live desk walk-through | Operator ratings → `08_Deliverables/Desk_Feedback_Log.md` (go-live gate) |
+| **4 (optional)** | PR-8 light unify | `--wf-*` vs `main.css` dual system — only if walk-through needs it |
 | Out of scope | `.wtc-*` DOM · widget re-scaffold · re-open C0–C7 |
 
-**Boot fix (done):** `scan_kpi_strip.js` `childList()` via `Array.from` — no more `.some`/`.find`/`.forEach` on HTMLCollection (cockpit meta stuck).
+**Boot fixes (done):**
+- `scan_kpi_strip.js` `childList()` via `Array.from` — HTMLCollection methods
+- **Refresh guard** — sticky `RENDER FALLBACK` recovery · bootstrap poll 3s→30s · null-safe `renderCommandBar` · `?boot_log=1` → `window.__WTM_BOOT_GUARD`
 
 ### Recommended open commands
 
@@ -85,13 +92,15 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 cd ~/Desktop/Whinfell_Transmission_Control
 git status
 git log -1 --oneline
+node tests/safe_boot_render.test.mjs
+node tests/refresh_render_guard.test.mjs
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
-# hard-refresh http://127.0.0.1:8765/
-node tests/koyfin_widget_shell.test.mjs
+# hard-refresh http://127.0.0.1:8765/?boot_log=1
+# expect #js-boot-check → RENDER SUCCESS (no sticky FALLBACK)
 ```
 
-Browser checklist: dark slate · ≤900 stack nav+widgets · accent links · form radius **4** · chips · strip **24px** · cards radius **8** · 44px header · light theme · no layout thrash.
+Browser checklist: **RENDER SUCCESS** flash then hide · hydrated widgets · dark slate · ≤900 stack · no sticky FALLBACK.
 
 ---
 
@@ -341,8 +350,10 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | Boot hang fix (BasisWatch ↔ `renderAll` loop) | **Done** | BUILD |
 | `runBootSequence()` + `renderAllFallback()` + boot diagnostics | **Done** | BUILD |
 | `tests/safe_boot_render.test.mjs` | **Done** — PASS | BUILD |
+| **Hard-refresh sticky FALLBACK guard** | **Done** — uncommitted · `refresh_render_guard` PASS | BUILD |
 | Mission probes + freshness + Phase 2.3 tests | **Done** — all PASS | BUILD |
 | One-click CSV collect UI + collect agent | **Done** | BUILD |
+| Commit + rebuild dist (refresh guard) | **Next** | BUILD |
 | Live desk walk-through | **In progress** | Clark · Wes |
 | Operator ratings | **Pending · go-live gate** | → `Desk_Feedback_Log.md` |
 
@@ -379,6 +390,7 @@ cd ~/Desktop/Whinfell_Transmission_Control
 
 # Phase 2.3 console + boot + collect UI
 node tests/safe_boot_render.test.mjs
+node tests/refresh_render_guard.test.mjs
 node tests/phase23_console.test.mjs
 node tests/auto_collect_panel.test.mjs
 python3 tests/test_collect_agent.py
@@ -421,6 +433,6 @@ python3 scripts/bang_bang_da_server.py   # :8766 — keep running for UI window 
 curl -s "http://127.0.0.1:8766/api/report?window=60" | python3 -m json.tool | head
 ```
 
-**Session close:** One-click collect UI **shipped** · collect agent `0.1.0` · tests **5/5 PASS** (`auto_collect_panel` · `test_collect_agent` · `phase23_console` · `safe_boot_render` · `task_force_wtm_export`) · **Next gate** = desk ratings → commit stack → LaunchAgent → Grok live chain.
+**Session close (Jul 9 refresh guard):** sticky FALLBACK **fixed** (uncommitted) · `safe_boot_render` + `refresh_render_guard` PASS · **Next gate** = commit refresh guard → `build_web.sh` → hard-refresh smoke → live desk ratings (`Desk_Feedback_Log.md`).
 
-**Desk smoke:** `open "index.html?safe_boot=1"` · click **Collect CSVs** (agent must be on `:8767`) · `open Whinfell_Midwest_Compute_Crush.html`
+**Desk smoke:** `bash scripts/build_web.sh` · `cd dist && python3 -m http.server 8765` · hard-refresh `/?boot_log=1` · badge **RENDER SUCCESS** · optional `?safe_boot=1` · Collect CSVs needs agent `:8767`.

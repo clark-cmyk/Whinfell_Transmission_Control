@@ -1,7 +1,49 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (scan_kpi_strip HTMLCollection boot fix · COMET C7 complete)
+**Last updated:** July 9, 2026 (hard-refresh RENDER FALLBACK guard · uncommitted)
+
+---
+
+## July 9, 2026 — Hard-refresh sticky RENDER FALLBACK
+
+```text
+CHUNK ID: BOOT-refresh-guard
+PHASE: Stability
+GOAL: Healthy hard-refresh never sticky-shows RENDER FALLBACK when desk paint succeeds
+
+CONTEXT
+- Symptom: Chrome + COMET hard-refresh sometimes left #js-boot-check on RENDER FALLBACK
+  while pipeline / HY OAS / widgets looked fully hydrated
+- Not server templates — client badge path only (bootstrap.js + core.js)
+- Root causes:
+  1) Successful renderAll never cleared a prior FALLBACK badge (sticky false negative)
+  2) bootstrap confirmCoreBoot timed out at 3s during slow auto-hydrate
+  3) renderCommandBar unguarded el().prop throws → global FALLBACK for optional chrome
+
+CHANGES
+- js/bootstrap.js — 30s hard poll · soft hydrating hint · clear false BOOT_FAILED ·
+  post-boot error handlers do not overwrite healthy SUCCESS
+- js/core.js — logConsoleGuard · consoleCanRenderSuccess · __WTM_LAST_RENDER_OK ·
+  recover RENDER SUCCESS only after failed→ok paint · null-safe command bar ·
+  boot end SUCCESS only if last paint ok · hydrateFromBundle uses renderAll boolean
+- tests/refresh_render_guard.test.mjs — FALLBACK → SUCCESS recovery regression
+- Refresh Bug.txt — full diagnosis + micro-chunk record
+
+QA
+- [x] safe_boot_render PASS
+- [x] refresh_render_guard PASS
+- [x] browser: slow hydrate (4.5s) ends RENDER SUCCESS · forced FALLBACK recovers
+- [ ] committed
+- [ ] build_web.sh → dist hard-refresh smoke ×5
+- [ ] COMET hard-refresh smoke
+
+NEXT SESSION
+1. Commit refresh guard (+ strategy doc updates)
+2. build_web.sh · serve dist · hard-refresh badge check
+3. Live desk walk-through / operator ratings (go-live)
+4. Optional: PR-8 light unify
+```
 
 ---
 
@@ -26,7 +68,7 @@ QA
 - [ ] browser hard-refresh · cockpit meta paints
 
 NEXT SESSION
-- live desk / PR-8 light unify
+- superseded by BOOT-refresh-guard (commit + desk smoke)
 ```
 
 ---

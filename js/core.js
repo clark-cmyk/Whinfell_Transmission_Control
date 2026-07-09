@@ -172,7 +172,47 @@ function signalBootCheck(message, isError) {
     check.textContent = message;
     check.style.color = isError ? '#f56565' : 'lime';
     check.classList.toggle('boot-check--error', !!isError);
+    if (!isError && message === 'RENDER SUCCESS') {
+      check.classList.remove('boot-check--error');
+      check.classList.add('boot-check--ok');
+      check.classList.remove('boot-check--hidden');
+    }
   }
+}
+
+/**
+ * Success vs fallback gate inputs — logged on every full paint decision.
+ * Fallback is for genuine paint failure only (not missing optional widgets).
+ */
+function logConsoleGuard(reason, extra) {
+  if (typeof window !== 'undefined') {
+    window.__WTM_BOOT_GUARD = {
+      at: new Date().toISOString(),
+      reason: reason || 'unknown',
+      safeBoot: SAFE_BOOT,
+      coreReady: !!window.__WTM_CORE_READY,
+      bootComplete: !!window.__WTM_BOOT_COMPLETE,
+      bootFailed: !!window.__WTM_BOOT_FAILED,
+      lastRenderOk: window.__WTM_LAST_RENDER_OK,
+      pipelineImported: !!(appState?.provenance?.hydratedAt || appState?.hydration?.node_cockpits),
+      hasNodeCockpits: !!appState?.hydration?.node_cockpits,
+      protocol: typeof location !== 'undefined' ? location.protocol : '?',
+      ...(extra || {}),
+    };
+  }
+  if (WTM_BOOT_VERBOSE || reason === 'fallback' || reason === 'error') {
+    bootLog(reason === 'fallback' || reason === 'error' ? 'warn' : 'info', 'console_guard', window.__WTM_BOOT_GUARD);
+  }
+}
+
+/** True when a full success shell paint is allowed (data optional; throw path uses fallback). */
+function consoleCanRenderSuccess(state) {
+  // Required shell anchors — if these are gone, fall back instead of throwing mid-paint.
+  if (typeof document === 'undefined') return false;
+  if (!document.getElementById('commandBar') && !document.getElementById('headerRegimeLine')) return false;
+  // Pipeline/hydration are soft: missing data paints empty cockpit, not global FALLBACK.
+  void state;
+  return true;
 }
 
 /** Yield to browser paint/input between heavy desk panels (Phase 2.3). */
@@ -2874,12 +2914,10 @@ function hydrateFromBundle(bundle, options = {}) {
     if (bundle[key]) appState.hydration[key] = bundle[key];
   }
 
-  try {
-    renderAll();
-  } catch (renderErr) {
-    bootLog('error', 'hydrateFromBundle renderAll failed', renderErr);
-    signalBootCheck('HYDRATE RENDER FALLBACK', true);
-    renderAllFallback(renderErr);
+  const paintOk = renderAll();
+  if (!paintOk) {
+    bootLog('error', 'hydrateFromBundle renderAll failed — kept FALLBACK until next healthy paint');
+    logConsoleGuard('hydrate_fallback', { snapshot: bundle?.snapshot_id || null });
   }
   markDirty();
   const label = isHydration ? 'Parquet hydration' : (isPipeline ? 'Pipeline bundle' : 'Hydration');
@@ -4373,7 +4411,9 @@ function renderCommandBar(state, gate) {
   const freshStatus = kpiCtx.freshStatus;
 
   const cmdBar = el('commandBar');
-  cmdBar.className = `shrink-0 border-b border-wtm-border bg-wtm-surface transition-all px-4 py-2 ${metrics.gateGlow || gate.glow}`;
+  if (cmdBar) {
+    cmdBar.className = `shrink-0 border-b border-wtm-border bg-wtm-surface transition-all px-4 py-2 ${metrics.gateGlow || gate.glow}`;
+  }
 
   const scoreCard = el('scoreCard');
   if (scoreCard) {
@@ -4383,26 +4423,29 @@ function renderCommandBar(state, gate) {
   }
 
   if (typeof WTM_ScanKpiStrip !== 'undefined') {
-    WTM_ScanKpiStrip.renderStrip(kpiCtx);
+    try { WTM_ScanKpiStrip.renderStrip(kpiCtx); } catch (e) { bootLog('warn', 'ScanKpiStrip skipped', e); }
   }
 
   if (typeof WTM_TransmissionRadar !== 'undefined') {
-    WTM_TransmissionRadar.render(kpiCtx);
+    try { WTM_TransmissionRadar.render(kpiCtx); } catch (e) { bootLog('warn', 'TransmissionRadar skipped', e); }
   }
 
   if (typeof WTM_CommandBarKpis !== 'undefined') {
-    WTM_CommandBarKpis.renderAll(kpiCtx, el);
+    try { WTM_CommandBarKpis.renderAll(kpiCtx, el); } catch (e) { bootLog('warn', 'CommandBarKpis skipped', e); }
   }
 
   const tx = metrics.txState;
-  el('cmdTxState').textContent = tx && TX_META[tx] ? TX_META[tx].label : (tx || '—');
-  el('cmdRegime').textContent = metrics.regime ? `Regime: ${metrics.regime}` : '—';
+  const cmdTx = el('cmdTxState');
+  if (cmdTx) cmdTx.textContent = tx && TX_META[tx] ? TX_META[tx].label : (tx || '—');
+  const cmdRegime = el('cmdRegime');
+  if (cmdRegime) cmdRegime.textContent = metrics.regime ? `Regime: ${metrics.regime}` : '—';
 
-  el('cmdGateSub').textContent = metrics.gateSub || gate.bannerSub || '—';
-  paintGate(state, gate);
+  const cmdGateSub = el('cmdGateSub');
+  if (cmdGateSub) cmdGateSub.textContent = metrics.gateSub || gate.bannerSub || '—';
+  try { paintGate(state, gate); } catch (e) { bootLog('warn', 'paintGate skipped', e); }
 
   const dot = el('cmdFreshnessDot');
-  dot.className = freshnessDotCls(freshStatus);
+  if (dot) dot.className = freshnessDotCls(freshStatus);
   const headerDot = el('headerFreshnessDot');
   if (headerDot) headerDot.className = freshnessDotCls(freshStatus);
   const headerFresh = el('headerFreshnessLabel');
@@ -4440,23 +4483,23 @@ function renderCommandBar(state, gate) {
 
   const badge = el('cmdHydrationBadge');
   const freshCluster = el('cmdFreshnessCluster');
-  if (prov.hydratedAt && metrics.source === 'pipeline') {
+  if (badge && prov.hydratedAt && metrics.source === 'pipeline') {
     badge.textContent = 'Pipeline';
     badge.className = 'text-[7px] font-bold uppercase px-1 py-0.5 rounded border cmd-authority-pipeline';
     badge.classList.remove('hidden');
     freshCluster?.classList.remove('border-wtm-accent/30', 'border-wtm-amber/30');
-  } else if (prov.hydratedAt && metrics.source === 'override') {
+  } else if (badge && prov.hydratedAt && metrics.source === 'override') {
     badge.textContent = 'Override';
     badge.className = 'text-[7px] font-bold uppercase px-1 py-0.5 rounded border cmd-authority-override';
     badge.classList.remove('hidden');
     freshCluster?.classList.remove('border-wtm-accent/30');
     freshCluster?.classList.add('border-wtm-amber/30');
-  } else {
+  } else if (badge) {
     badge.classList.add('hidden');
     freshCluster?.classList.remove('border-wtm-accent/30', 'border-wtm-amber/30');
   }
 
-  renderLadderCommandClusters(state);
+  try { renderLadderCommandClusters(state); } catch (e) { bootLog('warn', 'ladder clusters skipped', e); }
 }
 
 function renderOperatorPanel(state, gate) {
@@ -6626,6 +6669,8 @@ let _renderDepth = 0;
 /** Minimal desk paint when full renderAll throws (safe_boot / hydration import recovery). */
 function renderAllFallback(err) {
   bootLog('warn', 'renderAllFallback', err?.message || err);
+  if (typeof window !== 'undefined') window.__WTM_LAST_RENDER_OK = false;
+  logConsoleGuard('fallback', { err: err?.message || String(err || '') });
   let state;
   let gate;
   try {
@@ -6743,18 +6788,32 @@ function renderAllCore() {
 function renderAll() {
   if (_renderDepth > 3) {
     bootLog('warn', 'renderAll recursion capped');
-    return;
+    return false;
   }
   _renderDepth += 1;
   const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
   try {
+    if (!consoleCanRenderSuccess()) {
+      throw new Error('console shell anchors missing (#commandBar / #headerRegimeLine)');
+    }
     renderAllCore();
     const elapsed = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
     bootLog('debug', `renderAll ok ${elapsed.toFixed(1)}ms`);
+    const prevOk = typeof window !== 'undefined' ? window.__WTM_LAST_RENDER_OK : true;
+    if (typeof window !== 'undefined') window.__WTM_LAST_RENDER_OK = true;
+    logConsoleGuard('success', { elapsedMs: Math.round(elapsed) });
+    // Clear sticky FALLBACK only when recovering from a failed paint (not every keystroke re-render).
+    if (typeof window !== 'undefined' && window.__WTM_BOOT_COMPLETE && prevOk === false) {
+      signalBootCheck('RENDER SUCCESS');
+    }
+    return true;
   } catch (err) {
     console.error('[WTM] renderAll failed', err);
+    if (typeof window !== 'undefined') window.__WTM_LAST_RENDER_OK = false;
+    logConsoleGuard('error', { err: err.message || String(err) });
     signalBootCheck('RENDER ERROR: ' + (err.message || String(err)), true);
     renderAllFallback(err);
+    return false;
   } finally {
     _renderDepth -= 1;
   }
@@ -7115,7 +7174,8 @@ async function runBootSequence() {
     }
 
     bootLog('info', `phase=render hydrated=${hydrated}`);
-    renderAll();
+    const paintOk = renderAll();
+    logConsoleGuard(paintOk ? 'boot_render_ok' : 'boot_render_fallback', { hydrated });
 
     if (location.protocol !== 'file:') {
       try { await loadWebPublishStamp(); } catch (_) { /* non-fatal */ }
@@ -7126,7 +7186,16 @@ async function runBootSequence() {
 
     window.__WTM_BOOTED = true;
     window.__WTM_BOOT_COMPLETE = true;
-    signalBootCheck('RENDER SUCCESS');
+    // Clear any premature bootstrap timeout flag once core finishes.
+    window.__WTM_BOOT_FAILED = false;
+    // Only claim SUCCESS when last full paint succeeded. Sticky FALLBACK with a
+    // healthy desk was the hard-refresh mis-render; recovery happens on next ok paint.
+    if (paintOk || window.__WTM_LAST_RENDER_OK) {
+      signalBootCheck('RENDER SUCCESS');
+    } else {
+      signalBootCheck('RENDER FALLBACK', true);
+      bootLog('warn', 'boot complete with FALLBACK — full paint failed; UI may be partial');
+    }
     bootLog('info', 'boot complete');
 
     // Post-boot prompts + secondary lists after first paint (dialog stays responsive).
@@ -7265,6 +7334,8 @@ window.__testExports = {
   renderAllFallback,
   runBootSequence,
   bootLog,
+  logConsoleGuard,
+  consoleCanRenderSuccess,
   yieldToMain,
   scheduleDeferredWork,
   scheduleHeavyPanelRefresh,

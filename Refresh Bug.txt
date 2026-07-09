@@ -1,0 +1,198 @@
+# Task: Fix Whinfell Transmission Control refresh bug (fallback vs success render)
+
+**Status: FIXED (2026-07-09)**  
+**Scope:** Client boot badge + render guard only. No COMET chrome/layout changes.
+
+---
+
+## 0. Executive diagnosis (what was actually wrong)
+
+This is **not** a server-side Flask/Jinja success-vs-fallback template switch.
+
+The badge `#js-boot-check` is driven entirely by client JS:
+
+| Signal | Source |
+|--------|--------|
+| `RENDER SUCCESS` | `runBootSequence()` end · bootstrap poll · recovery after healthy `renderAll` |
+| `RENDER FALLBACK` | `renderAllFallback()` after a full `renderAllCore()` throw |
+| `BOOT TIMEOUT` | bootstrap poll (was only **3s**) |
+
+### Root causes (stack)
+
+1. **Sticky FALLBACK (primary UX bug)**  
+   After any intermediate `renderAll` failure, the badge stayed on `RENDER FALLBACK` even when a later full paint succeeded. Healthy widgets remained visible (from the last good paint / partial paint), so the desk looked fully hydrated while the top badge lied.
+
+2. **Bootstrap poll too short (secondary race)**  
+   `js/bootstrap.js` only waited `60 × 50ms = 3s` then set `BOOT TIMEOUT` + `__WTM_BOOT_FAILED`. Auto-hydrate of `data/hydration/latest.json` (~186KB) on cold hard-refresh can exceed 3s (Chrome + COMET). Core could still finish successfully afterward, but the race left false-failed flags and noisy mid-boot state.
+
+3. **Unguarded DOM in `renderCommandBar`**  
+   `el('commandBar').className`, `el('cmdFreshnessDot').className`, `el('cmdHydrationBadge').textContent`, etc. threw if a node was briefly missing (shell relocate / incomplete mount). That routed into global FALLBACK even when the rest of the desk was fine.
+
+4. **Environment-agnostic**  
+   Same JS path in Chrome and COMET — not User-Agent gated. No environment-specific fix needed.
+
+### Policy (target design)
+
+| Condition | Shell |
+|-----------|--------|
+| Full `renderAllCore()` completes without throw | **SUCCESS** |
+| Full paint throws → partial `renderAllFallback` | **FALLBACK** (honest degraded) |
+| Pipeline / hydration missing | **Still SUCCESS** (empty/pending widgets — not global FALLBACK) |
+| Optional widget failure (BasisWatch, radar, KPIs) | Local skip + warn — **not** global FALLBACK |
+| Next healthy `renderAll` after FALLBACK | **Recover SUCCESS** |
+
+---
+
+## 1. Chunk A — Guard design (implemented)
+
+### Must be true for SUCCESS
+- Shell anchors present: `#commandBar` **or** `#headerRegimeLine` (`consoleCanRenderSuccess()`).
+- Last full `renderAllCore()` did not throw (`window.__WTM_LAST_RENDER_OK === true`).
+- Boot sequence finished without uncaught exception (`__WTM_BOOT_COMPLETE`).
+
+### Triggers FALLBACK
+- Uncaught throw inside `renderAllCore` / shell-anchor failure.
+- Boot sequence catch path → `renderAllFallback`.
+
+### Explicitly does **not** gate SUCCESS
+- Pipeline freshness / import (soft — widgets show pending).
+- Dictionary badge (static meta OK).
+- User-Agent / COMET vs Chrome.
+- Safe boot flag (safe boot still SUCCESS without hydrate).
+
+---
+
+## 2. Chunk B — Instrumentation (implemented)
+
+### Files
+- `js/core.js` → `logConsoleGuard(reason, extra)`
+- Snapshot on `window.__WTM_BOOT_GUARD`
+
+### Shape
+```js
+window.__WTM_BOOT_GUARD = {
+  at: ISO-8601,
+  reason: 'success' | 'fallback' | 'error' | 'boot_render_ok' | 'boot_render_fallback' | 'hydrate_fallback',
+  safeBoot, coreReady, bootComplete, bootFailed, lastRenderOk,
+  pipelineImported, hasNodeCockpits, protocol,
+  // optional: elapsedMs, err, hydrated, snapshot
+};
+```
+
+### How to read
+1. Open `http://localhost:8765/?boot_log=1`
+2. Hard-refresh (Cmd+Shift+R)
+3. Console: `[WTM boot] console_guard …`
+4. Or evaluate: `copy(window.__WTM_BOOT_GUARD)`
+
+Verbose success logs only when `boot_log=1` / safe_boot; fallback/error always warn.
+
+---
+
+## 3. Chunk C — Guard / condition fix (implemented)
+
+### `js/bootstrap.js`
+- Soft wait ~6s (`BOOT: hydrating…`), hard timeout ~30s (+ extra if core ready).
+- Do **not** permanently fail at 3s while core is still loading hydrate.
+- On `__WTM_BOOT_COMPLETE`, clear false `__WTM_BOOT_FAILED`.
+- Global `error` / `unhandledrejection` no longer overwrite badge after healthy boot.
+
+### `js/core.js`
+- `consoleCanRenderSuccess()` — shell-anchor check only.
+- `renderAll()` returns `boolean`; tracks `__WTM_LAST_RENDER_OK`.
+- On success after a prior failure (`prevOk === false`), re-signal `RENDER SUCCESS` (clears sticky FALLBACK).
+- Boot end: SUCCESS only if last paint ok; else keep FALLBACK honestly.
+- Clear `__WTM_BOOT_FAILED` when boot completes.
+- `hydrateFromBundle` uses `renderAll()` return instead of dead try/catch (renderAll no longer rethrows).
+
+### Null-safe command bar
+- Guard `commandBar`, cmd text nodes, freshness dot, hydration badge.
+- Optional widgets (scan strip, radar, command KPIs, ladder clusters) wrapped in try/catch so they cannot flip the whole shell to FALLBACK.
+
+---
+
+## 4. Chunk D — Defensive improvements
+
+| Improvement | Why |
+|-------------|-----|
+| Sticky FALLBACK recovery | Healthy desk must not keep a red false badge |
+| Longer bootstrap poll | Hydrate >3s is normal on hard refresh |
+| Soft widget failures | Global FALLBACK reserved for shell paint failure |
+| Guard snapshot | Diff Chrome vs COMET without guessing |
+| No SUCCESS thrash on every keystroke | Only recover when `prevOk === false` |
+
+**Not changed (by design):** COMET C3/C4/C7 CSS, pipeline freshness gates, dictionary lock semantics.
+
+---
+
+## 5. Chunk E — How to test
+
+### Automated
+```bash
+node tests/safe_boot_render.test.mjs
+node tests/refresh_render_guard.test.mjs
+```
+Expect both `PASS`. The new test:
+1. Boots with `safe_boot=1`
+2. Forces `renderAllFallback` → `RENDER FALLBACK`
+3. Calls healthy `renderAll()` → must recover `RENDER SUCCESS`
+4. Asserts guard snapshot + no thrash on repeat paint
+
+### Chrome (manual)
+```bash
+# from repo root (or dist after build_web.sh)
+python3 -m http.server 8765
+open "http://localhost:8765/?boot_log=1"
+```
+1. Hard refresh 5× (Cmd+Shift+R).
+2. Badge should flash **RENDER SUCCESS** (green) then hide — **never** sticky **RENDER FALLBACK** when widgets are hydrated.
+3. Optional slow-network: DevTools → Network throttle; still end on SUCCESS after hydrate.
+
+### COMET
+Same URL with `?boot_log=1`. Confirm:
+- No sticky FALLBACK with full HY OAS / flipchart / ladders.
+- `window.__WTM_BOOT_GUARD.reason` is `success` or `boot_render_ok` after settle.
+- `window.__WTM_LAST_RENDER_OK === true`.
+
+### Regression smoke
+```bash
+node tests/safe_boot_render.test.mjs
+node tests/refresh_render_guard.test.mjs
+# optional after rebuild:
+# bash scripts/build_web.sh
+```
+
+---
+
+## 6. Files touched
+
+| File | Change |
+|------|--------|
+| `js/bootstrap.js` | Longer poll, softer timeout, no post-boot error overwrite |
+| `js/core.js` | Guard log, success recovery, null-safe command bar, boot end honesty |
+| `tests/refresh_render_guard.test.mjs` | **New** regression for sticky FALLBACK |
+| `Refresh Bug.txt` | This diagnosis + fix record |
+
+`docs/` and `dist/` copies are rebuild artifacts — run `bash scripts/build_web.sh` (or your usual publish path) before shipping Pages.
+
+---
+
+## 7. Micro-chunk apply order (if re-applying by hand)
+
+1. **bootstrap.js** — poll constants + confirmCoreBoot loop + error handlers  
+2. **core.js** — `logConsoleGuard` + `consoleCanRenderSuccess` next to `signalBootCheck`  
+3. **core.js** — `renderAll` / `renderAllFallback` / boot end SUCCESS policy  
+4. **core.js** — null-safe `renderCommandBar`  
+5. **tests/refresh_render_guard.test.mjs** — add + run  
+
+Each step is independently reviewable; step 3 is the user-visible fix.
+
+---
+
+## 8. Original task notes (preserved summary)
+
+Symptom: hard refresh sometimes showed `RENDER FALLBACK` while pipeline, HY OAS, and widgets looked fully healthy (Chrome + COMET).
+
+Constraint: do not change COMET chrome/layout for this fix.
+
+Deliverable: diagnosis + instrumentation + guard fix + tests — **done**.
