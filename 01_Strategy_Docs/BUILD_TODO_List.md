@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C7 responsive @900px shipped · COMET track complete)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip TBD after C7 commit · C7 code pending · tree dirty until commit
+**HEAD:** `main` tip **`3ecf23d`** · C7 code **`3ecf23d`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main · COMET C0–C7 complete · working tree clean after C7 commit
+Repo: Whinfell_Transmission_Control · main tip 3ecf23d · C7 3ecf23d · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C7 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C7 (tokens · density · nav · panel · control · chips · links/forms · responsive@900).
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` |
+| Branch | `main` tip **`3ecf23d`** |
 | Last UI commit | `feat(ui): COMET C7 optional responsive @900px` |
-| Working tree | **Clean** after C7 commit |
+| Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -63,7 +63,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | `a770a19` |
 | **C5** | Chip variants + strip height | `.console-chip--ok/warn/risk` · pipeline strip 24px · regime pills | `4dae71f` |
 | **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | `cf5c57e` |
-| **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | TBD |
+| **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | `3ecf23d` |
 
 **Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 

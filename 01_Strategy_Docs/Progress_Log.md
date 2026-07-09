@@ -30,8 +30,8 @@ CHANGES
 
 QA
 - [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
-- [x] build_web.sh OK (pending this session)
-- [ ] committed
+- [x] build_web.sh OK
+- [x] committed in 3ecf23d
 - [ ] browser-verify ≤900 stack · wrap nav · 1-col widgets · 1440 unchanged
 
 NEXT SESSION
