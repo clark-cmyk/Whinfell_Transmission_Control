@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C3 card chrome shipped · next C4)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`1e431df`** · C3 code **`1e431df`** · tree clean (noise untracked only)
+**HEAD:** `main` tip **`a2ec02f`** · C3 code **`1e431df`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 1e431df · C3 1e431df · working tree clean
+Repo: Whinfell_Transmission_Control · main tip a2ec02f · C3 1e431df · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C3 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C3 (tokens · density · nav · panel chrome).
@@ -41,7 +41,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`1e431df`** |
+| Branch | `main` tip **`a2ec02f`** |
 | Last UI commit | `feat(ui): COMET C3 widget card chrome lock` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
