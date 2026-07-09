@@ -55,6 +55,8 @@ function loadDeskOpsWithBasisWatch() {
           ok: true,
           json: async () => ({
             as_of: '2026-07-08T12:00:00Z',
+            snapshot_id: 'global-2026-07-08-test-01',
+            freshness_status: 'fresh',
             crypto_sleeve: { assets: { btc_spot_usd: { last_price: 101000 } } },
           }),
         };
@@ -114,9 +116,12 @@ async function run() {
   assert(resolved.basisWatch.asset === 'BTC', 'standalone asset preserved');
 
   const hydrationOk = await ops.refreshHydration();
-  assert(hydrationOk, 'refreshHydration via reloadHydration');
+  assert(hydrationOk && hydrationOk.ok, 'refreshHydration via reloadHydration');
   assert(getReloadHydrationState() === standaloneState, 'reloadHydration received standalone state');
   assert(standaloneState.hydration.crypto_sleeve.assets.btc_spot_usd.last_price === 101000, 'hydration merged');
+  assert(hydrationOk.snapshot_id === 'global-2026-07-08-test-01', 'stamp snapshot_id from BW merge');
+  assert(hydrationOk.as_of === '2026-07-08T12:00:00Z', 'stamp as_of from BW merge');
+  assert(standaloneState.provenance?.snapshotId === 'global-2026-07-08-test-01', 'provenance.snapshotId stamped');
 
   const curveOk = await ops.refreshBasisWatch();
   assert(curveOk, 'refreshBasisWatch');
@@ -127,6 +132,22 @@ async function run() {
   assert(full.ok, 'refreshAllDeskData ok on standalone');
   assert(full.results.hydration, 'hydration result');
   assert(full.results.curve, 'curve result');
+  assert(full.results.snapshot_id === 'global-2026-07-08-test-01', 'full refresh carries snapshot_id');
+
+  // Main desk: when deploy hydrate exists, it runs first and fills stamp (no BW short-circuit).
+  let deployCalls = 0;
+  sandbox.WTM_reloadDeployHydration = async () => {
+    deployCalls += 1;
+    return {
+      ok: true,
+      as_of: '2026-07-09T14:37:30+00:00',
+      snapshot_id: 'global-2026-07-09-raw2wtm-01',
+      freshness_status: 'fresh',
+    };
+  };
+  const mainStamp = await ops.refreshHydration();
+  assert(deployCalls === 1, 'deploy hydrate preferred when present');
+  assert(mainStamp.ok && mainStamp.snapshot_id === 'global-2026-07-09-raw2wtm-01', 'main desk stamp from deploy');
 
   console.log([
     'PASS desk_data_ops_standalone.test.mjs',
@@ -134,6 +155,7 @@ async function run() {
     `bw_build=${sandbox.WTM_BasisWatch.BW_BUILD}`,
     `spot=${standaloneState.hydration.crypto_sleeve.assets.btc_spot_usd.last_price}`,
     `model_asset=${standaloneState._basisWatchModel?.assetKey}`,
+    `deploy_calls=${deployCalls}`,
   ].join('\n'));
 }
 

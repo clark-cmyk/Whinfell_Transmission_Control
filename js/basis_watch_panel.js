@@ -86,23 +86,36 @@
   }
 
   function mergeHydrationBundle(state, bundle) {
-    if (!state || !bundle) return false;
+    if (!state || !bundle) {
+      return { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+    }
     state.hydration = {
       ...state.hydration,
       crypto_sleeve: bundle.crypto_sleeve,
       global: bundle.global,
       execution: bundle.execution,
       as_of: bundle.as_of,
+      snapshot_id: bundle.snapshot_id,
+      freshness_status: bundle.freshness_status,
       node_cockpits: bundle.node_cockpits,
+      task_force: bundle.task_force,
       task_force_panels: bundle.task_force_panels
         || global.WTM_TaskForceFeed?.extractTaskForcePanels?.(bundle.task_force),
+      rv_history: bundle.rv_history,
     };
     state.provenance = {
       ...state.provenance,
       dataAsOf: bundle.as_of,
+      snapshotId: bundle.snapshot_id || state.provenance?.snapshotId || null,
+      freshnessStatus: bundle.freshness_status || state.provenance?.freshnessStatus || null,
       hydratedAt: new Date().toISOString(),
     };
-    return true;
+    return {
+      ok: true,
+      as_of: bundle.as_of || null,
+      snapshot_id: bundle.snapshot_id || null,
+      freshness_status: bundle.freshness_status || null,
+    };
   }
 
   function yieldToMain() {
@@ -331,9 +344,13 @@
 
     let dataNote = '';
     if (curveQuoteDate && hydrationDate && gap != null && gap > 1) {
-      dataNote = `Futures ${curveQuoteDate} · desk spot ${hydrationDate} (${gap}d skew) · basis spot from Barchart ${basisSpotSeriesId(assetKey)}`;
+      dataNote = `Hydration ${hydrationDate} · Futures quote ${curveQuoteDate} (${gap}d skew) · basis from Barchart ${basisSpotSeriesId(assetKey)}`;
+    } else if (curveQuoteDate && hydrationDate) {
+      dataNote = `Hydration ${hydrationDate} · Futures quote ${curveQuoteDate} · ${spotSource === 'koyfin_desk' ? 'Koyfin' : 'Barchart'} spot`;
+    } else if (hydrationDate) {
+      dataNote = `Hydration ${hydrationDate} · futures curve pending`;
     } else if (curveQuoteDate) {
-      dataNote = `Curve ${curveQuoteDate} · ${spotSource === 'koyfin_desk' ? 'Koyfin' : 'Barchart'} spot`;
+      dataNote = `Futures quote ${curveQuoteDate} · ${spotSource === 'koyfin_desk' ? 'Koyfin' : 'Barchart'} spot`;
     }
 
     return {
@@ -531,18 +548,21 @@
 
   async function reloadHydration(state) {
     const target = state || getState();
-    if (location.protocol === 'file:') return false;
+    if (location.protocol === 'file:') {
+      return { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+    }
     const bundle = await loadHydrationBundle();
-    if (!bundle) return false;
+    if (!bundle) {
+      return { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+    }
     return mergeHydrationBundle(target, bundle);
   }
 
   async function reloadCurve(state, hooks) {
     const target = state || getState();
     invalidateCurveCache();
-    if (isStandalone()) {
-      await reloadHydration(target);
-    }
+    // Always re-merge hydration (embedded + standalone) so as_of/snapshot stay current.
+    await reloadHydration(target);
     target.basisWatch = target.basisWatch || {};
     target.basisWatch.mode = 'live';
     return refresh(target, hooks || {});
@@ -786,7 +806,10 @@
       spotDesk: koyfinSpot,
       spotSource: valuation.spotSource,
       spotChg: Number.isFinite(spotChg) ? spotChg : null,
+      // Valuation asOf stays curve-quote-first for DTE math; chrome shows hydration stamp separately.
       asOf: valuation.curveQuoteDate || state.hydration?.as_of || state.provenance?.dataAsOf,
+      hydrationAsOf: state.hydration?.as_of || state.provenance?.dataAsOf || valuation.hydrationDate || null,
+      snapshotId: state.hydration?.snapshot_id || state.provenance?.snapshotId || null,
       curveQuoteDate: valuation.curveQuoteDate,
       hydrationDate: valuation.hydrationDate,
       quoteGapDays: valuation.gap,
@@ -1408,7 +1431,23 @@
     }
 
     const note = el('bwDataNote');
-    if (note) note.textContent = model.dataNote || (model.contracts.length ? `As of ${String(model.asOf).slice(0, 19)}` : '');
+    if (note) {
+      if (model.dataNote) {
+        note.textContent = model.dataNote;
+      } else if (model.contracts.length) {
+        const hyd = model.hydrationAsOf || model.hydrationDate;
+        const fut = model.curveQuoteDate || model.asOf;
+        if (hyd && fut && String(hyd).slice(0, 10) !== String(fut).slice(0, 10)) {
+          note.textContent = `Hydration ${String(hyd).slice(0, 10)} · Futures quote ${String(fut).slice(0, 10)}`;
+        } else if (hyd) {
+          note.textContent = `Hydration ${String(hyd).slice(0, 19)}`;
+        } else {
+          note.textContent = `As of ${String(model.asOf).slice(0, 19)}`;
+        }
+      } else {
+        note.textContent = '';
+      }
+    }
 
     const shapeBadge = el('bwShapeBadge');
     if (shapeBadge && standalone) {

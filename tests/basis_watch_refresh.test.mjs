@@ -62,32 +62,54 @@ async function run() {
   await bw.ensureCurveHistory();
   const state = { basisWatch: { mode: 'live', view: 'basis', asset: 'BTC' }, hydration: { crypto_sleeve: { btc_spot_usd: { last_price: 100000 } } } };
 
-  let fetchCount = 0;
-  const { sandbox: sb2 } = loadBasisWatch(async () => {
-    fetchCount += 1;
-    return {
-      ok: true,
-      json: async () => ({
-        records: [{ raw_symbol: 'BTM26', latest: { close: 102000, date: '2026-07-01' } }],
-      }),
-    };
+  let curveFetchCount = 0;
+  let hydrationFetchCount = 0;
+  const { sandbox: sb2 } = loadBasisWatch(async (url) => {
+    const path = String(url);
+    if (path.includes('barchart_curve_history')) {
+      curveFetchCount += 1;
+      return {
+        ok: true,
+        json: async () => ({
+          records: [{ raw_symbol: 'BTM26', latest: { close: 102000, date: '2026-07-01' }, contract_meta: { contract_root: 'BT' } }],
+        }),
+      };
+    }
+    if (path.includes('latest.json')) {
+      hydrationFetchCount += 1;
+      return {
+        ok: true,
+        json: async () => ({
+          as_of: '2026-07-09T14:37:30+00:00',
+          snapshot_id: 'global-2026-07-09-raw2wtm-01',
+          freshness_status: 'fresh',
+          crypto_sleeve: { assets: { btc_spot_usd: { last_price: 100000 } } },
+        }),
+      };
+    }
+    return { ok: false, json: async () => ({}) };
   });
   const bw2 = sb2.WTM_BasisWatch;
   await bw2.ensureCurveHistory();
-  assert(fetchCount === 1, 'initial fetch');
+  assert(curveFetchCount === 1, 'initial curve fetch');
   await bw2.ensureCurveHistory();
-  assert(fetchCount === 1, 'cached — no second fetch');
+  assert(curveFetchCount === 1, 'cached — no second curve fetch');
 
   bw2.invalidateCurveCache();
-  await bw2.reloadCurve({ basisWatch: { mode: 'live' }, hydration: { crypto_sleeve: { btc_spot_usd: { last_price: 100000 } } } }, {});
-  assert(fetchCount === 2, 'reloadCurve refetches after invalidate');
+  await bw2.reloadCurve({
+    basisWatch: { mode: 'live' },
+    hydration: { crypto_sleeve: { assets: { btc_spot_usd: { last_price: 100000 } } } },
+  }, {});
+  assert(curveFetchCount === 2, 'reloadCurve refetches curve after invalidate');
+  assert(hydrationFetchCount >= 1, 'reloadCurve also reloads hydration');
 
   const model = state._basisWatchModel || bw.buildModel(state, { records: [{ raw_symbol: 'BTM26', latest: { close: 102000 } }] });
   assert(model.contracts.length >= 0, 'buildModel ok');
 
   console.log([
     'PASS basis_watch_refresh.test.mjs',
-    `fetchCount=${fetchCount}`,
+    `curveFetchCount=${curveFetchCount}`,
+    `hydrationFetchCount=${hydrationFetchCount}`,
     `invalidate=${typeof bw.invalidateCurveCache}`,
     `reloadCurve=${typeof bw.reloadCurve}`,
   ].join('\n'));

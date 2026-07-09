@@ -2959,6 +2959,12 @@ async function reloadDeployHydration(options = {}) {
     const ok = hydrateFromBundle(bundle, { force: options.force !== false });
     if (ok) {
       try { sessionStorage.setItem('whinfell_hydration_prompt_v1', '1'); } catch (_) { /* ignore */ }
+      // Drop cached curve so post-hydrate paint cannot stick on empty/stale records.
+      try {
+        if (typeof WTM_BasisWatch !== 'undefined' && typeof WTM_BasisWatch.invalidateCurveCache === 'function') {
+          WTM_BasisWatch.invalidateCurveCache();
+        }
+      } catch (_) { /* optional */ }
       scheduleHeavyPanelRefresh();
     }
     if (detail) {

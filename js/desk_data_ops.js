@@ -4,7 +4,7 @@
 (function deskDataOps(global) {
   'use strict';
 
-  const BUILD = '1.1-DESK-OPS-2026-07-08';
+  const BUILD = '1.2-DESK-OPS-FULL-HYDRATE-2026-07-09';
   const REFRESH_BTN_ID = 'btnDeskRefresh';
   const COLLECT_BTN_ID = 'btnMorningCollect';
 
@@ -59,33 +59,59 @@
     return false;
   }
 
+  function normalizeStamp(out) {
+    if (out && typeof out === 'object' && ('ok' in out || 'as_of' in out || 'snapshot_id' in out)) {
+      return {
+        ok: !!out.ok,
+        as_of: out.as_of || null,
+        snapshot_id: out.snapshot_id || null,
+        freshness_status: out.freshness_status || null,
+      };
+    }
+    return { ok: !!out, as_of: null, snapshot_id: null, freshness_status: null };
+  }
+
   async function refreshHydration() {
     /** @type {{ ok: boolean, as_of?: string|null, snapshot_id?: string|null, freshness_status?: string|null }} */
-    const stamp = { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+    let stamp = { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+
+    // Main desk: full deploy hydrate first so cockpits + toast stamps match latest.json.
+    // (BasisWatch partial merge alone used to short-circuit and skip this path.)
+    if (typeof global.WTM_reloadDeployHydration === 'function') {
+      try {
+        const out = await global.WTM_reloadDeployHydration({ force: true, detail: true });
+        stamp = normalizeStamp(out);
+        if (stamp.ok) {
+          // Keep embedded/standalone BW state warm without replacing stamp authority.
+          if (typeof global.WTM_BasisWatch?.reloadHydration === 'function') {
+            try {
+              const bwOut = await global.WTM_BasisWatch.reloadHydration(resolveDeskState());
+              const bwStamp = normalizeStamp(bwOut);
+              stamp.as_of = stamp.as_of || bwStamp.as_of;
+              stamp.snapshot_id = stamp.snapshot_id || bwStamp.snapshot_id;
+              stamp.freshness_status = stamp.freshness_status || bwStamp.freshness_status;
+            } catch (err) {
+              console.warn('[DeskOps] BasisWatch hydration sync skipped', err);
+            }
+          }
+          return stamp;
+        }
+      } catch (err) {
+        console.warn('[DeskOps] hydration refresh skipped', err);
+      }
+    }
+
+    // Standalone BasisWatch (or deploy path unavailable): panel-local merge.
     if (typeof global.WTM_BasisWatch?.reloadHydration === 'function') {
       try {
-        stamp.ok = !!(await global.WTM_BasisWatch.reloadHydration(resolveDeskState()));
+        const bwOut = await global.WTM_BasisWatch.reloadHydration(resolveDeskState());
+        stamp = normalizeStamp(bwOut);
         if (stamp.ok) return stamp;
       } catch (err) {
         console.warn('[DeskOps] BasisWatch hydration reload skipped', err);
       }
     }
-    if (typeof global.WTM_reloadDeployHydration === 'function') {
-      try {
-        const out = await global.WTM_reloadDeployHydration({ force: true, detail: true });
-        if (out && typeof out === 'object') {
-          stamp.ok = !!out.ok;
-          stamp.as_of = out.as_of || null;
-          stamp.snapshot_id = out.snapshot_id || null;
-          stamp.freshness_status = out.freshness_status || null;
-          return stamp;
-        }
-        stamp.ok = !!out;
-        return stamp;
-      } catch (err) {
-        console.warn('[DeskOps] hydration refresh skipped', err);
-      }
-    }
+
     if (global.WMC?.Hydrate?.load) {
       try {
         stamp.ok = !!(await global.WMC.Hydrate.load());

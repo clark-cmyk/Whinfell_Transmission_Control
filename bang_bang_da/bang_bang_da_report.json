@@ -1,38 +1,38 @@
 {
   "bang_bang_da_version": "2.0.0",
-  "generated_at": "2026-07-07T23:57:17.399121Z",
-  "as_of": "2026-07-06T04:10:25+00:00",
-  "snapshot_id": "global-2026-07-06-raw2wtm-01",
+  "generated_at": "2026-07-09T14:56:35.784682Z",
+  "as_of": "2026-07-09T14:37:30+00:00",
+  "snapshot_id": "global-2026-07-09-raw2wtm-01",
   "window_days": 60,
   "gate": {
-    "whinfell_score": 38.0,
-    "whinfell_ex_china": 70.67,
+    "whinfell_score": 50.0,
+    "whinfell_ex_china": 86.0,
     "sq3": 35.0,
-    "combined": 38.0,
+    "combined": 50.0,
     "zones": {
       "whinfell_ex_china": "green",
       "sq3": "red",
-      "combined": "red"
+      "combined": "amber"
     },
-    "transmission_state": "impaired",
-    "regime_tag": "Risk-Off / Credit Stress",
-    "tier": "defensive",
-    "zone": "red",
-    "blocked": true,
-    "block_reason": "Global Whinfell score 38 < 50 \u2014 layer2/3 blocked",
+    "transmission_state": "stressed",
+    "regime_tag": "Fragile Risk-On",
+    "tier": "light",
+    "zone": "amber",
+    "blocked": false,
+    "block_reason": "",
     "verdict_cap": "BLOCKED"
   },
   "risk_dashboard": {
-    "whinfell_ex_china": 70.67,
+    "whinfell_ex_china": 86.0,
     "sq3": 35.0,
-    "combined": 38.0,
+    "combined": 50.0,
     "zones": {
       "whinfell_ex_china": "green",
       "sq3": "red",
-      "combined": "red"
+      "combined": "amber"
     },
     "sources": {
-      "whinfell_ex_china": "node_cockpits.liquidity+credit+basis.composite_score_mean",
+      "whinfell_ex_china": "task_force.specialists.global_transmission.global_only_score",
       "sq3": "china.sq3_score",
       "combined": "global.whinfell_score"
     }
@@ -40,16 +40,16 @@
   "summary": {
     "trade_count": 8,
     "bucket_counts": {
-      "PASS": 0,
-      "1x": 0,
+      "PASS": 3,
+      "1x": 3,
       "2x": 0,
-      "3x": 0,
-      "BLOCKED": 7,
-      "DATA_GAP": 1
+      "3x": 2,
+      "BLOCKED": 0,
+      "DATA_GAP": 0
     },
     "top_signal": "sofr_fed_funds",
     "top_z": 4.26,
-    "top_sizing_bucket": "BLOCKED"
+    "top_sizing_bucket": "3x"
   },
   "trades": [
     {
@@ -63,7 +63,7 @@
       "z_score": 4.26,
       "z_abs": 4.26,
       "dislocation": "extreme",
-      "verdict": "BLOCKED",
+      "verdict": "BANG",
       "window_days": 60,
       "horizons": [
         {
@@ -290,17 +290,17 @@
         "Cross-read 2s10s for duration sponsorship before sizing"
       ],
       "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "liquidity",
       "series_id": "sofr_ois_spread",
       "legs": [],
       "recommendation": {
         "direction": "buy_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
+        "sizing_bucket": "3x",
+        "sizing_multiplier": 3,
         "structure": "Receive SOFR / pay Fed Funds \u2014 fade cheap front-end funding"
       }
     },
@@ -315,7 +315,7 @@
       "z_score": 3.14,
       "z_abs": 3.14,
       "dislocation": "extreme",
-      "verdict": "BLOCKED",
+      "verdict": "BANG",
       "window_days": 60,
       "horizons": [
         {
@@ -354,24 +354,12 @@
       ],
       "history": [
         {
-          "date": "2026-04-07",
+          "date": "2026-04-10",
           "value": 0.2797
         },
         {
-          "date": "2026-04-08",
-          "value": 0.2726
-        },
-        {
-          "date": "2026-04-09",
-          "value": 0.2831
-        },
-        {
-          "date": "2026-04-10",
-          "value": 0.2823
-        },
-        {
           "date": "2026-04-13",
-          "value": 0.2954
+          "value": 0.2726
         },
         {
           "date": "2026-04-14",
@@ -379,238 +367,250 @@
         },
         {
           "date": "2026-04-15",
-          "value": 0.2798
+          "value": 0.2823
         },
         {
           "date": "2026-04-16",
-          "value": 0.2708
+          "value": 0.2954
         },
         {
           "date": "2026-04-17",
-          "value": 0.2707
+          "value": 0.2831
         },
         {
           "date": "2026-04-20",
-          "value": 0.259
+          "value": 0.2798
         },
         {
           "date": "2026-04-21",
-          "value": 0.2379
+          "value": 0.2708
         },
         {
           "date": "2026-04-22",
-          "value": 0.2439
+          "value": 0.2707
         },
         {
           "date": "2026-04-23",
-          "value": 0.2596
+          "value": 0.259
         },
         {
           "date": "2026-04-24",
-          "value": 0.2723
+          "value": 0.2379
         },
         {
           "date": "2026-04-27",
-          "value": 0.2892
+          "value": 0.2439
         },
         {
           "date": "2026-04-28",
-          "value": 0.2881
+          "value": 0.2596
         },
         {
           "date": "2026-04-29",
-          "value": 0.2957
+          "value": 0.2723
         },
         {
           "date": "2026-04-30",
-          "value": 0.2919
+          "value": 0.2892
         },
         {
           "date": "2026-05-01",
-          "value": 0.2818
+          "value": 0.2881
         },
         {
           "date": "2026-05-04",
-          "value": 0.2821
+          "value": 0.2957
         },
         {
           "date": "2026-05-05",
-          "value": 0.2869
+          "value": 0.2919
         },
         {
           "date": "2026-05-06",
-          "value": 0.2891
-        },
-        {
-          "date": "2026-05-07",
           "value": 0.2818
         },
         {
-          "date": "2026-05-08",
-          "value": 0.2726
-        },
-        {
-          "date": "2026-05-11",
+          "date": "2026-05-07",
           "value": 0.2821
         },
         {
+          "date": "2026-05-08",
+          "value": 0.2869
+        },
+        {
+          "date": "2026-05-11",
+          "value": 0.2891
+        },
+        {
           "date": "2026-05-12",
-          "value": 0.2705
+          "value": 0.2818
         },
         {
           "date": "2026-05-13",
-          "value": 0.2633
+          "value": 0.2726
         },
         {
           "date": "2026-05-14",
-          "value": 0.2659
+          "value": 0.2821
         },
         {
           "date": "2026-05-15",
-          "value": 0.2561
+          "value": 0.2705
         },
         {
           "date": "2026-05-18",
-          "value": 0.2661
+          "value": 0.2633
         },
         {
           "date": "2026-05-19",
-          "value": 0.2701
+          "value": 0.2659
         },
         {
           "date": "2026-05-20",
-          "value": 0.2691
+          "value": 0.2561
         },
         {
           "date": "2026-05-21",
-          "value": 0.287
+          "value": 0.2661
         },
         {
           "date": "2026-05-22",
-          "value": 0.2785
+          "value": 0.2701
         },
         {
           "date": "2026-05-25",
-          "value": 0.2766
+          "value": 0.2691
         },
         {
           "date": "2026-05-26",
-          "value": 0.289
+          "value": 0.287
         },
         {
           "date": "2026-05-27",
-          "value": 0.2881
+          "value": 0.2785
         },
         {
           "date": "2026-05-28",
-          "value": 0.2762
+          "value": 0.2766
         },
         {
           "date": "2026-05-29",
-          "value": 0.2827
+          "value": 0.289
         },
         {
           "date": "2026-06-01",
-          "value": 0.2895
-        },
-        {
-          "date": "2026-06-02",
-          "value": 0.3085
-        },
-        {
-          "date": "2026-06-03",
-          "value": 0.2997
-        },
-        {
-          "date": "2026-06-04",
-          "value": 0.2878
-        },
-        {
-          "date": "2026-06-05",
-          "value": 0.2886
-        },
-        {
-          "date": "2026-06-08",
-          "value": 0.2958
-        },
-        {
-          "date": "2026-06-09",
-          "value": 0.2949
-        },
-        {
-          "date": "2026-06-10",
           "value": 0.2881
         },
         {
-          "date": "2026-06-11",
-          "value": 0.2758
+          "date": "2026-06-02",
+          "value": 0.2762
         },
         {
-          "date": "2026-06-12",
-          "value": 0.2753
+          "date": "2026-06-03",
+          "value": 0.2827
         },
         {
-          "date": "2026-06-15",
-          "value": 0.2764
-        },
-        {
-          "date": "2026-06-16",
-          "value": 0.2779
-        },
-        {
-          "date": "2026-06-17",
-          "value": 0.2974
-        },
-        {
-          "date": "2026-06-18",
-          "value": 0.292
-        },
-        {
-          "date": "2026-06-19",
+          "date": "2026-06-04",
           "value": 0.2895
         },
         {
+          "date": "2026-06-05",
+          "value": 0.3085
+        },
+        {
+          "date": "2026-06-08",
+          "value": 0.2997
+        },
+        {
+          "date": "2026-06-09",
+          "value": 0.2878
+        },
+        {
+          "date": "2026-06-10",
+          "value": 0.2886
+        },
+        {
+          "date": "2026-06-11",
+          "value": 0.2958
+        },
+        {
+          "date": "2026-06-12",
+          "value": 0.2949
+        },
+        {
+          "date": "2026-06-15",
+          "value": 0.2881
+        },
+        {
+          "date": "2026-06-16",
+          "value": 0.2758
+        },
+        {
+          "date": "2026-06-17",
+          "value": 0.2753
+        },
+        {
+          "date": "2026-06-18",
+          "value": 0.2764
+        },
+        {
+          "date": "2026-06-19",
+          "value": 0.2779
+        },
+        {
           "date": "2026-06-22",
-          "value": 0.2836
+          "value": 0.2974
         },
         {
           "date": "2026-06-23",
-          "value": 0.3012
+          "value": 0.292
         },
         {
           "date": "2026-06-24",
-          "value": 0.298
+          "value": 0.2895
         },
         {
           "date": "2026-06-25",
-          "value": 0.2926
+          "value": 0.2836
         },
         {
           "date": "2026-06-26",
-          "value": 0.2802
+          "value": 0.3012
         },
         {
           "date": "2026-06-29",
-          "value": 0.2794
+          "value": 0.298
         },
         {
           "date": "2026-06-30",
-          "value": 0.2608
+          "value": 0.2926
         },
         {
           "date": "2026-07-01",
-          "value": 0.2616
+          "value": 0.2802
         },
         {
           "date": "2026-07-02",
-          "value": 0.2638
+          "value": 0.2794
         },
         {
           "date": "2026-07-03",
-          "value": 0.242
+          "value": 0.2608
         },
         {
           "date": "2026-07-06",
+          "value": 0.2616
+        },
+        {
+          "date": "2026-07-07",
+          "value": 0.2638
+        },
+        {
+          "date": "2026-07-08",
+          "value": 0.242
+        },
+        {
+          "date": "2026-07-09",
           "value": 0.33
         }
       ],
@@ -623,9 +623,9 @@
         "MISO RT power drag on crush margin in summer peak"
       ],
       "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "aicompute",
       "series_id": "gpu_basis_spread",
@@ -643,272 +643,9 @@
       ],
       "recommendation": {
         "direction": "buy_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
+        "sizing_bucket": "3x",
+        "sizing_multiplier": 3,
         "structure": "Long 1M H200 fwd / short spot rental; overlay MISO RT hedge if summer peak"
-      }
-    },
-    {
-      "id": "eth_calendar",
-      "label": "ETH Calendar (1m vs 3m)",
-      "structure_type": "calendar",
-      "trade_type": "crypto_calendar",
-      "structure": "ET near vs deferred calendar",
-      "current_value": 1.4911,
-      "unit": "pct",
-      "z_score": 2.5,
-      "z_abs": 2.5,
-      "dislocation": "extreme",
-      "verdict": "BLOCKED",
-      "window_days": 60,
-      "horizons": [
-        {
-          "window_days": 30,
-          "horizon_key": "1m",
-          "z_score": 3.31,
-          "percentile": 99.7,
-          "current_value": 1.4911,
-          "unit": "pct",
-          "n_observations": 30,
-          "richness": "extreme",
-          "data_status": "rv_history"
-        },
-        {
-          "window_days": 60,
-          "horizon_key": "3m",
-          "z_score": 2.5,
-          "percentile": 87.5,
-          "current_value": 1.4911,
-          "unit": "pct",
-          "n_observations": 45,
-          "richness": "extreme",
-          "data_status": "rv_history"
-        },
-        {
-          "window_days": 90,
-          "horizon_key": "3m",
-          "z_score": 2.5,
-          "percentile": 87.5,
-          "current_value": 1.4911,
-          "unit": "pct",
-          "n_observations": 45,
-          "richness": "extreme",
-          "data_status": "rv_history"
-        }
-      ],
-      "history": [
-        {
-          "date": "2026-04-28",
-          "value": 1.3457
-        },
-        {
-          "date": "2026-04-29",
-          "value": 1.3355
-        },
-        {
-          "date": "2026-04-30",
-          "value": 1.329
-        },
-        {
-          "date": "2026-05-01",
-          "value": 1.3238
-        },
-        {
-          "date": "2026-05-04",
-          "value": 1.3262
-        },
-        {
-          "date": "2026-05-05",
-          "value": 1.3339
-        },
-        {
-          "date": "2026-05-06",
-          "value": 1.3579
-        },
-        {
-          "date": "2026-05-07",
-          "value": 1.3688
-        },
-        {
-          "date": "2026-05-08",
-          "value": 1.3887
-        },
-        {
-          "date": "2026-05-11",
-          "value": 1.4184
-        },
-        {
-          "date": "2026-05-12",
-          "value": 1.3905
-        },
-        {
-          "date": "2026-05-13",
-          "value": 1.3773
-        },
-        {
-          "date": "2026-05-14",
-          "value": 1.3619
-        },
-        {
-          "date": "2026-05-15",
-          "value": 1.3587
-        },
-        {
-          "date": "2026-05-18",
-          "value": 1.3701
-        },
-        {
-          "date": "2026-05-19",
-          "value": 1.3945
-        },
-        {
-          "date": "2026-05-20",
-          "value": 1.4201
-        },
-        {
-          "date": "2026-05-21",
-          "value": 1.413
-        },
-        {
-          "date": "2026-05-22",
-          "value": 1.4216
-        },
-        {
-          "date": "2026-05-25",
-          "value": 1.416
-        },
-        {
-          "date": "2026-05-26",
-          "value": 1.4248
-        },
-        {
-          "date": "2026-05-27",
-          "value": 1.4258
-        },
-        {
-          "date": "2026-05-28",
-          "value": 1.394
-        },
-        {
-          "date": "2026-05-29",
-          "value": 1.3875
-        },
-        {
-          "date": "2026-06-01",
-          "value": 1.3846
-        },
-        {
-          "date": "2026-06-02",
-          "value": 1.3799
-        },
-        {
-          "date": "2026-06-03",
-          "value": 1.4089
-        },
-        {
-          "date": "2026-06-04",
-          "value": 1.409
-        },
-        {
-          "date": "2026-06-05",
-          "value": 1.4187
-        },
-        {
-          "date": "2026-06-08",
-          "value": 1.4218
-        },
-        {
-          "date": "2026-06-09",
-          "value": 1.4077
-        },
-        {
-          "date": "2026-06-10",
-          "value": 1.4357
-        },
-        {
-          "date": "2026-06-11",
-          "value": 1.4219
-        },
-        {
-          "date": "2026-06-12",
-          "value": 1.4419
-        },
-        {
-          "date": "2026-06-15",
-          "value": 1.4206
-        },
-        {
-          "date": "2026-06-16",
-          "value": 1.4224
-        },
-        {
-          "date": "2026-06-17",
-          "value": 1.4374
-        },
-        {
-          "date": "2026-06-18",
-          "value": 1.4098
-        },
-        {
-          "date": "2026-06-19",
-          "value": 1.3941
-        },
-        {
-          "date": "2026-06-22",
-          "value": 1.419
-        },
-        {
-          "date": "2026-06-23",
-          "value": 1.4407
-        },
-        {
-          "date": "2026-06-24",
-          "value": 1.4301
-        },
-        {
-          "date": "2026-06-25",
-          "value": 1.4287
-        },
-        {
-          "date": "2026-06-26",
-          "value": 1.4442
-        },
-        {
-          "date": "2026-06-29",
-          "value": 1.4911
-        }
-      ],
-      "history_source": "rv_basis_reconstructed",
-      "suggested_structure": "Long deferred ET / short near ET \u2014 confirm vs BTC calendar peer",
-      "risk_notes": [
-        "ETH calendar liquidity thinner than BTC \u2014 widen stop",
-        "ETH/BTC beta confirmation unavailable in bundle \u2014 downgrade size",
-        "Series from Barchart ETM26 spreads when live; synthetic fallback otherwise"
-      ],
-      "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
-      "verdict_cap": "BLOCKED",
-      "node_id": "basis",
-      "series_id": "eth_calendar_et_near_deferred",
-      "legs": [
-        {
-          "side": "long",
-          "ticker": "ET Deferred",
-          "ratio": 1
-        },
-        {
-          "side": "short",
-          "ticker": "ET Near",
-          "ratio": 1
-        }
-      ],
-      "recommendation": {
-        "direction": "buy_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
-        "structure": "Long deferred ET / short near ET \u2014 confirm vs BTC calendar peer"
       }
     },
     {
@@ -922,7 +659,7 @@
       "z_score": 1.92,
       "z_abs": 1.92,
       "dislocation": "rich",
-      "verdict": "BLOCKED",
+      "verdict": "WATCH",
       "window_days": 60,
       "horizons": [
         {
@@ -961,263 +698,263 @@
       ],
       "history": [
         {
-          "date": "2026-04-07",
+          "date": "2026-04-10",
           "value": 0.2844
         },
         {
-          "date": "2026-04-08",
+          "date": "2026-04-13",
           "value": 0.2865
         },
         {
-          "date": "2026-04-09",
+          "date": "2026-04-14",
           "value": 0.2706
         },
         {
-          "date": "2026-04-10",
+          "date": "2026-04-15",
           "value": 0.2709
         },
         {
-          "date": "2026-04-13",
+          "date": "2026-04-16",
           "value": 0.278
         },
         {
-          "date": "2026-04-14",
+          "date": "2026-04-17",
           "value": 0.2651
         },
         {
-          "date": "2026-04-15",
+          "date": "2026-04-20",
           "value": 0.2763
         },
         {
-          "date": "2026-04-16",
+          "date": "2026-04-21",
           "value": 0.2779
         },
         {
-          "date": "2026-04-17",
+          "date": "2026-04-22",
           "value": 0.282
         },
         {
-          "date": "2026-04-20",
-          "value": 0.2687
-        },
-        {
-          "date": "2026-04-21",
-          "value": 0.2663
-        },
-        {
-          "date": "2026-04-22",
-          "value": 0.2722
-        },
-        {
           "date": "2026-04-23",
-          "value": 0.2793
+          "value": 0.2687
         },
         {
           "date": "2026-04-24",
-          "value": 0.2731
+          "value": 0.2663
         },
         {
           "date": "2026-04-27",
-          "value": 0.2683
+          "value": 0.2722
         },
         {
           "date": "2026-04-28",
-          "value": 0.2772
+          "value": 0.2793
         },
         {
           "date": "2026-04-29",
-          "value": 0.2807
+          "value": 0.2731
         },
         {
           "date": "2026-04-30",
-          "value": 0.2886
+          "value": 0.2683
         },
         {
           "date": "2026-05-01",
-          "value": 0.2897
+          "value": 0.2772
         },
         {
           "date": "2026-05-04",
-          "value": 0.3048
+          "value": 0.2807
         },
         {
           "date": "2026-05-05",
-          "value": 0.3162
+          "value": 0.2886
         },
         {
           "date": "2026-05-06",
-          "value": 0.331
+          "value": 0.2897
         },
         {
           "date": "2026-05-07",
-          "value": 0.3157
+          "value": 0.3048
         },
         {
           "date": "2026-05-08",
-          "value": 0.294
+          "value": 0.3162
         },
         {
           "date": "2026-05-11",
-          "value": 0.2804
+          "value": 0.331
         },
         {
           "date": "2026-05-12",
-          "value": 0.293
+          "value": 0.3157
         },
         {
           "date": "2026-05-13",
-          "value": 0.2889
+          "value": 0.294
         },
         {
           "date": "2026-05-14",
-          "value": 0.2805
+          "value": 0.2804
         },
         {
           "date": "2026-05-15",
-          "value": 0.2687
+          "value": 0.293
         },
         {
           "date": "2026-05-18",
-          "value": 0.2713
+          "value": 0.2889
         },
         {
           "date": "2026-05-19",
-          "value": 0.2532
+          "value": 0.2805
         },
         {
           "date": "2026-05-20",
-          "value": 0.2678
+          "value": 0.2687
         },
         {
           "date": "2026-05-21",
-          "value": 0.2631
+          "value": 0.2713
         },
         {
           "date": "2026-05-22",
-          "value": 0.2598
+          "value": 0.2532
         },
         {
           "date": "2026-05-25",
-          "value": 0.2643
+          "value": 0.2678
         },
         {
           "date": "2026-05-26",
-          "value": 0.2646
+          "value": 0.2631
         },
         {
           "date": "2026-05-27",
-          "value": 0.2883
+          "value": 0.2598
         },
         {
           "date": "2026-05-28",
-          "value": 0.3068
+          "value": 0.2643
         },
         {
           "date": "2026-05-29",
-          "value": 0.3104
+          "value": 0.2646
         },
         {
           "date": "2026-06-01",
-          "value": 0.3015
+          "value": 0.2883
         },
         {
           "date": "2026-06-02",
-          "value": 0.2893
+          "value": 0.3068
         },
         {
           "date": "2026-06-03",
-          "value": 0.2997
+          "value": 0.3104
         },
         {
           "date": "2026-06-04",
-          "value": 0.3089
+          "value": 0.3015
         },
         {
           "date": "2026-06-05",
-          "value": 0.304
+          "value": 0.2893
         },
         {
           "date": "2026-06-08",
-          "value": 0.3113
+          "value": 0.2997
         },
         {
           "date": "2026-06-09",
-          "value": 0.3242
+          "value": 0.3089
         },
         {
           "date": "2026-06-10",
-          "value": 0.3085
+          "value": 0.304
         },
         {
           "date": "2026-06-11",
-          "value": 0.2887
-        },
-        {
-          "date": "2026-06-12",
-          "value": 0.2977
-        },
-        {
-          "date": "2026-06-15",
-          "value": 0.3057
-        },
-        {
-          "date": "2026-06-16",
-          "value": 0.3173
-        },
-        {
-          "date": "2026-06-17",
           "value": 0.3113
         },
         {
+          "date": "2026-06-12",
+          "value": 0.3242
+        },
+        {
+          "date": "2026-06-15",
+          "value": 0.3085
+        },
+        {
+          "date": "2026-06-16",
+          "value": 0.2887
+        },
+        {
+          "date": "2026-06-17",
+          "value": 0.2977
+        },
+        {
           "date": "2026-06-18",
-          "value": 0.3215
+          "value": 0.3057
         },
         {
           "date": "2026-06-19",
-          "value": 0.3188
+          "value": 0.3173
         },
         {
           "date": "2026-06-22",
-          "value": 0.3279
+          "value": 0.3113
         },
         {
           "date": "2026-06-23",
-          "value": 0.3121
+          "value": 0.3215
         },
         {
           "date": "2026-06-24",
-          "value": 0.3119
+          "value": 0.3188
         },
         {
           "date": "2026-06-25",
-          "value": 0.3042
+          "value": 0.3279
         },
         {
           "date": "2026-06-26",
-          "value": 0.2859
+          "value": 0.3121
         },
         {
           "date": "2026-06-29",
-          "value": 0.2845
+          "value": 0.3119
         },
         {
           "date": "2026-06-30",
-          "value": 0.2767
+          "value": 0.3042
         },
         {
           "date": "2026-07-01",
-          "value": 0.2768
+          "value": 0.2859
         },
         {
           "date": "2026-07-02",
-          "value": 0.2904
+          "value": 0.2845
         },
         {
           "date": "2026-07-03",
-          "value": 0.2905
+          "value": 0.2767
         },
         {
           "date": "2026-07-06",
+          "value": 0.2768
+        },
+        {
+          "date": "2026-07-07",
+          "value": 0.2904
+        },
+        {
+          "date": "2026-07-08",
+          "value": 0.2905
+        },
+        {
+          "date": "2026-07-09",
           "value": 0.33
         }
       ],
@@ -1230,9 +967,9 @@
         "MISO RT power drag on crush margin in summer peak"
       ],
       "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "aicompute",
       "series_id": "gpu_crush_calendar_spread",
@@ -1250,8 +987,8 @@
       ],
       "recommendation": {
         "direction": "buy_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
+        "sizing_bucket": "1x",
+        "sizing_multiplier": 1,
         "structure": "Long 3M H200 fwd / short 1M fwd; overlay MISO RT hedge if summer peak"
       }
     },
@@ -1266,7 +1003,7 @@
       "z_score": -1.45,
       "z_abs": 1.45,
       "dislocation": "fair",
-      "verdict": "BLOCKED",
+      "verdict": "PASS",
       "window_days": 60,
       "horizons": [
         {
@@ -1333,9 +1070,9 @@
         "BTC bias: Neutral"
       ],
       "data_status": "live",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "basis",
       "series_id": "btc_basis_spot_1m",
@@ -1353,9 +1090,113 @@
       ],
       "recommendation": {
         "direction": "sell_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
+        "sizing_bucket": "1x",
+        "sizing_multiplier": 1,
         "structure": "Short BT 1M Fwd / Long BTC Spot / IBIT"
+      }
+    },
+    {
+      "id": "btc_calendar",
+      "label": "BTC Calendar (1m vs 3m)",
+      "structure_type": "calendar",
+      "trade_type": "crypto_calendar",
+      "structure": "BT near vs deferred calendar",
+      "current_value": 1.1915,
+      "unit": "pct",
+      "z_score": 1.05,
+      "z_abs": 1.05,
+      "dislocation": "fair",
+      "verdict": "PASS",
+      "window_days": 60,
+      "horizons": [
+        {
+          "window_days": 30,
+          "horizon_key": "1m",
+          "z_score": 1.05,
+          "percentile": 65.8,
+          "current_value": 1.1915,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        },
+        {
+          "window_days": 60,
+          "horizon_key": "3m",
+          "z_score": 1.05,
+          "percentile": 65.8,
+          "current_value": 1.1915,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        },
+        {
+          "window_days": 90,
+          "horizon_key": "3m",
+          "z_score": 1.05,
+          "percentile": 65.8,
+          "current_value": 1.1915,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-06-14",
+          "value": 1.1171
+        },
+        {
+          "date": "2026-06-15",
+          "value": 1.104
+        },
+        {
+          "date": "2026-06-16",
+          "value": 1.1416
+        },
+        {
+          "date": "2026-06-17",
+          "value": 1.1903
+        },
+        {
+          "date": "2026-06-18",
+          "value": 1.1915
+        }
+      ],
+      "history_source": "barchart_spread_history",
+      "suggested_structure": "Long deferred BT (BTQ) / short near BT (BTM) \u2014 fade richness",
+      "risk_notes": [
+        "Roll stress near expiry widens calendar independently of Z",
+        "CME margin step-ups can force deleveraging on calendar shorts",
+        "Cross-read ETH calendar for beta confirmation",
+        "BTC bias: Neutral"
+      ],
+      "data_status": "live",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
+      "verdict_cap": "BLOCKED",
+      "node_id": "basis",
+      "series_id": "btc_calendar_bt_near_deferred",
+      "legs": [
+        {
+          "side": "long",
+          "ticker": "BT Deferred",
+          "ratio": 1
+        },
+        {
+          "side": "short",
+          "ticker": "BT Near",
+          "ratio": 1
+        }
+      ],
+      "recommendation": {
+        "direction": "buy_spread",
+        "sizing_bucket": "1x",
+        "sizing_multiplier": 1,
+        "structure": "Long deferred BT (BTQ) / short near BT (BTM) \u2014 fade richness"
       }
     },
     {
@@ -1369,7 +1210,7 @@
       "z_score": 0.77,
       "z_abs": 0.77,
       "dislocation": "fair",
-      "verdict": "BLOCKED",
+      "verdict": "PASS",
       "window_days": 60,
       "horizons": [
         {
@@ -1596,282 +1437,18 @@
         "Quartile direction: higher_is_richer \u2014 positive Z = steep vs history"
       ],
       "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "liquidity",
       "series_id": "usgg2y10y",
       "legs": [],
       "recommendation": {
         "direction": "buy_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
+        "sizing_bucket": "PASS",
+        "sizing_multiplier": 0,
         "structure": "Flattener via long front / short back (IEF/TLT pair) \u2014 fade rich curve"
-      }
-    },
-    {
-      "id": "btc_calendar",
-      "label": "BTC Calendar (1m vs 3m)",
-      "structure_type": "calendar",
-      "trade_type": "crypto_calendar",
-      "structure": "BT near vs deferred calendar",
-      "current_value": 1.25,
-      "unit": "pct",
-      "z_score": -0.23,
-      "z_abs": 0.23,
-      "dislocation": "fair",
-      "verdict": "BLOCKED",
-      "window_days": 60,
-      "horizons": [
-        {
-          "window_days": 30,
-          "horizon_key": "1m",
-          "z_score": -0.87,
-          "percentile": 37.0,
-          "current_value": 1.25,
-          "unit": "pct",
-          "n_observations": 30,
-          "richness": "fair",
-          "data_status": "rv_history"
-        },
-        {
-          "window_days": 60,
-          "horizon_key": "3m",
-          "z_score": -0.23,
-          "percentile": 46.5,
-          "current_value": 1.25,
-          "unit": "pct",
-          "n_observations": 45,
-          "richness": "fair",
-          "data_status": "rv_history"
-        },
-        {
-          "window_days": 90,
-          "horizon_key": "3m",
-          "z_score": -0.23,
-          "percentile": 46.5,
-          "current_value": 1.25,
-          "unit": "pct",
-          "n_observations": 45,
-          "richness": "fair",
-          "data_status": "rv_history"
-        }
-      ],
-      "history": [
-        {
-          "date": "2026-04-28",
-          "value": 1.1793
-        },
-        {
-          "date": "2026-04-29",
-          "value": 1.1976
-        },
-        {
-          "date": "2026-04-30",
-          "value": 1.1862
-        },
-        {
-          "date": "2026-05-01",
-          "value": 1.1781
-        },
-        {
-          "date": "2026-05-04",
-          "value": 1.1851
-        },
-        {
-          "date": "2026-05-05",
-          "value": 1.1939
-        },
-        {
-          "date": "2026-05-06",
-          "value": 1.2036
-        },
-        {
-          "date": "2026-05-07",
-          "value": 1.2103
-        },
-        {
-          "date": "2026-05-08",
-          "value": 1.2326
-        },
-        {
-          "date": "2026-05-11",
-          "value": 1.2323
-        },
-        {
-          "date": "2026-05-12",
-          "value": 1.2352
-        },
-        {
-          "date": "2026-05-13",
-          "value": 1.2266
-        },
-        {
-          "date": "2026-05-14",
-          "value": 1.2242
-        },
-        {
-          "date": "2026-05-15",
-          "value": 1.2167
-        },
-        {
-          "date": "2026-05-18",
-          "value": 1.1924
-        },
-        {
-          "date": "2026-05-19",
-          "value": 1.2054
-        },
-        {
-          "date": "2026-05-20",
-          "value": 1.2154
-        },
-        {
-          "date": "2026-05-21",
-          "value": 1.2367
-        },
-        {
-          "date": "2026-05-22",
-          "value": 1.2258
-        },
-        {
-          "date": "2026-05-25",
-          "value": 1.2366
-        },
-        {
-          "date": "2026-05-26",
-          "value": 1.221
-        },
-        {
-          "date": "2026-05-27",
-          "value": 1.2194
-        },
-        {
-          "date": "2026-05-28",
-          "value": 1.2251
-        },
-        {
-          "date": "2026-05-29",
-          "value": 1.2573
-        },
-        {
-          "date": "2026-06-01",
-          "value": 1.2707
-        },
-        {
-          "date": "2026-06-02",
-          "value": 1.2978
-        },
-        {
-          "date": "2026-06-03",
-          "value": 1.3183
-        },
-        {
-          "date": "2026-06-04",
-          "value": 1.3052
-        },
-        {
-          "date": "2026-06-05",
-          "value": 1.3134
-        },
-        {
-          "date": "2026-06-08",
-          "value": 1.3397
-        },
-        {
-          "date": "2026-06-09",
-          "value": 1.3406
-        },
-        {
-          "date": "2026-06-10",
-          "value": 1.3394
-        },
-        {
-          "date": "2026-06-11",
-          "value": 1.3202
-        },
-        {
-          "date": "2026-06-12",
-          "value": 1.3271
-        },
-        {
-          "date": "2026-06-15",
-          "value": 1.3276
-        },
-        {
-          "date": "2026-06-16",
-          "value": 1.3233
-        },
-        {
-          "date": "2026-06-17",
-          "value": 1.3163
-        },
-        {
-          "date": "2026-06-18",
-          "value": 1.3418
-        },
-        {
-          "date": "2026-06-19",
-          "value": 1.3307
-        },
-        {
-          "date": "2026-06-22",
-          "value": 1.3214
-        },
-        {
-          "date": "2026-06-23",
-          "value": 1.3191
-        },
-        {
-          "date": "2026-06-24",
-          "value": 1.3262
-        },
-        {
-          "date": "2026-06-25",
-          "value": 1.3427
-        },
-        {
-          "date": "2026-06-26",
-          "value": 1.3299
-        },
-        {
-          "date": "2026-06-29",
-          "value": 1.25
-        }
-      ],
-      "history_source": "rv_basis_reconstructed",
-      "suggested_structure": "Long deferred BT (BTQ) / short near BT (BTM) \u2014 fade richness",
-      "risk_notes": [
-        "Roll stress near expiry widens calendar independently of Z",
-        "CME margin step-ups can force deleveraging on calendar shorts",
-        "Cross-read ETH calendar for beta confirmation",
-        "BTC bias: Neutral"
-      ],
-      "data_status": "rv_history",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
-      "verdict_cap": "BLOCKED",
-      "node_id": "basis",
-      "series_id": "btc_calendar_bt_near_deferred",
-      "legs": [
-        {
-          "side": "long",
-          "ticker": "BT Deferred",
-          "ratio": 1
-        },
-        {
-          "side": "short",
-          "ticker": "BT Near",
-          "ratio": 1
-        }
-      ],
-      "recommendation": {
-        "direction": "sell_spread",
-        "sizing_bucket": "BLOCKED",
-        "sizing_multiplier": null,
-        "structure": "Short BT Deferred / Long BT Near"
       }
     },
     {
@@ -1880,60 +1457,81 @@
       "structure_type": "basis",
       "trade_type": "crypto_basis",
       "structure": "Spot vs 1-month ETH forward",
-      "current_value": null,
+      "current_value": -18.0,
       "unit": "pct",
-      "z_score": null,
-      "z_abs": null,
-      "dislocation": "unavailable",
-      "verdict": "BLOCKED",
+      "z_score": -0.35,
+      "z_abs": 0.35,
+      "dislocation": "fair",
+      "verdict": "PASS",
       "window_days": 60,
       "horizons": [
         {
           "window_days": 30,
           "horizon_key": "1m",
-          "z_score": null,
-          "percentile": null,
-          "current_value": null,
+          "z_score": -0.35,
+          "percentile": 44.8,
+          "current_value": -18.0,
           "unit": "pct",
-          "n_observations": null,
-          "richness": "unavailable",
-          "data_status": "missing"
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
         },
         {
           "window_days": 60,
           "horizon_key": "3m",
-          "z_score": null,
-          "percentile": null,
-          "current_value": null,
+          "z_score": -0.35,
+          "percentile": 44.8,
+          "current_value": -18.0,
           "unit": "pct",
-          "n_observations": null,
-          "richness": "unavailable",
-          "data_status": "missing"
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
         },
         {
           "window_days": 90,
           "horizon_key": "3m",
-          "z_score": null,
-          "percentile": null,
-          "current_value": null,
+          "z_score": -0.35,
+          "percentile": 44.8,
+          "current_value": -18.0,
           "unit": "pct",
-          "n_observations": null,
-          "richness": "unavailable",
-          "data_status": "missing"
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
         }
       ],
-      "history": [],
-      "history_source": "unknown",
+      "history": [
+        {
+          "date": "2026-06-14",
+          "value": -16.0
+        },
+        {
+          "date": "2026-06-15",
+          "value": -17.0
+        },
+        {
+          "date": "2026-06-16",
+          "value": -18.0
+        },
+        {
+          "date": "2026-06-17",
+          "value": -19.0
+        },
+        {
+          "date": "2026-06-18",
+          "value": -18.0
+        }
+      ],
+      "history_source": "barchart_spread_history",
       "suggested_structure": "Long 1M ET forward / short spot or ETH vehicle \u2014 fade basis richness",
       "risk_notes": [
         "ETH basis liquidity thinner than BTC \u2014 widen stop",
         "ETH/BTC beta confirmation unavailable in bundle \u2014 downgrade size",
         "Spot vs 1M forward from Barchart ET spreads when live"
       ],
-      "data_status": "missing",
-      "blocked": true,
-      "block_reason": "Global gate Red \u2014 directional and RV expression blocked.",
-      "gate_zone": "red",
+      "data_status": "live",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
       "verdict_cap": "BLOCKED",
       "node_id": "basis",
       "series_id": "eth_basis_spot_1m",
@@ -1950,10 +1548,113 @@
         }
       ],
       "recommendation": {
-        "direction": "none",
-        "sizing_bucket": "DATA_GAP",
-        "sizing_multiplier": null,
-        "structure": "Spot vs 1-month ETH forward"
+        "direction": "sell_spread",
+        "sizing_bucket": "PASS",
+        "sizing_multiplier": 0,
+        "structure": "Short ET 1M Fwd / Long ETH Spot"
+      }
+    },
+    {
+      "id": "eth_calendar",
+      "label": "ETH Calendar (1m vs 3m)",
+      "structure_type": "calendar",
+      "trade_type": "crypto_calendar",
+      "structure": "ET near vs deferred calendar",
+      "current_value": 44.0,
+      "unit": "pct",
+      "z_score": 0.35,
+      "z_abs": 0.35,
+      "dislocation": "fair",
+      "verdict": "PASS",
+      "window_days": 60,
+      "horizons": [
+        {
+          "window_days": 30,
+          "horizon_key": "1m",
+          "z_score": 0.35,
+          "percentile": 55.2,
+          "current_value": 44.0,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        },
+        {
+          "window_days": 60,
+          "horizon_key": "3m",
+          "z_score": 0.35,
+          "percentile": 55.2,
+          "current_value": 44.0,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        },
+        {
+          "window_days": 90,
+          "horizon_key": "3m",
+          "z_score": 0.35,
+          "percentile": 55.2,
+          "current_value": 44.0,
+          "unit": "pct",
+          "n_observations": 5,
+          "richness": "fair",
+          "data_status": "live"
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-06-14",
+          "value": 42.0
+        },
+        {
+          "date": "2026-06-15",
+          "value": 43.0
+        },
+        {
+          "date": "2026-06-16",
+          "value": 44.0
+        },
+        {
+          "date": "2026-06-17",
+          "value": 45.0
+        },
+        {
+          "date": "2026-06-18",
+          "value": 44.0
+        }
+      ],
+      "history_source": "barchart_spread_history",
+      "suggested_structure": "Long deferred ET / short near ET \u2014 confirm vs BTC calendar peer",
+      "risk_notes": [
+        "ETH calendar liquidity thinner than BTC \u2014 widen stop",
+        "ETH/BTC beta confirmation unavailable in bundle \u2014 downgrade size",
+        "Series from Barchart ETM26 spreads when live; synthetic fallback otherwise"
+      ],
+      "data_status": "live",
+      "blocked": false,
+      "block_reason": "",
+      "gate_zone": "amber",
+      "verdict_cap": "BLOCKED",
+      "node_id": "basis",
+      "series_id": "eth_calendar_et_near_deferred",
+      "legs": [
+        {
+          "side": "long",
+          "ticker": "ET Deferred",
+          "ratio": 1
+        },
+        {
+          "side": "short",
+          "ticker": "ET Near",
+          "ratio": 1
+        }
+      ],
+      "recommendation": {
+        "direction": "buy_spread",
+        "sizing_bucket": "PASS",
+        "sizing_multiplier": 0,
+        "structure": "Long deferred ET / short near ET \u2014 confirm vs BTC calendar peer"
       }
     }
   ],
@@ -2104,6 +1805,134 @@
             "status": "pending_koyfin"
           }
         ]
+      },
+      {
+        "id": "midwest_calendar_secondary",
+        "trade_id": "midwest_calendar",
+        "title": "Midwest Compute \u2014 Nice-to-Have",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": [
+          {
+            "company": "Meta",
+            "segment": "Reality Labs adj.",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Vistra",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Constellation Energy",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Nvidia",
+            "segment": "Data Center",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          }
+        ],
+        "tier": "secondary",
+        "collapsed": true
+      },
+      {
+        "id": "midwest_basis_secondary",
+        "trade_id": "midwest_basis",
+        "title": "Midwest Compute \u2014 Nice-to-Have",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": [
+          {
+            "company": "Meta",
+            "segment": "Reality Labs adj.",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Vistra",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Constellation Energy",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Nvidia",
+            "segment": "Data Center",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          }
+        ],
+        "tier": "secondary",
+        "collapsed": true
       },
       {
         "id": "btc_basis_market",
@@ -2302,18 +2131,150 @@
         ]
       }
     ],
+    "midwest_secondary": [
+      {
+        "id": "midwest_calendar_secondary",
+        "trade_id": "midwest_calendar",
+        "title": "Midwest Compute \u2014 Nice-to-Have",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": [
+          {
+            "company": "Meta",
+            "segment": "Reality Labs adj.",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Vistra",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Constellation Energy",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Nvidia",
+            "segment": "Data Center",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          }
+        ],
+        "tier": "secondary",
+        "collapsed": true
+      },
+      {
+        "id": "midwest_basis_secondary",
+        "trade_id": "midwest_basis",
+        "title": "Midwest Compute \u2014 Nice-to-Have",
+        "columns": [
+          "company",
+          "segment",
+          "current_gm_pct",
+          "avg_gm_3yr",
+          "gm_z_3yr",
+          "quartile",
+          "cloud_multiplier",
+          "regime_signal",
+          "status"
+        ],
+        "rows": [
+          {
+            "company": "Meta",
+            "segment": "Reality Labs adj.",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Vistra",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Constellation Energy",
+            "segment": "Merchant Power",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          },
+          {
+            "company": "Nvidia",
+            "segment": "Data Center",
+            "current_gm_pct": null,
+            "avg_gm_3yr": null,
+            "gm_z_3yr": null,
+            "quartile": null,
+            "cloud_multiplier": 1.0,
+            "regime_signal": null,
+            "status": "pending_koyfin"
+          }
+        ],
+        "tier": "secondary",
+        "collapsed": true
+      }
+    ],
     "by_trade": {
       "midwest_calendar": {
         "alignment": "neutral",
         "table_ids": [
-          "midwest_calendar_primary"
+          "midwest_calendar_primary",
+          "midwest_calendar_secondary"
         ],
         "headline": null
       },
       "midwest_basis": {
         "alignment": "neutral",
         "table_ids": [
-          "midwest_basis_primary"
+          "midwest_basis_primary",
+          "midwest_basis_secondary"
         ],
         "headline": null
       },
@@ -2362,11 +2323,6 @@
         "body": null,
         "prompt_version": null
       },
-      "eth_calendar": {
-        "headline": null,
-        "body": null,
-        "prompt_version": null
-      },
       "midwest_calendar": {
         "headline": null,
         "body": null,
@@ -2377,17 +2333,22 @@
         "body": null,
         "prompt_version": null
       },
-      "curve_2s10s": {
-        "headline": null,
-        "body": null,
-        "prompt_version": null
-      },
       "btc_calendar": {
         "headline": null,
         "body": null,
         "prompt_version": null
       },
+      "curve_2s10s": {
+        "headline": null,
+        "body": null,
+        "prompt_version": null
+      },
       "eth_basis": {
+        "headline": null,
+        "body": null,
+        "prompt_version": null
+      },
+      "eth_calendar": {
         "headline": null,
         "body": null,
         "prompt_version": null

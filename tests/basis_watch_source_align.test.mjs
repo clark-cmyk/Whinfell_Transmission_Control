@@ -55,6 +55,8 @@ async function run() {
   const hydrationBasis = hydration.node_cockpits.basis.rv_basis.series.btc_basis_spot_1m.horizons['1m'].current_value;
 
   assert(modelBtc.curveQuoteDate === '2026-06-29', `curve quote date ${modelBtc.curveQuoteDate}`);
+  assert(modelBtc.hydrationAsOf === hydration.as_of || modelBtc.hydrationDate, 'hydration stamp on model');
+  assert(String(modelBtc.dataNote || '').includes('Hydration'), `dataNote shows Hydration: ${modelBtc.dataNote}`);
   assert(modelBtc.spotDesk === koyfin, 'desk spot preserved');
   assert(Math.abs(modelBtc.spot - 64753.5) < 50, `basis-implied spot ${modelBtc.spot}`);
   assert(modelBtc.spotSource === 'barchart_basis_implied', modelBtc.spotSource);

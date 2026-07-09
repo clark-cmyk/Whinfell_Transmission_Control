@@ -143,6 +143,8 @@
         </div>
       </section>
 
+      <div id="bbdmStaleBanner" class="hidden rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200" role="status"></div>
+
       <!-- Summary KPIs -->
       <section id="kpiStrip" class="grid grid-cols-2 sm:grid-cols-5 gap-3"></section>
 
@@ -280,7 +282,8 @@
     async function fetchFirst(paths) {
       for (const p of paths) {
         try {
-          const r = await fetch(p);
+          const bust = `${p}${p.includes('?') ? '&' : '?'}_=${Date.now()}`;
+          const r = await fetch(bust, { cache: 'no-store' });
           if (r.ok) return await r.json();
         } catch (_) { /* file:// or missing */ }
       }
@@ -472,9 +475,10 @@
       }
     }
 
-    function applyReport(data) {
+    function applyReport(data, meta) {
       if (!data) return false;
       report = data;
+      report._hydrationMeta = meta || null;
       const wd = String(report.window_days || 60);
       if ($('windowSelect').querySelector(`option[value="${wd}"]`)) {
         $('windowSelect').value = wd;
@@ -487,15 +491,39 @@
       return true;
     }
 
+    async function loadHydrationMeta() {
+      const hyd = await fetchFirst(HYDRATION_PATHS);
+      if (!hyd) return null;
+      return {
+        as_of: hyd.as_of || null,
+        snapshot_id: hyd.snapshot_id || null,
+        freshness_status: hyd.freshness_status || null,
+        score: hyd.global?.whinfell_score ?? null,
+      };
+    }
+
     async function loadReport() {
       $('tradeBody').innerHTML = '<tr><td colspan="7" class="px-4 py-6 text-center text-desk-muted text-sm">Loading report…</td></tr>';
-      const data = await fetchReport();
-      if (!applyReport(data)) {
+      const [data, hydMeta] = await Promise.all([fetchReport(), loadHydrationMeta()]);
+      if (!applyReport(data, hydMeta)) {
         $('tradeBody').innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-sm text-desk-muted">
           Report not found. Run <code class="text-desk-accent font-mono">scripts/Bang_Bang_Da.command</code><br/>
           <span class="text-[10px]">Or: python3 scripts/bang_bang_da_server.py + bang_bang_da_calculator.py</span>
         </td></tr>`;
+        return;
       }
+      // Surface stale static report vs live hydration without blocking paint.
+      try {
+        const repDay = String(report.as_of || '').slice(0, 10);
+        const hydDay = String(hydMeta?.as_of || '').slice(0, 10);
+        if (repDay && hydDay && repDay < hydDay) {
+          const banner = document.getElementById('bbdmStaleBanner');
+          if (banner) {
+            banner.classList.remove('hidden');
+            banner.textContent = `Report as_of ${repDay} lags hydration ${hydDay} (${hydMeta.snapshot_id || '—'}). Re-run Bang_Bang_Da.command or start API :8766.`;
+          }
+        }
+      } catch (_) { /* optional */ }
     }
 
     async function refreshWithWindow() {
