@@ -1,9 +1,10 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (rebuild + dist smoke closed · go-live walk-through next)  
+**Last updated:** July 9, 2026 (TF+BW+BBDM residual closed · operator walk-through next)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`f52ff1b`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`** · C7 code **`3ecf23d`**
+**HEAD:** `main` tip **`d68289c`** · TF re-merge **`c93ba07`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`** · C7 code **`3ecf23d`**  
+**Live snapshot:** **`global-2026-07-09-raw2wtm-01`** · TF `validation_status=complete` · BBDM gate score **50** (not 07-06 / 38)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,19 +16,20 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · rebuild + smoke closed)
+## NEW SESSION — start here (Jul 9 · TF+BW+BBDM residual closed)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip f52ff1b
+Repo: Whinfell_Transmission_Control · main tip d68289c
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: Desk_Feedback_Log.md · Progress_Log.md · Refresh Bug.txt (FIXED) · Fix Hydration 2.txt (FIXED)
-Shipped: FALLBACK guard · atomic hydration · rebuild+dist smoke ×5 RENDER SUCCESS (global-2026-07-08-raw2wtm-01)
-Next: (1) live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live gate)
-     (2) Task Force re-gather+merge on 07-08 snapshot (phase23_console / TF tests currently fail without task_force block)
-     (3) optional PR-8 light unify only if walk-through needs it
-Do NOT re-open boot badge for data-staleness · do NOT re-open publish atomicity without new bug
+Shipped: FALLBACK guard · atomic hydration · TF on global-2026-07-09-raw2wtm-01 (complete) ·
+  full-desk Refresh hydrate + BW dual stamps · BBDM re-score 07-09 (score 50, cache-bust+no-store) ·
+  residual re-verify + dist smoke ×3 RENDER SUCCESS
+Next: (1) live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live gate ONLY)
+     (2) optional PR-8 light unify only if walk-through needs it
+Do NOT re-open boot badge · atomic publish · TF re-merge · BBDM 07-06 gate without new bug
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -44,11 +46,12 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`f52ff1b`** (docs pin after hydration H1–H3) |
+| Branch | `main` tip **`d68289c`** (desk full hydrate + BW stamps + BBDM 07-09) · strategy pin this close-out |
+| TF re-merge | **`c93ba07`** on `global-2026-07-09-raw2wtm-01` · `validation_status=complete` |
 | Hydration publish | **`def1cd7`/`35fb486`** `Atomic Hydration Publish H1-H3` |
 | Refresh guard commit | **`7b4aee5`** sticky RENDER FALLBACK recovery |
-| Working tree | Clean · only untracked `collect.log` noise |
-| `dist/` | **gitignored** — rebuilt Jul 9 smoke · stamp `2026-07-09T14:38:31Z` |
+| Working tree | Clean after strategy pin · only untracked `collect.log` noise |
+| `dist/` | **gitignored** — rebuilt Jul 9 residual smoke · stamp `2026-07-09T15:03:46Z` |
 | WMC `?_=` leftover | **Already in tree** — `midwest_compute/wmc-hydrate.js` cache-bust + `no-store` |
 | Remote | Not pushed this session — push only if Clark asks |
 
@@ -70,31 +73,35 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | `3ecf23d` |
 | **Refresh guard** | Sticky FALLBACK + boot poll | `logConsoleGuard` · recover SUCCESS · 30s poll · null-safe cmd bar | **`7b4aee5`** |
 | **Hydration H1–H3** | Atomic publish + UI stamps | tmp+validate+replace · dual docs/data · `sources_manifest` · toast stamps | **`def1cd7`** |
-| **Rebuild + smoke** | Dist hard-refresh gate | `build_web.sh` · Playwright ×5 **RENDER SUCCESS** · snapshot `global-2026-07-08-raw2wtm-01` | docs pin this close-out |
+| **TF on live snap** | Re-gather + stubs + merge | `task_force` on `global-2026-07-09-raw2wtm-01` · complete | **`c93ba07`** |
+| **Desk Refresh + BW + BBDM** | Full hydrate · dual stamps · re-score | deploy hydrate first · BW hyd vs quote · BBDM day=07-09 score 50 | **`d68289c`** |
+| **Residual re-verify** | Gates + dist smoke | TF/BW/BBDM/atomic/safe_boot PASS · dist ×3 RENDER SUCCESS | docs pin this close-out |
 
 **Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK  
 **Tests at refresh guard:** `safe_boot_render` · `refresh_render_guard` — PASS  
 **Tests at hydration H1–H3:** `test_atomic_hydration_publish` · enrich v2 · auto_collect_panel — PASS  
-**Tests at rebuild+smoke (Jul 9):** atomic publish · safe_boot · refresh_guard · auto_collect · desk probes · freshness · rv_horizon — PASS · dist smoke ×5 PASS  
-**Known fail (not go-live blockers):** `phase23_console` · `task_force_wtm_export` · `task_force_panel_feed` — live `latest.json` has **no** `task_force` block (sidecar `data/hydration/task_force.json` still on **07-04** snapshot)
+**Tests at TF re-merge:** `test_complete_task_force_stubs` · `test_merge_task_force` · `task_force_wtm_export` · `task_force_panel_feed` · `phase23_console` — PASS  
+**Tests at desk/BW/BBDM:** `desk_data_ops_standalone` · `basis_watch_refresh` · `basis_watch_source_align` · `auto_collect_panel` · `test_bang_bang_da` — PASS  
+**Tests at residual re-verify (Jul 9):** atomic · safe_boot · refresh_guard · TF suite · desk/BW · BBDM — PASS · `build_web` stamp `2026-07-09T15:03:46Z` · dist smoke ×3 **RENDER SUCCESS** / `lastRenderOk=true`  
+**Closed gaps:** prior “no task_force block” / “BBDM stuck on 07-06” / “TF re-merge next” — **done** on `global-2026-07-09-raw2wtm-01`
 
 ### Next action for new session
 
-**→ Live desk walk-through / operator ratings (go-live gate)**
+**→ Live desk walk-through / operator ratings (go-live gate) — only remaining human step**
 
 | Priority | Goal | Detail |
 |----------|------|--------|
-| **1** | Rebuild + smoke | **Done** Jul 9 — `build_web.sh` · dist smoke ×5 RENDER SUCCESS · `global-2026-07-08-raw2wtm-01` Fresh |
-| **2** | Live desk walk-through | Operator ratings → `08_Deliverables/Desk_Feedback_Log.md` (go-live gate) |
-| **3** | Task Force on 07-08 | `--gatherer` on current hydration · Grok specialists or stubs · `--merge` · re-copy hydration · restore phase23/TF tests |
-| **4 (optional)** | PR-8 light unify | `--wf-*` vs `main.css` dual system — only if walk-through needs it |
-| Out of scope | `.wtc-*` DOM · re-open C0–C7 · re-open boot badge · re-open atomic publish without new bug · merge stale 07-04 TF over 07-08 score |
+| **1** | Live desk walk-through | Operator ratings → `08_Deliverables/Desk_Feedback_Log.md` (go-live gate) |
+| **2 (optional)** | PR-8 light unify | `--wf-*` vs `main.css` dual system — only if walk-through needs it |
+| Out of scope | `.wtc-*` DOM · re-open C0–C7 · re-open boot badge · re-open atomic publish without new bug · TF re-merge (already on 07-09) · invent multi-month curve history for quartile cells |
 
 **Boot / data fixes (done):**
 - `scan_kpi_strip.js` `childList()` via `Array.from` — HTMLCollection methods
 - **Refresh guard** — sticky `RENDER FALLBACK` recovery · commit **`7b4aee5`**
 - **Atomic hydration** — `copy_hydration_bundle.sh` dual dest · enrich `os.replace` · Collect/Refresh stamp toasts · commit **`def1cd7`**
-- **Rebuild + smoke** — dist pipeline Fresh · score path uses raw2wtm (58) until TF re-merge
+- **TF on live snapshot** — complete on `global-2026-07-09-raw2wtm-01` · commit **`c93ba07`**
+- **Desk Refresh full hydrate** · BW dual as_of chrome · BBDM re-score + cache-bust · commit **`d68289c`**
+- **Residual re-verify** — dual-dest TF parity · all gating suites green · dist RENDER SUCCESS ×3
 
 ### Recommended open commands
 
@@ -105,13 +112,14 @@ git log -1 --oneline
 python3 -m pytest tests/test_atomic_hydration_publish.py -q
 node tests/safe_boot_render.test.mjs
 node tests/refresh_render_guard.test.mjs
+node tests/phase23_console.test.mjs
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
 # hard-refresh http://127.0.0.1:8765/?boot_log=1
-# Refresh data → toast/badge as_of/snapshot for global-2026-07-08-raw2wtm-01
+# Refresh data → toast/badge as_of/snapshot for global-2026-07-09-raw2wtm-01
 ```
 
-Browser checklist: **RENDER SUCCESS** · hydrated widgets · freshness stamp matches published snapshot · no sticky FALLBACK · Collect/Refresh toast shows snapshot_id.
+Browser checklist: **RENDER SUCCESS** · hydrated widgets · TF score path live · freshness stamp matches published snapshot · no sticky FALLBACK · Collect/Refresh toast shows snapshot_id · BasisWatch shows hydration stamp separate from futures quote date · BBDM report day = hydration day.
 
 ---
 
@@ -448,6 +456,6 @@ python3 scripts/bang_bang_da_server.py   # :8766 — keep running for UI window 
 curl -s "http://127.0.0.1:8766/api/report?window=60" | python3 -m json.tool | head
 ```
 
-**Session close (Jul 9 rebuild + smoke):** tip **`f52ff1b`** · hydration H1–H3 + refresh guard shipped · dist smoke ×5 **RENDER SUCCESS** · snapshot **`global-2026-07-08-raw2wtm-01`** Fresh · **Next gate** = operator ratings (`Desk_Feedback_Log.md`) · then TF re-merge on 07-08.
+**Session close (Jul 9 residual):** code tip **`d68289c`** · strategy pin this close-out · TF on **`global-2026-07-09-raw2wtm-01`** complete · full-desk Refresh + BW dual stamps + BBDM score 50 · dist smoke ×3 **RENDER SUCCESS** · **Next gate** = operator ratings only (`Desk_Feedback_Log.md`).
 
 **Desk smoke:** `bash scripts/build_web.sh` · `cd dist && python3 -m http.server 8765` · hard-refresh `/?boot_log=1` · badge **RENDER SUCCESS** · optional `?safe_boot=1` · Collect CSVs needs agent `:8767`.

@@ -1,7 +1,47 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (rebuild + dist smoke · tip `f52ff1b`)
+**Last updated:** July 9, 2026 (TF+BW+BBDM residual re-verify · tip `d68289c`)
+
+---
+
+## July 9, 2026 — TF + desk Refresh + BBDM residual close-out
+
+```text
+CHUNK ID: DESK-tf-bw-bbdm-residual
+PHASE: Go-live residual balance
+GOAL: Close TF-on-live-snap · full-desk Refresh stamps · BBDM not 07-06 · re-verify + pin strategy
+STATUS: CLOSED — code already at c93ba07 + d68289c · residual = re-verify + strategy pin
+
+CONTEXT
+- Prior plan chunks shipped: TF re-merge (c93ba07) · desk full hydrate / BW dual stamps / BBDM re-score (d68289c)
+- Strategy docs still listed TF re-merge + 07-08 smoke as open; residual session re-ran gates only
+
+SHIPPED STATE (verified)
+- Dual dest hydration: docs/data + data/hydration latest.json
+  snapshot_id=global-2026-07-09-raw2wtm-01
+  task_force.snapshot_id match · validation_status=complete
+- Desk Refresh: deploy hydrate first (build 1.2-DESK-OPS-FULL-HYDRATE-2026-07-09) · stamp as_of/snapshot_id/freshness
+- BasisWatch: hydration as_of separate from futures quote date chrome
+- BBDM: bang_bang_da_report.json as_of day 2026-07-09 · gate.whinfell_score=50 · fetch ?_=&no-store
+
+QA
+- [x] dual-dest TF parity stamps
+- [x] test_complete_task_force_stubs · test_merge_task_force PASS
+- [x] task_force_wtm_export · task_force_panel_feed · phase23_console PASS
+- [x] desk_data_ops_standalone · basis_watch_refresh · basis_watch_source_align · auto_collect_panel PASS
+- [x] test_bang_bang_da PASS · report day ≠ 2026-07-06 · not score-38 artifact
+- [x] test_atomic_hydration_publish · safe_boot_render · refresh_render_guard PASS
+- [x] bash scripts/build_web.sh OK · stamp 2026-07-09T15:03:46Z
+- [x] dist hydration + BBDM report parity with sources
+- [x] Playwright dist smoke ×3 — all RENDER SUCCESS · lastRenderOk=true · 0 page errors
+- [ ] Operator COMET/Chrome ratings (Desk_Feedback_Log) — human gate only
+
+NEXT SESSION
+1. Live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live)
+2. Optional PR-8 light unify only if walk-through needs it
+3. Do not re-open TF re-merge / boot badge / atomic publish without new bug
+```
 
 ---
 
@@ -11,31 +51,24 @@
 CHUNK ID: DESK-smoke-rebuild
 PHASE: Go-live gate
 GOAL: Confirm dist serves RENDER SUCCESS + published 07-08 hydration after H1–H3
-STATUS: CLOSED — no code change · strategy pin this close-out
+STATUS: CLOSED — superseded by DESK-tf-bw-bbdm-residual (snapshot now global-2026-07-09-raw2wtm-01)
 
 CONTEXT
 - BUILD_TODO next #1 after hydration H1–H3 = rebuild + smoke
-- Working tree clean at tip f52ff1b
+- Working tree clean at tip f52ff1b (then c93ba07 / d68289c)
 - WMC ?_= leftover already present in midwest_compute/wmc-hydrate.js (committed)
 
 QA
 - [x] test_atomic_hydration_publish · safe_boot_render · refresh_render_guard · auto_collect_panel PASS
 - [x] run_desk_probes · freshness_indicators · rv_horizon_fallback PASS
-- [x] bash scripts/build_web.sh OK · stamp 2026-07-09T14:38:31Z
-- [x] dist/data/hydration/latest.json snapshot=global-2026-07-08-raw2wtm-01 · freshness=fresh · as_of=2026-07-08T03:56:43+00:00
-- [x] Playwright headless hard-refresh ×5 — all RENDER SUCCESS · lastRenderOk=true · Pipeline: Fresh · 0 page errors
+- [x] bash scripts/build_web.sh OK · stamp 2026-07-09T14:38:31Z (later residual rebuild 15:03:46Z)
+- [x] Playwright hard-refresh smoke — RENDER SUCCESS · lastRenderOk=true
+- [x] Task Force re-merge + residual re-verify closed TF / phase23 gap (see residual entry)
 - [ ] Operator COMET/Chrome ratings (Desk_Feedback_Log)
 
-KNOWN GAP (not smoke blocker)
-- live latest.json has no task_force block
-- data/hydration/task_force.json still snapshot global-2026-07-04-raw2wtm-01 (score 69 stubs)
-- phase23_console · task_force_wtm_export · task_force_panel_feed FAIL until TF re-gather/merge on 07-08
-- Do NOT merge stale 07-04 TF over raw2wtm score 58
-
-NEXT SESSION
+NEXT SESSION (historical — residual closed TF item)
 1. Live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live)
-2. Task Force --gatherer on 07-08 · specialists/stubs · --merge · re-copy hydration
-3. Optional PR-8 light unify only if walk-through needs it
+2. Optional PR-8 light unify only if walk-through needs it
 ```
 
 ---
@@ -73,10 +106,9 @@ QA
 - [x] post-H1–H3 rebuild + Playwright ×5 (see DESK-smoke-rebuild)
 - [ ] COMET / live desk operator ratings
 
-NEXT SESSION
+NEXT SESSION (historical — residual closed TF item)
 1. Live desk walk-through / Desk_Feedback_Log ratings (go-live)
-2. Task Force re-merge on 07-08 (do not paste 07-04 stubs over score 58)
-3. Do not re-open boot badge for data-staleness
+2. Do not re-open boot badge for data-staleness · TF re-merge already on 07-09
 ```
 
 ---
