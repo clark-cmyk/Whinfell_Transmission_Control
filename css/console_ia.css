@@ -2511,7 +2511,9 @@ body.ia-layer-dig.ia-dig-view-basis-watch .ia-midwest-crush-host {
   font-style: normal;
 }
 /* ── COMET C6 — desk links toolbar (map COMET §10; no class fork) ──
- * Koyfin / Barchart / Docs as accent toolbar items under Tools strip.
+ * Koyfin / Barchart / Docs as accent toolbar items. Standalone TOOLS
+ * strip label removed (utility label cleanup) — empty ::after still
+ * forces a flex wrap before external links.
  */
 body.ia-shell-active .console-tech-meta {
   display: flex;
@@ -2551,24 +2553,18 @@ body.ia-shell-active a#ddVersionBadge:hover {
   background: var(--wf-accent-soft);
   text-decoration: underline;
 }
+/* Flex line-break only — no visible TOOLS label */
 body.ia-shell-active .console-tech-meta::after {
-  content: "Tools";
+  content: "";
   order: 19;
   flex: 1 1 100%;
-  min-height: 22px;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--wf-gap-2);
-  margin-top: var(--wf-gap-1);
+  height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
   border: none;
-  border-radius: 0;
-  background: transparent;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--wf-text-3);
-  box-sizing: border-box;
+  overflow: hidden;
+  pointer-events: none;
 }
 /* Inline toolbar row: Koyfin + Barchart side-by-side */
 body.ia-shell-active .console-tech-meta a.console-chip--external {
@@ -4120,6 +4116,54 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
     border-left: none;
     border-top: 1px solid var(--wf-border);
     max-height: min(280px, 40vh);
+  }
+}
+
+/* ── Workspace width + left-rail zoom resilience (desk ≥1025px)
+ * Use full shell width; fixed left/right tracks so Command+ zoom crunches
+ * the center canvas first, not nav labels. Sits above ≤1024 collapse band;
+ * C7 ≤900 stack unchanged.
+ */
+@media (min-width: 1025px) {
+  :root {
+    --wf-rail-w: 260px;
+    --ia-left-w: 260px;
+  }
+
+  .ia-workspace {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    /* Fixed left · fluid center · fixed right — full horizontal span */
+    grid-template-columns: 260px minmax(0, 1fr) 280px;
+  }
+
+  body.ia-left-collapsed .ia-workspace {
+    grid-template-columns: var(--ia-left-w-collapsed) minmax(0, 1fr) 280px;
+  }
+
+  .ia-left-frame {
+    min-width: 260px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  /* Icons-only rail must stay narrow when collapsed */
+  body.ia-left-collapsed .ia-left-frame {
+    min-width: 0;
+  }
+
+  .ia-center-canvas {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ia-right-frame {
+    min-width: 240px;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 

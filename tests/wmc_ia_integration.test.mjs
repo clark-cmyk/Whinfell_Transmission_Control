@@ -16,7 +16,8 @@ function runHtmlChecks() {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
   assert(html.includes('ia-specialized-tools'), 'Specialized Tools nav group');
-  assert(html.includes('Specialized tools'), 'Specialized tools label');
+  assert(html.includes('wf-rail-section__label">Tools'), 'Tools rail label');
+  assert(!html.includes('>Specialized tools<'), 'old Specialized tools label removed');
   assert(html.includes('btnIaBasisWatch'), 'BasisWatch nav button');
   const registry = fs.readFileSync(path.join(ROOT, 'js/top_utility_registry.js'), 'utf8');
   assert(registry.includes('btnDeskRefresh'), 'global refresh control registered');
