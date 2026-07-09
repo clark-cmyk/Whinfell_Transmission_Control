@@ -1,7 +1,7 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (hard-refresh RENDER FALLBACK guard · uncommitted)
+**Last updated:** July 9, 2026 (refresh guard close-out · `7b4aee5` committed · tip `3c4ccf0`)
 
 ---
 
@@ -11,6 +11,7 @@
 CHUNK ID: BOOT-refresh-guard
 PHASE: Stability
 GOAL: Healthy hard-refresh never sticky-shows RENDER FALLBACK when desk paint succeeds
+STATUS: CLOSED — committed 7b4aee5 · tip 3c4ccf0 · strategy docs pinned this close-out
 
 CONTEXT
 - Symptom: Chrome + COMET hard-refresh sometimes left #js-boot-check on RENDER FALLBACK
@@ -34,14 +35,15 @@ QA
 - [x] safe_boot_render PASS
 - [x] refresh_render_guard PASS
 - [x] browser: slow hydrate (4.5s) ends RENDER SUCCESS · forced FALLBACK recovers
-- [ ] committed
-- [ ] build_web.sh → dist hard-refresh smoke ×5
-- [ ] COMET hard-refresh smoke
+- [x] committed (7b4aee5)
+- [x] strategy docs pin (close-out Jul 9)
+- [x] build_web.sh → dist hard-refresh smoke ×5 (Playwright headless · all RENDER SUCCESS / lastRenderOk)
+- [ ] COMET hard-refresh smoke (operator — same URL `?boot_log=1`)
 
 NEXT SESSION
-1. Commit refresh guard (+ strategy doc updates)
-2. build_web.sh · serve dist · hard-refresh badge check
-3. Live desk walk-through / operator ratings (go-live)
+1. Confirm dist smoke if not just run · live desk walk-through / operator ratings (go-live)
+2. Hydration reliability micro-chunk 1 only (Fix the refresh-hydration.txt) — atomic publish
+3. Do NOT re-open boot badge policy for data-staleness
 4. Optional: PR-8 light unify
 ```
 
@@ -53,6 +55,7 @@ NEXT SESSION
 CHUNK ID: BOOT-hasRcZones
 PHASE: Stability
 GOAL: Stop renderAll / cockpit meta fail from HTMLCollection lacking Array methods
+STATUS: CLOSED — committed 491891c (before refresh guard)
 
 CONTEXT
 - Known note: hasRcZones used (layout.children || []).some — HTMLCollection has no .some
@@ -64,11 +67,11 @@ CHANGES
 
 QA
 - [x] scan_kpi_strip · phase16 · koyfin_widget_shell PASS
-- [ ] committed
-- [ ] browser hard-refresh · cockpit meta paints
+- [x] committed (491891c)
+- [ ] browser hard-refresh · cockpit meta paints (covered by desk smoke)
 
 NEXT SESSION
-- superseded by BOOT-refresh-guard (commit + desk smoke)
+- superseded by BOOT-refresh-guard (closed)
 ```
 
 ---
