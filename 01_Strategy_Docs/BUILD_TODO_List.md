@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C6 links + forms shipped · next C7)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`cf5c57e`** · C6 code **`cf5c57e`** · tree clean (noise untracked only)
+**HEAD:** `main` tip **`0f49c87`** · C6 code **`cf5c57e`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip cf5c57e · C6 cf5c57e · working tree clean
+Repo: Whinfell_Transmission_Control · main tip 0f49c87 · C6 cf5c57e · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C6 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C6 (tokens · density · nav · panel · control · chips · links/forms).
@@ -41,7 +41,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`cf5c57e`** |
+| Branch | `main` tip **`0f49c87`** |
 | Last UI commit | `feat(ui): COMET C6 links toolbar + form fields` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
