@@ -110,7 +110,16 @@ function runShellJsChecks() {
   assert(css.includes('--ia-left-w: var(--wf-rail-w)'), 'COMET C0 rail width bridge');
   assert(!css.includes('.wtc-shell'), 'COMET C0 must not introduce .wtc-shell class fork');
   assert(!css.includes('.wtc-widget'), 'COMET C0 must not introduce .wtc-widget class fork');
+  // COMET C1 — shell density (apply tokens; no hard-coded 72px top, no .wtc-* fork)
+  assert(css.includes('--ia-top-h: var(--wf-header-h)'), 'COMET C1 --ia-top-h bridges to --wf-header-h');
+  assert(!css.includes('--ia-top-h: 72px'), 'COMET C1 retired hard-coded 72px top height');
+  assert(css.includes('min-height: var(--wf-header-h)'), 'COMET C1 applies --wf-header-h to header chrome');
+  assert(css.includes('height: var(--wf-status-strip-h)'), 'COMET C1 expanded toggle strip uses --wf-status-strip-h');
   assert(css.includes('.ia-widget-grid'), 'widget grid CSS');
+  assert(
+    /\.ia-widget-grid\s*\{[^}]*gap:\s*var\(--wf-gap-3\)/s.test(css),
+    'COMET C1 widget grid gap uses --wf-gap-3'
+  );
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

@@ -1,7 +1,40 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (handoff @ 38f23a3 · next COMET C1)
+**Last updated:** July 9, 2026 (COMET C1 density · next C2)
+
+---
+
+## July 9, 2026 — COMET CSS C1 (shell density)
+
+```text
+CHUNK ID: COMET-C1
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Apply C0 density tokens — 44px header feel · rail/canvas gap · no new palette · no .wtc-*
+
+CONTEXT
+- Spec: COMET_CSS_Refactor_Spec.md (design language only)
+- C0 shipped tokens; C1 consumes them on .ia-* / .wf-* only
+
+CHANGES
+- css/console_ia.css
+  · --ia-top-h: var(--wf-header-h) (retired hard 72px)
+  · expanded toggle strip → --wf-status-strip-h
+  · .ia-top-body / .console-topbar → min/height --wf-header-h · tighter zone padding
+  · .ia-left-body padding/gap → --wf-gap-2
+  · .ia-center-canvas / .ia-widget-grid padding → gap-2/3 tokens (grid gap was hard 12px)
+  · light theme: bridge --ia-top-h / rail widths to density tokens
+- tests/koyfin_widget_shell.test.mjs — C1 density asserts
+
+QA
+- [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [x] committed in e8594d6
+- [ ] browser-verify denser header @ 1440 + light theme + collapse strip
+
+NEXT SESSION
+- COMET C2 nav hover/active — see BUILD_TODO handoff
+```
 
 ---
 

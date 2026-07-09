@@ -1,9 +1,7 @@
 /* Phase 2.3 IA shell — calm neutral workstation (scan · dig · iterate)
  *
- * COMET C0 — token bridge only:
- * Map COMET Koyfin-style slate palette into --wf-* (single system).
- * --ia-* aliases onto --wf-* (no dual hex islands, no .wtc-* class fork).
- * Density / header-height application is C1+; tokens exist here for later chunks.
+ * COMET C0 — token bridge: COMET slate → --wf-*; --ia-* aliases; no .wtc-* fork.
+ * COMET C1 — shell density: apply --wf-header-h / rail-canvas gap-padding via .ia-* /.wf-* only.
  */
 
 :root {
@@ -67,7 +65,7 @@
   --wf-panel-min-h: 264px;
   --wf-panel-tall-h: 420px;
 
-  /* Density tokens (consumed by C1+; values defined only) */
+  /* Density tokens (C1 applies to shell chrome) */
   --wf-header-h: 44px;
   --wf-header-h-collapsed: 28px;
   --wf-status-strip-h: 24px;
@@ -85,7 +83,7 @@
   --ia-accent: var(--wf-accent);
   --ia-amber: var(--wf-warn);
   --ia-red: var(--wf-risk);
-  --ia-top-h: 72px;
+  --ia-top-h: var(--wf-header-h);
   --ia-top-h-collapsed: var(--wf-header-h-collapsed);
   --ia-left-w: var(--wf-rail-w);
   --ia-left-w-collapsed: var(--wf-rail-w-collapsed);
@@ -101,7 +99,7 @@
   background: var(--ia-shell-bg);
 }
 
-/* ── Top frame ── */
+/* ── Top frame (C1 density) ── */
 .ia-top-frame {
   flex-shrink: 0;
   border-bottom: 1px solid var(--ia-border);
@@ -110,9 +108,17 @@
 .ia-top-frame-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
+  gap: var(--wf-gap-2);
+  padding: 0 var(--wf-gap-3);
   min-height: var(--ia-top-h-collapsed);
+  box-sizing: border-box;
+}
+/* Expanded: thin toggle strip only — status-strip height, not a second header band */
+.ia-top-frame:not([data-collapsed="true"]) .ia-top-frame-bar {
+  height: var(--wf-status-strip-h);
+  min-height: var(--wf-status-strip-h);
+  max-height: var(--wf-status-strip-h);
+  justify-content: flex-end;
 }
 .whinfell-logo {
   display: flex;
@@ -166,9 +172,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 6px;
-  padding: 4px 10px 8px;
+  gap: 0;
+  padding: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
+  min-height: var(--wf-header-h);
+  box-sizing: border-box;
 }
 .ia-top-pipeline-strip {
   display: none;
@@ -311,6 +319,14 @@
 .ia-top-body .console-topbar {
   border: none;
   background: transparent;
+  flex: 1;
+  width: 100%;
+  min-height: var(--wf-header-h);
+  height: var(--wf-header-h);
+  max-height: var(--wf-header-h);
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0;
 }
 
 /* KPI tiles */
@@ -444,10 +460,10 @@ body.ia-left-collapsed .wf-nav-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--wf-gap-3);
+  padding: var(--wf-gap-2);
   display: flex;
   flex-direction: column;
-  gap: var(--wf-gap-3);
+  gap: var(--wf-gap-2);
   min-width: 0;
 }
 
@@ -897,7 +913,7 @@ body.ia-shell-active .ia-dd-audit-btn {
   text-align: left;
 }
 
-/* ── Center canvas (Chunk B) ── */
+/* ── Center canvas (Chunk B · C1 density) ── */
 .ia-center-canvas {
   min-height: 0;
   min-width: 0;
@@ -905,7 +921,7 @@ body.ia-shell-active .ia-dd-audit-btn {
   display: flex;
   flex-direction: column;
   gap: var(--wf-gap-3);
-  padding: var(--wf-gap-3);
+  padding: var(--wf-gap-2) var(--wf-gap-3);
   background: var(--wf-canvas-bg);
 }
 
@@ -2688,11 +2704,26 @@ body.ia-shell-active #headerLinkBarchart::before {
   padding-bottom: var(--console-topbar-pad-y, 5px);
 }
 
-/* Slim header in IA mode */
+/* Slim header in IA mode (C1 — 44px via --wf-header-h) */
 body.ia-shell-active .console-topbar {
-  padding: 4px 10px;
-  min-height: auto;
-  border-bottom: 1px solid var(--ia-border);
+  padding: 0 var(--wf-gap-2);
+  min-height: var(--wf-header-h);
+  height: var(--wf-header-h);
+  max-height: var(--wf-header-h);
+  box-sizing: border-box;
+  align-items: center;
+  border-bottom: none;
+}
+body.ia-shell-active .console-topbar-zone {
+  padding: 0 var(--wf-gap-2);
+  gap: var(--wf-gap-1);
+  justify-content: center;
+  min-height: 0;
+}
+body.ia-shell-active .console-topbar--slim .console-topbar-zone--status,
+body.ia-shell-active .console-topbar--slim .console-topbar-zone--actions {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 body.ia-shell-active .console-regime-line,
 body.ia-shell-active .console-regime-sub { display: none; }
@@ -2778,10 +2809,10 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
   .ia-left-body { display: none; }
 }
 
-/* ── Koyfin widget dashboard grid ── */
+/* ── Koyfin widget dashboard grid (C1 density) ── */
 .ia-widget-grid {
   display: grid;
-  gap: 12px;
+  gap: var(--wf-gap-3);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas:
     "cockpit cockpit curve"
@@ -2792,7 +2823,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
   overflow-x: hidden;
   flex: 1;
   min-height: 0;
-  padding: var(--wf-gap-3);
+  padding: var(--wf-gap-2) var(--wf-gap-3);
   background: var(--wf-canvas-bg);
 }
 .wf-panel--risk-cockpit { grid-area: cockpit; min-height: var(--wf-panel-min-h); }
@@ -3732,7 +3763,7 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --wf-shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
   --wf-shadow-md: 0 6px 18px rgba(26, 26, 26, 0.08);
 
-  /* Density tokens unchanged (C1 applies) */
+  /* Density (same values as dark; C1 consumers inherit) */
   --wf-header-h: 44px;
   --wf-header-h-collapsed: 28px;
   --wf-status-strip-h: 24px;
@@ -3752,6 +3783,10 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --ia-accent: var(--wf-accent-teal);
   --ia-amber: var(--wf-warn);
   --ia-red: var(--wf-risk);
+  --ia-top-h: var(--wf-header-h);
+  --ia-top-h-collapsed: var(--wf-header-h-collapsed);
+  --ia-left-w: var(--wf-rail-w);
+  --ia-left-w-collapsed: var(--wf-rail-w-collapsed);
 }
 
 :root[data-theme="light"] .wf-panel,
