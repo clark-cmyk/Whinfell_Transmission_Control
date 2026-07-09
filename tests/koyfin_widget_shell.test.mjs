@@ -40,10 +40,19 @@ function runHtmlChecks() {
   assert(html.includes('id="btnCompareMode"'), 'Compare action present');
   assert(html.includes('id="btnExportNode"'), 'Export node action present');
   assert(html.includes('id="widgetFlipchart"'), 'Flipchart widget present');
+  assert(html.includes('wf-panel--flipchart'), 'Flipchart uses wf-panel chrome');
+  assert(html.includes('id="flipchartPanelMeta"'), 'Flipchart panel meta present');
   assert(html.includes('id="flipchartSlideIndex"'), 'Flipchart slide index present');
   assert(html.includes('id="flipchartRegimeTag"'), 'Flipchart regime pill present');
   assert(html.includes('flipchart-header__title-group'), 'Flipchart header title group present');
+  assert(html.includes('id="cockpitActions"'), 'Flipchart pager/actions present');
+  assert(html.includes('id="cockpitDecisionRail"'), 'Flipchart implications rail present');
+  assert(html.includes('id="btnFlipPrev"'), 'Flipchart prev control present');
+  assert(html.includes('id="btnFlipNext"'), 'Flipchart next control present');
+  assert(html.includes('← → flip · 1–5 jump · f focus · c compare'), 'Flipchart keyboard hint unchanged');
   assert(html.includes('id="widgetDepth"'), 'Depth widget present');
+  assert(html.includes('wf-panel--depth'), 'Depth uses wf-panel chrome');
+  assert(html.includes('id="depthPanelMeta"'), 'Depth panel meta present');
   assert(html.includes('id="depthLaddersWidget"'), 'DepthLaddersWidget present');
   assert(html.includes('id="depthLaddersStatus"'), 'Depth status row present');
   assert(html.includes('class="ladder-viz-region"'), 'Ladder viz region present');
@@ -74,9 +83,12 @@ function runShellJsChecks() {
   assert(shellSrc.includes('hyOasThesisBody'), 'HY OAS thesis host');
   assert(shellSrc.includes('hyOasHandoffActions'), 'HY OAS handoff relocation');
   assert(shellSrc.includes('iaFlipchartHost'), 'flipchart relocation');
+  assert(shellSrc.includes('syncFlipchartPanelMeta'), 'Flipchart panel meta sync');
+  assert(shellSrc.includes('observeFlipchartPanelMeta'), 'Flipchart panel meta observer');
   assert(shellSrc.includes('iaDepthHost'), 'depth relocation');
   assert(shellSrc.includes('assembleDepthLaddersWidget'), 'depth widget assembly');
   assert(shellSrc.includes('syncDepthLaddersStatus'), 'depth status sync');
+  assert(shellSrc.includes('syncDepthPanelMeta'), 'Depth panel meta sync');
   assert(shellSrc.includes('depthLaddersContent'), 'depth content host');
   assert(shellSrc.includes('parsePipelineFreshness'), 'pipeline freshness parser');
   assert(shellSrc.includes('iaTopFreshnessDot'), 'collapsed strip dot sync');
@@ -85,6 +97,19 @@ function runShellJsChecks() {
   const css = fs.readFileSync(path.join(ROOT, 'css/console_ia.css'), 'utf8');
   assert(css.includes(':root[data-theme="light"]'), 'light theme tokens');
   assert(css.includes('--wf-bg-page'), 'wf-bg-page token');
+  // COMET C0 — token bridge (map palette → --wf-*; no .wtc-* class fork)
+  assert(css.includes('--wf-ok:'), 'COMET C0 --wf-ok status token');
+  assert(css.includes('--wf-warn:'), 'COMET C0 --wf-warn status token');
+  assert(css.includes('--wf-risk:'), 'COMET C0 --wf-risk status token');
+  assert(css.includes('--wf-control-bg:'), 'COMET C0 --wf-control-bg token');
+  assert(css.includes('--wf-header-h:'), 'COMET C0 --wf-header-h density token');
+  assert(css.includes('--wf-status-strip-h:'), 'COMET C0 --wf-status-strip-h token');
+  assert(css.includes('--wf-radius-control:'), 'COMET C0 --wf-radius-control token');
+  assert(css.includes('--wf-radius-widget:'), 'COMET C0 --wf-radius-widget token');
+  assert(css.includes('--ia-shell-bg: var(--wf-shell-bg)'), 'COMET C0 --ia-* bridges to --wf-*');
+  assert(css.includes('--ia-left-w: var(--wf-rail-w)'), 'COMET C0 rail width bridge');
+  assert(!css.includes('.wtc-shell'), 'COMET C0 must not introduce .wtc-shell class fork');
+  assert(!css.includes('.wtc-widget'), 'COMET C0 must not introduce .wtc-widget class fork');
   assert(css.includes('.ia-widget-grid'), 'widget grid CSS');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
@@ -94,9 +119,12 @@ function runShellJsChecks() {
   assert(css.includes('#iaRadarHost .transmission-radar .radar-title'), 'radar double-title suppress in host');
   assert(css.includes('.hy-oas-subsection'), 'HY OAS subsection CSS');
   assert(css.includes('.hy-oas-handoff-actions'), 'HY OAS handoff actions CSS');
+  assert(css.includes('.wf-panel--flipchart'), 'Flipchart panel grid area');
+  assert(css.includes('.wf-panel--flipchart .wf-panel__meta'), 'Flipchart panel meta chrome');
   assert(css.includes('.flipchart-slide-index'), 'Flipchart slide index CSS');
   assert(css.includes('.flipchart-regime-tag'), 'Flipchart regime pill CSS');
   assert(css.includes('.depth-ladders-status'), 'Depth status row CSS');
+  assert(css.includes('.wf-panel--depth .wf-panel__meta'), 'Depth panel meta chrome');
   assert(css.includes('.ladder-viz-region'), 'Ladder viz region CSS');
   assert(css.includes('.ia-top-phase-tag'), 'collapsed phase tag CSS');
   assert(css.includes('[data-collapsed="true"] .ia-top-pipeline-strip'), 'collapsed pipeline strip CSS');
@@ -119,9 +147,30 @@ function runActivatorCheck() {
   const mkNode = (id) => ({ id, parentElement: null });
 
   const hyOasMeta = { id: 'hyOasPanelMeta', textContent: '—', setAttribute(k, v) { this[k] = v; } };
+  const flipMeta = { id: 'flipchartPanelMeta', textContent: '—', setAttribute(k, v) { this[k] = v; } };
+  const depthMeta = { id: 'depthPanelMeta', textContent: '—', setAttribute(k, v) { this[k] = v; } };
   const basisLead = { id: 'basisTacticalLead', textContent: 'HY OAS cheap; half size' };
   const chartSub = { id: 'cockpitChartSubtitle', textContent: '—' };
   const basisReading = { id: 'basisReadingValue', textContent: '+12 bps' };
+  const flipPos = { id: 'flipchartPosition', textContent: '2 / 5' };
+  const flipSlide = { id: 'flipchartSlideIndex', textContent: 'Slide 2 of 5' };
+  const flipTitle = { id: 'flipchartTitle', textContent: 'Credit' };
+  const flipRegime = { id: 'flipchartRegimeTag', textContent: 'Defensive' };
+  const depthHydration = { id: 'depthStatusHydration', textContent: '—' };
+  const depthFreshness = { id: 'depthStatusFreshness', textContent: '—' };
+  const depthViz = { id: 'depthStatusViz', textContent: 'Viz —' };
+  const depthWarn = {
+    id: 'depthStatusWarn',
+    textContent: 'WARN',
+    classList: { _s: new Set(['depth-status-badge--hidden']), contains(c) { return this._s.has(c); }, toggle(c, force) {
+      if (force === false) this._s.delete(c); else if (force === true) this._s.add(c); else if (this._s.has(c)) this._s.delete(c); else this._s.add(c);
+    } },
+    attributes: { 'aria-hidden': 'true' },
+    setAttribute(k, v) { this.attributes[k] = v; },
+    getAttribute(k) { return this.attributes[k] ?? null; },
+  };
+  const hydrationImport = { id: 'hydrationImportStatus', textContent: 'Imported 9:41 AM · fresh' };
+  const headerFresh = { id: 'headerFreshnessLabel', textContent: 'fresh' };
   const ctx = {
     document: {
       body: { classList: { _s: new Set(), add(c) { this._s.add(c); }, remove(c) { this._s.delete(c); }, toggle(c) { this._s.has(c) ? this._s.delete(c) : this._s.add(c); } } },
@@ -157,6 +206,18 @@ function runActivatorCheck() {
           basisTacticalLead: basisLead,
           cockpitChartSubtitle: chartSub,
           basisReadingValue: basisReading,
+          flipchartPanelMeta: flipMeta,
+          flipchartPosition: flipPos,
+          flipchartSlideIndex: flipSlide,
+          flipchartTitle: flipTitle,
+          flipchartRegimeTag: flipRegime,
+          depthPanelMeta: depthMeta,
+          depthStatusHydration: depthHydration,
+          depthStatusFreshness: depthFreshness,
+          depthStatusViz: depthViz,
+          depthStatusWarn: depthWarn,
+          hydrationImportStatus: hydrationImport,
+          headerFreshnessLabel: headerFresh,
         };
         return nodes[id] || null;
       },
@@ -168,6 +229,7 @@ function runActivatorCheck() {
     clearInterval() {},
     setTimeout(fn) { fn(); return 0; },
     setInterval(fn) { fn(); return 0; },
+    __vizDiagnostics: { ok: true, passed: 9, total: 10 },
   };
   vm.runInNewContext(shellSrc, ctx);
   ctx.WTM_IaShell.activateShell();
@@ -178,10 +240,19 @@ function runActivatorCheck() {
   assert(hosts.hyOasThesisBody?.includes('basisSummaryStrip'), 'basis structure in Thesis subsection');
   assert(hosts.hyOasThesisBody?.includes('cockpitDetailBand'), 'component drivers in Thesis subsection');
   assert(hosts.hyOasThesisBody?.includes('hyOasHandoffActions'), 'handoff row in Thesis subsection');
+  assert(hosts.iaFlipchartHost?.includes('cockpitActions'), 'flipchart pager relocated into card');
+  assert(hosts.iaFlipchartHost?.includes('cockpitDecisionRail'), 'flipchart implications relocated into card');
   assert(hosts.depthLaddersContent?.includes('consoleDepthDisclosure'), 'depth disclosure in widget content');
   const metaLine = ctx.WTM_IaShell.syncHyOasPanelMeta();
   assert(metaLine === 'HY OAS cheap; half size · +12 bps', 'HY OAS panel meta line');
   assert(hyOasMeta.textContent === metaLine, 'HY OAS panel meta written');
+  const flipLine = ctx.WTM_IaShell.syncFlipchartPanelMeta();
+  assert(flipLine === '2/5 · Credit · Defensive', 'Flipchart panel meta line');
+  assert(flipMeta.textContent === flipLine, 'Flipchart panel meta written');
+  ctx.WTM_IaShell.syncDepthLaddersStatus();
+  const depthLine = ctx.WTM_IaShell.syncDepthPanelMeta();
+  assert(depthLine === 'Applied · fresh · Viz 9/10', 'Depth panel meta line');
+  assert(depthMeta.textContent === depthLine, 'Depth panel meta written');
   ctx.WTM_IaShell.focusWidget('hy_oas');
   assert(typeof ctx.WTM_IaShell.focusWidget === 'function', 'focusWidget callable');
 }

@@ -1,22 +1,31 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (handoff · Chunks 4–5 committed)  
+**Last updated:** July 9, 2026 (Koyfin 6–7 + COMET C0 shipped)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` · Koyfin Chunks 4–5 (radar + HY OAS panel meta)  
-
-
+**HEAD:** `main` · see latest commit (Chunks 6–7 + COMET C0)  
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
 - `Whinfell UI Optimization Plan.md.txt`  
 - `Whinfell Transmission Control — UI Optimization Report for GROK.txt`  
 - `Whinfell Transmission Control — Light Theme Spec for GROK.txt` *(truncated on disk)*  
+- **`01_Strategy_Docs/COMET_CSS_Refactor_Spec.md`** — Koyfin-style grid shell CSS (from COMET; Phase 2.3) · root copy `COMET CSS Refactor Spec.txt`  
 - Care package: prior layout thrash → consolidation + **small verified changes only**
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after Chunks 4–5)
+## NEW SESSION — start here (Jul 9 · after COMET C0)
+
+### Paste block (drop into next session)
+
+```text
+Repo: Whinfell_Transmission_Control · Koyfin 1–7 + COMET C0 done
+Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md
+Next: COMET C1 shell density (apply --wf-header-h / rail-canvas padding) OR browser-verify C0 slate + light.
+Rules: edit root → build_web.sh → serve dist only · one small change · tests after · no .wtc-* fork.
+```
 
 ### Rules (non-negotiable)
 
@@ -25,62 +34,60 @@
 3. **One chunk / one concern per step** · max ~6 files · run tests before next edit
 4. No Python one-off HTML rewrites without `import re` / targeting the wrong tree
 5. Prefer `git restore` over stacking failed CSS experiments
+6. COMET: **map don’t fork** — never bulk-rename markup to `.wtc-*`
 
 ### Git / working tree
 
 | Item | State |
 |------|--------|
-| Branch | `main` |
-| Working tree | **Clean** after Chunks 4–5 commit (untracked noise ok) |
+| Branch | `main` · Koyfin 6–7 + COMET C0 committed |
+| Working tree | clean after commit (noise untracked ok) |
 | `dist/` | **gitignored** — always rebuild after source changes |
-| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` (ok to leave) |
+| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root COMET inbox copy |
 | Remote | Not pushed this session — push only if Clark asks |
 
-### Shipped / ready (Chunks 1–5)
+### Shipped (Koyfin 1–7 + COMET C0)
 
 | Chunk | Goal | Key change | Status |
 |-------|------|------------|--------|
-| **1** | TopShell heal | `relocateTopBar()` · dist = root via `build_web.sh` | **Done · committed** |
-| **2** | Left icons-only | Drop `display:none` on collapsed left body · RC/RD/HY… codes · 44px rail | **Done · committed** |
-| **3** | Risk Cockpit polish | `#riskCockpitPanelMeta` · `syncPanelMeta()` Score · Gate · Regime | **Done · committed** |
-| **4** | Radar + Risk Curve | Sibling `wf-panel`s · `#radarPanelMeta` · hide double title · min-heights | **Done · committed** |
-| **5** | HY OAS proxy | Structure pre-existed · `#hyOasPanelMeta` · `syncHyOasPanelMeta` · chrome | **Done · committed** |
+| **1–5** | TopShell · left · cockpit · radar · HY OAS | panel meta + grid | **Done** `825d9f4` / `9cca83a` |
+| **6** | Flipchart polish | `#flipchartPanelMeta` | **Done** (this commit) |
+| **7** | Depth polish | `#depthPanelMeta` | **Done** (this commit) |
+| **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · no `.wtc-*` | **Done** (this commit) |
 
-**Tests (Chunks 4–5):** `transmission_radar` · `koyfin_widget_shell` · `phase16_integration` · `wmc_ia_integration` — PASS
-
-**Note:** Plan completeness table is **stale**. Root already has widget grid + PR-6…7 structure. Do **not** re-scaffold. Polish gaps only.
+**Tests at ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS
 
 ### Next action for new session
 
-**→ Browser-verify after hydrate, then Chunk 6 (PR-6): Flipchart polish only if gaps**
+**→ COMET C1 shell density** (apply tokens already defined) · then C2–C5 chrome · PR-8 light remainder
 
 | Goal | Detail |
 |------|--------|
-| Browser | Radar meta · HY OAS meta after mission read · Here's Why / Compare / Export still work |
-| Chunk 6 | Flipchart card structure exists — polish only if gaps |
-| Out of scope | Light theme unify (Chunk 8) · widget rewrites · transaction codes |
+| C0 | **Done** — palette + semantic + density *tokens only* (heights not applied yet) |
+| C1 | Apply `--wf-header-h` feel · rail/canvas gap/padding via existing classes |
+| C2+ | Nav hover · card radius lock · chips · links |
+| Out of scope | `.wtc-*` DOM fork · widget re-scaffold · transaction codes |
 
-**PR-6 files (if polish needed):** `index.html` · `css/console_ia.css` · `js/console_ia_shell.js` · flipchart hosts · `tests/koyfin_widget_shell.test.mjs`
+**Known boot note:** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail. Separate fix if still open.
 
 ### Recommended open commands
 
 ```bash
 cd ~/Desktop/Whinfell_Transmission_Control
-git log -2 --oneline   # Chunks 4–5 · prior 1–3
+git status
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
 # hard-refresh http://127.0.0.1:8765/
 node tests/koyfin_widget_shell.test.mjs
-node tests/transmission_radar.test.mjs
 ```
 
-Browser checklist: Cockpit / Radar / **HY OAS** panel meta · Numerics + Thesis · handoff actions · left **HY** code.
+Browser checklist: dark slate shell · Flipchart/Depth meta · light theme toggle still usable · no layout thrash.
 
 ---
 
 ## Koyfin UI Optimization (dashboard grid) — PR track
 
-Specs: UI Optimization Plan + Report + Light Theme Spec.
+Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor Spec**.
 
 | PR | Chunk | Goal | Status |
 |----|-------|------|--------|
@@ -89,20 +96,72 @@ Specs: UI Optimization Plan + Report + Light Theme Spec.
 | PR-3 | 3 | Risk Cockpit `wf-panel` polish | **Done** Jul 9 (panel meta + chrome lock) |
 | PR-4 | 4 | Radar + Risk Curve dashboard row | **Done** Jul 9 (panel meta · no re-scaffold) |
 | PR-5 | 5 | HY OAS proxy widget | **Done** Jul 9 (panel meta · handoff row locked) |
-| PR-6 | 6 | Flipchart widget | Structure exists — polish only · **Next** |
-| PR-7 | 7 | Depth & Ladders widget | Structure exists; Playwright depth test timeout open |
-| PR-8 | 8 | Light theme unify (`--wf-*` vs `main.css` dual system) | Tokens in `console_ia.css`; dual palette still |
+| PR-6 | 6 | Flipchart widget | **Done** Jul 9 (panel meta · no re-scaffold) |
+| PR-7 | 7 | Depth & Ladders widget | **Done** Jul 9 (panel meta · no re-scaffold) |
+| PR-8 | 8 | Light theme unify (`--wf-*` vs `main.css` dual system) | Partial — C0 bridges `--ia-*`; main.css dual remains |
+| **COMET** | C0 | Token bridge | **Done** Jul 9 |
+| **COMET** | C1–C6 | Density · nav · cards · chips · links | **Next** — C1 apply header/padding tokens |
 
 ### Known gaps (do not re-break)
 
 | Gap | Priority |
 |-----|----------|
 | Left collapse hides body (icons-only dead) | **Fixed Chunk 2** |
-| Dual light systems (`main.css` vs `--wf-*` GROK tokens) | P1 — Chunk 8 |
+| Dual light systems (`main.css` vs `--wf-*` GROK tokens) | P1 — Chunk 8 + COMET tokens |
+| COMET hard-coded hex vs `--wf-*` | P1 — never ship a second class system; alias into tokens |
 | `depth_ladders_widget` Playwright timeout | P2 investigate (BOOT?) |
 | Transaction / output codes on nav | Deferred |
-| Operator Precision placement | Deferred (not in DOM) |
+| Operator Precision placement | Deferred (not in DOM) — COMET §9 chips when placed |
 | Light Theme Spec file truncated (~70 lines) | Complete before full Chunk 8 |
+
+---
+
+## COMET CSS Refactor (Koyfin-style shell) — tracked
+
+**Source:** `01_Strategy_Docs/COMET_CSS_Refactor_Spec.md` (canonical) · root `COMET CSS Refactor Spec.txt` (inbox copy)  
+**Goal:** Console feels like a clean Koyfin-style dashboard (header + left nav + central widget grid) — **without** proprietary assets or layout thrash.  
+**Primary file:** `css/console_ia.css` (+ light tokens). Prefer **token + existing class** edits over new DOM.
+
+### Rules (COMET-specific)
+
+1. **Map, don’t fork.** Spec uses `.wtc-*` as *design language only*. Implement via existing `.wtm-ia-shell` / `.ia-*` / `.wf-panel` / `--wf-*`. Do **not** bulk-rename markup to `.wtc-*` unless a later PR deliberately aliases both.
+2. **Hard hex → tokens.** COMET colors (`#020617`, `#1e293b`, `#22c55e`, …) become `--wf-*` / `--ia-*` values (and light-theme counterparts). No new one-off hex islands in component CSS.
+3. **One concern per step** · serve `dist/` only · tests after · `git restore` over stacked CSS experiments.
+4. **Do not re-scaffold** widget grid / relocateNodes hosts. COMET is chrome + density polish.
+
+### Spec → existing shell map
+
+| COMET § | Spec class (intent) | Existing target | Coverage |
+|--------|---------------------|-----------------|----------|
+| 1 Global shell | `.wtc-shell` / `.wtc-main` | `.wtm-ia-shell` · `.ia-body` / main grid | **Partial** — full-height flex/grid exists |
+| 2 Left nav + dashboard | `.wtc-nav` · `.wtc-dashboard` | `.ia-left-frame` · `.ia-center-canvas` / `.ia-widget-grid` | **Partial** — rail + canvas; width tokens 168/44 |
+| 3 Header bar | `.wtc-header` (44px) | `.ia-top-frame` · `.console-topbar` | **Partial** — collapsible; height tokens differ |
+| 4 Search + actions | `.wtc-search` · `.wtc-btn` | top utility chips · Docs/Refresh/Publish | **Open** — normalize control chrome |
+| 5 Nav items | `.wtc-nav-item` · section titles | `.wf-nav-item` · `.ia-view-shortcut` · specialized tools | **Partial** — icons-only codes done (Chunk 2) |
+| 6 Widget grid rows | `.wtc-row` / 3col / full | `.ia-widget-grid` · `grid-template-areas` | **Mostly done** — Koyfin PR-1…6 |
+| 7 Widget cards | `.wtc-widget` · header/body | `.wf-panel` · `__header` / `__body` / `__meta` | **Mostly done** — meta polish 3–6 |
+| 8 Form controls | `.wtc-field` · input/select | HY OAS / dig hosts · mission controls | **Open** — normalize inside panels |
+| 9 KPI chips / tags | `.wtc-chip*` | `.console-chip` · regime tags · status badges | **Partial** — unify warn/ok/risk variants |
+| 10 Links toolbar | `.wtc-link` · link-row | Koyfin/Barchart/Docs strip · desk links | **Open** — toolbar item styling |
+| 11 Freshness strip | `.wtc-status-strip` (24px) | `.ia-top-pipeline-strip` · header freshness | **Partial** — collapsed strip exists |
+| 12 Responsive | stack nav @900px | optional; not blocking desk 1440 | **Deferred** |
+
+### COMET implementation chunks (queued)
+
+| Chunk | Goal | Primary touch | Depends |
+|-------|------|---------------|---------|
+| **C0** | Token bridge: map COMET palette → `--wf-*` / light | `css/console_ia.css` `:root` + `[data-theme="light"]` | **Done** Jul 9 |
+| **C1** | Shell density: header 44px feel · rail/canvas gap/padding | top frame · left frame · canvas padding | **Next** — tokens ready |
+| **C2** | Nav item + section title polish (hover/active) | left nav list · view shortcuts | C0/C1 |
+| **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | PR-3…7 structure |
+| **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | C0 |
+| **C5** | Chip variants ok/warn/risk + status strip height | chips · pipeline strip · regime pills | C0 |
+| **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | C3–C5 |
+| **C7** | Optional responsive @900px | media query only | after C1–C3 stable |
+
+**Acceptance (COMET track overall):** Desk at 1440 looks denser/cleaner Koyfin-like; single token system; no second shell class tree; keyboard + relocateNodes + widget hosts unchanged.
+
+**Out of scope for COMET:** Python rewrites of HTML · widget re-scaffold · transaction codes · chart canvas logic · replacing IA layer scan/dig/iterate.
 
 ---
 
@@ -156,15 +215,19 @@ Specs: UI Optimization Plan + Report + Light Theme Spec.
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0 | **Koyfin Chunk 6** — Flipchart polish only if gaps | **High · active UI track** | BUILD | Structure OK · no re-scaffold · tests |
-| 0a | **Koyfin Chunks 4–5** — Radar + HY OAS panel meta | **Done · committed** | BUILD | meta lines · tests PASS |
-| 0b | **Koyfin Chunks 1–3** committed | **Done** `825d9f4` | BUILD | Committed on `main` |
+| 0e | **COMET C1** — shell density (apply `--wf-header-h` / padding) | **High · next UI track** | BUILD | Use C0 tokens only · no `.wtc-*` · tests |
+| 0d | **COMET CSS C0** — token bridge | **Done** | BUILD | `--wf-*` slate + `--ia-*` bridge · tests PASS |
+| 0 | **Koyfin Chunk 7** — Depth panel meta | **Done** | BUILD | `#depthPanelMeta` · min-height · tests PASS |
+| 0c | **Koyfin Chunk 6** — Flipchart panel meta | **Done** | BUILD | meta · pager+implications · keyboard OK |
+| 0a | **Koyfin Chunks 4–5** — Radar + HY OAS panel meta | **Done** `9cca83a` | BUILD | meta lines · tests PASS |
+| 0b | **Koyfin Chunks 1–3** | **Done** `825d9f4` | BUILD | Committed on `main` |
 | 1 | **Live desk walk-through** — ratings in `Desk_Feedback_Log.md` | **High · go-live gate** | Clark · Wes | All 5 nodes + UI/docs rated |
-| 2 | **Push / desk stack** when ready | **Medium** | Clark | `825d9f4` on remote if desired · no thrash |
+| 2 | **Push / desk stack** when ready | **Medium** | Clark | `9cca83a` on remote if desired · no thrash |
 | 3 | **Task Force live Grok chain** | **Medium** | BUILD | Manual 12-step run → `--merge` → replace specialist stubs with live TxIntegrator |
 | 4 | **Collect agent auto-start** — LaunchAgent on login | **Medium** | BUILD | Agent on `:8767` without manual Terminal tab |
 | 5 | **Post-collect hydration** — auto `copy_hydration_bundle.sh` + import prompt | **Medium** | BUILD | Collect button → fresh bundle → WTC import nudge |
 | 6 | **Morning runbook** — Quick Ref for `.command` + collect agent | **Low** | BUILD | `Whinfell_Quick_Reference_v1.5.md` matches Care Package Jul 5 workflow |
+| 7 | **COMET C7** — optional responsive @900px | **Low** | BUILD | Media query only after C1–C3 stable |
 
 ---
 

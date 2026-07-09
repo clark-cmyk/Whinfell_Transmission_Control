@@ -1,50 +1,95 @@
-/* Phase 2.3 IA shell — calm neutral workstation (scan · dig · iterate) */
+/* Phase 2.3 IA shell — calm neutral workstation (scan · dig · iterate)
+ *
+ * COMET C0 — token bridge only:
+ * Map COMET Koyfin-style slate palette into --wf-* (single system).
+ * --ia-* aliases onto --wf-* (no dual hex islands, no .wtc-* class fork).
+ * Density / header-height application is C1+; tokens exist here for later chunks.
+ */
 
 :root {
-  --ia-shell-bg: #0b0f14;
-  --ia-surface: #121820;
-  --ia-border: rgba(255, 255, 255, 0.08);
-  --ia-muted: #8b9cb3;
-  --ia-text: #e8eef5;
-  --ia-green: #3dd68c;
-  --ia-green-dim: rgba(61, 214, 140, 0.14);
-  --ia-accent: #5eb3ff;
-  --ia-amber: #d6a34a;
-  --ia-red: #cf5c5c;
-  --ia-top-h: 72px;
-  --ia-top-h-collapsed: 28px;
-  --ia-left-w: 168px;
-  --ia-left-w-collapsed: 44px;
-  --ia-bottom-h: 88px;
+  /* ── COMET → --wf-* dark surfaces (slate near-black) ── */
+  --wf-shell-bg: #020617;
+  --wf-rail-bg: #030712;
+  --wf-canvas-bg: #0b1220;
+  --wf-panel-bg: #0f172a;
+  --wf-panel-bg-2: #111c2e;
+  --wf-panel-bg-3: #1e293b;
+  --wf-control-bg: #0f172a;
+  --wf-control-border: #1e293b;
 
-  /* Koyfin framing tokens (Chunks A–B) */
-  --wf-shell-bg: #0b0f14;
-  --wf-rail-bg: #111821;
-  --wf-canvas-bg: #0e151d;
-  --wf-panel-bg: #151d27;
-  --wf-panel-bg-2: #192331;
-  --wf-panel-bg-3: #1d2837;
-  --wf-border: rgba(255, 255, 255, 0.08);
-  --wf-border-strong: rgba(255, 255, 255, 0.14);
-  --wf-divider: rgba(255, 255, 255, 0.06);
-  --wf-divider-strong: rgba(255, 255, 255, 0.10);
-  --wf-text: rgba(255, 255, 255, 0.92);
-  --wf-text-2: rgba(255, 255, 255, 0.74);
-  --wf-text-3: rgba(255, 255, 255, 0.52);
+  /* Borders / dividers (COMET #1e293b family) */
+  --wf-border: #1e293b;
+  --wf-border-strong: #334155;
+  --wf-divider: rgba(30, 41, 59, 0.88);
+  --wf-divider-strong: #1e293b;
+
+  /* Text (COMET #e5e7eb / slate) */
+  --wf-text: #e5e7eb;
+  --wf-text-2: #cbd5e1;
+  --wf-text-3: #64748b;
+  --wf-text-inverse: #0b1120;
+
+  /* Accent + status (COMET primary green + desk amber/red) */
   --wf-accent: #67a7ff;
   --wf-accent-soft: rgba(103, 167, 255, 0.18);
-  --wf-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.20);
-  --wf-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.22);
-  --wf-radius-sm: 8px;
+  --wf-ok: #22c55e;
+  --wf-ok-strong: #16a34a;
+  --wf-ok-fg: #0b1120;
+  --wf-ok-soft: rgba(34, 197, 94, 0.14);
+  --wf-warn: #d6a34a;
+  --wf-warn-soft: rgba(214, 163, 74, 0.14);
+  --wf-risk: #cf5c5c;
+  --wf-risk-soft: rgba(207, 92, 92, 0.14);
+
+  /* Theme-parity surface aliases (light uses same names) */
+  --wf-bg-page: var(--wf-shell-bg);
+  --wf-bg-card: var(--wf-panel-bg);
+  --wf-bg-subtle: var(--wf-panel-bg-2);
+
+  /* Elevation */
+  --wf-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --wf-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.32);
+
+  /* Radius — widget cards 8 · controls 4 (COMET) */
+  --wf-radius-control: 4px;
+  --wf-radius-widget: 8px;
+  --wf-radius-sm: var(--wf-radius-widget);
   --wf-radius-md: 10px;
   --wf-radius-lg: 12px;
+
+  /* Type + spacing */
   --wf-text-xxs: 12px;
   --wf-text-xs: 13px;
   --wf-text-sm: 14px;
   --wf-gap-1: 4px;
+  --wf-gap-2: 8px;
   --wf-gap-3: 12px;
   --wf-panel-min-h: 264px;
   --wf-panel-tall-h: 420px;
+
+  /* Density tokens (consumed by C1+; values defined only) */
+  --wf-header-h: 44px;
+  --wf-header-h-collapsed: 28px;
+  --wf-status-strip-h: 24px;
+  --wf-rail-w: 168px;
+  --wf-rail-w-collapsed: 44px;
+
+  /* ── --ia-* bridge onto --wf-* (legacy class consumers) ── */
+  --ia-shell-bg: var(--wf-shell-bg);
+  --ia-surface: var(--wf-panel-bg);
+  --ia-border: var(--wf-border);
+  --ia-muted: var(--wf-text-3);
+  --ia-text: var(--wf-text);
+  --ia-green: #3dd68c;
+  --ia-green-dim: rgba(61, 214, 140, 0.14);
+  --ia-accent: var(--wf-accent);
+  --ia-amber: var(--wf-warn);
+  --ia-red: var(--wf-risk);
+  --ia-top-h: 72px;
+  --ia-top-h-collapsed: var(--wf-header-h-collapsed);
+  --ia-left-w: var(--wf-rail-w);
+  --ia-left-w-collapsed: var(--wf-rail-w-collapsed);
+  --ia-bottom-h: 88px;
 }
 
 .wtm-ia-shell {
@@ -2754,8 +2799,8 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 .wf-panel--risk-curve { grid-area: curve; min-height: var(--wf-panel-min-h); }
 .wf-panel--radar { grid-area: radar; min-height: var(--wf-panel-min-h); }
 .wf-panel--hy-oas { grid-area: hyoas; min-height: var(--wf-panel-min-h); }
-.wf-panel--flipchart { grid-area: flip; }
-.wf-panel--depth { grid-area: depth; }
+.wf-panel--flipchart { grid-area: flip; min-height: var(--wf-panel-min-h); }
+.wf-panel--depth { grid-area: depth; min-height: var(--wf-panel-min-h); }
 
 /* Chunk 3 — Risk Cockpit card: one panel chrome, body flush into tile layout */
 .wf-panel--risk-cockpit > .wf-panel__header {
@@ -2818,6 +2863,43 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 }
 #iaHyOasHost .hy-oas-handoff-actions.wf-panel__actions {
   margin-top: 0;
+}
+
+/* Chunk 6 — Flipchart: header meta + one-card chrome (pager + implications already assembled) */
+.wf-panel--flipchart > .wf-panel__header {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wf-panel--flipchart .wf-panel__meta {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-panel--flipchart > .wf-panel__body--flush {
+  min-height: 0;
+}
+
+/* Chunk 7 — Depth & Ladders: header meta + chrome (status row + viz region already assembled) */
+.wf-panel--depth > .wf-panel__header {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wf-panel--depth .wf-panel__meta {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-panel--depth > .wf-panel__body--flush {
+  min-height: 0;
+}
+#iaDepthHost {
+  min-height: 0;
 }
 
 body.ia-layer-scan .ia-center-canvas,
@@ -3603,7 +3685,7 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   }
 }
 
-/* ── Light theme (GROK spec) ── */
+/* ── Light theme (GROK spec + COMET C0 semantic parity) ── */
 :root[data-theme="light"] {
   --wf-bg-page: #F9FAFB;
   --wf-bg-card: #FFFFFF;
@@ -3618,20 +3700,15 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --wf-border-card: #E5E7EB;
   --wf-border-subtle: #D1D5DB;
 
-  --ia-shell-bg: var(--wf-bg-page);
-  --ia-surface: var(--wf-bg-card);
-  --ia-border: var(--wf-border-card);
-  --ia-muted: var(--wf-text-muted);
-  --ia-text: var(--wf-text-primary);
-  --ia-green: var(--wf-accent-green);
-  --ia-green-dim: rgba(46, 139, 87, 0.12);
-  --ia-accent: var(--wf-accent-teal);
+  /* Surfaces → same --wf-* names as dark */
   --wf-shell-bg: var(--wf-bg-page);
   --wf-rail-bg: var(--wf-bg-card);
   --wf-canvas-bg: var(--wf-bg-page);
   --wf-panel-bg: var(--wf-bg-card);
   --wf-panel-bg-2: var(--wf-bg-subtle);
   --wf-panel-bg-3: var(--wf-bg-subtle);
+  --wf-control-bg: var(--wf-bg-subtle);
+  --wf-control-border: var(--wf-border-card);
   --wf-border: var(--wf-border-card);
   --wf-border-strong: var(--wf-border-subtle);
   --wf-divider: var(--wf-border-card);
@@ -3641,8 +3718,40 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --wf-text-3: var(--wf-text-muted);
   --wf-accent: var(--wf-accent-teal);
   --wf-accent-soft: rgba(46, 134, 171, 0.14);
+
+  /* Status (Whinfell light greens + shared warn/risk) */
+  --wf-ok: var(--wf-accent-green);
+  --wf-ok-strong: #246b43;
+  --wf-ok-fg: #FFFFFF;
+  --wf-ok-soft: rgba(46, 139, 87, 0.12);
+  --wf-warn: #b45309;
+  --wf-warn-soft: rgba(180, 83, 9, 0.12);
+  --wf-risk: #9b2c2c;
+  --wf-risk-soft: rgba(155, 44, 44, 0.12);
+
   --wf-shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
   --wf-shadow-md: 0 6px 18px rgba(26, 26, 26, 0.08);
+
+  /* Density tokens unchanged (C1 applies) */
+  --wf-header-h: 44px;
+  --wf-header-h-collapsed: 28px;
+  --wf-status-strip-h: 24px;
+  --wf-rail-w: 168px;
+  --wf-rail-w-collapsed: 44px;
+  --wf-radius-control: 4px;
+  --wf-radius-widget: 8px;
+
+  /* --ia-* bridge */
+  --ia-shell-bg: var(--wf-bg-page);
+  --ia-surface: var(--wf-bg-card);
+  --ia-border: var(--wf-border-card);
+  --ia-muted: var(--wf-text-muted);
+  --ia-text: var(--wf-text-primary);
+  --ia-green: var(--wf-accent-green);
+  --ia-green-dim: var(--wf-ok-soft);
+  --ia-accent: var(--wf-accent-teal);
+  --ia-amber: var(--wf-warn);
+  --ia-red: var(--wf-risk);
 }
 
 :root[data-theme="light"] .wf-panel,

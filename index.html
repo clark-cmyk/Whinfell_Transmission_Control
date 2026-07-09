@@ -237,7 +237,10 @@ window.DICTIONARY_BADGE_DEFAULT = {
             </div>
           </article>
           <article id="widgetFlipchart" class="wf-panel wf-panel--flipchart" data-widget="flipchart">
-            <header class="wf-panel__header"><span class="wf-panel__title">Flipchart</span></header>
+            <header class="wf-panel__header">
+              <span class="wf-panel__title">Flipchart</span>
+              <span class="wf-panel__meta" id="flipchartPanelMeta" aria-live="polite">—</span>
+            </header>
             <div class="wf-panel__body wf-panel__body--flush" id="iaFlipchartHost"></div>
           </article>
           <article id="widgetDepth" class="wf-panel wf-panel--depth depth-ladders-widget-card" data-widget="depth_ladders">
@@ -249,6 +252,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
                 </svg>
                 Depth · Command bar &amp; Ladders
               </span>
+              <span class="wf-panel__meta" id="depthPanelMeta" aria-live="polite">—</span>
             </header>
             <div class="wf-panel__body wf-panel__body--flush" id="iaDepthHost">
               <div class="depth-ladders-widget" id="depthLaddersWidget">

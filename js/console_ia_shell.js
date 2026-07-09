@@ -60,7 +60,10 @@
     const freshnessEl = el('depthStatusFreshness');
     const vizEl = el('depthStatusViz');
     const warnEl = el('depthStatusWarn');
-    if (!hydrationEl) return;
+    if (!hydrationEl) {
+      syncDepthPanelMeta();
+      return;
+    }
 
     const importRaw = stripNodeText(el('hydrationImportStatus')).toLowerCase();
     if (/no bundle|not imported|degraded|critical/.test(importRaw)) {
@@ -97,6 +100,43 @@
       warnEl.classList.toggle('depth-status-badge--hidden', !warn);
       warnEl.setAttribute('aria-hidden', warn ? 'false' : 'true');
     }
+
+    syncDepthPanelMeta();
+  }
+
+  /** Chunk 7 — Depth header glance: compact hydration · freshness · viz · WARN (presentation only). */
+  function syncDepthPanelMeta() {
+    const meta = el('depthPanelMeta');
+    if (!meta) return '';
+
+    const hydRaw = stripNodeText(el('depthStatusHydration'));
+    const freshRaw = stripNodeText(el('depthStatusFreshness'));
+    const vizRaw = stripNodeText(el('depthStatusViz'));
+    const warnEl = el('depthStatusWarn');
+    const warnVisible = Boolean(
+      warnEl
+      && !warnEl.classList?.contains?.('depth-status-badge--hidden')
+      && warnEl.getAttribute?.('aria-hidden') !== 'true',
+    );
+
+    let hydShort = '';
+    if (/pending/i.test(hydRaw)) hydShort = 'Pending';
+    else if (/stale/i.test(hydRaw)) hydShort = 'Stale';
+    else if (/applied/i.test(hydRaw)) hydShort = 'Applied';
+    else if (hydRaw && hydRaw !== '—') hydShort = truncateMeta(hydRaw, 16);
+
+    const parts = [];
+    if (hydShort) parts.push(hydShort);
+    if (freshRaw && freshRaw !== '—') parts.push(truncateMeta(freshRaw, 18));
+    if (vizRaw && vizRaw !== 'Viz —' && vizRaw !== '—') parts.push(vizRaw);
+    if (warnVisible) parts.push('WARN');
+
+    const line = parts.length ? parts.join(' · ') : '—';
+    meta.textContent = line;
+    if (typeof meta.setAttribute === 'function') {
+      meta.setAttribute('title', line === '—' ? 'Depth · ladders status pending' : line);
+    }
+    return line;
   }
 
   function assembleDepthLaddersWidget() {
@@ -300,6 +340,33 @@
     meta.textContent = line;
     if (typeof meta.setAttribute === 'function') {
       meta.setAttribute('title', line === '—' ? 'HY OAS pending mission read' : line);
+    }
+    return line;
+  }
+
+  /** Chunk 6 — Flipchart header glance: position · asset · regime (presentation only). */
+  function syncFlipchartPanelMeta() {
+    const meta = el('flipchartPanelMeta');
+    if (!meta) return '';
+    const posRaw = stripNodeText(el('flipchartPosition'));
+    const slideRaw = stripNodeText(el('flipchartSlideIndex'));
+    const title = truncateMeta(stripNodeText(el('flipchartTitle')), 18);
+    const regime = truncateMeta(stripNodeText(el('flipchartRegimeTag')), 14);
+    let pos = '';
+    if (posRaw && posRaw !== '—') {
+      pos = posRaw.replace(/\s*\/\s*/, '/');
+    } else if (slideRaw && slideRaw !== '—') {
+      const m = slideRaw.match(/(\d+)\s*(?:of|\/)\s*(\d+)/i);
+      pos = m ? `${m[1]}/${m[2]}` : slideRaw.replace(/^Slide\s+/i, '');
+    }
+    const parts = [];
+    if (pos) parts.push(pos);
+    if (title) parts.push(title);
+    if (regime) parts.push(regime);
+    const line = parts.length ? parts.join(' · ') : '—';
+    meta.textContent = line;
+    if (typeof meta.setAttribute === 'function') {
+      meta.setAttribute('title', line === '—' ? 'Flipchart pending node' : line);
     }
     return line;
   }
@@ -522,6 +589,26 @@
     syncHyOasPanelMeta();
   }
 
+  function observeFlipchartPanelMeta() {
+    if (typeof MutationObserver === 'undefined') {
+      syncFlipchartPanelMeta();
+      return;
+    }
+    const obs = new MutationObserver(syncFlipchartPanelMeta);
+    ['flipchartPosition', 'flipchartSlideIndex', 'flipchartTitle', 'flipchartRegimeTag'].forEach((id) => {
+      const node = el(id);
+      if (!node) return;
+      obs.observe(node, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+    });
+    syncFlipchartPanelMeta();
+  }
+
   function activateShell() {
     if (activated) return true;
     const shell = el('wtmIaShell');
@@ -535,6 +622,7 @@
       observeDepthLaddersStatus();
       observeRiskCurveSummary();
       observeHyOasPanelMeta();
+      observeFlipchartPanelMeta();
       activated = true;
       return true;
     } catch (err) {
@@ -570,7 +658,9 @@
     assembleDepthLaddersWidget,
     assembleHyOasWidget,
     syncDepthLaddersStatus,
+    syncDepthPanelMeta,
     syncHyOasPanelMeta,
+    syncFlipchartPanelMeta,
     syncRiskCurveSummary,
     setLayer,
     setDigView,

@@ -74,6 +74,7 @@ function runDomStructureChecks() {
     'depthStatusFreshness',
     'depthStatusViz',
     'depthStatusWarn',
+    'depthPanelMeta',
     'consoleDepthDisclosure',
     'commandBar',
   ]) {
@@ -83,6 +84,8 @@ function runDomStructureChecks() {
   assert(html.includes('class="ladder-viz-region"'), 'ladder viz region class');
   assert(html.includes('depth-ladders-plumbing-icon'), 'plumbing SVG icon');
   assert(html.includes('Depth · Command bar &amp; Ladders'), 'widget header title');
+  assert(html.includes('id="depthPanelMeta"'), 'Depth panel meta present');
+  assert(html.includes('wf-panel--depth'), 'Depth uses wf-panel chrome');
 
   const widgetInsideHost = /<div[^>]*id="iaDepthHost"[\s\S]*<div[^>]*id="depthLaddersWidget"/.test(html);
   assert(widgetInsideHost, 'depthLaddersWidget nested in iaDepthHost');
@@ -105,6 +108,8 @@ function runCssScopingChecks() {
   assert(css.includes('#iaDepthHost .depth-ladders-status'), 'status row scoped to iaDepthHost');
   assert(css.includes('#iaDepthHost .depth-status-badge'), 'WARN chip scoped to iaDepthHost');
   assert(css.includes('#iaDepthHost .ladder-viz-region'), 'viz region scoped to iaDepthHost');
+  assert(css.includes('.wf-panel--depth .wf-panel__meta'), 'Depth panel meta chrome');
+  assert(/\.wf-panel--depth\s*\{[^}]*min-height:\s*var\(--wf-panel-min-h\)/s.test(css), 'Depth panel min-height');
 
   const statusBlock = css.match(/#iaDepthHost \.depth-ladders-status\s*\{[^}]+\}/s)?.[0] || '';
   assert(statusBlock.includes('linear-gradient'), 'status row uses gradient banner');
@@ -156,6 +161,7 @@ function createShellHarness(extraIds = []) {
     'iaHyOasHost', 'hyOasNumericsBody', 'hyOasThesisBody', 'iaFlipchartHost', 'iaDepthHost',
     'depthLaddersContent', 'depthLaddersWidget', 'depthLaddersStatus', 'iaDigHost',
     'depthStatusHydration', 'depthStatusFreshness', 'depthStatusViz', 'depthStatusWarn',
+    'depthPanelMeta',
     'hydrationImportStatus', 'headerFreshnessLabel', 'vizDiagnosticsBadge',
     'scanKpiStrip', 'nodeRail', 'transmissionRadar', 'cockpitChartArea', 'basisSummaryStrip',
     'cockpitDetailBand', 'hyOasHandoffActions', 'cockpitActions', 'cockpitDecisionRail',
@@ -184,6 +190,7 @@ function createShellHarness(extraIds = []) {
   mkText('depthStatusHydration', '—');
   mkText('depthStatusFreshness', '—');
   mkText('depthStatusViz', 'Viz —');
+  mkText('depthPanelMeta', '—');
   const warn = mkText('depthStatusWarn', 'WARN');
   warn.classList.add('depth-status-badge', 'depth-status-badge--hidden');
   warn.setAttribute('aria-hidden', 'true');
@@ -245,6 +252,7 @@ function runSyncDepthLaddersStatusUnitTests() {
         freshness: 'fresh',
         viz: 'Viz 9/10',
         warnVisible: false,
+        meta: 'Applied · fresh · Viz 9/10',
       },
     },
     {
@@ -258,6 +266,7 @@ function runSyncDepthLaddersStatusUnitTests() {
         freshness: '—',
         viz: 'Viz 6/9',
         warnVisible: true,
+        meta: 'Pending · Viz 6/9 · WARN',
       },
     },
     {
@@ -270,6 +279,7 @@ function runSyncDepthLaddersStatusUnitTests() {
         freshness: 'stale',
         viz: 'Viz 7/10',
         warnVisible: true,
+        meta: 'Stale · stale · Viz 7/10 · WARN',
       },
     },
     {
@@ -282,6 +292,7 @@ function runSyncDepthLaddersStatusUnitTests() {
         freshness: 'delayed',
         viz: 'Viz 10/10',
         warnVisible: false,
+        meta: 'Pending · delayed · Viz 10/10',
       },
     },
     {
@@ -295,6 +306,7 @@ function runSyncDepthLaddersStatusUnitTests() {
         freshness: '—',
         viz: 'Viz —',
         warnVisible: false,
+        meta: '—',
       },
     },
   ];
@@ -316,6 +328,7 @@ function runSyncDepthLaddersStatusUnitTests() {
     const freshnessEl = nodes.get('depthStatusFreshness');
     const vizEl = nodes.get('depthStatusViz');
     const warnEl = nodes.get('depthStatusWarn');
+    const metaEl = nodes.get('depthPanelMeta');
 
     assert(hydrationEl.textContent === tc.expect.hydration, `${tc.name}: hydration`);
     assert(freshnessEl.textContent === tc.expect.freshness, `${tc.name}: freshness`);
@@ -328,13 +341,16 @@ function runSyncDepthLaddersStatusUnitTests() {
       warnEl.getAttribute('aria-hidden') === (tc.expect.warnVisible ? 'false' : 'true'),
       `${tc.name}: WARN aria-hidden`,
     );
+    assert(metaEl.textContent === tc.expect.meta, `${tc.name}: panel meta`);
+    assert(ctx.WTM_IaShell.syncDepthPanelMeta() === tc.expect.meta, `${tc.name}: syncDepthPanelMeta return`);
   }
 
   const { ctx, nodes } = createShellHarness();
   nodes.delete('depthStatusHydration');
   nodes.get('headerFreshnessLabel').textContent = 'should-not-sync';
   ctx.WTM_IaShell.syncDepthLaddersStatus();
-  assert(nodes.get('depthStatusFreshness').textContent === '—', 'sync no-ops when hydration mount missing');
+  assert(nodes.get('depthStatusFreshness').textContent === '—', 'status body no-ops when hydration mount missing');
+  assert(nodes.get('depthPanelMeta').textContent === '—', 'panel meta stays empty when body status unwritten');
 }
 
 function runAssembleDepthLaddersWidgetTests() {
@@ -368,7 +384,9 @@ function runShellIntegrationChecks() {
   assert(shellSrc.includes('assembleDepthLaddersWidget'), 'assembler present');
   assert(shellSrc.includes('observeDepthLaddersStatus'), 'depth status observer wired');
   assert(shellSrc.includes('syncDepthLaddersStatus()'), 'status sync invoked from observers');
-  assert(/assembleDepthLaddersWidget,\s*\n\s*syncDepthLaddersStatus/.test(shellSrc), 'assembler exported on WTM_IaShell');
+  assert(shellSrc.includes('syncDepthPanelMeta'), 'Depth panel meta sync present');
+  assert(shellSrc.includes('syncDepthLaddersStatus,'), 'status sync exported on WTM_IaShell');
+  assert(shellSrc.includes('syncDepthPanelMeta,'), 'panel meta exported on WTM_IaShell');
 
   const uiPolish = fs.readFileSync(path.join(ROOT, 'js/ui_polish.js'), 'utf8');
   assert(uiPolish.includes('syncDepthLaddersStatus'), 'viz diagnostics triggers depth status sync');

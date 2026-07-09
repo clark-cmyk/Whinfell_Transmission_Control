@@ -1,7 +1,144 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (handoff · Chunks 4–5 committed)
+**Last updated:** July 9, 2026 (Koyfin 6–7 + COMET C0 · next C1 density)
+
+---
+
+## July 9, 2026 — COMET CSS C0 (token bridge)
+
+```text
+CHUNK ID: COMET-C0
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Map COMET palette into --wf-*; bridge --ia-* onto --wf-*; no .wtc-* fork
+
+CONTEXT
+- Spec: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md (design language only)
+- Rules: map don’t fork · hex → tokens · density application deferred to C1
+
+CHANGES
+- css/console_ia.css :root — COMET slate surfaces/borders/text → --wf-*
+  · semantic --wf-ok / --wf-warn / --wf-risk (+ soft)
+  · density tokens: --wf-header-h 44 · --wf-status-strip-h 24 · rail widths · radius control/widget
+  · --ia-* aliases var(--wf-*) for single system
+- css/console_ia.css [data-theme="light"] — same semantic token names (Whinfell light values)
+- tests/koyfin_widget_shell.test.mjs — C0 token + no .wtc-* asserts
+
+QA
+- [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [ ] browser-verify dark slate shell + light theme still desk-usable
+
+NEXT SESSION
+- COMET C1 shell density (apply --wf-header-h / padding) — optional after visual check
+- Or PR-8 light theme unify remainder
+```
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 7 (Depth & Ladders panel polish)
+
+```text
+CHUNK ID: Koyfin-PR-7
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Depth card header meta + chrome parity; status row / viz / disclosure already assembled
+
+CONTEXT
+- Widget shell already had #widgetDepth · status row · ladder viz · assembleDepthLaddersWidget
+- Structure intact — no re-scaffold; disclosure still relocated into depthLaddersContent
+- Gap vs Cockpit/Radar/HY OAS/Flipchart: missing panel meta + panel min-height
+
+CHANGES
+- index.html — #depthPanelMeta in Depth header
+- js/console_ia_shell.js — syncDepthPanelMeta (Applied/Pending/Stale · freshness · Viz · WARN)
+  · invoked from syncDepthLaddersStatus (one source of truth)
+- css/console_ia.css — depth min-height + meta chrome
+- tests/koyfin_widget_shell.test.mjs · depth_ladders_widget.test.mjs — meta asserts
+
+QA
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] depth_ladders_widget.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] shell_shortcuts.test.mjs PASS
+- [x] build_web.sh OK → dist/
+- [ ] commit (not requested this turn)
+- [ ] browser-verify Depth meta after hydrate
+
+NEXT SESSION
+- Commit Chunks 6–7 if desired
+- COMET CSS C0 token bridge (pairs with light theme PR-8) — see BUILD_TODO
+- Playwright depth e2e timeout remains P2 (separate)
+```
+
+---
+
+## July 9, 2026 — COMET CSS Refactor Spec → BUILD_TODO
+
+```text
+SOURCE: COMET CSS Refactor Spec.txt (inbox) → 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md (canonical)
+GOAL: Track Koyfin-style shell CSS without dual class system / layout thrash
+
+INCORPORATED INTO BUILD_TODO
+- Handoff specs list + paste block
+- Full section: map COMET §1–12 → existing .wtm-ia-shell / .ia-* / .wf-panel / --wf-*
+- Chunks C0–C7 (token bridge · density · nav · cards · actions · chips · links · responsive)
+- Rules: map don’t fork · hex → tokens · no .wtc-* bulk rename · after PR-7 / with PR-8
+- Highest priority 0d COMET C0–C6
+
+STATUS: Spec tracked · implementation not started (queued after Chunk 7 Depth)
+NEXT: Chunks 6–7 uncommitted · then COMET C0 token bridge (pairs with light theme PR-8)
+```
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 6 (Flipchart panel polish)
+
+```text
+CHUNK ID: Koyfin-PR-6
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Flipchart pager + implications as one card; header meta chrome parity
+
+CONTEXT
+- Widget shell already relocated cockpitActions + cockpitDecisionRail into #iaFlipchartHost
+- Structure had slide index, regime tag, keyboard hint — no re-scaffold
+- Browser-verify: acceptance met (one card · ←→ / 1–5 / f / c still work)
+- Gap vs Cockpit/Radar/HY OAS: missing panel meta + panel min-height
+
+CHANGES
+- index.html — #flipchartPanelMeta in Flipchart header
+- js/console_ia_shell.js — syncFlipchartPanelMeta (pos · asset · regime) + MutationObserver
+- css/console_ia.css — flipchart min-height + meta chrome
+- tests/koyfin_widget_shell.test.mjs — meta + pager/implications relocation asserts
+
+QA
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] shell_shortcuts.test.mjs PASS
+- [x] build_web.sh OK → dist/
+- [x] browser-verify: meta "1/5 · Liq" → updates on flip; implications in card
+- [ ] commit (not requested this turn)
+
+NOTE
+- scan_kpi_strip hasRcZones HTMLCollection.some can break renderAll (cockpit meta) — separate
+
+NEXT SESSION
+- Commit Chunk 6 if desired
+- PR-7 Depth polish only if gaps (no re-scaffold)
+- Then COMET CSS C0+ (see BUILD_TODO · COMET_CSS_Refactor_Spec.md)
+```
+
+---
+
+## July 9, 2026 — Session handoff (Chunks 4–5 committed · tip 9cca83a)
+
+```text
+HEAD: 9cca83a feat(ui): Koyfin Chunks 4–5 — Radar and HY OAS panel meta
+PARENT FEATURE: 825d9f4 Chunks 1–3
+SHIPPED: PR-4 radarPanelMeta · PR-5 hyOasPanelMeta (no re-scaffold)
+WORKING TREE: clean (untracked noise only)
+NEXT SESSION: browser-verify → Chunk 6 Flipchart polish only if gaps
+START: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
+```
 
 ---
 
