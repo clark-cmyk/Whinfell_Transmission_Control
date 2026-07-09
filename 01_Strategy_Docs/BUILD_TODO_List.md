@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (Koyfin 6–7 + COMET C0 shipped)  
+**Last updated:** July 9, 2026 (session handoff · ready COMET C1)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` · see latest commit (Chunks 6–7 + COMET C0)  
+**HEAD:** `main` tip **`38f23a3`** · working tree **clean** (noise untracked only)  
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,17 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C0)
+## NEW SESSION — start here (Jul 9 · after `38f23a3`)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · Koyfin 1–7 + COMET C0 done
+Repo: Whinfell_Transmission_Control · main tip 38f23a3 · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md
-Next: COMET C1 shell density (apply --wf-header-h / rail-canvas padding) OR browser-verify C0 slate + light.
-Rules: edit root → build_web.sh → serve dist only · one small change · tests after · no .wtc-* fork.
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C0 entry)
+Shipped: Koyfin PR-1…7 + COMET C0 (token bridge). Density tokens exist; not applied yet.
+Next: COMET C1 — shell density only (css/console_ia.css). Apply --wf-header-h / rail-canvas padding via .ia-* /.wf-* only.
+Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
 ### Rules (non-negotiable)
@@ -40,48 +41,58 @@ Rules: edit root → build_web.sh → serve dist only · one small change · tes
 
 | Item | State |
 |------|--------|
-| Branch | `main` · Koyfin 6–7 + COMET C0 committed |
-| Working tree | clean after commit (noise untracked ok) |
+| Branch | `main` tip **`38f23a3`** |
+| Last commit | `feat(ui): Koyfin Chunks 6–7 + COMET C0 token bridge` |
+| Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
-| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root COMET inbox copy |
+| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
 
-### Shipped (Koyfin 1–7 + COMET C0)
+### Shipped on tip `38f23a3`
 
-| Chunk | Goal | Key change | Status |
+| Chunk | Goal | Key change | Commit |
 |-------|------|------------|--------|
-| **1–5** | TopShell · left · cockpit · radar · HY OAS | panel meta + grid | **Done** `825d9f4` / `9cca83a` |
-| **6** | Flipchart polish | `#flipchartPanelMeta` | **Done** (this commit) |
-| **7** | Depth polish | `#depthPanelMeta` | **Done** (this commit) |
-| **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · no `.wtc-*` | **Done** (this commit) |
+| **1–3** | TopShell · left icons-only · Cockpit meta | relocateTopBar · RC codes · `#riskCockpitPanelMeta` | `825d9f4` |
+| **4–5** | Radar + HY OAS meta | `#radarPanelMeta` · `#hyOasPanelMeta` | `9cca83a` |
+| **6** | Flipchart polish | `#flipchartPanelMeta` · pager+implications card | `38f23a3` |
+| **7** | Depth polish | `#depthPanelMeta` · status/viz/disclosure card | `38f23a3` |
+| **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
 
-**Tests at ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS
+**Tests at ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
 ### Next action for new session
 
-**→ COMET C1 shell density** (apply tokens already defined) · then C2–C5 chrome · PR-8 light remainder
+**→ COMET C1 — shell density** (apply C0 tokens; do not invent new palette)
 
 | Goal | Detail |
 |------|--------|
-| C0 | **Done** — palette + semantic + density *tokens only* (heights not applied yet) |
-| C1 | Apply `--wf-header-h` feel · rail/canvas gap/padding via existing classes |
-| C2+ | Nav hover · card radius lock · chips · links |
-| Out of scope | `.wtc-*` DOM fork · widget re-scaffold · transaction codes |
+| **C1 (do this)** | Header **44px feel** via `--wf-header-h` · rail/canvas gap/padding · collapsed strip height if needed |
+| Primary file | `css/console_ia.css` only preferred · optional test assert in `tests/koyfin_widget_shell.test.mjs` |
+| Targets | `.ia-top-frame` / `.console-topbar` · `.ia-left-frame` · `.ia-center-canvas` / `.ia-widget-grid` |
+| Tokens ready | `--wf-header-h` · `--wf-header-h-collapsed` · `--wf-status-strip-h` · `--wf-rail-w*` · `--wf-gap-*` · `--wf-radius-*` |
+| Acceptance | Desk at 1440 denser/cleaner; keyboard + relocateNodes + widget hosts **unchanged**; light theme still usable |
+| After C1 | C2 nav hover/active · C3 card chrome lock · C4 controls · C5 chips · C6 links |
+| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · chart canvas |
 
-**Known boot note:** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail. Separate fix if still open.
+**C1 do-not:** change business JS · re-scaffold grid · hard-code new hex (use `--wf-*` only) · touch `main.css` dual system unless forced
+
+**Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
+
+**Optional preflight:** browser-verify C0 slate dark + light theme before C1 density edits.
 
 ### Recommended open commands
 
 ```bash
 cd ~/Desktop/Whinfell_Transmission_Control
-git status
+git status   # expect clean @ 38f23a3
+git log -1 --oneline
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
 # hard-refresh http://127.0.0.1:8765/
 node tests/koyfin_widget_shell.test.mjs
 ```
 
-Browser checklist: dark slate shell · Flipchart/Depth meta · light theme toggle still usable · no layout thrash.
+Browser checklist (pre/post C1): dark slate shell · Flipchart meta on flip · Depth meta `Applied · … · Viz n/n` · left **DP/FL/RC…** · light theme toggle · no layout thrash.
 
 ---
 
@@ -222,7 +233,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | 0a | **Koyfin Chunks 4–5** — Radar + HY OAS panel meta | **Done** `9cca83a` | BUILD | meta lines · tests PASS |
 | 0b | **Koyfin Chunks 1–3** | **Done** `825d9f4` | BUILD | Committed on `main` |
 | 1 | **Live desk walk-through** — ratings in `Desk_Feedback_Log.md` | **High · go-live gate** | Clark · Wes | All 5 nodes + UI/docs rated |
-| 2 | **Push / desk stack** when ready | **Medium** | Clark | `9cca83a` on remote if desired · no thrash |
+| 2 | **Push / desk stack** when ready | **Medium** | Clark | `38f23a3` on remote if desired · no thrash |
 | 3 | **Task Force live Grok chain** | **Medium** | BUILD | Manual 12-step run → `--merge` → replace specialist stubs with live TxIntegrator |
 | 4 | **Collect agent auto-start** — LaunchAgent on login | **Medium** | BUILD | Agent on `:8767` without manual Terminal tab |
 | 5 | **Post-collect hydration** — auto `copy_hydration_bundle.sh` + import prompt | **Medium** | BUILD | Collect button → fresh bundle → WTC import nudge |

@@ -1,7 +1,28 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (Koyfin 6–7 + COMET C0 · next C1 density)
+**Last updated:** July 9, 2026 (handoff @ 38f23a3 · next COMET C1)
+
+---
+
+## July 9, 2026 — Session handoff (Koyfin 6–7 + COMET C0 committed)
+
+```text
+HEAD: 38f23a3 feat(ui): Koyfin Chunks 6–7 + COMET C0 token bridge
+PARENT: 9cca83a Chunks 4–5
+WORKING TREE: clean (untracked noise only — layout notes · backup · logo · root COMET inbox)
+SHIPPED THIS TIP
+- PR-6 #flipchartPanelMeta
+- PR-7 #depthPanelMeta
+- COMET C0 --wf-* slate + --ia-* bridge + density tokens (not applied)
+- 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md tracked
+
+NEXT SESSION
+- Read BUILD_TODO_List.md → "NEW SESSION — start here"
+- COMET C1: apply --wf-header-h / rail-canvas padding in css/console_ia.css only
+- Tests: koyfin_widget_shell (+ any density asserts) · build_web.sh · serve dist/
+- Do not introduce .wtc-* · do not re-scaffold widgets
+```
 
 ---
 
@@ -27,11 +48,11 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
+- [x] committed in 38f23a3
 - [ ] browser-verify dark slate shell + light theme still desk-usable
 
 NEXT SESSION
-- COMET C1 shell density (apply --wf-header-h / padding) — optional after visual check
-- Or PR-8 light theme unify remainder
+- COMET C1 shell density (apply --wf-header-h / padding) — see BUILD_TODO handoff
 ```
 
 ---
