@@ -5,6 +5,7 @@
  * COMET C2 — nav hover/active: .wf-nav-item slate states via --wf-* (no .wtc-* fork).
  * COMET C3 — widget card chrome: .wf-panel* radius-widget · border · header/body gap via --wf-*.
  * COMET C4 — topbar control set: .console-chip / .btn-console via --wf-radius-control · control tokens.
+ * COMET C5 — chip ok/warn/risk variants · pipeline status strip --wf-status-strip-h · regime pills.
  */
 
 :root {
@@ -68,10 +69,10 @@
   --wf-panel-min-h: 264px;
   --wf-panel-tall-h: 420px;
 
-  /* Density tokens (C1 applies to shell chrome) */
+  /* Density tokens (C1 shell · C5 strip = collapsed chrome) */
   --wf-header-h: 44px;
-  --wf-header-h-collapsed: 28px;
   --wf-status-strip-h: 24px;
+  --wf-header-h-collapsed: var(--wf-status-strip-h);
   --wf-rail-w: 168px;
   --wf-rail-w-collapsed: 44px;
 
@@ -216,24 +217,30 @@
   border-bottom-color: rgba(207, 92, 92, 0.28);
 }
 .ia-top-frame[data-collapsed="true"] .ia-top-frame-bar {
-  height: var(--ia-top-h-collapsed);
-  min-height: var(--ia-top-h-collapsed);
-  max-height: var(--ia-top-h-collapsed);
-  padding: 0 10px;
-  gap: 8px;
+  height: var(--wf-status-strip-h);
+  min-height: var(--wf-status-strip-h);
+  max-height: var(--wf-status-strip-h);
+  padding: 0 var(--wf-gap-3);
+  gap: var(--wf-gap-2);
+  box-sizing: border-box;
 }
 .ia-top-frame[data-collapsed="true"] .ia-top-body { display: none; }
 .ia-top-frame[data-collapsed="true"] .ia-frame-toggle { transform: rotate(-90deg); }
+/* COMET C5 / §11 — pipeline strip = 24px status strip (map COMET status strip) */
 .ia-top-frame[data-collapsed="true"] .ia-top-pipeline-strip {
   display: flex;
   align-items: center;
-  gap: 8px;
+  height: var(--wf-status-strip-h);
+  min-height: var(--wf-status-strip-h);
+  max-height: var(--wf-status-strip-h);
+  gap: var(--wf-gap-2);
   font-size: var(--wf-text-xxs);
   font-weight: 600;
-  color: var(--wf-text);
+  color: var(--wf-text-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 .ia-top-frame[data-collapsed="true"] .ia-top-phase-tag {
   display: inline-flex;
@@ -2878,16 +2885,42 @@ span.console-chip:hover {
   justify-content: flex-end;
   gap: var(--wf-gap-1);
 }
-/* Collect agent status stays tokenized (ok/warn); C5 owns full chip family */
+/* ── COMET C5 — status chip variants ok/warn/risk (map COMET §9; no class fork) ── */
+.console-chip--ok,
 .wtm-collect-agent-status.wtm-collect-agent--online {
   color: var(--wf-ok);
   border-color: var(--wf-ok);
   background: var(--wf-ok-soft);
+  font-weight: 600;
 }
+.console-chip--warn,
 .wtm-collect-agent-status.wtm-collect-agent--offline {
   color: var(--wf-warn);
   border-color: var(--wf-warn);
   background: var(--wf-warn-soft);
+  font-weight: 600;
+}
+.console-chip--risk {
+  color: var(--wf-risk);
+  border-color: var(--wf-risk);
+  background: var(--wf-risk-soft);
+  font-weight: 600;
+}
+/* Status chips keep variant colors on span hover (override control-set hover) */
+span.console-chip--ok:hover {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+span.console-chip--warn:hover {
+  color: var(--wf-warn);
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
+}
+span.console-chip--risk:hover {
+  color: var(--wf-risk);
+  border-color: var(--wf-risk);
+  background: var(--wf-risk-soft);
 }
 
 /* Chunk H — breakpoint + zoom QA */
@@ -3420,27 +3453,31 @@ body.ia-layer-dig .ia-center-canvas {
   color: var(--ia-red);
 }
 
+/* C5 — regime pills → ok / neutral / warn tokens (no hard rgba islands) */
 #iaRiskCockpitHost .regime-constructive,
 #iaRiskCockpitHost .rc-footer-chip.regime-constructive {
-  border-color: rgba(61, 214, 140, 0.22);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
 }
 #iaRiskCockpitHost .rc-footer-chip.regime-constructive .rc-footer-chip__value {
-  color: var(--ia-green);
+  color: var(--wf-ok);
 }
 #iaRiskCockpitHost .regime-defensive,
 #iaRiskCockpitHost .rc-footer-chip.regime-defensive {
-  border-color: rgba(139, 156, 179, 0.28);
+  border-color: var(--wf-border-strong);
+  background: var(--wf-panel-bg-2);
 }
 #iaRiskCockpitHost .rc-footer-chip.regime-defensive .rc-footer-chip__value {
   color: var(--wf-text-2);
 }
 #iaRiskCockpitHost .regime-stressed,
 #iaRiskCockpitHost .rc-footer-chip.regime-stressed {
-  border-color: rgba(214, 163, 74, 0.28);
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
 }
 #iaRiskCockpitHost .rc-footer-chip.regime-stressed .rc-footer-chip__value,
 #iaRiskCockpitHost .rc-footer-chip__hint.regime-stressed {
-  color: var(--ia-amber);
+  color: var(--wf-warn);
 }
 #iaRiskCurveHost .node-rail {
   display: grid;
@@ -3666,14 +3703,15 @@ body.ia-layer-dig .ia-center-canvas {
   white-space: nowrap;
   flex-shrink: 0;
 }
+/* C5 — regime pill chrome (COMET §9 pill tags → existing flipchart regime tag) */
 #iaFlipchartHost .flipchart-regime-tag {
   display: inline-flex;
   align-items: center;
   min-height: 20px;
-  padding: 1px 8px;
+  padding: 1px var(--wf-gap-2);
   border-radius: 999px;
-  border: 1px solid var(--wf-divider);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--wf-border);
+  background: var(--wf-panel-bg-2);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -3682,19 +3720,19 @@ body.ia-layer-dig .ia-center-canvas {
   line-height: 1.2;
 }
 #iaFlipchartHost .flipchart-regime-tag.regime-constructive {
-  border-color: rgba(61, 214, 140, 0.28);
-  color: var(--ia-green);
-  background: rgba(61, 214, 140, 0.08);
+  border-color: var(--wf-ok);
+  color: var(--wf-ok);
+  background: var(--wf-ok-soft);
 }
 #iaFlipchartHost .flipchart-regime-tag.regime-defensive {
-  border-color: rgba(139, 156, 179, 0.32);
+  border-color: var(--wf-border-strong);
   color: var(--wf-text-2);
-  background: rgba(139, 156, 179, 0.08);
+  background: var(--wf-panel-bg-2);
 }
 #iaFlipchartHost .flipchart-regime-tag.regime-stressed {
-  border-color: rgba(214, 163, 74, 0.32);
-  color: var(--ia-amber);
-  background: rgba(214, 163, 74, 0.08);
+  border-color: var(--wf-warn);
+  color: var(--wf-warn);
+  background: var(--wf-warn-soft);
 }
 #iaFlipchartHost .flipchart-regime-tag--unset {
   font-weight: 600;
@@ -3925,10 +3963,10 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --wf-shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
   --wf-shadow-md: 0 6px 18px rgba(26, 26, 26, 0.08);
 
-  /* Density (same values as dark; C1 consumers inherit) */
+  /* Density (same values as dark; C1/C5 consumers inherit) */
   --wf-header-h: 44px;
-  --wf-header-h-collapsed: 28px;
   --wf-status-strip-h: 24px;
+  --wf-header-h-collapsed: var(--wf-status-strip-h);
   --wf-rail-w: 168px;
   --wf-rail-w-collapsed: 44px;
   --wf-radius-control: 4px;
@@ -4041,15 +4079,58 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   border-color: var(--wf-border-subtle);
   background: var(--wf-ok-soft);
 }
+/* C5 light — status chip variants + agent status parity */
+:root[data-theme="light"] .console-chip--ok,
 :root[data-theme="light"] .wtm-collect-agent-status.wtm-collect-agent--online {
   color: var(--wf-ok);
   border-color: var(--wf-ok);
   background: var(--wf-ok-soft);
 }
+:root[data-theme="light"] .console-chip--warn,
 :root[data-theme="light"] .wtm-collect-agent-status.wtm-collect-agent--offline {
   color: var(--wf-warn);
   border-color: var(--wf-warn);
   background: var(--wf-warn-soft);
+}
+:root[data-theme="light"] .console-chip--risk {
+  color: var(--wf-risk);
+  border-color: var(--wf-risk);
+  background: var(--wf-risk-soft);
+}
+:root[data-theme="light"] span.console-chip--ok:hover {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+:root[data-theme="light"] span.console-chip--warn:hover {
+  color: var(--wf-warn);
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
+}
+:root[data-theme="light"] span.console-chip--risk:hover {
+  color: var(--wf-risk);
+  border-color: var(--wf-risk);
+  background: var(--wf-risk-soft);
+}
+/* C5 light — regime pills */
+:root[data-theme="light"] #iaFlipchartHost .flipchart-regime-tag.regime-constructive,
+:root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip.regime-constructive {
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+:root[data-theme="light"] #iaFlipchartHost .flipchart-regime-tag.regime-constructive,
+:root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip.regime-constructive .rc-footer-chip__value {
+  color: var(--wf-ok);
+}
+:root[data-theme="light"] #iaFlipchartHost .flipchart-regime-tag.regime-stressed,
+:root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip.regime-stressed {
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
+}
+:root[data-theme="light"] #iaFlipchartHost .flipchart-regime-tag.regime-stressed,
+:root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip.regime-stressed .rc-footer-chip__value,
+:root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip__hint.regime-stressed {
+  color: var(--wf-warn);
 }
 :root[data-theme="light"] .whinfell-logo-text {
   color: var(--wf-accent-green);

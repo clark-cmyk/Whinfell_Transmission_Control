@@ -179,6 +179,41 @@ function runShellJsChecks() {
   );
   assert(!css.includes('.wtc-search'), 'COMET C4 must not introduce .wtc-search class fork');
   assert(!css.includes('.wtc-btn'), 'COMET C4 must not introduce .wtc-btn class fork');
+  // COMET C5 — chip ok/warn/risk + status strip height (pipeline strip · regime pills)
+  assert(
+    /\.console-chip--ok[\s\S]{0,160}?background:\s*var\(--wf-ok-soft\)/s.test(css),
+    'COMET C5 .console-chip--ok uses --wf-ok-soft'
+  );
+  assert(
+    /\.console-chip--warn[\s\S]{0,160}?background:\s*var\(--wf-warn-soft\)/s.test(css),
+    'COMET C5 .console-chip--warn uses --wf-warn-soft'
+  );
+  assert(
+    /\.console-chip--risk[\s\S]{0,160}?background:\s*var\(--wf-risk-soft\)/s.test(css),
+    'COMET C5 .console-chip--risk uses --wf-risk-soft'
+  );
+  assert(
+    /--wf-header-h-collapsed:\s*var\(--wf-status-strip-h\)/.test(css),
+    'COMET C5 collapsed header height aliases --wf-status-strip-h'
+  );
+  assert(
+    /\.ia-top-pipeline-strip\s*\{[^}]*height:\s*var\(--wf-status-strip-h\)/s.test(css),
+    'COMET C5 pipeline strip height uses --wf-status-strip-h'
+  );
+  assert(
+    /\[data-collapsed="true"\] \.ia-top-frame-bar\s*\{[^}]*height:\s*var\(--wf-status-strip-h\)/s.test(css),
+    'COMET C5 collapsed frame bar uses --wf-status-strip-h'
+  );
+  assert(
+    /\.flipchart-regime-tag\.regime-constructive\s*\{[^}]*color:\s*var\(--wf-ok\)/s.test(css),
+    'COMET C5 flipchart constructive regime uses --wf-ok'
+  );
+  assert(
+    /\.flipchart-regime-tag\.regime-stressed\s*\{[^}]*color:\s*var\(--wf-warn\)/s.test(css),
+    'COMET C5 flipchart stressed regime uses --wf-warn'
+  );
+  assert(!/\.wtc-chip[\s{,.-]/.test(css), 'COMET C5 must not introduce .wtc-chip class fork');
+  assert(!/\.wtc-status-strip[\s{,.-]/.test(css), 'COMET C5 must not introduce .wtc-status-strip class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

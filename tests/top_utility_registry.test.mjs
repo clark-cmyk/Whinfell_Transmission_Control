@@ -178,4 +178,23 @@ assert(
 assert(!css.includes('.wtc-btn'), 'COMET C4 no .wtc-btn fork');
 assert(!css.includes('.wtc-search'), 'COMET C4 no .wtc-search fork');
 
+/* COMET C5 — status chip variants + strip height locks */
+assert(
+  /\.console-chip--ok[\s\S]{0,160}?background:\s*var\(--wf-ok-soft\)/s.test(css),
+  'COMET C5 chip--ok soft token'
+);
+assert(
+  /\.console-chip--warn[\s\S]{0,160}?background:\s*var\(--wf-warn-soft\)/s.test(css),
+  'COMET C5 chip--warn soft token'
+);
+assert(
+  /\.console-chip--risk[\s\S]{0,160}?background:\s*var\(--wf-risk-soft\)/s.test(css),
+  'COMET C5 chip--risk soft token'
+);
+assert(
+  /\.ia-top-pipeline-strip\s*\{[^}]*height:\s*var\(--wf-status-strip-h\)/s.test(css),
+  'COMET C5 pipeline strip --wf-status-strip-h'
+);
+assert(!/\.wtc-chip[\s{,.-]/.test(css), 'COMET C5 no .wtc-chip fork');
+
 console.log('top_utility_registry.test.mjs — all assertions passed');

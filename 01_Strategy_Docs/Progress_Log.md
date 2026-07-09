@@ -1,7 +1,40 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C4 control set · next C5)
+**Last updated:** July 9, 2026 (COMET C5 chips + strip · next C6)
+
+---
+
+## July 9, 2026 — COMET CSS C5 (chip variants + status strip)
+
+```text
+CHUNK ID: COMET-C5
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Status chip ok/warn/risk family · pipeline strip --wf-status-strip-h (24px) · regime pills tokenized
+
+CONTEXT
+- Spec §9 KPI chips + §11 status strip (design language only)
+- C4 control set done; C5 is status variants + strip density (no business JS)
+
+CHANGES
+- css/console_ia.css
+  · .console-chip--ok / --warn / --risk via --wf-*-soft status tokens
+  · collect agent online/offline grouped onto ok/warn family
+  · --wf-header-h-collapsed → var(--wf-status-strip-h) (24px)
+  · collapsed .ia-top-frame-bar + .ia-top-pipeline-strip height = --wf-status-strip-h
+  · flipchart + cockpit regime pills: constructive=ok · stressed=warn · defensive=neutral
+  · light theme parity for chips + regime pills
+- tests/koyfin_widget_shell.test.mjs — C5 chip/strip/regime asserts
+- tests/top_utility_registry.test.mjs — C5 CSS locks
+
+QA
+- [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [ ] browser-verify collapsed strip 24px · chip variants · regime pills · dark + light
+
+NEXT SESSION
+- COMET C6 links row (Koyfin / Barchart / Docs) + form field normalize — see BUILD_TODO handoff
+```
 
 ---
 
