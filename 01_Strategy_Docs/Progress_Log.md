@@ -1,7 +1,7 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (TODO pin + GitHub push · tip `3105694` · code `d68289c`)
+**Last updated:** July 9, 2026 (TODO pin + GitHub push · code tip `d68289c`)
 
 ---
 
@@ -11,7 +11,7 @@
 CHUNK ID: DESK-todo-push
 PHASE: Handoff
 GOAL: Pin BUILD_TODO / Progress_Log to residual close-out and push main to origin
-STATUS: CLOSED — pushed origin/main (includes c93ba07 · d68289c · strategy pin)
+STATUS: CLOSED — origin/main push (c93ba07 · d68289c · strategy docs)
 
 NEXT SESSION
 1. Live desk walk-through / operator ratings → Desk_Feedback_Log.md

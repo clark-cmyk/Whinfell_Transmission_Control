@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (TODO pin + push · operator walk-through next)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`3105694`** · code **`d68289c`** · TF re-merge **`c93ba07`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`**  
+**HEAD:** `main` · code tip **`d68289c`** (TF+BW+BBDM) · strategy docs on main · TF re-merge **`c93ba07`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`**  
 **Live snapshot:** **`global-2026-07-09-raw2wtm-01`** · TF `validation_status=complete` · BBDM gate score **50** (not 07-06 / 38)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
@@ -21,7 +21,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 3105694 (code d68289c)
+Repo: Whinfell_Transmission_Control · main · code tip d68289c
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: Desk_Feedback_Log.md · Progress_Log.md · Refresh Bug.txt (FIXED) · Fix Hydration 2.txt (FIXED)
 Shipped: FALLBACK guard · atomic hydration · TF on global-2026-07-09-raw2wtm-01 (complete) ·
@@ -46,7 +46,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`3105694`** (strategy pin) · code **`d68289c`** (desk full hydrate + BW + BBDM) |
+| Branch | `main` · code tip **`d68289c`** (desk full hydrate + BW + BBDM) · strategy docs pinned + pushed |
 | TF re-merge | **`c93ba07`** on `global-2026-07-09-raw2wtm-01` · `validation_status=complete` |
 | Hydration publish | **`def1cd7`/`35fb486`** `Atomic Hydration Publish H1-H3` |
 | Refresh guard commit | **`7b4aee5`** sticky RENDER FALLBACK recovery |
@@ -456,6 +456,6 @@ python3 scripts/bang_bang_da_server.py   # :8766 — keep running for UI window 
 curl -s "http://127.0.0.1:8766/api/report?window=60" | python3 -m json.tool | head
 ```
 
-**Session close (Jul 9 residual):** tip **`3105694`** · code **`d68289c`** · TF on **`global-2026-07-09-raw2wtm-01`** complete · full-desk Refresh + BW dual stamps + BBDM score 50 · dist smoke ×3 **RENDER SUCCESS** · pushed to GitHub · **Next gate** = operator ratings only (`Desk_Feedback_Log.md`).
+**Session close (Jul 9 residual):** code tip **`d68289c`** · strategy docs pinned + pushed · TF on **`global-2026-07-09-raw2wtm-01`** complete · full-desk Refresh + BW dual stamps + BBDM score 50 · dist smoke ×3 **RENDER SUCCESS** · pushed to GitHub · **Next gate** = operator ratings only (`Desk_Feedback_Log.md`).
 
 **Desk smoke:** `bash scripts/build_web.sh` · `cd dist && python3 -m http.server 8765` · hard-refresh `/?boot_log=1` · badge **RENDER SUCCESS** · optional `?safe_boot=1` · Collect CSVs needs agent `:8767`.
