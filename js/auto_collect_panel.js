@@ -169,31 +169,59 @@
         hydrationOk: !!r.hydration,
         curveOk: !!r.curve,
         wmcOk: !!r.wmc,
+        as_of: r.as_of || null,
+        snapshot_id: r.snapshot_id || null,
+        freshness_status: r.freshness_status || null,
       };
     }
-    return { hydrationOk: false, curveOk: false, wmcOk: false };
+    return {
+      hydrationOk: false,
+      curveOk: false,
+      wmcOk: false,
+      as_of: null,
+      snapshot_id: null,
+      freshness_status: null,
+    };
+  }
+
+  function formatHydrationStamp(reload) {
+    if (!reload?.snapshot_id && !reload?.as_of) return '';
+    const parts = [];
+    if (reload.snapshot_id) parts.push(String(reload.snapshot_id));
+    if (reload.as_of) parts.push(String(reload.as_of));
+    if (reload.freshness_status) parts.push(String(reload.freshness_status));
+    return parts.length ? ` · ${parts.join(' · ')}` : '';
   }
 
   async function onMorningCollectComplete(pollResult) {
     if (pollResult?.ok) {
-      const { hydrationOk, curveOk, wmcOk } = await reloadDeskDataAfterCollect();
+      const reload = await reloadDeskDataAfterCollect();
+      const { hydrationOk, curveOk, wmcOk } = reload;
+      const stamp = formatHydrationStamp(reload);
       if (typeof global.renderAll === 'function') {
         try { global.renderAll(); } catch { /* ignore */ }
       }
       if (typeof global.WMC?.refreshAfterCollect === 'function') {
         if (wmcOk) {
-          notify('Collect complete — Midwest Compute data refreshed');
+          notify(`Collect complete — Midwest Compute data refreshed${stamp}`);
         } else {
-          notify('Collect complete — partial refresh (check hydration path)');
+          notify(`Collect complete — partial refresh (check hydration path)${stamp}`);
         }
       } else if (hydrationOk && curveOk) {
-        notify('Collect complete — BasisWatch curve refreshed');
+        notify(`Collect complete — hydration + BasisWatch refreshed${stamp}`);
       } else if (hydrationOk || curveOk) {
-        notify('Collect complete — partial desk refresh (check curve or hydration paths)');
+        notify(`Collect complete — partial desk refresh${stamp} (check curve or hydration paths)`);
       } else {
-        notify('Collect complete — run scripts/sync_live_desk_data.sh or Refresh curve in BasisWatch');
+        notify('Collect complete — run scripts/sync_live_desk_data.sh or Refresh data');
       }
-      return { ok: true, hydrationOk, curveOk, wmcOk };
+      return {
+        ok: true,
+        hydrationOk,
+        curveOk,
+        wmcOk,
+        as_of: reload.as_of,
+        snapshot_id: reload.snapshot_id,
+      };
     }
 
     const job = pollResult?.job || {};

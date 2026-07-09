@@ -60,28 +60,41 @@
   }
 
   async function refreshHydration() {
+    /** @type {{ ok: boolean, as_of?: string|null, snapshot_id?: string|null, freshness_status?: string|null }} */
+    const stamp = { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
     if (typeof global.WTM_BasisWatch?.reloadHydration === 'function') {
       try {
-        return !!(await global.WTM_BasisWatch.reloadHydration(resolveDeskState()));
+        stamp.ok = !!(await global.WTM_BasisWatch.reloadHydration(resolveDeskState()));
+        if (stamp.ok) return stamp;
       } catch (err) {
         console.warn('[DeskOps] BasisWatch hydration reload skipped', err);
       }
     }
     if (typeof global.WTM_reloadDeployHydration === 'function') {
       try {
-        return !!(await global.WTM_reloadDeployHydration({ force: true }));
+        const out = await global.WTM_reloadDeployHydration({ force: true, detail: true });
+        if (out && typeof out === 'object') {
+          stamp.ok = !!out.ok;
+          stamp.as_of = out.as_of || null;
+          stamp.snapshot_id = out.snapshot_id || null;
+          stamp.freshness_status = out.freshness_status || null;
+          return stamp;
+        }
+        stamp.ok = !!out;
+        return stamp;
       } catch (err) {
         console.warn('[DeskOps] hydration refresh skipped', err);
       }
     }
     if (global.WMC?.Hydrate?.load) {
       try {
-        return !!(await global.WMC.Hydrate.load());
+        stamp.ok = !!(await global.WMC.Hydrate.load());
+        return stamp;
       } catch (err) {
         console.warn('[DeskOps] WMC hydrate skipped', err);
       }
     }
-    return false;
+    return stamp;
   }
 
   async function refreshWmc() {
@@ -125,19 +138,29 @@
       curve: false,
       wmc: false,
       surfaces: false,
+      as_of: null,
+      snapshot_id: null,
+      freshness_status: null,
     };
     try {
-      results.hydration = await refreshHydration();
+      const hyd = await refreshHydration();
+      results.hydration = !!(hyd && hyd.ok);
+      results.as_of = hyd?.as_of || null;
+      results.snapshot_id = hyd?.snapshot_id || null;
+      results.freshness_status = hyd?.freshness_status || null;
       results.curve = await refreshBasisWatch();
       results.wmc = await refreshWmc();
       results.surfaces = refreshToolSurfaces();
 
       const any = results.hydration || results.curve || results.wmc || results.surfaces;
+      const stampBit = results.snapshot_id
+        ? ` · ${results.snapshot_id}${results.as_of ? ` @ ${results.as_of}` : ''}`
+        : '';
       if (!options.silent) {
         if (results.hydration && results.curve) {
-          notify('Desk data refreshed — hydration + BasisWatch curve');
+          notify(`Desk data refreshed — hydration + BasisWatch curve${stampBit}`);
         } else if (any) {
-          notify('Desk data refreshed — partial (some panels may need publish/collect)');
+          notify(`Desk data refreshed — partial${stampBit} (some panels may need publish/collect)`);
         } else {
           notify('Refresh complete — no live data paths (check hydration / curve JSON)');
         }

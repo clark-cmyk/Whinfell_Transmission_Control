@@ -555,7 +555,7 @@
       curveCache = { records: [] };
       return curveCache;
     }
-    curveFetchPromise = fetch(`${CURVE_URL}?_=${Date.now()}`)
+    curveFetchPromise = fetch(`${CURVE_URL}?_=${Date.now()}`, { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : { records: [] }))
       .then(data => { curveCache = data || { records: [] }; return curveCache; })
       .catch(() => { curveCache = { records: [] }; return curveCache; });
@@ -565,7 +565,7 @@
   async function loadHydrationBundle() {
     if (location.protocol === 'file:') return null;
     try {
-      const res = await fetch(`${HYDRATION_URL}?_=${Date.now()}`);
+      const res = await fetch(`${HYDRATION_URL}?_=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) return null;
       return await res.json();
     } catch { return null; }

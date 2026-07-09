@@ -2942,21 +2942,36 @@ function importHydrationFile(file, options = {}) {
 
 const DEPLOY_HYDRATION_URL = 'data/hydration/latest.json';
 
+/**
+ * Force-reload deploy hydration (cache-bust + no-store).
+ * Returns boolean for legacy callers, or detail object when options.detail === true:
+ * { ok, as_of, snapshot_id, freshness_status }
+ */
 async function reloadDeployHydration(options = {}) {
-  if (location.protocol === 'file:') return false;
+  const detail = !!options.detail;
+  const fail = () => (detail ? { ok: false, as_of: null, snapshot_id: null, freshness_status: null } : false);
+  if (location.protocol === 'file:') return fail();
   try {
     const res = await fetch(`${DEPLOY_HYDRATION_URL}?_=${Date.now()}`, { cache: 'no-store' });
-    if (!res.ok) return false;
+    if (!res.ok) return fail();
     const bundle = await res.json();
-    if (!bundle || bundle.validation_status === 'missing') return false;
+    if (!bundle || bundle.validation_status === 'missing') return fail();
     const ok = hydrateFromBundle(bundle, { force: options.force !== false });
     if (ok) {
       try { sessionStorage.setItem('whinfell_hydration_prompt_v1', '1'); } catch (_) { /* ignore */ }
       scheduleHeavyPanelRefresh();
     }
+    if (detail) {
+      return {
+        ok: !!ok,
+        as_of: bundle.as_of || null,
+        snapshot_id: bundle.snapshot_id || null,
+        freshness_status: bundle.freshness_status || null,
+      };
+    }
     return !!ok;
   } catch (_) {
-    return false;
+    return fail();
   }
 }
 

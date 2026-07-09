@@ -2,14 +2,14 @@
   "hydration_version": "1.3.0",
   "pipeline_version": "1.0.0",
   "bundle_version": "1.0.0",
-  "snapshot_id": "global-2026-07-07-raw2wtm-01",
-  "lineage_hash": "sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7",
+  "snapshot_id": "global-2026-07-08-raw2wtm-01",
+  "lineage_hash": "sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5",
   "validation_status": "parsed",
-  "as_of": "2026-07-07T21:52:29+00:00",
+  "as_of": "2026-07-08T03:56:43+00:00",
   "source": "parquet_hydration",
   "freshness_status": "fresh",
   "global": {
-    "observation_id": "global-2026-07-07-raw2wtm-01",
+    "observation_id": "global-2026-07-08-raw2wtm-01",
     "whinfell_score": 58,
     "transmission_state": "elevated",
     "regime_tag": "Constructive / Selective Risk-On",
@@ -32,8 +32,8 @@
     "sq3_score": 35,
     "sq3_band": "Impaired",
     "regime_tag": "desk-auto",
-    "observation_id": "china-2026-07-07-raw2wtm-01",
-    "as_of": "2026-07-07T21:52:29+00:00",
+    "observation_id": "china-2026-07-08-raw2wtm-01",
+    "as_of": "2026-07-08T03:56:43+00:00",
     "source": "manual"
   },
   "china_ladder": {
@@ -73,156 +73,156 @@
   },
   "crypto_sleeve": {
     "version": "1.0.0",
-    "as_of": "2026-07-07T21:52:29.599259+00:00",
+    "as_of": "2026-07-08T03:56:43.562699+00:00",
     "assets": {
       "xrp_spot_usd": {
         "ticker": "XRPUSD",
         "asset_key": "xrp_spot_usd",
-        "last_price": 1.1142,
+        "last_price": 1.0946,
         "name": "Ripple - United States Dollar",
-        "1_day": "-0.0034",
-        "vol_1m": 50.38,
-        "tr_1m": -0.0156,
-        "tr_3m": -0.1547,
-        "total_return_ytd": "-0.3940",
-        "tr_1w": 0.0712,
-        "total_return_5d": "-0.0211",
-        "chg_1d": -0.0034,
-        "tr_6m": -0.4886,
-        "tr_1y": -0.5149,
-        "total_return_3y": "1.3775",
-        "total_return_5y": "0.6884",
-        "total_return_qtd": "0.0712",
+        "1_day": "-0.0209",
+        "vol_1m": 49.18,
+        "tr_1m": -0.0702,
+        "tr_3m": -0.1885,
+        "total_return_ytd": "-0.4047",
+        "tr_1w": 0.0355,
+        "total_return_5d": "-0.0384",
+        "chg_1d": -0.0209,
+        "tr_6m": -0.4879,
+        "tr_1y": -0.5235,
+        "total_return_3y": "1.3390",
+        "total_return_5y": "0.6436",
+        "total_return_qtd": "0.0523",
         "_raw": {
           "Ticker": "XRPUSD",
-          "Last Price": "1.1142",
+          "Last Price": "1.0946",
           "Name": "Ripple - United States Dollar",
-          "1-Day %": "-0.0034",
-          "Volatility (1M)": "50.38",
-          "Total Return (1M)": "-0.0156",
-          "Total Return (3M)": "-0.1547",
-          "Total Return (YTD)": "-0.3940",
-          "Total Return (1W)": "0.0712",
-          "Total Return (5D)": "-0.0211",
-          "Total Return (1D)": "-0.0034",
-          "Total Return (6M)": "-0.4886",
-          "Total Return (1Y)": "-0.5149",
-          "Total Return (3Y)": "1.3775",
-          "Total Return (5Y)": "0.6884",
-          "Total Return (QTD)": "0.0712"
+          "1-Day %": "-0.0209",
+          "Volatility (1M)": "49.18",
+          "Total Return (1M)": "-0.0702",
+          "Total Return (3M)": "-0.1885",
+          "Total Return (YTD)": "-0.4047",
+          "Total Return (1W)": "0.0355",
+          "Total Return (5D)": "-0.0384",
+          "Total Return (1D)": "-0.0209",
+          "Total Return (6M)": "-0.4879",
+          "Total Return (1Y)": "-0.5235",
+          "Total Return (3Y)": "1.3390",
+          "Total Return (5Y)": "0.6436",
+          "Total Return (QTD)": "0.0523"
         }
       },
       "btc_spot_usd": {
         "ticker": "BTCUSD",
         "asset_key": "btc_spot_usd",
-        "last_price": 63425.44,
+        "last_price": 62678.69,
         "name": "Bitcoin - United States Dollar",
-        "1_day": "-0.0036",
-        "vol_1m": 29.1,
-        "tr_1m": 0.0257,
-        "tr_3m": -0.085,
-        "total_return_ytd": "-0.2783",
-        "tr_1w": 0.0818,
-        "total_return_5d": "0.0113",
-        "chg_1d": -0.0036,
-        "tr_6m": -0.303,
-        "tr_1y": -0.4163,
-        "total_return_3y": "1.0919",
-        "total_return_5y": "0.8675",
-        "total_return_10y": "101.0522",
-        "total_return_qtd": "0.0818",
+        "1_day": "-0.0154",
+        "vol_1m": 28.67,
+        "tr_1m": -0.0124,
+        "tr_3m": -0.122,
+        "total_return_ytd": "-0.2868",
+        "tr_1w": 0.0434,
+        "total_return_5d": "-0.0006",
+        "chg_1d": -0.0154,
+        "tr_6m": -0.3131,
+        "tr_1y": -0.4232,
+        "total_return_3y": "1.0708",
+        "total_return_5y": "0.8143",
+        "total_return_10y": "93.8671",
+        "total_return_qtd": "0.0690",
         "_raw": {
           "Ticker": "BTCUSD",
-          "Last Price": "63425.44",
+          "Last Price": "62678.69",
           "Name": "Bitcoin - United States Dollar",
-          "1-Day %": "-0.0036",
-          "Volatility (1M)": "29.10",
-          "Total Return (1M)": "0.0257",
-          "Total Return (3M)": "-0.0850",
-          "Total Return (YTD)": "-0.2783",
-          "Total Return (1W)": "0.0818",
-          "Total Return (5D)": "0.0113",
-          "Total Return (1D)": "-0.0036",
-          "Total Return (6M)": "-0.3030",
-          "Total Return (1Y)": "-0.4163",
-          "Total Return (3Y)": "1.0919",
-          "Total Return (5Y)": "0.8675",
-          "Total Return (10Y)": "101.0522",
-          "Total Return (QTD)": "0.0818"
+          "1-Day %": "-0.0154",
+          "Volatility (1M)": "28.67",
+          "Total Return (1M)": "-0.0124",
+          "Total Return (3M)": "-0.1220",
+          "Total Return (YTD)": "-0.2868",
+          "Total Return (1W)": "0.0434",
+          "Total Return (5D)": "-0.0006",
+          "Total Return (1D)": "-0.0154",
+          "Total Return (6M)": "-0.3131",
+          "Total Return (1Y)": "-0.4232",
+          "Total Return (3Y)": "1.0708",
+          "Total Return (5Y)": "0.8143",
+          "Total Return (10Y)": "93.8671",
+          "Total Return (QTD)": "0.0690"
         }
       },
       "eth_spot_usd": {
         "ticker": "ETHUSD",
         "asset_key": "eth_spot_usd",
-        "last_price": 1776.7,
+        "last_price": 1748.7,
         "name": "Ethereum - United States Dollar",
-        "1_day": "-0.0035",
-        "vol_1m": 44.63,
-        "tr_1m": 0.0918,
-        "tr_3m": -0.1601,
-        "total_return_ytd": "-0.4033",
-        "tr_1w": 0.1292,
-        "total_return_5d": "0.0070",
-        "chg_1d": -0.0035,
-        "tr_6m": -0.4355,
-        "tr_1y": -0.3165,
-        "total_return_3y": "-0.0566",
-        "total_return_5y": "-0.2311",
-        "total_return_qtd": "0.1292",
+        "1_day": "-0.0192",
+        "vol_1m": 42.99,
+        "tr_1m": 0.0351,
+        "tr_3m": -0.2088,
+        "total_return_ytd": "-0.4127",
+        "tr_1w": 0.082,
+        "total_return_5d": "-0.0089",
+        "chg_1d": -0.0192,
+        "tr_6m": -0.4387,
+        "tr_1y": -0.3273,
+        "total_return_3y": "-0.0625",
+        "total_return_5y": "-0.2600",
+        "total_return_qtd": "0.1114",
         "_raw": {
           "Ticker": "ETHUSD",
-          "Last Price": "1776.70",
+          "Last Price": "1748.70",
           "Name": "Ethereum - United States Dollar",
-          "1-Day %": "-0.0035",
-          "Volatility (1M)": "44.63",
-          "Total Return (1M)": "0.0918",
-          "Total Return (3M)": "-0.1601",
-          "Total Return (YTD)": "-0.4033",
-          "Total Return (1W)": "0.1292",
-          "Total Return (5D)": "0.0070",
-          "Total Return (1D)": "-0.0035",
-          "Total Return (6M)": "-0.4355",
-          "Total Return (1Y)": "-0.3165",
-          "Total Return (3Y)": "-0.0566",
-          "Total Return (5Y)": "-0.2311",
-          "Total Return (QTD)": "0.1292"
+          "1-Day %": "-0.0192",
+          "Volatility (1M)": "42.99",
+          "Total Return (1M)": "0.0351",
+          "Total Return (3M)": "-0.2088",
+          "Total Return (YTD)": "-0.4127",
+          "Total Return (1W)": "0.0820",
+          "Total Return (5D)": "-0.0089",
+          "Total Return (1D)": "-0.0192",
+          "Total Return (6M)": "-0.4387",
+          "Total Return (1Y)": "-0.3273",
+          "Total Return (3Y)": "-0.0625",
+          "Total Return (5Y)": "-0.2600",
+          "Total Return (QTD)": "0.1114"
         }
       },
       "sol_spot_usd": {
         "ticker": "SOLUSD",
         "asset_key": "sol_spot_usd",
-        "last_price": 80.77,
+        "last_price": 78.58,
         "name": "Solana - United States Dollar",
-        "1_day": "-0.0043",
-        "vol_1m": 60.23,
-        "tr_1m": 0.2491,
-        "tr_3m": -0.014,
-        "total_return_ytd": "-0.3498",
-        "tr_1w": 0.0979,
-        "total_return_5d": "-0.0224",
-        "chg_1d": -0.0043,
-        "tr_6m": -0.4065,
-        "tr_1y": -0.4617,
-        "total_return_3y": "2.8925",
-        "total_return_5y": "1.4112",
-        "total_return_qtd": "0.0979",
+        "1_day": "-0.0313",
+        "vol_1m": 59.52,
+        "tr_1m": 0.1647,
+        "tr_3m": -0.0564,
+        "total_return_ytd": "-0.3675",
+        "tr_1w": 0.016,
+        "total_return_5d": "-0.0489",
+        "chg_1d": -0.0313,
+        "tr_6m": -0.4366,
+        "tr_1y": -0.4763,
+        "total_return_3y": "2.6892",
+        "total_return_5y": "1.0910",
+        "total_return_qtd": "0.0681",
         "_raw": {
           "Ticker": "SOLUSD",
-          "Last Price": "80.7700",
+          "Last Price": "78.5800",
           "Name": "Solana - United States Dollar",
-          "1-Day %": "-0.0043",
-          "Volatility (1M)": "60.23",
-          "Total Return (1M)": "0.2491",
-          "Total Return (3M)": "-0.0140",
-          "Total Return (YTD)": "-0.3498",
-          "Total Return (1W)": "0.0979",
-          "Total Return (5D)": "-0.0224",
-          "Total Return (1D)": "-0.0043",
-          "Total Return (6M)": "-0.4065",
-          "Total Return (1Y)": "-0.4617",
-          "Total Return (3Y)": "2.8925",
-          "Total Return (5Y)": "1.4112",
-          "Total Return (QTD)": "0.0979"
+          "1-Day %": "-0.0313",
+          "Volatility (1M)": "59.52",
+          "Total Return (1M)": "0.1647",
+          "Total Return (3M)": "-0.0564",
+          "Total Return (YTD)": "-0.3675",
+          "Total Return (1W)": "0.0160",
+          "Total Return (5D)": "-0.0489",
+          "Total Return (1D)": "-0.0313",
+          "Total Return (6M)": "-0.4366",
+          "Total Return (1Y)": "-0.4763",
+          "Total Return (3Y)": "2.6892",
+          "Total Return (5Y)": "1.0910",
+          "Total Return (QTD)": "0.0681"
         }
       }
     },
@@ -274,8 +274,8 @@
     },
     "correlation_series": {},
     "snapshot": {
-      "as_of": "2026-07-07T21:52:29.597942+00:00",
-      "source_file": "credit_20260707_1652.csv",
+      "as_of": "2026-07-08T03:56:43.561389+00:00",
+      "source_file": "credit_20260707_2256.csv",
       "tickers_found": [
         "BTCUSD",
         "ETHUSD",
@@ -340,7 +340,7 @@
       "band": "Supportive",
       "band_key": "supportive",
       "freshness_status": "fresh",
-      "as_of": "2026-07-07T21:52:29+00:00",
+      "as_of": "2026-07-08T03:56:43+00:00",
       "horizon_marks": {
         "d1": "flat",
         "d5": "flat",
@@ -366,7 +366,7 @@
           "weight": 0.3,
           "contribution": 30.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -377,7 +377,7 @@
           "weight": 0.25,
           "contribution": 25.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -388,7 +388,7 @@
           "weight": 0.2,
           "contribution": 5.0,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         },
         {
@@ -399,7 +399,7 @@
           "weight": 0.15,
           "contribution": 3.75,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         },
         {
@@ -410,7 +410,7 @@
           "weight": 0.1,
           "contribution": 2.5,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         }
       ],
@@ -610,7 +610,7 @@
         "enabled": false,
         "source": "derived",
         "degrade_mode": "unavailable",
-        "as_of": "2026-07-07",
+        "as_of": "2026-07-08",
         "horizon_display": "5d",
         "basket_id": "liquidity_duration",
         "basket_label": "Duration & front-end sponsorship",
@@ -646,7 +646,7 @@
       "band": "Blocked",
       "band_key": "blocked",
       "freshness_status": "fresh",
-      "as_of": "2026-07-07T21:52:29+00:00",
+      "as_of": "2026-07-08T03:56:43+00:00",
       "horizon_marks": {
         "d1": "flat",
         "d5": "down",
@@ -865,7 +865,7 @@
         "enabled": true,
         "source": "derived",
         "degrade_mode": "fallback_1d_credit",
-        "as_of": "2026-07-07",
+        "as_of": "2026-07-08",
         "horizon_display": "1d",
         "basket_id": "credit_hy_ig",
         "basket_label": "Credit ETF sponsorship",
@@ -964,7 +964,7 @@
       "band": "Supportive",
       "band_key": "supportive",
       "freshness_status": "fresh",
-      "as_of": "2026-07-07T21:52:29+00:00",
+      "as_of": "2026-07-08T03:56:43+00:00",
       "horizon_marks": {
         "d1": "flat",
         "d5": "flat",
@@ -990,7 +990,7 @@
           "weight": 0.3,
           "contribution": 30.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1001,7 +1001,7 @@
           "weight": 0.25,
           "contribution": 6.25,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         },
         {
@@ -1012,7 +1012,7 @@
           "weight": 0.2,
           "contribution": -20.0,
           "direction": "down",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1023,7 +1023,7 @@
           "weight": 0.15,
           "contribution": 3.75,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         },
         {
@@ -1034,7 +1034,7 @@
           "weight": 0.1,
           "contribution": 2.5,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         }
       ],
@@ -1234,7 +1234,7 @@
         "enabled": false,
         "source": "derived",
         "degrade_mode": "unavailable",
-        "as_of": "2026-07-07",
+        "as_of": "2026-07-08",
         "horizon_display": "5d",
         "basket_id": "breadth_participation",
         "basket_label": "Equity participation sponsorship",
@@ -1270,7 +1270,7 @@
       "band": "Supportive",
       "band_key": "supportive",
       "freshness_status": "fresh",
-      "as_of": "2026-07-07T21:52:29+00:00",
+      "as_of": "2026-07-08T03:56:43+00:00",
       "horizon_marks": {
         "d1": "flat",
         "d5": "flat",
@@ -1296,7 +1296,7 @@
           "weight": 0.3,
           "contribution": 30.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1307,7 +1307,7 @@
           "weight": 0.25,
           "contribution": 25.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1318,7 +1318,7 @@
           "weight": 0.2,
           "contribution": -20.0,
           "direction": "down",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1329,7 +1329,7 @@
           "weight": 0.15,
           "contribution": -15.0,
           "direction": "down",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1340,7 +1340,7 @@
           "weight": 0.1,
           "contribution": 2.5,
           "direction": "flat",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "horizon_fallback"
         }
       ],
@@ -1540,7 +1540,7 @@
         "enabled": false,
         "source": "derived",
         "degrade_mode": "unavailable",
-        "as_of": "2026-07-07",
+        "as_of": "2026-07-08",
         "horizon_display": "5d",
         "basket_id": "highbeta_crypto_beta",
         "basket_label": "High-beta & crypto vehicle sponsorship",
@@ -1576,7 +1576,7 @@
       "band": "Supportive",
       "band_key": "supportive",
       "freshness_status": "fresh",
-      "as_of": "2026-07-07T21:52:29+00:00",
+      "as_of": "2026-07-08T03:56:43+00:00",
       "horizon_marks": {
         "d1": "flat",
         "d5": "flat",
@@ -1602,7 +1602,7 @@
           "weight": 0.3,
           "contribution": 30.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1613,7 +1613,7 @@
           "weight": 0.25,
           "contribution": 25.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1624,7 +1624,7 @@
           "weight": 0.2,
           "contribution": 20.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1635,7 +1635,7 @@
           "weight": 0.15,
           "contribution": 15.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         },
         {
@@ -1646,7 +1646,7 @@
           "weight": 0.1,
           "contribution": 10.0,
           "direction": "up",
-          "as_of": "2026-07-07T21:52:29+00:00",
+          "as_of": "2026-07-08T03:56:43+00:00",
           "source": "rv_history"
         }
       ],
@@ -1732,61 +1732,59 @@
         "series": {
           "btc_calendar_bt_near_deferred": {
             "quartile_direction": "higher_is_richer",
-            "label": "BTC Calendar (1m vs 3m)",
+            "label": "BT near-deferred calendar",
             "horizons": {
               "1m": {
-                "current_value": 1.1915,
+                "current_value": 1.25,
                 "unit": "pct",
-                "percentile": 100.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
+                "percentile": 63.6,
+                "quartile": 3,
+                "richness_label": "rich",
+                "lookback_start": "2026-06-08",
+                "lookback_end": "2026-06-29",
+                "n_observations": 22
               },
               "3m": {
-                "current_value": 1.1915,
+                "current_value": 1.25,
                 "unit": "pct",
-                "percentile": 100.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
+                "percentile": 57.1,
+                "quartile": 3,
+                "richness_label": "rich",
+                "lookback_start": "2026-04-28",
+                "lookback_end": "2026-06-29",
+                "n_observations": 63
               },
               "6m": {
-                "current_value": 1.1915,
+                "current_value": 1.25,
                 "unit": "pct",
-                "percentile": 100.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
+                "percentile": 55.6,
+                "quartile": 3,
+                "richness_label": "rich",
+                "lookback_start": "2026-02-24",
+                "lookback_end": "2026-06-29",
+                "n_observations": 126
               },
               "12m": {
-                "current_value": 1.1915,
+                "current_value": 1.25,
                 "unit": "pct",
-                "percentile": 100.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
+                "percentile": 53.6,
+                "quartile": 3,
+                "richness_label": "rich",
+                "lookback_start": "2025-10-21",
+                "lookback_end": "2026-06-29",
+                "n_observations": 252
               },
               "3y": {
-                "current_value": 1.1915,
+                "current_value": 1.25,
                 "unit": "pct",
-                "percentile": 100.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
+                "percentile": 53.4,
+                "quartile": 3,
+                "richness_label": "rich",
+                "lookback_start": "2024-06-04",
+                "lookback_end": "2026-06-29",
+                "n_observations": 756
               }
-            },
-            "data_status": "live",
-            "history_source": "barchart_spread_history"
+            }
           },
           "btc_basis_vs_refs": {
             "quartile_direction": "higher_is_richer",
@@ -1843,180 +1841,6 @@
                 "n_observations": 756
               }
             }
-          },
-          "eth_calendar_et_near_deferred": {
-            "quartile_direction": "higher_is_richer",
-            "label": "ETH Calendar (1m vs 3m)",
-            "horizons": {
-              "1m": {
-                "current_value": 44.0,
-                "unit": "pct",
-                "percentile": 80.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3m": {
-                "current_value": 44.0,
-                "unit": "pct",
-                "percentile": 80.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "6m": {
-                "current_value": 44.0,
-                "unit": "pct",
-                "percentile": 80.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "12m": {
-                "current_value": 44.0,
-                "unit": "pct",
-                "percentile": 80.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3y": {
-                "current_value": 44.0,
-                "unit": "pct",
-                "percentile": 80.0,
-                "quartile": 4,
-                "richness_label": "extreme",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              }
-            },
-            "data_status": "live",
-            "history_source": "barchart_spread_history"
-          },
-          "btc_basis_spot_1m": {
-            "quartile_direction": "higher_is_richer",
-            "label": "BTC basis (spot vs 1m)",
-            "horizons": {
-              "1m": {
-                "current_value": -0.4687,
-                "unit": "pct",
-                "percentile": 20.0,
-                "quartile": 1,
-                "richness_label": "cheap",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3m": {
-                "current_value": -0.4687,
-                "unit": "pct",
-                "percentile": 20.0,
-                "quartile": 1,
-                "richness_label": "cheap",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "6m": {
-                "current_value": -0.4687,
-                "unit": "pct",
-                "percentile": 20.0,
-                "quartile": 1,
-                "richness_label": "cheap",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "12m": {
-                "current_value": -0.4687,
-                "unit": "pct",
-                "percentile": 20.0,
-                "quartile": 1,
-                "richness_label": "cheap",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3y": {
-                "current_value": -0.4687,
-                "unit": "pct",
-                "percentile": 20.0,
-                "quartile": 1,
-                "richness_label": "cheap",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              }
-            },
-            "data_status": "live",
-            "history_source": "barchart_spread_history"
-          },
-          "eth_basis_spot_1m": {
-            "quartile_direction": "higher_is_richer",
-            "label": "ETH Basis (Spot vs 1m)",
-            "horizons": {
-              "1m": {
-                "current_value": -18.0,
-                "unit": "pct",
-                "percentile": 60.0,
-                "quartile": 3,
-                "richness_label": "rich",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3m": {
-                "current_value": -18.0,
-                "unit": "pct",
-                "percentile": 60.0,
-                "quartile": 3,
-                "richness_label": "rich",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "6m": {
-                "current_value": -18.0,
-                "unit": "pct",
-                "percentile": 60.0,
-                "quartile": 3,
-                "richness_label": "rich",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "12m": {
-                "current_value": -18.0,
-                "unit": "pct",
-                "percentile": 60.0,
-                "quartile": 3,
-                "richness_label": "rich",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              },
-              "3y": {
-                "current_value": -18.0,
-                "unit": "pct",
-                "percentile": 60.0,
-                "quartile": 3,
-                "richness_label": "rich",
-                "lookback_start": "2026-06-14",
-                "lookback_end": "2026-06-18",
-                "n_observations": 5
-              }
-            },
-            "data_status": "live",
-            "history_source": "barchart_spread_history"
           }
         }
       },
@@ -2038,7 +1862,7 @@
         "enabled": false,
         "source": "derived",
         "degrade_mode": "unavailable",
-        "as_of": "2026-07-07",
+        "as_of": "2026-07-08",
         "horizon_display": "5d",
         "basket_id": "basis_warehouse_proxy",
         "basket_label": "Warehouse / ETF basis proxy sponsorship",
@@ -2074,8 +1898,8 @@
     "gate_zone": "amber",
     "whinfell_score": 58
   },
-  "wtm_export_v21": "--- WTM EXPORT v2.1 ---\nWhinfell Score: 58\nTransmission State: elevated\nRegime Tag: Constructive / Selective Risk-On\nKey Observation: US10Y +; MAX +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-07T21:52:29\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-07-raw2wtm-01\nLineage Hash: sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7\nValidation Status: parsed\nData As Of: 2026-07-07T21:52:29Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.",
-  "wtm_export_v22": "--- WTM EXPORT v2.2 ---\nWhinfell Score: 58\nTransmission State: elevated\nRegime Tag: Constructive / Selective Risk-On\nKey Observation: US10Y +; MAX +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-07T21:52:29\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-07-raw2wtm-01\nLineage Hash: sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7\nValidation Status: parsed\nData As Of: 2026-07-07T21:52:29Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.\n\n--- NODE COCKPIT: Liquidity & Rates ---\nNode ID: liquidity\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Liquidity & Rates mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 2s10s curve trade / SOFR spread (low)\nSelected Implementation: \u2014\nRV Series: usgg2y10y\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China liquidity & rates stage horizon_net -1 (informational)\nKey Observation: Liquidity & Rates horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Credit Confirmation ---\nNode ID: credit\nComposite Score: 38\nComposite Score Source: horizon_net_fallback\nBand: Blocked\nBand Key: blocked\nFreshness Status: fresh\nHorizon Net: -1\nHorizon Marks: d1\u2192 d5\u2193 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Credit Confirmation mixed marks \u2014 prefer RV or reduced size. (Flows: 1D fallback only \u2014 treat as indicative.)\nRelative Value: long_spread \u2014 HYG vs LQD (or HY\u2212IG OAS proxy) (medium)\nSelected Implementation: \u2014\nRV Series: hy_oas_proxy\nRV Direction: higher_is_cheaper\nRV Horizon: 3m\nRV Quartile: Q4\nRV Percentile: 90.5\nRV Richness: cheap\nChina Parallel: present \u2014 horizon_net -3\nChina Parallel Note: China credit confirmation stage horizon_net -3 (informational)\nKey Observation: Credit Confirmation horizon_net -1 from suggested tracer marks.\nFunds Flow Enabled: true\nFunds Flow Status: fallback_1d\nFunds Flow Source: credit_cross_section\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: credit_cross_section_1d_only\nFunds Flow Verdict: mixed\nFunds Flow 1D: -0.26% AUM\nFunds Flow Breadth: 1/4\nFunds Flow Confidence Penalty: 1\nFunds Flow Summary: 1D credit flows mildly negative \u2014 5D unavailable.\n\n--- NODE COCKPIT: Equity Breadth ---\nNode ID: breadth\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Equity Breadth mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IWM/SPY participation pair (low)\nSelected Implementation: \u2014\nRV Series: iwm_spy_ratio\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net 1\nChina Parallel Note: China equity breadth stage horizon_net +1 (informational)\nKey Observation: Equity Breadth horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: High-Beta / BTC ---\nNode ID: highbeta\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 High-Beta / BTC mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IBIT vs QQQ beta spread (low)\nSelected Implementation: \u2014\nRV Series: ibit_qqq_beta_spread\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 38.1\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China high-beta / china cyclical transmission stage horizon_net -1 (informational)\nKey Observation: BTC bias Neutral; horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Basis & Term Structure ---\nNode ID: basis\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Basis & Term Structure mixed marks \u2014 prefer RV or reduced size.\nRelative Value: short_spread \u2014 BT near vs deferred calendar (medium)\nSelected Implementation: \u2014\nRV Series: btc_calendar_bt_near_deferred\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q3\nRV Percentile: 57.1\nRV Richness: rich\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China basis & term structure stage horizon_net -1 (informational)\nKey Observation: Calendar at 67145.00% (Jun/Back); horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014",
+  "wtm_export_v21": "--- WTM EXPORT v2.1 ---\nWhinfell Score: 58\nTransmission State: elevated\nRegime Tag: Constructive / Selective Risk-On\nKey Observation: US10Y +; MAX +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-08T03:56:43\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-08-raw2wtm-01\nLineage Hash: sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5\nValidation Status: parsed\nData As Of: 2026-07-08T03:56:43Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.",
+  "wtm_export_v22": "--- WTM EXPORT v2.2 ---\nWhinfell Score: 58\nTransmission State: elevated\nRegime Tag: Constructive / Selective Risk-On\nKey Observation: US10Y +; MAX +\nGross Risk Recommendation: \u2014\nBTC Bias: Neutral\nTimestamp: 2026-07-08T03:56:43\nSQ3 Score: 35\nSQ3 Band: Impaired\nPolicy Strength: 50\nState Impulse Score: 0\nGrowth Impulse Score: 0\nChina Regime Tag: desk-auto\nSnapshot ID: global-2026-07-08-raw2wtm-01\nLineage Hash: sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5\nValidation Status: parsed\nData As Of: 2026-07-08T03:56:43Z\nSource Channel: koyfin\nFreshness Status: fresh\nOutput Kind: unknown\n--- CHINA LADDER EXPORT v1.1 ---\nChina Raw Score: 43\nChina Final Score: 26\nChina Final Band: Impaired\nSQ3 Policy Score: 35\nWeakest China Stage: Credit Confirmation\nKey China Observation: Weakest stage Credit Confirmation at 32/100 \u2014 avoid new China-linked exposure until composite clears 50.\n\n--- NODE COCKPIT: Liquidity & Rates ---\nNode ID: liquidity\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Liquidity & Rates mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 2s10s curve trade / SOFR spread (low)\nSelected Implementation: \u2014\nRV Series: usgg2y10y\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China liquidity & rates stage horizon_net -1 (informational)\nKey Observation: Liquidity & Rates horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Credit Confirmation ---\nNode ID: credit\nComposite Score: 38\nComposite Score Source: horizon_net_fallback\nBand: Blocked\nBand Key: blocked\nFreshness Status: fresh\nHorizon Net: -1\nHorizon Marks: d1\u2192 d5\u2193 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Credit Confirmation mixed marks \u2014 prefer RV or reduced size. (Flows: 1D fallback only \u2014 treat as indicative.)\nRelative Value: long_spread \u2014 HYG vs LQD (or HY\u2212IG OAS proxy) (medium)\nSelected Implementation: \u2014\nRV Series: hy_oas_proxy\nRV Direction: higher_is_cheaper\nRV Horizon: 3m\nRV Quartile: Q4\nRV Percentile: 90.5\nRV Richness: cheap\nChina Parallel: present \u2014 horizon_net -3\nChina Parallel Note: China credit confirmation stage horizon_net -3 (informational)\nKey Observation: Credit Confirmation horizon_net -1 from suggested tracer marks.\nFunds Flow Enabled: true\nFunds Flow Status: fallback_1d\nFunds Flow Source: credit_cross_section\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: credit_cross_section_1d_only\nFunds Flow Verdict: mixed\nFunds Flow 1D: -0.26% AUM\nFunds Flow Breadth: 1/4\nFunds Flow Confidence Penalty: 1\nFunds Flow Summary: 1D credit flows mildly negative \u2014 5D unavailable.\n\n--- NODE COCKPIT: Equity Breadth ---\nNode ID: breadth\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Equity Breadth mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IWM/SPY participation pair (low)\nSelected Implementation: \u2014\nRV Series: iwm_spy_ratio\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 44.4\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net 1\nChina Parallel Note: China equity breadth stage horizon_net +1 (informational)\nKey Observation: Equity Breadth horizon_net +0 from suggested tracer marks.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: High-Beta / BTC ---\nNode ID: highbeta\nComposite Score: 72\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 High-Beta / BTC mixed marks \u2014 prefer RV or reduced size.\nRelative Value: neutral \u2014 IBIT vs QQQ beta spread (low)\nSelected Implementation: \u2014\nRV Series: ibit_qqq_beta_spread\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q2\nRV Percentile: 38.1\nRV Richness: fair\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China high-beta / china cyclical transmission stage horizon_net -1 (informational)\nKey Observation: BTC bias Neutral; horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014\n\n--- NODE COCKPIT: Basis & Term Structure ---\nNode ID: basis\nComposite Score: 100\nComposite Score Source: weighted_components\nBand: Supportive\nBand Key: supportive\nFreshness Status: fresh\nHorizon Net: 0\nHorizon Marks: d1\u2192 d5\u2192 d20\u2192 d60\u2192\nDirectional: neutral (low) \u2014 Basis & Term Structure mixed marks \u2014 prefer RV or reduced size.\nRelative Value: short_spread \u2014 BT near vs deferred calendar (medium)\nSelected Implementation: \u2014\nRV Series: btc_calendar_bt_near_deferred\nRV Direction: higher_is_richer\nRV Horizon: 3m\nRV Quartile: Q3\nRV Percentile: 57.1\nRV Richness: rich\nChina Parallel: present \u2014 horizon_net -1\nChina Parallel Note: China basis & term structure stage horizon_net -1 (informational)\nKey Observation: Calendar at 67145.00% (Jun/Back); horizon_net +0.\nFunds Flow Enabled: false\nFunds Flow Status: unavailable\nFunds Flow Source: none\nFunds Flow Degraded: true\nFunds Flow Fallback Reason: non_credit_node_no_fallback\nFunds Flow Verdict: neutral\nFunds Flow Confidence Penalty: 0\nFunds Flow Summary: \u2014",
   "warnings": [
     "ornn_h200: stub data (live fetch not configured)",
     "miso_indiana_hub: stub data (live fetch not configured)"
@@ -2094,8 +1918,8 @@
     ]
   },
   "flows_sidecar": {
-    "as_of": "2026-07-07",
-    "source_file": "flows_20260707_1652.csv",
+    "as_of": "2026-07-08",
+    "source_file": "flows_20260707_2256.csv",
     "ingest_mode": "fallback_1d_only",
     "flows_status": "fallback_1d",
     "ticker_count": 3,
@@ -2118,7 +1942,7 @@
   },
   "ingest_provenance": {
     "window_hours": 48,
-    "staged_count": 90,
+    "staged_count": 130,
     "entries": [
       {
         "filename": "futures_intraday_20260705_1002.csv",
@@ -2293,7 +2117,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.630664+00:00",
+        "staged_at": "2026-07-08T03:56:43.620534+00:00",
         "sha256": "72114793b9a67c69ad99a4f360e0115630702e95cd06229201e0ebecafeed562"
       },
       {
@@ -2309,7 +2133,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.632566+00:00",
+        "staged_at": "2026-07-08T03:56:43.622542+00:00",
         "sha256": "719d00591710eff447a7f01327c05b92151a2a1d788f5a2233f4d83f5d373a0b"
       },
       {
@@ -2325,7 +2149,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.636263+00:00",
+        "staged_at": "2026-07-08T03:56:43.624410+00:00",
         "sha256": "5060f6df32320a0ad6c5fe65c1dc5acd0123feca0925fbf5357b5482c251be9e"
       },
       {
@@ -2341,7 +2165,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.637362+00:00",
+        "staged_at": "2026-07-08T03:56:43.625503+00:00",
         "sha256": "d8d41c152e4d26f53fa3823aaa874db5a4ae0d9d38bbe1365ef5ad6eb00a8a23"
       },
       {
@@ -2357,8 +2181,8 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.640346+00:00",
-        "sha256": "4a72634db2605e8247c291cddfc7ae74a44e3cae4691c1ae88f6a6c09b1ca247"
+        "staged_at": "2026-07-08T03:56:43.628206+00:00",
+        "sha256": "c429067e1d5983d637e6f8cb06067debcf86780b6dcd2578ee1b3dfd52e365ae"
       },
       {
         "filename": "futures_intraday_20260707_1622.csv",
@@ -2373,7 +2197,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.642225+00:00",
+        "staged_at": "2026-07-08T03:56:43.629919+00:00",
         "sha256": "36a9a011eab25796c9cd594c1b89e3c7c68b69c207fc3e4d93fdd5851221d276"
       },
       {
@@ -2389,7 +2213,7 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.644034+00:00",
+        "staged_at": "2026-07-08T03:56:43.631670+00:00",
         "sha256": "c441e52e7b79796796fbef0123cfe0ad718b6a594d4ce80ed6c3634c98baf710"
       },
       {
@@ -2405,8 +2229,136 @@
         "vendor": "barchart",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.646552+00:00",
+        "staged_at": "2026-07-08T03:56:43.633379+00:00",
         "sha256": "d515c24d4beda5a0dff45b1e15149d054eba2d668904d45d728f73ebc7612ba0"
+      },
+      {
+        "filename": "futures_intraday_20260707_2019.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.636071+00:00",
+        "sha256": "c429067e1d5983d637e6f8cb06067debcf86780b6dcd2578ee1b3dfd52e365ae"
+      },
+      {
+        "filename": "futures_intraday_20260707_2024.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.637777+00:00",
+        "sha256": "6ede7fd838859b5881547bcd33daf4203a8d02d9372989486ae6c72f4a76593f"
+      },
+      {
+        "filename": "futures_intraday_20260707_2241.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.639600+00:00",
+        "sha256": "b721008605f462d2a71c703aa1bf44d93b308de7b156eafcb92da647d5a99d1b"
+      },
+      {
+        "filename": "futures_intraday_20260707_2243.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.641342+00:00",
+        "sha256": "c92d77257a5d419665aa6a521bba0da597a77b27e807b4728c52706da153cb53"
+      },
+      {
+        "filename": "futures_intraday_20260707_2245.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.642944+00:00",
+        "sha256": "d47e07d4daf84d0e2b3ebbc2e554f793847c4031d431cb6fb57a2293a71bee37"
+      },
+      {
+        "filename": "futures_intraday_20260707_2246.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.644686+00:00",
+        "sha256": "48a79a17d2c542ac5616d17e79cd53520965d659d2232a8955fea505f5ad517a"
+      },
+      {
+        "filename": "futures_intraday_20260707_2250.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.646417+00:00",
+        "sha256": "7a5108dbcafcbfcb20c825fe7da6df54b91ab80c3fe4e9e20b183c03e2b8b410"
+      },
+      {
+        "filename": "futures_intraday_20260707_2256.csv",
+        "dataset": "futures_intraday",
+        "source": "barchart",
+        "source_class": "barchart_quote_snapshot",
+        "output_kind": "quote_snapshot",
+        "output_kinds": [
+          "quote_snapshot",
+          "execution_l3"
+        ],
+        "vendor": "barchart",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.648446+00:00",
+        "sha256": "6bec94961d6eaec2b4987f9f4424be5a2a7a0f6fca5c9bce6cda3ca8982cd484"
       },
       {
         "filename": "credit_20260705_1002.csv",
@@ -2581,8 +2533,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.474043+00:00",
-        "sha256": "f1594c39641797fc22379ccbc8344f4b1c6e30d33dc439450dcb758e87dbae9c"
+        "staged_at": "2026-07-08T03:56:43.304157+00:00",
+        "sha256": "264f84edcc72f0086848d9a3c4921c920de862d798d6735df06300a2db94e163"
       },
       {
         "filename": "credit_20260707_0741.csv",
@@ -2597,8 +2549,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.492550+00:00",
-        "sha256": "ff0338643c45215a3a7e4b2fed076e9dba11a3a08edd816ec38481ff4b753315"
+        "staged_at": "2026-07-08T03:56:43.321389+00:00",
+        "sha256": "fa4736d5a03d4aa3a54914f42e00b0f812ebb11ae0a91627a46754848f1c7fb0"
       },
       {
         "filename": "credit_20260707_0743.csv",
@@ -2613,8 +2565,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.509784+00:00",
-        "sha256": "ff0338643c45215a3a7e4b2fed076e9dba11a3a08edd816ec38481ff4b753315"
+        "staged_at": "2026-07-08T03:56:43.337976+00:00",
+        "sha256": "fa4736d5a03d4aa3a54914f42e00b0f812ebb11ae0a91627a46754848f1c7fb0"
       },
       {
         "filename": "credit_20260707_1356.csv",
@@ -2629,8 +2581,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.527370+00:00",
-        "sha256": "8a0bf262003bcead04c672dac7c27baed6fd44a10d8a9db2795534acb82728c3"
+        "staged_at": "2026-07-08T03:56:43.354919+00:00",
+        "sha256": "ece0bf24ae9cb78f993beb713edd7f1153311cc34aebc8ef9cea884fc3dcc7ca"
       },
       {
         "filename": "credit_20260707_1526.csv",
@@ -2645,8 +2597,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.545052+00:00",
-        "sha256": "917b696dafb3d7386281e185440754caac020d83e7741037a6b082ca06b7ea57"
+        "staged_at": "2026-07-08T03:56:43.371587+00:00",
+        "sha256": "c4f4ea0a479e5a48a5486dab50a11f5d8f116155300192bd1969ec5a206a53ab"
       },
       {
         "filename": "credit_20260707_1622.csv",
@@ -2661,8 +2613,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.562595+00:00",
-        "sha256": "be38228da091d89f103932c7f1ad2743879d0d8e7fce76688bc90d9182ea0f97"
+        "staged_at": "2026-07-08T03:56:43.389581+00:00",
+        "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
       },
       {
         "filename": "credit_20260707_1629.csv",
@@ -2677,8 +2629,8 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.580125+00:00",
-        "sha256": "be38228da091d89f103932c7f1ad2743879d0d8e7fce76688bc90d9182ea0f97"
+        "staged_at": "2026-07-08T03:56:43.407951+00:00",
+        "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
       },
       {
         "filename": "credit_20260707_1652.csv",
@@ -2693,8 +2645,136 @@
         "vendor": "koyfin",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.597205+00:00",
-        "sha256": "be38228da091d89f103932c7f1ad2743879d0d8e7fce76688bc90d9182ea0f97"
+        "staged_at": "2026-07-08T03:56:43.424830+00:00",
+        "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
+      },
+      {
+        "filename": "credit_20260707_2019.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.443360+00:00",
+        "sha256": "365d5f8656682089b49b64b90072eea4859bf9a8940d74a35c040e9555dfdc06"
+      },
+      {
+        "filename": "credit_20260707_2024.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.460347+00:00",
+        "sha256": "365d5f8656682089b49b64b90072eea4859bf9a8940d74a35c040e9555dfdc06"
+      },
+      {
+        "filename": "credit_20260707_2241.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.477224+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+      },
+      {
+        "filename": "credit_20260707_2243.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.493642+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+      },
+      {
+        "filename": "credit_20260707_2245.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.510238+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+      },
+      {
+        "filename": "credit_20260707_2247.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.526594+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+      },
+      {
+        "filename": "credit_20260707_2250.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.543550+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+      },
+      {
+        "filename": "credit_20260707_2256.csv",
+        "dataset": "credit",
+        "source": "koyfin",
+        "source_class": "koyfin_snapshot_csv",
+        "output_kind": "snapshot",
+        "output_kinds": [
+          "snapshot_validation",
+          "universe_membership"
+        ],
+        "vendor": "koyfin",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.560676+00:00",
+        "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
       },
       {
         "filename": "equities_20260705_1002.csv",
@@ -2836,8 +2916,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.614266+00:00",
-        "sha256": "80b0a872ec874bda753e6d63cf19b24bb6a2fa989ea8e118e3a2eb698f67729e"
+        "staged_at": "2026-07-08T03:56:43.576891+00:00",
+        "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
       },
       {
         "filename": "equities_20260707_0742.csv",
@@ -2849,8 +2929,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.615902+00:00",
-        "sha256": "80b0a872ec874bda753e6d63cf19b24bb6a2fa989ea8e118e3a2eb698f67729e"
+        "staged_at": "2026-07-08T03:56:43.578252+00:00",
+        "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
       },
       {
         "filename": "equities_20260707_0743.csv",
@@ -2862,8 +2942,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.617176+00:00",
-        "sha256": "80b0a872ec874bda753e6d63cf19b24bb6a2fa989ea8e118e3a2eb698f67729e"
+        "staged_at": "2026-07-08T03:56:43.579506+00:00",
+        "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
       },
       {
         "filename": "equities_20260707_1356.csv",
@@ -2875,8 +2955,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.618260+00:00",
-        "sha256": "efdf79946e18985c92d0b71bae5f92f6ca36b2e0337ccb84c026535d0a52c9ff"
+        "staged_at": "2026-07-08T03:56:43.580675+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
       },
       {
         "filename": "equities_20260707_1526.csv",
@@ -2888,8 +2968,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.619363+00:00",
-        "sha256": "bb7919ca9a4f9074f9799a292b0de965dab893f4adf3a779cc40d70d00cf3b14"
+        "staged_at": "2026-07-08T03:56:43.581764+00:00",
+        "sha256": "a232b9438a6a64bc445bd5ef528c59018aa58f5a62e759fa7f672ed9982350a4"
       },
       {
         "filename": "equities_20260707_1622.csv",
@@ -2901,8 +2981,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.620465+00:00",
-        "sha256": "efdf79946e18985c92d0b71bae5f92f6ca36b2e0337ccb84c026535d0a52c9ff"
+        "staged_at": "2026-07-08T03:56:43.582873+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
       },
       {
         "filename": "equities_20260707_1630.csv",
@@ -2914,8 +2994,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.621660+00:00",
-        "sha256": "efdf79946e18985c92d0b71bae5f92f6ca36b2e0337ccb84c026535d0a52c9ff"
+        "staged_at": "2026-07-08T03:56:43.584402+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
       },
       {
         "filename": "equities_20260707_1652.csv",
@@ -2927,8 +3007,112 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.622939+00:00",
-        "sha256": "efdf79946e18985c92d0b71bae5f92f6ca36b2e0337ccb84c026535d0a52c9ff"
+        "staged_at": "2026-07-08T03:56:43.585975+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2020.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.587377+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2024.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.588757+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2242.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.591336+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2243.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.593591+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2245.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.595133+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2247.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.596359+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2250.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.597549+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+      },
+      {
+        "filename": "equities_20260707_2256.csv",
+        "dataset": "equities",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.600099+00:00",
+        "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
       },
       {
         "filename": "flows_20260705_1002.csv",
@@ -3070,7 +3254,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.623673+00:00",
+        "staged_at": "2026-07-08T03:56:43.601067+00:00",
         "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
       },
       {
@@ -3083,7 +3267,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.624338+00:00",
+        "staged_at": "2026-07-08T03:56:43.601768+00:00",
         "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
       },
       {
@@ -3096,7 +3280,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.625180+00:00",
+        "staged_at": "2026-07-08T03:56:43.603149+00:00",
         "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
       },
       {
@@ -3109,7 +3293,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.625822+00:00",
+        "staged_at": "2026-07-08T03:56:43.603875+00:00",
         "sha256": "00b1653dcde959221d08cb10723c97c8d2c49e5fb9f00747e071006ccc878bfe"
       },
       {
@@ -3122,7 +3306,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.626572+00:00",
+        "staged_at": "2026-07-08T03:56:43.604509+00:00",
         "sha256": "980d6c06c8c403f23daf8f010f4ce52c1adb4afc3c08e89c1223a350c8a607a4"
       },
       {
@@ -3135,7 +3319,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.627406+00:00",
+        "staged_at": "2026-07-08T03:56:43.607010+00:00",
         "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
       },
       {
@@ -3148,7 +3332,7 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.628026+00:00",
+        "staged_at": "2026-07-08T03:56:43.608572+00:00",
         "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
       },
       {
@@ -3161,7 +3345,111 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.628701+00:00",
+        "staged_at": "2026-07-08T03:56:43.609357+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2019.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.610083+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2024.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.610712+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2241.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.611458+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2243.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.612676+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2245.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.613343+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2247.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.615256+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2250.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.617596+00:00",
+        "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+      },
+      {
+        "filename": "flows_20260707_2256.csv",
+        "dataset": "flows",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.618838+00:00",
         "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
       },
       {
@@ -3304,8 +3592,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.648140+00:00",
-        "sha256": "a17b0d8162b3fb46becd92c57e620140257e2e3cf6ec37ddffa9136912cc1e9d"
+        "staged_at": "2026-07-08T03:56:43.649795+00:00",
+        "sha256": "017cd71b4d36cfb611c8a5d41fced7b450e8e17afe9b58b6f51cc3db38c4cc97"
       },
       {
         "filename": "rates_20260707_0741.csv",
@@ -3317,8 +3605,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.649300+00:00",
-        "sha256": "05809b15c17c2dab68dad0e22932162e653dec20fd730e985defc2d66f896dea"
+        "staged_at": "2026-07-08T03:56:43.651371+00:00",
+        "sha256": "899a593eb70bc641e9d02507e6ea938e45086ef90a12bd2aa898c4c8a62b603d"
       },
       {
         "filename": "rates_20260707_0743.csv",
@@ -3330,8 +3618,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.650487+00:00",
-        "sha256": "05809b15c17c2dab68dad0e22932162e653dec20fd730e985defc2d66f896dea"
+        "staged_at": "2026-07-08T03:56:43.652727+00:00",
+        "sha256": "899a593eb70bc641e9d02507e6ea938e45086ef90a12bd2aa898c4c8a62b603d"
       },
       {
         "filename": "rates_20260707_1356.csv",
@@ -3343,8 +3631,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.651636+00:00",
-        "sha256": "87f63b43e194cd588d6bf0d77ce4481bd2ccdfa48479de79c2150b7b77e9b58d"
+        "staged_at": "2026-07-08T03:56:43.654259+00:00",
+        "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
       },
       {
         "filename": "rates_20260707_1526.csv",
@@ -3356,8 +3644,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.652880+00:00",
-        "sha256": "87f63b43e194cd588d6bf0d77ce4481bd2ccdfa48479de79c2150b7b77e9b58d"
+        "staged_at": "2026-07-08T03:56:43.656399+00:00",
+        "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
       },
       {
         "filename": "rates_20260707_1622.csv",
@@ -3369,8 +3657,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.654045+00:00",
-        "sha256": "87f63b43e194cd588d6bf0d77ce4481bd2ccdfa48479de79c2150b7b77e9b58d"
+        "staged_at": "2026-07-08T03:56:43.657956+00:00",
+        "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
       },
       {
         "filename": "rates_20260707_1629.csv",
@@ -3382,8 +3670,8 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.655722+00:00",
-        "sha256": "87f63b43e194cd588d6bf0d77ce4481bd2ccdfa48479de79c2150b7b77e9b58d"
+        "staged_at": "2026-07-08T03:56:43.659296+00:00",
+        "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
       },
       {
         "filename": "rates_20260707_1652.csv",
@@ -3395,14 +3683,118 @@
         "vendor": "",
         "priority": "",
         "canonical_assets": [],
-        "staged_at": "2026-07-07T21:52:29.657018+00:00",
-        "sha256": "87f63b43e194cd588d6bf0d77ce4481bd2ccdfa48479de79c2150b7b77e9b58d"
+        "staged_at": "2026-07-08T03:56:43.661986+00:00",
+        "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+      },
+      {
+        "filename": "rates_20260707_2019.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.663299+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2024.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.664770+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2241.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.666409+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2243.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.668097+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2245.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.669472+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2247.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.671188+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2250.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.672617+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+      },
+      {
+        "filename": "rates_20260707_2256.csv",
+        "dataset": "rates",
+        "source": "koyfin",
+        "source_class": "unknown",
+        "output_kind": "unknown",
+        "output_kinds": [],
+        "vendor": "",
+        "priority": "",
+        "canonical_assets": [],
+        "staged_at": "2026-07-08T03:56:43.674139+00:00",
+        "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
       }
     ],
     "output_kinds": {
-      "quote_snapshot": 18,
-      "snapshot": 18,
-      "unknown": 54
+      "quote_snapshot": 26,
+      "snapshot": 26,
+      "unknown": 78
     },
     "primary_output_kind": "unknown",
     "source_classes": [
@@ -3412,7 +3804,7 @@
     ]
   },
   "ai_compute": {
-    "as_of": "2026-07-07",
+    "as_of": "2026-07-08",
     "source": "pipeline_v15",
     "thesis": "Architect AI Exchange v1.5: H200 forward curve + MISO Indiana Hub power as transmission inputs between liquidity stress and high-beta BTC.",
     "ornn_h200": {
@@ -3520,7 +3912,7 @@
     }
   },
   "corporate_credit": {
-    "as_of": "2026-07-07",
+    "as_of": "2026-07-08",
     "source": "pipeline_v15",
     "hy_oas_bps": 339.2,
     "percentile": 90.5,
@@ -3537,7 +3929,7 @@
     "tactical_lead": "HY OAS proxy cheap at \u2014 bps; Blocked band."
   },
   "trade_tracker": {
-    "as_of": "2026-07-07",
+    "as_of": "2026-07-08",
     "source": "pipeline_v15",
     "trades": [
       {
@@ -3570,7 +3962,7 @@
     ]
   },
   "btc_attribution": {
-    "as_of": "2026-07-07",
+    "as_of": "2026-07-08",
     "source": "pipeline_v15",
     "btc_bias": "Neutral",
     "btc_ret_1d_pct": 2.2,
@@ -3614,7 +4006,7 @@
     "summary": "BTC bias Neutral \u2014 credit leg dragging on impaired transmission."
   },
   "margin_rules": {
-    "as_of": "2026-07-07",
+    "as_of": "2026-07-08",
     "source": "pipeline_v15",
     "whinfell_score": 58,
     "tier": "light",
@@ -3633,9 +4025,9 @@
   },
   "hydration_audit": {
     "audit_version": "1.0.0",
-    "generated_at": "2026-07-07T21:52:30.686033+00:00",
-    "snapshot_id": "global-2026-07-07-raw2wtm-01",
-    "lineage_hash": "sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7",
+    "generated_at": "2026-07-08T03:56:44.392478+00:00",
+    "snapshot_id": "global-2026-07-08-raw2wtm-01",
+    "lineage_hash": "sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5",
     "summary": {
       "total_fields": 43,
       "required_fields": 33,
@@ -3657,8 +4049,8 @@
         "ui_target": "command bar \u00b7 provenance",
         "status": "ok",
         "required": true,
-        "value": "global-2026-07-07-raw2wtm-01",
-        "value_preview": "global-2026-07-07-raw2wtm-01",
+        "value": "global-2026-07-08-raw2wtm-01",
+        "value_preview": "global-2026-07-08-raw2wtm-01",
         "notes": ""
       },
       {
@@ -3668,8 +4060,8 @@
         "ui_target": "command bar \u00b7 lineage",
         "status": "ok",
         "required": true,
-        "value": "sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7",
-        "value_preview": "sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7",
+        "value": "sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5",
+        "value_preview": "sha256:39948da80aaf6556f7235926f6d9ff9ae144806acaf0eac617e61616ff4ed7c5",
         "notes": ""
       },
       {
@@ -3679,8 +4071,8 @@
         "ui_target": "freshness chip \u00b7 data as-of",
         "status": "ok",
         "required": true,
-        "value": "2026-07-07T21:52:29+00:00",
-        "value_preview": "2026-07-07T21:52:29+00:00",
+        "value": "2026-07-08T03:56:43+00:00",
+        "value_preview": "2026-07-08T03:56:43+00:00",
         "notes": ""
       },
       {
@@ -3844,8 +4236,8 @@
         "ui_target": "China freshness",
         "status": "ok",
         "required": false,
-        "value": "2026-07-07T21:52:29+00:00",
-        "value_preview": "2026-07-07T21:52:29+00:00",
+        "value": "2026-07-08T03:56:43+00:00",
+        "value_preview": "2026-07-08T03:56:43+00:00",
         "notes": ""
       },
       {
@@ -3943,8 +4335,8 @@
         "ui_target": "flows sponsorship as-of",
         "status": "ok",
         "required": false,
-        "value": "2026-07-07",
-        "value_preview": "2026-07-07",
+        "value": "2026-07-08",
+        "value_preview": "2026-07-08",
         "notes": "Re-export WTM-Flows-Global.csv when stale"
       },
       {
@@ -4440,1682 +4832,1852 @@
       }
     ]
   },
-  "rv_history": {
-    "version": "2.0.0-chunk15",
-    "as_of": "2026-07-07T21:52:29",
-    "bbdm_primary_series": [
-      "btc_basis_spot_1m",
-      "btc_calendar_bt_near_deferred",
-      "eth_basis_spot_1m",
-      "eth_calendar_et_near_deferred",
-      "gpu_basis_spread",
-      "gpu_crush_calendar_spread",
-      "sofr_ois_spread",
-      "usgg2y10y"
-    ],
-    "series": {
-      "btc_basis_spot_1m": {
-        "label": "BTC basis (spot vs 1m)",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "barchart_spread_history",
-        "data_status": "live",
-        "adapter_version": "2.0.0-chunk08",
-        "series_id": "btc_basis_spot_1m",
-        "points": [
-          {
-            "date": "2026-06-14",
-            "value": -0.4344
-          },
-          {
-            "date": "2026-06-15",
-            "value": -0.4281
-          },
-          {
-            "date": "2026-06-16",
-            "value": -0.4384
-          },
-          {
-            "date": "2026-06-17",
-            "value": -0.4543
-          },
-          {
-            "date": "2026-06-18",
-            "value": -0.4687
-          }
-        ],
-        "bbdm_trade_id": "btc_basis"
-      },
-      "btc_calendar_bt_near_deferred": {
-        "label": "BTC Calendar (1m vs 3m)",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "barchart_spread_history",
-        "data_status": "live",
-        "adapter_version": "2.0.0-chunk09",
-        "series_id": "btc_calendar_bt_near_deferred",
-        "bbdm_trade_id": "btc_calendar",
-        "points": [
-          {
-            "date": "2026-06-14",
-            "value": 1.1171
-          },
-          {
-            "date": "2026-06-15",
-            "value": 1.104
-          },
-          {
-            "date": "2026-06-16",
-            "value": 1.1416
-          },
-          {
-            "date": "2026-06-17",
-            "value": 1.1903
-          },
-          {
-            "date": "2026-06-18",
-            "value": 1.1915
-          }
-        ]
-      },
-      "eth_basis_spot_1m": {
-        "label": "ETH Basis (Spot vs 1m)",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "barchart_spread_history",
-        "data_status": "live",
-        "adapter_version": "2.0.0-chunk10",
-        "series_id": "eth_basis_spot_1m",
-        "bbdm_trade_id": "eth_basis",
-        "points": [
-          {
-            "date": "2026-06-14",
-            "value": -16.0
-          },
-          {
-            "date": "2026-06-15",
-            "value": -17.0
-          },
-          {
-            "date": "2026-06-16",
-            "value": -18.0
-          },
-          {
-            "date": "2026-06-17",
-            "value": -19.0
-          },
-          {
-            "date": "2026-06-18",
-            "value": -18.0
-          }
-        ]
-      },
-      "eth_calendar_et_near_deferred": {
-        "label": "ETH Calendar (1m vs 3m)",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "barchart_spread_history",
-        "data_status": "live",
-        "adapter_version": "2.0.0-chunk11",
-        "series_id": "eth_calendar_et_near_deferred",
-        "bbdm_trade_id": "eth_calendar",
-        "points": [
-          {
-            "date": "2026-06-14",
-            "value": 42.0
-          },
-          {
-            "date": "2026-06-15",
-            "value": 43.0
-          },
-          {
-            "date": "2026-06-16",
-            "value": 44.0
-          },
-          {
-            "date": "2026-06-17",
-            "value": 45.0
-          },
-          {
-            "date": "2026-06-18",
-            "value": 44.0
-          }
-        ]
-      },
-      "gpu_basis_spread": {
-        "label": "Midwest Compute Basis (Spot vs 1m)",
-        "unit": "$/hr spread",
-        "quartile_direction": "higher_is_richer",
-        "source": "ai_compute_reconstructed",
-        "data_status": "fallback",
-        "adapter_version": "2.0.0-chunk12",
-        "series_id": "gpu_basis_spread",
-        "bbdm_trade_id": "midwest_basis",
-        "points": [
-          {
-            "date": "2026-04-08",
-            "value": 0.2797
-          },
-          {
-            "date": "2026-04-09",
-            "value": 0.2726
-          },
-          {
-            "date": "2026-04-10",
-            "value": 0.2831
-          },
-          {
-            "date": "2026-04-13",
-            "value": 0.2823
-          },
-          {
-            "date": "2026-04-14",
-            "value": 0.2954
-          },
-          {
-            "date": "2026-04-15",
-            "value": 0.2831
-          },
-          {
-            "date": "2026-04-16",
-            "value": 0.2798
-          },
-          {
-            "date": "2026-04-17",
-            "value": 0.2708
-          },
-          {
-            "date": "2026-04-20",
-            "value": 0.2707
-          },
-          {
-            "date": "2026-04-21",
-            "value": 0.259
-          },
-          {
-            "date": "2026-04-22",
-            "value": 0.2379
-          },
-          {
-            "date": "2026-04-23",
-            "value": 0.2439
-          },
-          {
-            "date": "2026-04-24",
-            "value": 0.2596
-          },
-          {
-            "date": "2026-04-27",
-            "value": 0.2723
-          },
-          {
-            "date": "2026-04-28",
-            "value": 0.2892
-          },
-          {
-            "date": "2026-04-29",
-            "value": 0.2881
-          },
-          {
-            "date": "2026-04-30",
-            "value": 0.2957
-          },
-          {
-            "date": "2026-05-01",
-            "value": 0.2919
-          },
-          {
-            "date": "2026-05-04",
-            "value": 0.2818
-          },
-          {
-            "date": "2026-05-05",
-            "value": 0.2821
-          },
-          {
-            "date": "2026-05-06",
-            "value": 0.2869
-          },
-          {
-            "date": "2026-05-07",
-            "value": 0.2891
-          },
-          {
-            "date": "2026-05-08",
-            "value": 0.2818
-          },
-          {
-            "date": "2026-05-11",
-            "value": 0.2726
-          },
-          {
-            "date": "2026-05-12",
-            "value": 0.2821
-          },
-          {
-            "date": "2026-05-13",
-            "value": 0.2705
-          },
-          {
-            "date": "2026-05-14",
-            "value": 0.2633
-          },
-          {
-            "date": "2026-05-15",
-            "value": 0.2659
-          },
-          {
-            "date": "2026-05-18",
-            "value": 0.2561
-          },
-          {
-            "date": "2026-05-19",
-            "value": 0.2661
-          },
-          {
-            "date": "2026-05-20",
-            "value": 0.2701
-          },
-          {
-            "date": "2026-05-21",
-            "value": 0.2691
-          },
-          {
-            "date": "2026-05-22",
-            "value": 0.287
-          },
-          {
-            "date": "2026-05-25",
-            "value": 0.2785
-          },
-          {
-            "date": "2026-05-26",
-            "value": 0.2766
-          },
-          {
-            "date": "2026-05-27",
-            "value": 0.289
-          },
-          {
-            "date": "2026-05-28",
-            "value": 0.2881
-          },
-          {
-            "date": "2026-05-29",
-            "value": 0.2762
-          },
-          {
-            "date": "2026-06-01",
-            "value": 0.2827
-          },
-          {
-            "date": "2026-06-02",
-            "value": 0.2895
-          },
-          {
-            "date": "2026-06-03",
-            "value": 0.3085
-          },
-          {
-            "date": "2026-06-04",
-            "value": 0.2997
-          },
-          {
-            "date": "2026-06-05",
-            "value": 0.2878
-          },
-          {
-            "date": "2026-06-08",
-            "value": 0.2886
-          },
-          {
-            "date": "2026-06-09",
-            "value": 0.2958
-          },
-          {
-            "date": "2026-06-10",
-            "value": 0.2949
-          },
-          {
-            "date": "2026-06-11",
-            "value": 0.2881
-          },
-          {
-            "date": "2026-06-12",
-            "value": 0.2758
-          },
-          {
-            "date": "2026-06-15",
-            "value": 0.2753
-          },
-          {
-            "date": "2026-06-16",
-            "value": 0.2764
-          },
-          {
-            "date": "2026-06-17",
-            "value": 0.2779
-          },
-          {
-            "date": "2026-06-18",
-            "value": 0.2974
-          },
-          {
-            "date": "2026-06-19",
-            "value": 0.292
-          },
-          {
-            "date": "2026-06-22",
-            "value": 0.2895
-          },
-          {
-            "date": "2026-06-23",
-            "value": 0.2836
-          },
-          {
-            "date": "2026-06-24",
-            "value": 0.3012
-          },
-          {
-            "date": "2026-06-25",
-            "value": 0.298
-          },
-          {
-            "date": "2026-06-26",
-            "value": 0.2926
-          },
-          {
-            "date": "2026-06-29",
-            "value": 0.2802
-          },
-          {
-            "date": "2026-06-30",
-            "value": 0.2794
-          },
-          {
-            "date": "2026-07-01",
-            "value": 0.2608
-          },
-          {
-            "date": "2026-07-02",
-            "value": 0.2616
-          },
-          {
-            "date": "2026-07-03",
-            "value": 0.2638
-          },
-          {
-            "date": "2026-07-06",
-            "value": 0.242
-          },
-          {
-            "date": "2026-07-07",
-            "value": 0.33
-          }
-        ]
-      },
-      "gpu_crush_calendar_spread": {
-        "label": "Midwest Compute Calendar (1m vs 3m)",
-        "unit": "$/hr spread",
-        "quartile_direction": "higher_is_richer",
-        "source": "ai_compute_reconstructed",
-        "data_status": "fallback",
-        "adapter_version": "2.0.0-chunk13",
-        "series_id": "gpu_crush_calendar_spread",
-        "bbdm_trade_id": "midwest_calendar",
-        "points": [
-          {
-            "date": "2026-04-08",
-            "value": 0.2844
-          },
-          {
-            "date": "2026-04-09",
-            "value": 0.2865
-          },
-          {
-            "date": "2026-04-10",
-            "value": 0.2706
-          },
-          {
-            "date": "2026-04-13",
-            "value": 0.2709
-          },
-          {
-            "date": "2026-04-14",
-            "value": 0.278
-          },
-          {
-            "date": "2026-04-15",
-            "value": 0.2651
-          },
-          {
-            "date": "2026-04-16",
-            "value": 0.2763
-          },
-          {
-            "date": "2026-04-17",
-            "value": 0.2779
-          },
-          {
-            "date": "2026-04-20",
-            "value": 0.282
-          },
-          {
-            "date": "2026-04-21",
-            "value": 0.2687
-          },
-          {
-            "date": "2026-04-22",
-            "value": 0.2663
-          },
-          {
-            "date": "2026-04-23",
-            "value": 0.2722
-          },
-          {
-            "date": "2026-04-24",
-            "value": 0.2793
-          },
-          {
-            "date": "2026-04-27",
-            "value": 0.2731
-          },
-          {
-            "date": "2026-04-28",
-            "value": 0.2683
-          },
-          {
-            "date": "2026-04-29",
-            "value": 0.2772
-          },
-          {
-            "date": "2026-04-30",
-            "value": 0.2807
-          },
-          {
-            "date": "2026-05-01",
-            "value": 0.2886
-          },
-          {
-            "date": "2026-05-04",
-            "value": 0.2897
-          },
-          {
-            "date": "2026-05-05",
-            "value": 0.3048
-          },
-          {
-            "date": "2026-05-06",
-            "value": 0.3162
-          },
-          {
-            "date": "2026-05-07",
-            "value": 0.331
-          },
-          {
-            "date": "2026-05-08",
-            "value": 0.3157
-          },
-          {
-            "date": "2026-05-11",
-            "value": 0.294
-          },
-          {
-            "date": "2026-05-12",
-            "value": 0.2804
-          },
-          {
-            "date": "2026-05-13",
-            "value": 0.293
-          },
-          {
-            "date": "2026-05-14",
-            "value": 0.2889
-          },
-          {
-            "date": "2026-05-15",
-            "value": 0.2805
-          },
-          {
-            "date": "2026-05-18",
-            "value": 0.2687
-          },
-          {
-            "date": "2026-05-19",
-            "value": 0.2713
-          },
-          {
-            "date": "2026-05-20",
-            "value": 0.2532
-          },
-          {
-            "date": "2026-05-21",
-            "value": 0.2678
-          },
-          {
-            "date": "2026-05-22",
-            "value": 0.2631
-          },
-          {
-            "date": "2026-05-25",
-            "value": 0.2598
-          },
-          {
-            "date": "2026-05-26",
-            "value": 0.2643
-          },
-          {
-            "date": "2026-05-27",
-            "value": 0.2646
-          },
-          {
-            "date": "2026-05-28",
-            "value": 0.2883
-          },
-          {
-            "date": "2026-05-29",
-            "value": 0.3068
-          },
-          {
-            "date": "2026-06-01",
-            "value": 0.3104
-          },
-          {
-            "date": "2026-06-02",
-            "value": 0.3015
-          },
-          {
-            "date": "2026-06-03",
-            "value": 0.2893
-          },
-          {
-            "date": "2026-06-04",
-            "value": 0.2997
-          },
-          {
-            "date": "2026-06-05",
-            "value": 0.3089
-          },
-          {
-            "date": "2026-06-08",
-            "value": 0.304
-          },
-          {
-            "date": "2026-06-09",
-            "value": 0.3113
-          },
-          {
-            "date": "2026-06-10",
-            "value": 0.3242
-          },
-          {
-            "date": "2026-06-11",
-            "value": 0.3085
-          },
-          {
-            "date": "2026-06-12",
-            "value": 0.2887
-          },
-          {
-            "date": "2026-06-15",
-            "value": 0.2977
-          },
-          {
-            "date": "2026-06-16",
-            "value": 0.3057
-          },
-          {
-            "date": "2026-06-17",
-            "value": 0.3173
-          },
-          {
-            "date": "2026-06-18",
-            "value": 0.3113
-          },
-          {
-            "date": "2026-06-19",
-            "value": 0.3215
-          },
-          {
-            "date": "2026-06-22",
-            "value": 0.3188
-          },
-          {
-            "date": "2026-06-23",
-            "value": 0.3279
-          },
-          {
-            "date": "2026-06-24",
-            "value": 0.3121
-          },
-          {
-            "date": "2026-06-25",
-            "value": 0.3119
-          },
-          {
-            "date": "2026-06-26",
-            "value": 0.3042
-          },
-          {
-            "date": "2026-06-29",
-            "value": 0.2859
-          },
-          {
-            "date": "2026-06-30",
-            "value": 0.2845
-          },
-          {
-            "date": "2026-07-01",
-            "value": 0.2767
-          },
-          {
-            "date": "2026-07-02",
-            "value": 0.2768
-          },
-          {
-            "date": "2026-07-03",
-            "value": 0.2904
-          },
-          {
-            "date": "2026-07-06",
-            "value": 0.2905
-          },
-          {
-            "date": "2026-07-07",
-            "value": 0.33
-          }
-        ]
-      },
-      "sofr_ois_spread": {
-        "label": "SOFR vs Fed Funds",
-        "unit": "bps",
-        "quartile_direction": "higher_is_cheaper",
-        "source": "rv_basis_reconstructed",
-        "resolved_series_id": "sofr_ois_spread",
-        "points": [
-          {
-            "date": "2026-04-28",
-            "value": 343.3201
-          },
-          {
-            "date": "2026-04-29",
-            "value": 343.8846
-          },
-          {
-            "date": "2026-04-30",
-            "value": 341.2934
-          },
-          {
-            "date": "2026-05-01",
-            "value": 348.4839
-          },
-          {
-            "date": "2026-05-04",
-            "value": 352.8736
-          },
-          {
-            "date": "2026-05-05",
-            "value": 353.9371
-          },
-          {
-            "date": "2026-05-06",
-            "value": 356.1753
-          },
-          {
-            "date": "2026-05-07",
-            "value": 354.1208
-          },
-          {
-            "date": "2026-05-08",
-            "value": 360.3302
-          },
-          {
-            "date": "2026-05-11",
-            "value": 359.1011
-          },
-          {
-            "date": "2026-05-12",
-            "value": 361.5442
-          },
-          {
-            "date": "2026-05-13",
-            "value": 360.9892
-          },
-          {
-            "date": "2026-05-14",
-            "value": 361.9733
-          },
-          {
-            "date": "2026-05-15",
-            "value": 359.7442
-          },
-          {
-            "date": "2026-05-18",
-            "value": 359.0657
-          },
-          {
-            "date": "2026-05-19",
-            "value": 359.31
-          },
-          {
-            "date": "2026-05-20",
-            "value": 360.3502
-          },
-          {
-            "date": "2026-05-21",
-            "value": 356.1037
-          },
-          {
-            "date": "2026-05-22",
-            "value": 349.5559
-          },
-          {
-            "date": "2026-05-25",
-            "value": 350.5048
-          },
-          {
-            "date": "2026-05-26",
-            "value": 356.1129
-          },
-          {
-            "date": "2026-05-27",
-            "value": 353.2321
-          },
-          {
-            "date": "2026-05-28",
-            "value": 356.9252
-          },
-          {
-            "date": "2026-05-29",
-            "value": 362.6886
-          },
-          {
-            "date": "2026-06-01",
-            "value": 362.6656
-          },
-          {
-            "date": "2026-06-02",
-            "value": 360.4205
-          },
-          {
-            "date": "2026-06-03",
-            "value": 363.3257
-          },
-          {
-            "date": "2026-06-04",
-            "value": 366.6143
-          },
-          {
-            "date": "2026-06-05",
-            "value": 367.327
-          },
-          {
-            "date": "2026-06-08",
-            "value": 361.7266
-          },
-          {
-            "date": "2026-06-09",
-            "value": 363.0622
-          },
-          {
-            "date": "2026-06-10",
-            "value": 362.6047
-          },
-          {
-            "date": "2026-06-11",
-            "value": 360.9669
-          },
-          {
-            "date": "2026-06-12",
-            "value": 362.412
-          },
-          {
-            "date": "2026-06-15",
-            "value": 362.1484
-          },
-          {
-            "date": "2026-06-16",
-            "value": 362.0508
-          },
-          {
-            "date": "2026-06-17",
-            "value": 354.2464
-          },
-          {
-            "date": "2026-06-18",
-            "value": 351.8865
-          },
-          {
-            "date": "2026-06-19",
-            "value": 354.2038
-          },
-          {
-            "date": "2026-06-22",
-            "value": 351.5812
-          },
-          {
-            "date": "2026-06-23",
-            "value": 346.9377
-          },
-          {
-            "date": "2026-06-24",
-            "value": 350.0166
-          },
-          {
-            "date": "2026-06-25",
-            "value": 350.4472
-          },
-          {
-            "date": "2026-06-26",
-            "value": 347.0239
-          },
-          {
-            "date": "2026-06-29",
-            "value": 320.0
-          }
-        ],
-        "series_id": "sofr_ois_spread",
-        "bbdm_trade_id": "sofr_fed_funds",
-        "adapter_version": "2.0.0-chunk14",
-        "data_status": "live"
-      },
-      "usgg2y10y": {
-        "label": "2s10s Curve",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "rv_basis_reconstructed",
-        "resolved_series_id": "usgg2y10y",
-        "points": [
-          {
-            "date": "2026-04-28",
-            "value": 1.2788
-          },
-          {
-            "date": "2026-04-29",
-            "value": 1.2859
-          },
-          {
-            "date": "2026-04-30",
-            "value": 1.2835
-          },
-          {
-            "date": "2026-05-01",
-            "value": 1.2893
-          },
-          {
-            "date": "2026-05-04",
-            "value": 1.2717
-          },
-          {
-            "date": "2026-05-05",
-            "value": 1.2445
-          },
-          {
-            "date": "2026-05-06",
-            "value": 1.2252
-          },
-          {
-            "date": "2026-05-07",
-            "value": 1.2188
-          },
-          {
-            "date": "2026-05-08",
-            "value": 1.2128
-          },
-          {
-            "date": "2026-05-11",
-            "value": 1.1994
-          },
-          {
-            "date": "2026-05-12",
-            "value": 1.1828
-          },
-          {
-            "date": "2026-05-13",
-            "value": 1.189
-          },
-          {
-            "date": "2026-05-14",
-            "value": 1.1979
-          },
-          {
-            "date": "2026-05-15",
-            "value": 1.1852
-          },
-          {
-            "date": "2026-05-18",
-            "value": 1.181
-          },
-          {
-            "date": "2026-05-19",
-            "value": 1.1843
-          },
-          {
-            "date": "2026-05-20",
-            "value": 1.1791
-          },
-          {
-            "date": "2026-05-21",
-            "value": 1.1859
-          },
-          {
-            "date": "2026-05-22",
-            "value": 1.1816
-          },
-          {
-            "date": "2026-05-25",
-            "value": 1.1755
-          },
-          {
-            "date": "2026-05-26",
-            "value": 1.1759
-          },
-          {
-            "date": "2026-05-27",
-            "value": 1.1808
-          },
-          {
-            "date": "2026-05-28",
-            "value": 1.2102
-          },
-          {
-            "date": "2026-05-29",
-            "value": 1.2082
-          },
-          {
-            "date": "2026-06-01",
-            "value": 1.1929
-          },
-          {
-            "date": "2026-06-02",
-            "value": 1.1779
-          },
-          {
-            "date": "2026-06-03",
-            "value": 1.1532
-          },
-          {
-            "date": "2026-06-04",
-            "value": 1.1448
-          },
-          {
-            "date": "2026-06-05",
-            "value": 1.14
-          },
-          {
-            "date": "2026-06-08",
-            "value": 1.1468
-          },
-          {
-            "date": "2026-06-09",
-            "value": 1.1515
-          },
-          {
-            "date": "2026-06-10",
-            "value": 1.1697
-          },
-          {
-            "date": "2026-06-11",
-            "value": 1.1742
-          },
-          {
-            "date": "2026-06-12",
-            "value": 1.1689
-          },
-          {
-            "date": "2026-06-15",
-            "value": 1.1732
-          },
-          {
-            "date": "2026-06-16",
-            "value": 1.1692
-          },
-          {
-            "date": "2026-06-17",
-            "value": 1.1777
-          },
-          {
-            "date": "2026-06-18",
-            "value": 1.166
-          },
-          {
-            "date": "2026-06-19",
-            "value": 1.152
-          },
-          {
-            "date": "2026-06-22",
-            "value": 1.1602
-          },
-          {
-            "date": "2026-06-23",
-            "value": 1.173
-          },
-          {
-            "date": "2026-06-24",
-            "value": 1.1933
-          },
-          {
-            "date": "2026-06-25",
-            "value": 1.2112
-          },
-          {
-            "date": "2026-06-26",
-            "value": 1.2264
-          },
-          {
-            "date": "2026-06-29",
-            "value": 1.225
-          }
-        ],
-        "series_id": "usgg2y10y",
-        "bbdm_trade_id": "curve_2s10s",
-        "adapter_version": "2.0.0-chunk14",
-        "data_status": "live"
-      },
-      "btc_basis_vs_refs": {
-        "label": "Basis vs ref band",
-        "unit": "pct",
-        "quartile_direction": "higher_is_richer",
-        "source": "rv_basis_reconstructed",
-        "resolved_series_id": "btc_basis_vs_refs",
-        "points": [
-          {
-            "date": "2026-04-28",
-            "value": 1.0984
-          },
-          {
-            "date": "2026-04-29",
-            "value": 1.117
-          },
-          {
-            "date": "2026-04-30",
-            "value": 1.1401
-          },
-          {
-            "date": "2026-05-01",
-            "value": 1.1496
-          },
-          {
-            "date": "2026-05-04",
-            "value": 1.168
-          },
-          {
-            "date": "2026-05-05",
-            "value": 1.1654
-          },
-          {
-            "date": "2026-05-06",
-            "value": 1.1459
-          },
-          {
-            "date": "2026-05-07",
-            "value": 1.1512
-          },
-          {
-            "date": "2026-05-08",
-            "value": 1.1581
-          },
-          {
-            "date": "2026-05-11",
-            "value": 1.1636
-          },
-          {
-            "date": "2026-05-12",
-            "value": 1.1707
-          },
-          {
-            "date": "2026-05-13",
-            "value": 1.1821
-          },
-          {
-            "date": "2026-05-14",
-            "value": 1.158
-          },
-          {
-            "date": "2026-05-15",
-            "value": 1.1674
-          },
-          {
-            "date": "2026-05-18",
-            "value": 1.1629
-          },
-          {
-            "date": "2026-05-19",
-            "value": 1.1642
-          },
-          {
-            "date": "2026-05-20",
-            "value": 1.1557
-          },
-          {
-            "date": "2026-05-21",
-            "value": 1.1306
-          },
-          {
-            "date": "2026-05-22",
-            "value": 1.1139
-          },
-          {
-            "date": "2026-05-25",
-            "value": 1.1287
-          },
-          {
-            "date": "2026-05-26",
-            "value": 1.1409
-          },
-          {
-            "date": "2026-05-27",
-            "value": 1.1515
-          },
-          {
-            "date": "2026-05-28",
-            "value": 1.1624
-          },
-          {
-            "date": "2026-05-29",
-            "value": 1.19
-          },
-          {
-            "date": "2026-06-01",
-            "value": 1.209
-          },
-          {
-            "date": "2026-06-02",
-            "value": 1.2167
-          },
-          {
-            "date": "2026-06-03",
-            "value": 1.2152
-          },
-          {
-            "date": "2026-06-04",
-            "value": 1.2162
-          },
-          {
-            "date": "2026-06-05",
-            "value": 1.2144
-          },
-          {
-            "date": "2026-06-08",
-            "value": 1.2064
-          },
-          {
-            "date": "2026-06-09",
-            "value": 1.2155
-          },
-          {
-            "date": "2026-06-10",
-            "value": 1.2075
-          },
-          {
-            "date": "2026-06-11",
-            "value": 1.2051
-          },
-          {
-            "date": "2026-06-12",
-            "value": 1.2121
-          },
-          {
-            "date": "2026-06-15",
-            "value": 1.2166
-          },
-          {
-            "date": "2026-06-16",
-            "value": 1.2361
-          },
-          {
-            "date": "2026-06-17",
-            "value": 1.2437
-          },
-          {
-            "date": "2026-06-18",
-            "value": 1.2322
-          },
-          {
-            "date": "2026-06-19",
-            "value": 1.226
-          },
-          {
-            "date": "2026-06-22",
-            "value": 1.243
-          },
-          {
-            "date": "2026-06-23",
-            "value": 1.2396
-          },
-          {
-            "date": "2026-06-24",
-            "value": 1.2326
-          },
-          {
-            "date": "2026-06-25",
-            "value": 1.2273
-          },
-          {
-            "date": "2026-06-26",
-            "value": 1.2231
-          },
-          {
-            "date": "2026-06-29",
-            "value": 1.275
-          }
-        ]
-      },
-      "gpu_crush_spread": {
-        "label": "GPU crush spread (3M\u2212Spot)",
-        "unit": "usd_per_hr",
-        "quartile_direction": "higher_is_richer",
-        "source": "ai_compute_reconstructed",
-        "points": [
-          {
-            "date": "2026-04-08",
-            "value": 0.5783
-          },
-          {
-            "date": "2026-04-09",
-            "value": 0.5864
-          },
-          {
-            "date": "2026-04-10",
-            "value": 0.6089
-          },
-          {
-            "date": "2026-04-13",
-            "value": 0.5942
-          },
-          {
-            "date": "2026-04-14",
-            "value": 0.5885
-          },
-          {
-            "date": "2026-04-15",
-            "value": 0.6022
-          },
-          {
-            "date": "2026-04-16",
-            "value": 0.6328
-          },
-          {
-            "date": "2026-04-17",
-            "value": 0.6763
-          },
-          {
-            "date": "2026-04-20",
-            "value": 0.6462
-          },
-          {
-            "date": "2026-04-21",
-            "value": 0.6699
-          },
-          {
-            "date": "2026-04-22",
-            "value": 0.6614
-          },
-          {
-            "date": "2026-04-23",
-            "value": 0.6483
-          },
-          {
-            "date": "2026-04-24",
-            "value": 0.655
-          },
-          {
-            "date": "2026-04-27",
-            "value": 0.6815
-          },
-          {
-            "date": "2026-04-28",
-            "value": 0.6563
-          },
-          {
-            "date": "2026-04-29",
-            "value": 0.6409
-          },
-          {
-            "date": "2026-04-30",
-            "value": 0.6523
-          },
-          {
-            "date": "2026-05-01",
-            "value": 0.5911
-          },
-          {
-            "date": "2026-05-04",
-            "value": 0.5821
-          },
-          {
-            "date": "2026-05-05",
-            "value": 0.6062
-          },
-          {
-            "date": "2026-05-06",
-            "value": 0.6096
-          },
-          {
-            "date": "2026-05-07",
-            "value": 0.582
-          },
-          {
-            "date": "2026-05-08",
-            "value": 0.5889
-          },
-          {
-            "date": "2026-05-11",
-            "value": 0.5931
-          },
-          {
-            "date": "2026-05-12",
-            "value": 0.6087
-          },
-          {
-            "date": "2026-05-13",
-            "value": 0.623
-          },
-          {
-            "date": "2026-05-14",
-            "value": 0.5948
-          },
-          {
-            "date": "2026-05-15",
-            "value": 0.5899
-          },
-          {
-            "date": "2026-05-18",
-            "value": 0.5889
-          },
-          {
-            "date": "2026-05-19",
-            "value": 0.5659
-          },
-          {
-            "date": "2026-05-20",
-            "value": 0.583
-          },
-          {
-            "date": "2026-05-21",
-            "value": 0.5601
-          },
-          {
-            "date": "2026-05-22",
-            "value": 0.578
-          },
-          {
-            "date": "2026-05-25",
-            "value": 0.6134
-          },
-          {
-            "date": "2026-05-26",
-            "value": 0.6005
-          },
-          {
-            "date": "2026-05-27",
-            "value": 0.6195
-          },
-          {
-            "date": "2026-05-28",
-            "value": 0.6239
-          },
-          {
-            "date": "2026-05-29",
-            "value": 0.6365
-          },
-          {
-            "date": "2026-06-01",
-            "value": 0.617
-          },
-          {
-            "date": "2026-06-02",
-            "value": 0.6193
-          },
-          {
-            "date": "2026-06-03",
-            "value": 0.6144
-          },
-          {
-            "date": "2026-06-04",
-            "value": 0.624
-          },
-          {
-            "date": "2026-06-05",
-            "value": 0.6451
-          },
-          {
-            "date": "2026-06-08",
-            "value": 0.6478
-          },
-          {
-            "date": "2026-06-09",
-            "value": 0.6545
-          },
-          {
-            "date": "2026-06-10",
-            "value": 0.6424
-          },
-          {
-            "date": "2026-06-11",
-            "value": 0.652
-          },
-          {
-            "date": "2026-06-12",
-            "value": 0.6536
-          },
-          {
-            "date": "2026-06-15",
-            "value": 0.6342
-          },
-          {
-            "date": "2026-06-16",
-            "value": 0.6414
-          },
-          {
-            "date": "2026-06-17",
-            "value": 0.656
-          },
-          {
-            "date": "2026-06-18",
-            "value": 0.6608
-          },
-          {
-            "date": "2026-06-19",
-            "value": 0.6718
-          },
-          {
-            "date": "2026-06-22",
-            "value": 0.6272
-          },
-          {
-            "date": "2026-06-23",
-            "value": 0.6138
-          },
-          {
-            "date": "2026-06-24",
-            "value": 0.6134
-          },
-          {
-            "date": "2026-06-25",
-            "value": 0.6212
-          },
-          {
-            "date": "2026-06-26",
-            "value": 0.632
-          },
-          {
-            "date": "2026-06-29",
-            "value": 0.6405
-          },
-          {
-            "date": "2026-06-30",
-            "value": 0.6229
-          },
-          {
-            "date": "2026-07-01",
-            "value": 0.5977
-          },
-          {
-            "date": "2026-07-02",
-            "value": 0.6055
-          },
-          {
-            "date": "2026-07-03",
-            "value": 0.5846
-          },
-          {
-            "date": "2026-07-06",
-            "value": 0.5446
-          },
-          {
-            "date": "2026-07-07",
-            "value": 0.66
-          }
-        ]
-      }
+  "sources_manifest": [
+    {
+      "filename": "futures_intraday_20260705_1002.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.005156+00:00",
+      "sha256": "faaa41d837d4efe18902429673cbb5e9dbfafa48015581f440e29305de12e974"
+    },
+    {
+      "filename": "futures_intraday_20260705_1007.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.007170+00:00",
+      "sha256": "701342c989834276483f187c1a16a0112c44d1f9a16fa794e51bfdccd0f837a7"
+    },
+    {
+      "filename": "futures_intraday_20260705_1009.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.009299+00:00",
+      "sha256": "491b379f33bf66cddd3a3e4489651f1b2ad3b3f0c4725fda6ff66f90202d1de2"
+    },
+    {
+      "filename": "futures_intraday_20260705_1014.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.011249+00:00",
+      "sha256": "8fc9698f34978dd8bcad84df8dfdecbd9770f9a99536190ba489817e6d1531db"
+    },
+    {
+      "filename": "futures_intraday_20260705_1504.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.013648+00:00",
+      "sha256": "67afaa69db32b60b010f5bbd3fdde762e41b2cb69180251ea52ada9521cdd78c"
+    },
+    {
+      "filename": "futures_intraday_20260705_1505.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.015596+00:00",
+      "sha256": "c7574daee38d81b6f810aa180aefdd2497bb3d2a10f8ac5a9ffc72e30d37c91f"
+    },
+    {
+      "filename": "futures_intraday_20260705_1507.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.017713+00:00",
+      "sha256": "b1060a9022f3cec0ef2dd33136757b251ffb91dfa503fb97dc5cd9ecb4327822"
+    },
+    {
+      "filename": "futures_intraday_20260705_2256.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.019751+00:00",
+      "sha256": "9e3b73e33e9462ac336e15af9480ebd0b18bd102a1de0e74ae9088ceb25dae01"
+    },
+    {
+      "filename": "futures_intraday_20260705_2309.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.022205+00:00",
+      "sha256": "1c64276394e62acc1ab0326365b8fc5b43cd655683500edf74b13555c13d6da5"
+    },
+    {
+      "filename": "futures_intraday_20260706_0934.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T14:35:21.160266+00:00",
+      "sha256": "9a55fc5a5d0c1d66bf23c130876738f80568b619d0d59f0042f43531daa0f358"
+    },
+    {
+      "filename": "futures_intraday_20260707_0718.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.620534+00:00",
+      "sha256": "72114793b9a67c69ad99a4f360e0115630702e95cd06229201e0ebecafeed562"
+    },
+    {
+      "filename": "futures_intraday_20260707_0741.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.622542+00:00",
+      "sha256": "719d00591710eff447a7f01327c05b92151a2a1d788f5a2233f4d83f5d373a0b"
+    },
+    {
+      "filename": "futures_intraday_20260707_0743.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.624410+00:00",
+      "sha256": "5060f6df32320a0ad6c5fe65c1dc5acd0123feca0925fbf5357b5482c251be9e"
+    },
+    {
+      "filename": "futures_intraday_20260707_1356.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.625503+00:00",
+      "sha256": "d8d41c152e4d26f53fa3823aaa874db5a4ae0d9d38bbe1365ef5ad6eb00a8a23"
+    },
+    {
+      "filename": "futures_intraday_20260707_1526.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.628206+00:00",
+      "sha256": "c429067e1d5983d637e6f8cb06067debcf86780b6dcd2578ee1b3dfd52e365ae"
+    },
+    {
+      "filename": "futures_intraday_20260707_1622.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.629919+00:00",
+      "sha256": "36a9a011eab25796c9cd594c1b89e3c7c68b69c207fc3e4d93fdd5851221d276"
+    },
+    {
+      "filename": "futures_intraday_20260707_1629.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.631670+00:00",
+      "sha256": "c441e52e7b79796796fbef0123cfe0ad718b6a594d4ce80ed6c3634c98baf710"
+    },
+    {
+      "filename": "futures_intraday_20260707_1652.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.633379+00:00",
+      "sha256": "d515c24d4beda5a0dff45b1e15149d054eba2d668904d45d728f73ebc7612ba0"
+    },
+    {
+      "filename": "futures_intraday_20260707_2019.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.636071+00:00",
+      "sha256": "c429067e1d5983d637e6f8cb06067debcf86780b6dcd2578ee1b3dfd52e365ae"
+    },
+    {
+      "filename": "futures_intraday_20260707_2024.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.637777+00:00",
+      "sha256": "6ede7fd838859b5881547bcd33daf4203a8d02d9372989486ae6c72f4a76593f"
+    },
+    {
+      "filename": "futures_intraday_20260707_2241.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.639600+00:00",
+      "sha256": "b721008605f462d2a71c703aa1bf44d93b308de7b156eafcb92da647d5a99d1b"
+    },
+    {
+      "filename": "futures_intraday_20260707_2243.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.641342+00:00",
+      "sha256": "c92d77257a5d419665aa6a521bba0da597a77b27e807b4728c52706da153cb53"
+    },
+    {
+      "filename": "futures_intraday_20260707_2245.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.642944+00:00",
+      "sha256": "d47e07d4daf84d0e2b3ebbc2e554f793847c4031d431cb6fb57a2293a71bee37"
+    },
+    {
+      "filename": "futures_intraday_20260707_2246.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.644686+00:00",
+      "sha256": "48a79a17d2c542ac5616d17e79cd53520965d659d2232a8955fea505f5ad517a"
+    },
+    {
+      "filename": "futures_intraday_20260707_2250.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.646417+00:00",
+      "sha256": "7a5108dbcafcbfcb20c825fe7da6df54b91ab80c3fe4e9e20b183c03e2b8b410"
+    },
+    {
+      "filename": "futures_intraday_20260707_2256.csv",
+      "dataset": "futures_intraday",
+      "source": "barchart",
+      "source_class": "barchart_quote_snapshot",
+      "output_kind": "quote_snapshot",
+      "output_kinds": [
+        "quote_snapshot",
+        "execution_l3"
+      ],
+      "vendor": "barchart",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.648446+00:00",
+      "sha256": "6bec94961d6eaec2b4987f9f4424be5a2a7a0f6fca5c9bce6cda3ca8982cd484"
+    },
+    {
+      "filename": "credit_20260705_1002.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.811279+00:00",
+      "sha256": "d598321e8364c501b20fe4a9798654c4fdafcb53e212e593c4837dcc0806f8dc"
+    },
+    {
+      "filename": "credit_20260705_1007.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.830609+00:00",
+      "sha256": "7cc15bde87ec12cb8890eae3af0c14342a90755191e92f5308b6d8edb38b84f0"
+    },
+    {
+      "filename": "credit_20260705_1009.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.850040+00:00",
+      "sha256": "d598321e8364c501b20fe4a9798654c4fdafcb53e212e593c4837dcc0806f8dc"
+    },
+    {
+      "filename": "credit_20260705_1014.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.869243+00:00",
+      "sha256": "d598321e8364c501b20fe4a9798654c4fdafcb53e212e593c4837dcc0806f8dc"
+    },
+    {
+      "filename": "credit_20260705_1504.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.888056+00:00",
+      "sha256": "3279729dc74bd5f598f3e34b7e990ac056ff326a0ce9830b13e3027e8918d17b"
+    },
+    {
+      "filename": "credit_20260705_1505.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.906341+00:00",
+      "sha256": "3279729dc74bd5f598f3e34b7e990ac056ff326a0ce9830b13e3027e8918d17b"
+    },
+    {
+      "filename": "credit_20260705_1507.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.924485+00:00",
+      "sha256": "3279729dc74bd5f598f3e34b7e990ac056ff326a0ce9830b13e3027e8918d17b"
+    },
+    {
+      "filename": "credit_20260705_2256.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.943917+00:00",
+      "sha256": "0473d6ae22c62774c1926d7eabf4cf0b457d5e7ed955893284563c071f32f87c"
+    },
+    {
+      "filename": "credit_20260705_2310.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.963031+00:00",
+      "sha256": "0473d6ae22c62774c1926d7eabf4cf0b457d5e7ed955893284563c071f32f87c"
+    },
+    {
+      "filename": "credit_20260706_0934.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T14:35:21.140989+00:00",
+      "sha256": "611a3e3348c07d8c01e045b8eb3d0be938a2f1262192eaf8e1d7d37c18a09977"
+    },
+    {
+      "filename": "credit_20260707_0718.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.304157+00:00",
+      "sha256": "264f84edcc72f0086848d9a3c4921c920de862d798d6735df06300a2db94e163"
+    },
+    {
+      "filename": "credit_20260707_0741.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.321389+00:00",
+      "sha256": "fa4736d5a03d4aa3a54914f42e00b0f812ebb11ae0a91627a46754848f1c7fb0"
+    },
+    {
+      "filename": "credit_20260707_0743.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.337976+00:00",
+      "sha256": "fa4736d5a03d4aa3a54914f42e00b0f812ebb11ae0a91627a46754848f1c7fb0"
+    },
+    {
+      "filename": "credit_20260707_1356.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.354919+00:00",
+      "sha256": "ece0bf24ae9cb78f993beb713edd7f1153311cc34aebc8ef9cea884fc3dcc7ca"
+    },
+    {
+      "filename": "credit_20260707_1526.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.371587+00:00",
+      "sha256": "c4f4ea0a479e5a48a5486dab50a11f5d8f116155300192bd1969ec5a206a53ab"
+    },
+    {
+      "filename": "credit_20260707_1622.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.389581+00:00",
+      "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
+    },
+    {
+      "filename": "credit_20260707_1629.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.407951+00:00",
+      "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
+    },
+    {
+      "filename": "credit_20260707_1652.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.424830+00:00",
+      "sha256": "193e16f5ca98674d02748f17db249e2681e30779a0c00f1675a236c4fa914445"
+    },
+    {
+      "filename": "credit_20260707_2019.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.443360+00:00",
+      "sha256": "365d5f8656682089b49b64b90072eea4859bf9a8940d74a35c040e9555dfdc06"
+    },
+    {
+      "filename": "credit_20260707_2024.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.460347+00:00",
+      "sha256": "365d5f8656682089b49b64b90072eea4859bf9a8940d74a35c040e9555dfdc06"
+    },
+    {
+      "filename": "credit_20260707_2241.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.477224+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "credit_20260707_2243.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.493642+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "credit_20260707_2245.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.510238+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "credit_20260707_2247.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.526594+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "credit_20260707_2250.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.543550+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "credit_20260707_2256.csv",
+      "dataset": "credit",
+      "source": "koyfin",
+      "source_class": "koyfin_snapshot_csv",
+      "output_kind": "snapshot",
+      "output_kinds": [
+        "snapshot_validation",
+        "universe_membership"
+      ],
+      "vendor": "koyfin",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.560676+00:00",
+      "sha256": "6861b970f1a80dc57f0aaa5b62126670e686d8cafad2cb5bcb01c71abaad665c"
+    },
+    {
+      "filename": "equities_20260705_1002.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.983630+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1007.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.984840+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1009.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.986425+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1014.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.987847+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1504.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.989147+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1506.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.990560+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_1507.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.992150+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_2257.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.993428+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260705_2310.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.994906+00:00",
+      "sha256": "1ac087fdff61bfcf26b91b3cf79c7702cbbe62f763204b89bccf1501ddf55577"
+    },
+    {
+      "filename": "equities_20260706_0935.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T14:35:21.157918+00:00",
+      "sha256": "8ea08f6557f3a0f3f79baa1d523d0d1ab2a64318b1cce5d2a95fe7d9a3be4333"
+    },
+    {
+      "filename": "equities_20260707_0718.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.576891+00:00",
+      "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
+    },
+    {
+      "filename": "equities_20260707_0742.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.578252+00:00",
+      "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
+    },
+    {
+      "filename": "equities_20260707_0743.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.579506+00:00",
+      "sha256": "88fea3198d8f51bebf160afb428d6ec3cc997616c6aaf540db8c461e8d3b5604"
+    },
+    {
+      "filename": "equities_20260707_1356.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.580675+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_1526.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.581764+00:00",
+      "sha256": "a232b9438a6a64bc445bd5ef528c59018aa58f5a62e759fa7f672ed9982350a4"
+    },
+    {
+      "filename": "equities_20260707_1622.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.582873+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_1630.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.584402+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_1652.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.585975+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2020.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.587377+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2024.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.588757+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2242.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.591336+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2243.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.593591+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2245.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.595133+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2247.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.596359+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2250.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.597549+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "equities_20260707_2256.csv",
+      "dataset": "equities",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.600099+00:00",
+      "sha256": "6ab2bed5efa12dea37c1d8e32822ab2a19b48776591616ee0f592cd4c996fd45"
+    },
+    {
+      "filename": "flows_20260705_1002.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.995858+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1007.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.996818+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1009.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.997926+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1014.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.998934+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1504.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:24.999992+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1505.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.000740+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_1507.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.001539+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_2257.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.002656+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260705_2310.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.003329+00:00",
+      "sha256": "349b7e896f0357a63874250ef003fa9659f91834c3e33ae02193d0502e5c0b83"
+    },
+    {
+      "filename": "flows_20260706_0935.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T14:35:21.158575+00:00",
+      "sha256": "e7ec0aa314110f1dd1d32b24d40c8dab40985e0a58e8f6e80d0e511a27219797"
+    },
+    {
+      "filename": "flows_20260707_0718.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.601067+00:00",
+      "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
+    },
+    {
+      "filename": "flows_20260707_0741.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.601768+00:00",
+      "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
+    },
+    {
+      "filename": "flows_20260707_0743.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.603149+00:00",
+      "sha256": "a1b652c1fc0b0d0f6738d16bbb49fd507886a6f0e13a85687567d614fc9e7271"
+    },
+    {
+      "filename": "flows_20260707_1356.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.603875+00:00",
+      "sha256": "00b1653dcde959221d08cb10723c97c8d2c49e5fb9f00747e071006ccc878bfe"
+    },
+    {
+      "filename": "flows_20260707_1526.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.604509+00:00",
+      "sha256": "980d6c06c8c403f23daf8f010f4ce52c1adb4afc3c08e89c1223a350c8a607a4"
+    },
+    {
+      "filename": "flows_20260707_1622.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.607010+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_1629.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.608572+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_1652.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.609357+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2019.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.610083+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2024.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.610712+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2241.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.611458+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2243.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.612676+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2245.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.613343+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2247.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.615256+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2250.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.617596+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "flows_20260707_2256.csv",
+      "dataset": "flows",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.618838+00:00",
+      "sha256": "77c0c17de0ab93e6539fc396214a4ebe74ac4dece6fc565b079269f519fddebc"
+    },
+    {
+      "filename": "rates_20260705_1002.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.026435+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1007.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.029782+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1009.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.032071+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1014.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.033633+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1504.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.035279+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1505.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.036865+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_1507.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.038549+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_2257.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.040547+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260705_2310.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T04:10:25.042498+00:00",
+      "sha256": "ddeec7519e61e79126cfb8e28fbff656147eeff8557a982415640810aa10d992"
+    },
+    {
+      "filename": "rates_20260706_0935.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-06T14:35:21.161609+00:00",
+      "sha256": "b0fa04efcb20951a9f2c221a3b775b388244c76527ce637733203a6622f44ab7"
+    },
+    {
+      "filename": "rates_20260707_0718.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.649795+00:00",
+      "sha256": "017cd71b4d36cfb611c8a5d41fced7b450e8e17afe9b58b6f51cc3db38c4cc97"
+    },
+    {
+      "filename": "rates_20260707_0741.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.651371+00:00",
+      "sha256": "899a593eb70bc641e9d02507e6ea938e45086ef90a12bd2aa898c4c8a62b603d"
+    },
+    {
+      "filename": "rates_20260707_0743.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.652727+00:00",
+      "sha256": "899a593eb70bc641e9d02507e6ea938e45086ef90a12bd2aa898c4c8a62b603d"
+    },
+    {
+      "filename": "rates_20260707_1356.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.654259+00:00",
+      "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+    },
+    {
+      "filename": "rates_20260707_1526.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.656399+00:00",
+      "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+    },
+    {
+      "filename": "rates_20260707_1622.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.657956+00:00",
+      "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+    },
+    {
+      "filename": "rates_20260707_1629.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.659296+00:00",
+      "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+    },
+    {
+      "filename": "rates_20260707_1652.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.661986+00:00",
+      "sha256": "fc87c554ab2052281f5f2903f669875302ccd5eefc7afe92f2eeee9e83558290"
+    },
+    {
+      "filename": "rates_20260707_2019.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.663299+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2024.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.664770+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2241.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.666409+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2243.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.668097+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2245.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.669472+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2247.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.671188+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2250.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.672617+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
+    },
+    {
+      "filename": "rates_20260707_2256.csv",
+      "dataset": "rates",
+      "source": "koyfin",
+      "source_class": "unknown",
+      "output_kind": "unknown",
+      "output_kinds": [],
+      "vendor": "",
+      "priority": "",
+      "canonical_assets": [],
+      "staged_at": "2026-07-08T03:56:43.674139+00:00",
+      "sha256": "2a7479d4d32dcec5e27552b61fc62d9405f1c7a4058b1266763e964a049722d9"
     }
-  },
-  "bbdm_rv_enrich": {
-    "version": "2.0.0-chunk15",
-    "enriched_at": "2026-07-08T00:22:45+00:00",
-    "rv_history_version": "2.0.0-chunk15",
-    "primary_series": [
-      "btc_basis_spot_1m",
-      "btc_calendar_bt_near_deferred",
-      "eth_basis_spot_1m",
-      "eth_calendar_et_near_deferred",
-      "gpu_basis_spread",
-      "gpu_crush_calendar_spread",
-      "sofr_ois_spread",
-      "usgg2y10y"
-    ],
-    "series_lineage": [
-      {
-        "series_id": "btc_basis_spot_1m",
-        "bbdm_trade_id": "btc_basis",
-        "structure_type": "basis",
-        "trade_type": "crypto_basis",
-        "data_status": "live",
-        "source": "barchart_spread_history",
-        "adapter_module": "whinfell_pipeline/btc_basis_series.py",
-        "adapter_version": "2.0.0-chunk08",
-        "points_count": 5,
-        "cockpit_present": true,
-        "resolved_series_id": "btc_basis_spot_1m"
-      },
-      {
-        "series_id": "btc_calendar_bt_near_deferred",
-        "bbdm_trade_id": "btc_calendar",
-        "structure_type": "calendar",
-        "trade_type": "crypto_calendar",
-        "data_status": "live",
-        "source": "barchart_spread_history",
-        "adapter_module": "whinfell_pipeline/btc_calendar_series.py",
-        "adapter_version": "2.0.0-chunk09",
-        "points_count": 5,
-        "cockpit_present": true,
-        "resolved_series_id": "btc_calendar_bt_near_deferred"
-      },
-      {
-        "series_id": "eth_basis_spot_1m",
-        "bbdm_trade_id": "eth_basis",
-        "structure_type": "basis",
-        "trade_type": "crypto_basis",
-        "data_status": "live",
-        "source": "barchart_spread_history",
-        "adapter_module": "whinfell_pipeline/eth_basis_series.py",
-        "adapter_version": "2.0.0-chunk10",
-        "points_count": 5,
-        "cockpit_present": true,
-        "resolved_series_id": "eth_basis_spot_1m"
-      },
-      {
-        "series_id": "eth_calendar_et_near_deferred",
-        "bbdm_trade_id": "eth_calendar",
-        "structure_type": "calendar",
-        "trade_type": "crypto_calendar",
-        "data_status": "live",
-        "source": "barchart_spread_history",
-        "adapter_module": "whinfell_pipeline/eth_calendar_series.py",
-        "adapter_version": "2.0.0-chunk11",
-        "points_count": 5,
-        "cockpit_present": true,
-        "resolved_series_id": "eth_calendar_et_near_deferred"
-      },
-      {
-        "series_id": "gpu_basis_spread",
-        "bbdm_trade_id": "midwest_basis",
-        "structure_type": "basis",
-        "trade_type": "compute",
-        "data_status": "fallback",
-        "source": "ai_compute_reconstructed",
-        "adapter_module": "whinfell_pipeline/midwest_basis_series.py",
-        "adapter_version": "2.0.0-chunk12",
-        "points_count": 65,
-        "cockpit_present": false,
-        "resolved_series_id": "gpu_basis_spread"
-      },
-      {
-        "series_id": "gpu_crush_calendar_spread",
-        "bbdm_trade_id": "midwest_calendar",
-        "structure_type": "calendar",
-        "trade_type": "compute",
-        "data_status": "fallback",
-        "source": "ai_compute_reconstructed",
-        "adapter_module": "whinfell_pipeline/midwest_calendar_series.py",
-        "adapter_version": "2.0.0-chunk13",
-        "points_count": 65,
-        "cockpit_present": false,
-        "resolved_series_id": "gpu_crush_calendar_spread"
-      },
-      {
-        "series_id": "sofr_ois_spread",
-        "bbdm_trade_id": "sofr_fed_funds",
-        "structure_type": "single",
-        "trade_type": "rates",
-        "data_status": "live",
-        "source": "rv_basis_reconstructed",
-        "adapter_module": "whinfell_pipeline/rates_series.py",
-        "adapter_version": "2.0.0-chunk14",
-        "points_count": 45,
-        "cockpit_present": true,
-        "resolved_series_id": "sofr_ois_spread"
-      },
-      {
-        "series_id": "usgg2y10y",
-        "bbdm_trade_id": "curve_2s10s",
-        "structure_type": "single",
-        "trade_type": "rates",
-        "data_status": "live",
-        "source": "rv_basis_reconstructed",
-        "adapter_module": "whinfell_pipeline/rates_series.py",
-        "adapter_version": "2.0.0-chunk14",
-        "points_count": 45,
-        "cockpit_present": true,
-        "resolved_series_id": "usgg2y10y"
-      }
-    ],
-    "cockpit_injects": [
-      {
-        "node": "basis",
-        "series_id": "eth_calendar_et_near_deferred",
-        "method": "eth_calendar"
-      },
-      {
-        "node": "basis",
-        "series_id": "btc_basis_spot_1m",
-        "method": "btc_basis"
-      },
-      {
-        "node": "basis",
-        "series_id": "btc_calendar_bt_near_deferred",
-        "method": "btc_calendar"
-      },
-      {
-        "node": "basis",
-        "series_id": "eth_basis_spot_1m",
-        "method": "eth_basis"
-      }
-    ],
-    "input_lineage_hash": "sha256:44ec5c1431cb321e352eecb90a4a9a127f11dc75675d5ec45c291ec8cfcb42e7",
-    "live_count": 6,
-    "fallback_count": 2,
-    "enrich_lineage_hash": "sha256:8cde25130d43b6fab39f0b8a7ede22ccc366561e584a754d954321c6ffb0b87f"
-  }
+  ]
 }
