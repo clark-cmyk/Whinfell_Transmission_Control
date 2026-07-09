@@ -4,6 +4,7 @@
  * COMET C1 — shell density: --wf-header-h / rail-canvas gap-padding via .ia-* /.wf-* only.
  * COMET C2 — nav hover/active: .wf-nav-item slate states via --wf-* (no .wtc-* fork).
  * COMET C3 — widget card chrome: .wf-panel* radius-widget · border · header/body gap via --wf-*.
+ * COMET C4 — topbar control set: .console-chip / .btn-console via --wf-radius-control · control tokens.
  */
 
 :root {
@@ -161,14 +162,19 @@
   background: rgba(94, 179, 255, 0.08);
 }
 .ia-frame-toggle {
-  font-size: 12px;
-  padding: 2px 6px;
-  border: 1px solid var(--ia-border);
-  border-radius: 4px;
-  background: transparent;
-  color: var(--ia-muted);
+  font-size: var(--wf-text-xxs);
+  padding: var(--wf-gap-1) var(--wf-gap-2);
+  border: 1px solid var(--wf-control-border);
+  border-radius: var(--wf-radius-control);
+  background: var(--wf-control-bg);
+  color: var(--wf-text-3);
   cursor: pointer;
   flex-shrink: 0;
+}
+.ia-frame-toggle:hover {
+  background: var(--wf-panel-bg-3);
+  border-color: var(--wf-border-strong);
+  color: var(--wf-text);
 }
 .ia-top-body {
   display: flex;
@@ -2747,6 +2753,143 @@ body.ia-shell-active .console-regime-sub { display: none; }
 body.ia-shell-active .console-title { font-size: 12px; }
 body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 
+/* ── COMET C4 — topbar control set (.console-chip / .btn-console; no .wtc-*) ──
+ * Maps COMET §4 search+actions → existing top utilities + action row.
+ * radius-control · control-bg/border · primary=ok · accent · secondary default.
+ */
+.console-chip,
+.console-actions-row .btn-console,
+.console-actions-row > button {
+  border-radius: var(--wf-radius-control);
+  border: 1px solid var(--wf-control-border);
+  background: var(--wf-control-bg);
+  color: var(--wf-text-2);
+  font-size: var(--wf-text-xxs);
+  font-weight: 500;
+  line-height: 1;
+  padding: var(--wf-gap-1) var(--wf-gap-2);
+  min-height: 28px;
+  height: auto;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wf-gap-1);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.console-chip:hover,
+.console-actions-row .btn-console:hover,
+.console-actions-row > button:hover {
+  background: var(--wf-panel-bg-3);
+  border-color: var(--wf-border-strong);
+  color: var(--wf-text);
+}
+span.console-chip {
+  cursor: default;
+}
+span.console-chip:hover {
+  background: var(--wf-control-bg);
+  border-color: var(--wf-control-border);
+  color: var(--wf-text-2);
+}
+.console-chip--compact {
+  min-width: 28px;
+  padding: var(--wf-gap-1) 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.console-chip--meta {
+  color: var(--wf-text-3);
+  background: var(--wf-panel-bg-2);
+  border-color: var(--wf-border);
+  font-weight: 600;
+}
+.console-chip--meta.console-chip--build {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+.console-chip--external {
+  color: var(--wf-text-2);
+  background: transparent;
+  border-color: var(--wf-control-border);
+}
+.console-chip--action,
+.console-chip--default {
+  color: var(--wf-text-2);
+}
+.console-chip--mode {
+  color: var(--wf-accent);
+  border-color: var(--wf-accent);
+  background: var(--wf-accent-soft);
+  font-weight: 600;
+}
+/* Primary = COMET green action */
+.console-chip--primary,
+.console-actions-row .btn-console--primary {
+  background: var(--wf-ok-strong);
+  border-color: var(--wf-ok);
+  color: var(--wf-ok-fg);
+  font-weight: 650;
+}
+.console-chip--primary:hover,
+.console-actions-row .btn-console--primary:hover {
+  background: var(--wf-ok);
+  border-color: var(--wf-ok);
+  color: var(--wf-ok-fg);
+}
+/* Secondary accent (Refresh / Import hydration / Publish) */
+.console-chip--accent,
+.console-actions-row .btn-console--accent {
+  background: var(--wf-accent-soft);
+  border-color: var(--wf-accent);
+  color: var(--wf-accent);
+  font-weight: 600;
+}
+.console-chip--accent:hover,
+.console-actions-row .btn-console--accent:hover {
+  background: var(--wf-accent-soft);
+  border-color: var(--wf-border-strong);
+  color: var(--wf-text);
+}
+/* Save — solid accent control */
+.console-chip--save,
+.console-actions-row .btn-console--save {
+  background: var(--wf-accent);
+  border-color: var(--wf-accent);
+  color: var(--wf-text-inverse);
+  font-weight: 600;
+}
+.console-chip--save:hover,
+.console-actions-row .btn-console--save:hover {
+  filter: brightness(1.06);
+  color: var(--wf-text-inverse);
+}
+.console-tech-meta {
+  gap: var(--wf-gap-1);
+}
+.console-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--wf-gap-1);
+}
+/* Collect agent status stays tokenized (ok/warn); C5 owns full chip family */
+.wtm-collect-agent-status.wtm-collect-agent--online {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+.wtm-collect-agent-status.wtm-collect-agent--offline {
+  color: var(--wf-warn);
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
+}
+
 /* Chunk H — breakpoint + zoom QA */
 @media (max-width: 1440px) {
   .ia-workspace {
@@ -3843,6 +3986,70 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   background: var(--wf-bg-subtle);
   border-color: var(--wf-border-subtle);
   color: var(--wf-text-primary);
+}
+/* C4 light — topbar control set token parity */
+:root[data-theme="light"] .console-chip,
+:root[data-theme="light"] .console-actions-row .btn-console,
+:root[data-theme="light"] .console-actions-row > button,
+:root[data-theme="light"] .ia-frame-toggle {
+  background: var(--wf-bg-card);
+  border-color: var(--wf-border-card);
+  color: var(--wf-text-primary);
+}
+:root[data-theme="light"] .console-chip:hover,
+:root[data-theme="light"] .console-actions-row .btn-console:hover,
+:root[data-theme="light"] .console-actions-row > button:hover,
+:root[data-theme="light"] .ia-frame-toggle:hover {
+  background: var(--wf-bg-subtle);
+  border-color: var(--wf-border-subtle);
+  color: var(--wf-text-primary);
+}
+:root[data-theme="light"] span.console-chip:hover {
+  background: var(--wf-bg-card);
+  border-color: var(--wf-border-card);
+}
+:root[data-theme="light"] .console-chip--meta {
+  color: var(--wf-text-muted);
+  background: var(--wf-bg-subtle);
+  border-color: var(--wf-border-card);
+}
+:root[data-theme="light"] .console-chip--meta.console-chip--build {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+:root[data-theme="light"] .console-chip--primary,
+:root[data-theme="light"] .console-actions-row .btn-console--primary {
+  background: var(--wf-ok-strong);
+  border-color: var(--wf-ok);
+  color: var(--wf-ok-fg);
+}
+:root[data-theme="light"] .console-chip--accent,
+:root[data-theme="light"] .console-actions-row .btn-console--accent {
+  background: var(--wf-ok-soft);
+  border-color: var(--wf-accent-teal, var(--wf-accent));
+  color: var(--wf-accent-teal, var(--wf-accent));
+}
+:root[data-theme="light"] .console-chip--save,
+:root[data-theme="light"] .console-actions-row .btn-console--save {
+  background: var(--wf-accent-teal, var(--wf-accent));
+  border-color: var(--wf-accent-teal, var(--wf-accent));
+  color: #fff;
+}
+:root[data-theme="light"] .console-chip--mode {
+  color: var(--wf-accent-teal, var(--wf-accent));
+  border-color: var(--wf-border-subtle);
+  background: var(--wf-ok-soft);
+}
+:root[data-theme="light"] .wtm-collect-agent-status.wtm-collect-agent--online {
+  color: var(--wf-ok);
+  border-color: var(--wf-ok);
+  background: var(--wf-ok-soft);
+}
+:root[data-theme="light"] .wtm-collect-agent-status.wtm-collect-agent--offline {
+  color: var(--wf-warn);
+  border-color: var(--wf-warn);
+  background: var(--wf-warn-soft);
 }
 :root[data-theme="light"] .whinfell-logo-text {
   color: var(--wf-accent-green);

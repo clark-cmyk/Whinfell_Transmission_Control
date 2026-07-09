@@ -165,4 +165,17 @@ Object.values(actionEls).forEach((btn) => {
   assert(btn.className.includes('btn-console'), `action ${btn.id} keeps btn-console`);
 });
 
+/* COMET C4 — CSS control set locks (map to .console-chip; no .wtc-btn fork) */
+const css = fs.readFileSync(path.join(ROOT, 'css/console_ia.css'), 'utf8');
+assert(
+  /\.console-chip\s*,[\s\S]{0,120}?border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+  'COMET C4 console-chip radius-control'
+);
+assert(
+  /\.console-chip--primary[\s\S]{0,160}?background:\s*var\(--wf-ok-strong\)/s.test(css),
+  'COMET C4 primary = ok-strong'
+);
+assert(!css.includes('.wtc-btn'), 'COMET C4 no .wtc-btn fork');
+assert(!css.includes('.wtc-search'), 'COMET C4 no .wtc-search fork');
+
 console.log('top_utility_registry.test.mjs — all assertions passed');

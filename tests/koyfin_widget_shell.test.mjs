@@ -156,6 +156,29 @@ function runShellJsChecks() {
     'COMET C3 .wf-panel is flex column card shell'
   );
   assert(!css.includes('.wtc-widget'), 'COMET C3 must not introduce .wtc-widget class fork');
+  // COMET C4 — topbar control set (.console-chip / .btn-console; radius-control · primary=ok)
+  assert(
+    /\.console-chip\s*,[\s\S]{0,120}?border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C4 .console-chip radius uses --wf-radius-control'
+  );
+  assert(
+    /\.console-chip\s*,[\s\S]{0,200}?background:\s*var\(--wf-control-bg\)/s.test(css),
+    'COMET C4 .console-chip background uses --wf-control-bg'
+  );
+  assert(
+    /\.console-chip--primary[\s\S]{0,160}?background:\s*var\(--wf-ok-strong\)/s.test(css),
+    'COMET C4 primary control uses --wf-ok-strong'
+  );
+  assert(
+    /\.console-actions-row[\s\S]{0,120}?gap:\s*var\(--wf-gap-1\)/s.test(css),
+    'COMET C4 actions row gap uses --wf-gap-1'
+  );
+  assert(
+    /\.ia-frame-toggle\s*\{[^}]*border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C4 frame toggle uses --wf-radius-control'
+  );
+  assert(!css.includes('.wtc-search'), 'COMET C4 must not introduce .wtc-search class fork');
+  assert(!css.includes('.wtc-btn'), 'COMET C4 must not introduce .wtc-btn class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

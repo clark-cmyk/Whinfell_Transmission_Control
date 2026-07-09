@@ -1,7 +1,40 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C3 card chrome · next C4)
+**Last updated:** July 9, 2026 (COMET C4 control set · next C5)
+
+---
+
+## July 9, 2026 — COMET CSS C4 (topbar control set)
+
+```text
+CHUNK ID: COMET-C4
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Topbar .console-chip / .btn-console as control set via --wf-*; no .wtc-btn/.wtc-search fork
+
+CONTEXT
+- Spec §4 search+actions (design language only) → map onto existing top utilities + action row
+- No search input in topbar yet; control chrome is the C4 surface
+
+CHANGES
+- css/console_ia.css
+  · .console-chip / .btn-console / action-row buttons: radius-control · control-bg/border · gap-1
+  · primary → --wf-ok-strong / --wf-ok (COMET green primary)
+  · accent / save / meta / mode / external tokenized
+  · .ia-frame-toggle control chrome + hover
+  · agent online/offline → ok/warn soft tokens (C5 owns full chip family)
+  · light theme control set parity
+- tests/koyfin_widget_shell.test.mjs — C4 control asserts
+- tests/top_utility_registry.test.mjs — C4 CSS locks
+
+QA
+- [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [ ] browser-verify chips radius 4 · primary green Collect · dark + light
+
+NEXT SESSION
+- COMET C5 chip variants ok/warn/risk + status strip height — see BUILD_TODO handoff
+```
 
 ---
 
