@@ -30,6 +30,7 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
+- [x] committed in cf5c57e
 - [ ] browser-verify accent links · form radius 4 · dark + light
 
 NEXT SESSION

@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C6 links + forms shipped · next C7)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`TBD after commit`** · C6 code pending · tree dirty until ship
+**HEAD:** `main` tip **`cf5c57e`** · C6 code **`cf5c57e`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main · C6 shipped · working tree clean after commit
+Repo: Whinfell_Transmission_Control · main tip cf5c57e · C6 cf5c57e · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C6 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C6 (tokens · density · nav · panel · control · chips · links/forms).
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` (C6 ship pending / see tip after commit) |
+| Branch | `main` tip **`cf5c57e`** |
 | Last UI commit | `feat(ui): COMET C6 links toolbar + form fields` |
-| Working tree | **Clean** after C6 commit |
+| Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -62,7 +62,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | `1e431df` |
 | **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | `a770a19` |
 | **C5** | Chip variants + strip height | `.console-chip--ok/warn/risk` · pipeline strip 24px · regime pills | `4dae71f` |
-| **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | (this ship) |
+| **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | `cf5c57e` |
 
 **Tests at C6 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
