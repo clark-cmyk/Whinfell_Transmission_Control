@@ -28,7 +28,7 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
-- [x] committed in C2_SHA
+- [x] committed in 7860c49
 - [ ] browser-verify nav hover/active + icons-only codes + light theme
 
 NEXT SESSION

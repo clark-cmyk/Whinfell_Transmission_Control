@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C2 nav shipped · next C3)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip — run `git log -1 --oneline` · C2 code **`C2_SHA`** · tree clean (noise untracked only)
+**HEAD:** `main` tip — run `git log -1 --oneline` · C2 code **`7860c49`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip C2_SHA · working tree clean
+Repo: Whinfell_Transmission_Control · main tip 7860c49 · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C2 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C2 (tokens · density · nav hover/active).
@@ -41,7 +41,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`C2_SHA`** |
+| Branch | `main` tip **`7860c49`** |
 | Last UI commit | `feat(ui): COMET C2 nav hover/active` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
@@ -58,7 +58,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **7** | Depth polish | `#depthPanelMeta` · status/viz/disclosure card | `38f23a3` |
 | **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
 | **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
-| **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `C2_SHA` |
+| **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `7860c49` |
 
 **Tests at C2 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
