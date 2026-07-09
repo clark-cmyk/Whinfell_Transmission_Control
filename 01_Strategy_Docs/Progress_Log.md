@@ -29,7 +29,7 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
-- [x] committed in e8594d6
+- [x] committed in a69ad00
 - [ ] browser-verify denser header @ 1440 + light theme + collapse strip
 
 NEXT SESSION

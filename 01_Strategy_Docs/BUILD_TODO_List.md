@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C1 density shipped · next C2)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`e8594d6`** · working tree **clean** (noise untracked only)
+**HEAD:** `main` tip **`a69ad00`** · working tree **clean** (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip e8594d6 · working tree clean
+Repo: Whinfell_Transmission_Control · main tip a69ad00 · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C1 entry)
 Shipped: Koyfin PR-1…7 + COMET C0 (tokens) + C1 (shell density applied).
@@ -41,7 +41,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`e8594d6`** |
+| Branch | `main` tip **`a69ad00`** |
 | Last UI commit | `feat(ui): COMET C1 shell density` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
@@ -57,7 +57,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **6** | Flipchart polish | `#flipchartPanelMeta` · pager+implications card | `38f23a3` |
 | **7** | Depth polish | `#depthPanelMeta` · status/viz/disclosure card | `38f23a3` |
 | **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
-| **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `e8594d6` |
+| **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
 
 **Tests at C1 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
