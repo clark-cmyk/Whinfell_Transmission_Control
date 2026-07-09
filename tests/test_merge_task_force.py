@@ -12,6 +12,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MERGE = ROOT / "scripts" / "merge_task_force.py"
 LATEST = ROOT / "docs" / "data" / "hydration" / "latest.json"
+PIPELINE_SEQ = [
+    "data_gatherer",
+    "btc_eth_basis",
+    "btc_eth_vol_arb",
+    "compute_gpu",
+    "power_nat_gas",
+    "metals_debt",
+    "china_sq3_deep",
+    "sofr_fedfunds",
+    "hy_vs_ig",
+    "global_transmission",
+    "master_sizing",
+    "tx_integrator",
+]
 
 
 class MergeTaskForceTests(unittest.TestCase):
@@ -66,7 +80,7 @@ class MergeTaskForceTests(unittest.TestCase):
                 json.dumps(
                     {
                         "task_force_version": "1.1.0",
-                        "pipeline_seq": json.loads(LATEST.read_text())["task_force"]["pipeline_seq"],
+                        "pipeline_seq": PIPELINE_SEQ,
                         "validation_status": "complete",
                         "master_sizing": {"verdict": "WATCH"},
                     }

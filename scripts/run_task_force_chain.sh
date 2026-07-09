@@ -58,15 +58,25 @@ echo "FORMAT: each Grok Task returns the full task_force object in one \`\`\`jso
 echo ""
 echo "Local steps (no Grok):"
 echo "  $0 --gatherer          # TCM-Task-DataGatherer via run_data_gatherer.py"
+echo "  $0 --complete-stubs    # specialist stubs + WTM on gatherer snapshot"
 echo "  $0 --merge             # merge task_force.json → hydration (after TxIntegrator)"
+echo "  $0 --refresh           # gatherer → complete-stubs → merge → atomic dual re-copy"
 echo "  scripts/copy_hydration_bundle.sh   # post daily --chain (Clark URLs gate)"
 echo ""
 echo "Verify:"
 echo "  node tests/task_force_wtm_export.test.mjs"
+echo "  node tests/task_force_panel_feed.test.mjs"
+echo "  node tests/phase23_console.test.mjs"
 echo "  python3 tests/test_merge_task_force.py"
+echo "  python3 tests/test_complete_task_force_stubs.py"
 
 if [[ "${1:-}" == "--gatherer" ]]; then
   python3 "$ROOT/scripts/run_data_gatherer.py" --input "$HYDRATION" --output "$OUT"
+  exit $?
+fi
+
+if [[ "${1:-}" == "--complete-stubs" ]]; then
+  python3 "$ROOT/scripts/complete_task_force_stubs.py" --input "$OUT" --output "$OUT"
   exit $?
 fi
 
@@ -76,4 +86,35 @@ if [[ "${1:-}" == "--merge" ]]; then
     --task-force "$OUT" \
     --output "$MERGE_TARGET"
   exit $?
+fi
+
+if [[ "${1:-}" == "--refresh" ]]; then
+  # Full local path: live gatherer snapshot + complete stubs → merge → dual atomic publish.
+  # Re-copy uses WHINFELL_HYDRATION_SRC so Cousins pipeline SRC cannot wipe TF.
+  python3 "$ROOT/scripts/run_data_gatherer.py" --input "$HYDRATION" --output "$OUT"
+  python3 "$ROOT/scripts/complete_task_force_stubs.py" --input "$OUT" --output "$OUT"
+  MERGED_TMP="$(mktemp "${TMPDIR:-/tmp}/wtm_tf_merged.XXXXXX")"
+  trap 'rm -f "$MERGED_TMP"' EXIT
+  python3 "$ROOT/scripts/merge_task_force.py" \
+    --hydration "$MERGE_TARGET" \
+    --task-force "$OUT" \
+    --output "$MERGED_TMP"
+  WHINFELL_HYDRATION_SRC="$MERGED_TMP" bash "$ROOT/scripts/copy_hydration_bundle.sh"
+  python3 - <<PY
+import json
+from pathlib import Path
+root = Path(r'''$ROOT''')
+for rel in ("docs/data/hydration/latest.json", "data/hydration/latest.json"):
+    p = root / rel
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert d.get("task_force"), f"missing task_force in {p}"
+    assert d["task_force"].get("snapshot_id") == d.get("snapshot_id"), f"snap mismatch {p}"
+    ms = (d.get("task_force") or {}).get("master_sizing") or {}
+    print(
+        f"tf_refresh_ok path={p} snapshot_id={d.get('snapshot_id')} "
+        f"validation={d['task_force'].get('validation_status')} "
+        f"score={ms.get('full_whinfell_score')} verdict={ms.get('verdict')}"
+    )
+PY
+  exit 0
 fi

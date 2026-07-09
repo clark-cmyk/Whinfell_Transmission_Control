@@ -37,7 +37,13 @@ function run() {
 
   const ok = w.hydrateFromBundle(raw, { force: true });
   assert(ok !== false, 'hydrateFromBundle with full bundle');
-  assert(w.document.getElementById('whinfellScore').value === '69', 'task_force WTM score applied');
+  const expectedScore = String(raw.task_force?.master_sizing?.full_whinfell_score ?? '');
+  assert(expectedScore, 'task_force master_sizing.full_whinfell_score present');
+  assert(
+    w.document.getElementById('whinfellScore').value === expectedScore,
+    `task_force WTM score applied (${expectedScore})`,
+  );
+  assert(raw.task_force.snapshot_id === raw.snapshot_id, 'task_force snapshot matches bundle');
 
   console.log([
     'PASS phase23_console.test.mjs',
@@ -47,6 +53,7 @@ function run() {
     `safe_boot=${w.SAFE_BOOT}`,
     `meta_polling=${w.DD_META_POLLING_ENABLED}`,
     `whinfellScore=${w.document.getElementById('whinfellScore').value}`,
+    `snapshot_id=${raw.snapshot_id}`,
   ].join('\n'));
 }
 

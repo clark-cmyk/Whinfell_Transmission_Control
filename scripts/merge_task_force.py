@@ -48,6 +48,24 @@ def merge(hydration: dict, task_force: dict) -> dict:
     return out
 
 
+def atomic_write_json(path: Path, payload: dict) -> None:
+    """Temp + os.replace so readers never see a partial latest.json."""
+    import os
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    try:
+        tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        os.replace(tmp, path)
+    except Exception:
+        if tmp.is_file():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+        raise
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description="Merge task_force into hydration latest.json")
@@ -77,14 +95,25 @@ def main() -> int:
     task_force_path = Path(args.task_force)
     output_path = Path(args.output) if args.output else hydration_path
 
-    hydration = json.loads(hydration_path.read_text())
-    task_force = json.loads(task_force_path.read_text())
+    hydration = json.loads(hydration_path.read_text(encoding="utf-8"))
+    task_force = json.loads(task_force_path.read_text(encoding="utf-8"))
     errors = validate_task_force(task_force)
 
     if errors:
         print("FAIL merge_task_force")
         for e in errors:
             print(f"  - {e}")
+        return 1
+
+    # Guard: never promote TF stamped for a different hydration snapshot.
+    tf_snap = task_force.get("snapshot_id") or (
+        (task_force.get("snapshot") or {}).get("hydration_ref") or {}
+    ).get("snapshot_id")
+    hy_snap = hydration.get("snapshot_id")
+    if tf_snap and hy_snap and str(tf_snap) != str(hy_snap):
+        print("FAIL merge_task_force")
+        print(f"  - snapshot_id mismatch task_force={tf_snap!r} hydration={hy_snap!r}")
+        print("  - re-run --gatherer on current latest.json before --merge")
         return 1
 
     merged = merge(hydration, task_force)
@@ -95,14 +124,15 @@ def main() -> int:
         print("DRY-RUN merge_task_force OK")
         print(f"  hydration: {hydration_path}")
         print(f"  task_force: {task_force_path}")
+        print(f"  snapshot_id: {hy_snap}")
         print(f"  validation_status: {task_force.get('validation_status')}")
         print(f"  wtm_export_v21: {'yes' if has_wtm else 'no'}")
         print(f"  verdict: {verdict}")
         return 0
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(merged, indent=2) + "\n")
+    atomic_write_json(output_path, merged)
     print(f"merged task_force into {output_path}")
+    print(f"  snapshot_id={hy_snap}")
     print(f"  validation_status={task_force.get('validation_status')}")
     print(f"  wtm_export_v21={'yes' if has_wtm else 'no'}")
     print(f"  verdict={verdict}")

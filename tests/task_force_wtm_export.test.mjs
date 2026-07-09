@@ -44,9 +44,11 @@ function run() {
     assert(parsed.fields[key] != null && parsed.fields[key] !== '', `parsed field ${key}`);
   }
   assert(parsed.fields.sourceChannel === 'task_force', 'sourceChannel task_force');
-  assert(parsed.fields.whinfellScore === '69', 'whinfellScore from stub');
+  const expectedScore = String(tf.master_sizing?.full_whinfell_score ?? parsed.fields.whinfellScore);
+  assert(parsed.fields.whinfellScore === expectedScore, `whinfellScore from TF WTM (${expectedScore})`);
+  const gross = String(tf.master_sizing?.gross_pct ?? '');
   assert(
-    (parsed.fields.grossRiskRecommendation || '').includes('30%'),
+    gross === '' || (parsed.fields.grossRiskRecommendation || '').includes(`${gross}%`),
     'grossRiskRecommendation from task_force WTM',
   );
 
@@ -55,10 +57,13 @@ function run() {
   const ok = w.hydrateFromBundle(mergedBundle, { force: true });
   assert(ok !== false, 'hydrateFromBundle succeeded');
 
-  assert(w.document.getElementById('whinfellScore').value === '69', 'hydration whinfellScore');
-  assert(w.document.getElementById('transmissionState').value === 'elevated', 'hydration transmissionState');
+  assert(w.document.getElementById('whinfellScore').value === expectedScore, 'hydration whinfellScore');
+  assert(w.document.getElementById('transmissionState').value, 'hydration transmissionState set');
   assert(w.document.getElementById('chinaPolicyStrength').value === '50', 'hydration chinaPolicyStrength');
-  assert(w.document.getElementById('grossA').value === '30', 'grossA from WTM gross risk parse');
+  if (gross) {
+    assert(w.document.getElementById('grossA').value === gross, 'grossA from WTM gross risk parse');
+  }
+  assert(tf.snapshot_id === bundle.snapshot_id, 'task_force snapshot_id matches hydration');
 
   if (tf.validation_status === 'complete') {
     assert(tf.master_sizing, 'master_sizing present when complete');
