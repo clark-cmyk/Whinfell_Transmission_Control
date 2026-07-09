@@ -25,11 +25,20 @@ function runHtmlChecks() {
   assert(html.includes('wf-panel--risk-cockpit'), 'Risk Cockpit uses wf-panel chrome');
   assert(html.includes('id="riskCockpitPanelMeta"'), 'Risk Cockpit panel meta present');
   assert(html.includes('id="widgetRiskCurve"'), 'Risk Curve widget present');
+  assert(html.includes('wf-panel--risk-curve'), 'Risk Curve uses wf-panel chrome');
   assert(html.includes('id="widgetTransmissionRadar"'), 'Radar widget present');
+  assert(html.includes('wf-panel--radar'), 'Radar uses wf-panel chrome');
+  assert(html.includes('id="radarPanelMeta"'), 'Radar panel meta present');
   assert(html.includes('id="widgetHyOas"'), 'HY OAS widget present');
+  assert(html.includes('wf-panel--hy-oas'), 'HY OAS uses wf-panel chrome');
+  assert(html.includes('id="hyOasPanelMeta"'), 'HY OAS panel meta present');
   assert(html.includes('id="hyOasNumerics"'), 'HY OAS Numerics subsection present');
   assert(html.includes('id="hyOasThesisHandoff"'), 'HY OAS Thesis & Handoff subsection present');
   assert(html.includes('id="hyOasHandoffActions"'), 'HY OAS handoff actions row present');
+  assert(html.includes('wf-panel__actions'), 'HY OAS actions use wf-panel__actions');
+  assert(html.includes('id="btnHeresWhy"'), "Here's Why action present");
+  assert(html.includes('id="btnCompareMode"'), 'Compare action present');
+  assert(html.includes('id="btnExportNode"'), 'Export node action present');
   assert(html.includes('id="widgetFlipchart"'), 'Flipchart widget present');
   assert(html.includes('id="flipchartSlideIndex"'), 'Flipchart slide index present');
   assert(html.includes('id="flipchartRegimeTag"'), 'Flipchart regime pill present');
@@ -59,6 +68,8 @@ function runShellJsChecks() {
   assert(shellSrc.includes('iaRadarHost'), 'radar relocation');
   assert(shellSrc.includes('iaHyOasHost'), 'HY OAS relocation');
   assert(shellSrc.includes('assembleHyOasWidget'), 'HY OAS subsection assembly');
+  assert(shellSrc.includes('syncHyOasPanelMeta'), 'HY OAS panel meta sync');
+  assert(shellSrc.includes('observeHyOasPanelMeta'), 'HY OAS panel meta observer');
   assert(shellSrc.includes('hyOasNumericsBody'), 'HY OAS numerics host');
   assert(shellSrc.includes('hyOasThesisBody'), 'HY OAS thesis host');
   assert(shellSrc.includes('hyOasHandoffActions'), 'HY OAS handoff relocation');
@@ -76,6 +87,11 @@ function runShellJsChecks() {
   assert(css.includes('--wf-bg-page'), 'wf-bg-page token');
   assert(css.includes('.ia-widget-grid'), 'widget grid CSS');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
+  assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
+  assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');
+  assert(css.includes('.wf-panel--hy-oas'), 'HY OAS panel grid area');
+  assert(css.includes('.wf-panel--hy-oas .wf-panel__meta'), 'HY OAS panel meta chrome');
+  assert(css.includes('#iaRadarHost .transmission-radar .radar-title'), 'radar double-title suppress in host');
   assert(css.includes('.hy-oas-subsection'), 'HY OAS subsection CSS');
   assert(css.includes('.hy-oas-handoff-actions'), 'HY OAS handoff actions CSS');
   assert(css.includes('.flipchart-slide-index'), 'Flipchart slide index CSS');
@@ -102,6 +118,10 @@ function runActivatorCheck() {
   const mkHost = (id) => ({ id, appendChild(n) { hosts[id] = hosts[id] || []; hosts[id].push(n?.id || n); } });
   const mkNode = (id) => ({ id, parentElement: null });
 
+  const hyOasMeta = { id: 'hyOasPanelMeta', textContent: '—', setAttribute(k, v) { this[k] = v; } };
+  const basisLead = { id: 'basisTacticalLead', textContent: 'HY OAS cheap; half size' };
+  const chartSub = { id: 'cockpitChartSubtitle', textContent: '—' };
+  const basisReading = { id: 'basisReadingValue', textContent: '+12 bps' };
   const ctx = {
     document: {
       body: { classList: { _s: new Set(), add(c) { this._s.add(c); }, remove(c) { this._s.delete(c); }, toggle(c) { this._s.has(c) ? this._s.delete(c) : this._s.add(c); } } },
@@ -133,6 +153,10 @@ function runActivatorCheck() {
           basisWatchPanel: mkNode('basisWatchPanel'),
           iaMidwestCrushHost: mkNode('iaMidwestCrushHost'),
           nodeCockpitZone: { id, classList: { add() {}, toggle() {} } },
+          hyOasPanelMeta: hyOasMeta,
+          basisTacticalLead: basisLead,
+          cockpitChartSubtitle: chartSub,
+          basisReadingValue: basisReading,
         };
         return nodes[id] || null;
       },
@@ -155,6 +179,9 @@ function runActivatorCheck() {
   assert(hosts.hyOasThesisBody?.includes('cockpitDetailBand'), 'component drivers in Thesis subsection');
   assert(hosts.hyOasThesisBody?.includes('hyOasHandoffActions'), 'handoff row in Thesis subsection');
   assert(hosts.depthLaddersContent?.includes('consoleDepthDisclosure'), 'depth disclosure in widget content');
+  const metaLine = ctx.WTM_IaShell.syncHyOasPanelMeta();
+  assert(metaLine === 'HY OAS cheap; half size · +12 bps', 'HY OAS panel meta line');
+  assert(hyOasMeta.textContent === metaLine, 'HY OAS panel meta written');
   ctx.WTM_IaShell.focusWidget('hy_oas');
   assert(typeof ctx.WTM_IaShell.focusWidget === 'function', 'focusWidget callable');
 }

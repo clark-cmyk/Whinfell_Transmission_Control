@@ -96,10 +96,27 @@ function main() {
   assert(mod.formatNet(-1) === '-1', 'formatNet negative');
   assert(mod.netCue(0) === 'Flat', 'netCue flat');
 
+  // Chunk 4 — panel header meta (summary · weakest)
+  assert(typeof mod.syncPanelMeta === 'function', 'syncPanelMeta export');
+  assert(mod.PANEL_META_ID === 'radarPanelMeta', 'panel meta id');
+  const metaEl = { textContent: '', title: '', setAttribute(k, v) { this[k] = v; } };
+  const metaDoc = { getElementById: (id) => (id === 'radarPanelMeta' ? metaEl : null) };
+  const metaLine = mod.syncPanelMeta(display, metaDoc);
+  assert(metaLine === 'Mixed · 58 · Weakest Cred', 'panel meta line');
+  assert(metaEl.textContent === metaLine, 'panel meta written');
+  const emptyMeta = mod.syncPanelMeta(mod.buildRadarDisplay(null), metaDoc);
+  assert(emptyMeta.includes('Not wired'), 'empty panel meta falls back');
+
   const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   assert(indexHtml.includes('id="transmissionRadar"'), 'index mount');
   assert(indexHtml.includes('transmission_radar.css'), 'css linked');
   assert(indexHtml.includes('transmission_radar.js'), 'js linked');
+  assert(indexHtml.includes('id="widgetTransmissionRadar"'), 'radar wf-panel wrapper');
+  assert(indexHtml.includes('wf-panel--radar'), 'radar panel class');
+  assert(indexHtml.includes('id="radarPanelMeta"'), 'radar panel meta in header');
+  assert(indexHtml.includes('id="widgetRiskCurve"'), 'risk curve sibling panel');
+  assert(indexHtml.includes('wf-panel--risk-curve'), 'risk curve panel class');
+  assert(indexHtml.includes('id="iaRiskCurveSummary"'), 'left rail keeps curve shortcut');
   const scanPos = indexHtml.indexOf('id="scanKpiStrip"');
   const shellPos = indexHtml.indexOf('id="wtmIaShell"');
   const scanHostPos = indexHtml.indexOf('id="iaScanHost"');

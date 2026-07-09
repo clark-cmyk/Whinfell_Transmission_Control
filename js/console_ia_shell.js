@@ -278,6 +278,32 @@
     summary.textContent = `Curve · ${label}`;
   }
 
+  /** Chunk 5 — HY OAS header glance: mission lead · basis reading (presentation only). */
+  function truncateMeta(text, max) {
+    const s = String(text || '').trim();
+    if (!s || s === '—') return '';
+    if (s.length <= max) return s;
+    return `${s.slice(0, Math.max(1, max - 1))}…`;
+  }
+
+  function syncHyOasPanelMeta() {
+    const meta = el('hyOasPanelMeta');
+    if (!meta) return '';
+    const lead = truncateMeta(stripNodeText(el('basisTacticalLead')), 42);
+    const subtitle = truncateMeta(stripNodeText(el('cockpitChartSubtitle')), 36);
+    const reading = truncateMeta(stripNodeText(el('basisReadingValue')), 18);
+    const head = lead || subtitle;
+    const parts = [];
+    if (head) parts.push(head);
+    if (reading) parts.push(reading);
+    const line = parts.length ? parts.join(' · ') : '—';
+    meta.textContent = line;
+    if (typeof meta.setAttribute === 'function') {
+      meta.setAttribute('title', line === '—' ? 'HY OAS pending mission read' : line);
+    }
+    return line;
+  }
+
   function applyDigViewClasses() {
     const body = document.body;
     Object.values(DIG_VIEW_CLASS).forEach((cls) => body.classList.remove(cls));
@@ -482,6 +508,20 @@
     syncRiskCurveSummary();
   }
 
+  function observeHyOasPanelMeta() {
+    if (typeof MutationObserver === 'undefined') {
+      syncHyOasPanelMeta();
+      return;
+    }
+    const obs = new MutationObserver(syncHyOasPanelMeta);
+    ['basisTacticalLead', 'cockpitChartSubtitle', 'basisReadingValue'].forEach((id) => {
+      const node = el(id);
+      if (!node) return;
+      obs.observe(node, { childList: true, characterData: true, subtree: true });
+    });
+    syncHyOasPanelMeta();
+  }
+
   function activateShell() {
     if (activated) return true;
     const shell = el('wtmIaShell');
@@ -494,6 +534,7 @@
       observePipelineStrip();
       observeDepthLaddersStatus();
       observeRiskCurveSummary();
+      observeHyOasPanelMeta();
       activated = true;
       return true;
     } catch (err) {
@@ -527,7 +568,10 @@
     relocateNodes,
     relocateTopBar,
     assembleDepthLaddersWidget,
+    assembleHyOasWidget,
     syncDepthLaddersStatus,
+    syncHyOasPanelMeta,
+    syncRiskCurveSummary,
     setLayer,
     setDigView,
     selectMidwestCrush,

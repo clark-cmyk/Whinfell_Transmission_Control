@@ -5,9 +5,10 @@
 (function transmissionRadar(global) {
   'use strict';
 
-  const BUILD = '1.1.0-CHUNK11';
+  const BUILD = '1.2.0-CHUNK11-PANEL-META';
   const MOUNT_ID = 'transmissionRadar';
   const INNER_ID = 'transmissionRadarMount';
+  const PANEL_META_ID = 'radarPanelMeta';
   const HORIZONS = Object.freeze(['d1', 'd5', 'd20', 'd60']);
 
   const RADAR_SLEEVE_REGISTRY = Object.freeze([
@@ -206,6 +207,22 @@
       + '</div>';
   }
 
+  /** Chunk 4 — live glance line in .wf-panel__header meta (presentation only). */
+  function syncPanelMeta(display, doc) {
+    const document = doc || global.document;
+    const meta = document?.getElementById?.(PANEL_META_ID);
+    if (!meta) return '';
+    const summary = String(display?.summaryFace || RADAR_DISPLAY.summaryFace || '—').trim() || '—';
+    const weakest = String(display?.weakestFace || RADAR_DISPLAY.weakestFace || '—').trim() || '—';
+    const prefix = display?.weakestPrefix || RADAR_DISPLAY.weakestPrefix || 'Weakest';
+    const line = `${summary} · ${prefix} ${weakest}`;
+    meta.textContent = line;
+    if (typeof meta.setAttribute === 'function') {
+      meta.setAttribute('title', `Transmission ${summary}; ${prefix.toLowerCase()} ${weakest}`);
+    }
+    return line;
+  }
+
   function shellHtml(display = RADAR_DISPLAY) {
     const sleeves = (display.sleeves && display.sleeves.length)
       ? display.sleeves.map((s) => sleeveCardHtml(s, display)).join('')
@@ -262,16 +279,20 @@
     return inner;
   }
 
-  function renderShell(mountEl, display = RADAR_DISPLAY) {
-    const inner = mountEl || ensureMount();
-    if (!inner) return false;
+  function renderShell(mountEl, display = RADAR_DISPLAY, doc) {
+    const inner = mountEl || ensureMount(doc);
+    if (!inner) {
+      syncPanelMeta(display, doc);
+      return false;
+    }
     inner.innerHTML = shellHtml(display);
+    syncPanelMeta(display, doc);
     return true;
   }
 
-  function render(ctx, mountEl) {
+  function render(ctx, mountEl, doc) {
     const display = buildRadarDisplay(ctx);
-    return renderShell(mountEl, display);
+    return renderShell(mountEl, display, doc);
   }
 
   global.WTM_TransmissionRadar = Object.freeze({
@@ -281,6 +302,7 @@
     RADAR_DISPLAY,
     REASONS,
     NET_CUE,
+    PANEL_META_ID,
     formatNet,
     netCue,
     stageHasMarks,
@@ -289,6 +311,7 @@
     resolveSleeve,
     resolveWeakestShort,
     weakestSleeveId,
+    syncPanelMeta,
     shellHtml,
     ensureMount,
     renderShell,

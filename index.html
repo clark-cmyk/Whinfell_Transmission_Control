@@ -212,11 +212,17 @@ window.DICTIONARY_BADGE_DEFAULT = {
             <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCurveHost"></div>
           </article>
           <article id="widgetTransmissionRadar" class="wf-panel wf-panel--radar" data-widget="transmission_radar">
-            <header class="wf-panel__header"><span class="wf-panel__title">Transmission Signal Radar</span></header>
+            <header class="wf-panel__header">
+              <span class="wf-panel__title">Transmission Signal Radar</span>
+              <span class="wf-panel__meta" id="radarPanelMeta" aria-live="polite">—</span>
+            </header>
             <div class="wf-panel__body wf-panel__body--flush" id="iaRadarHost"></div>
           </article>
           <article id="widgetHyOas" class="wf-panel wf-panel--hy-oas" data-widget="hy_oas">
-            <header class="wf-panel__header"><span class="wf-panel__title">HY OAS Proxy</span></header>
+            <header class="wf-panel__header">
+              <span class="wf-panel__title">HY OAS Proxy</span>
+              <span class="wf-panel__meta" id="hyOasPanelMeta" aria-live="polite">—</span>
+            </header>
             <div class="wf-panel__body wf-panel__body--flush" id="iaHyOasHost">
               <div class="hy-oas-widget" id="hyOasWidget">
                 <section class="wf-subframe hy-oas-subsection hy-oas-subsection--numerics" id="hyOasNumerics" aria-label="Numerics">

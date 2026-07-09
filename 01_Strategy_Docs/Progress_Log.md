@@ -1,7 +1,73 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (handoff · Chunks 1–3 @ 825d9f4)
+**Last updated:** July 9, 2026 (handoff · Chunks 4–5 committed)
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 5 (HY OAS panel polish)
+
+```text
+CHUNK ID: Koyfin-PR-5
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: HY OAS as one widget with header meta; numerics/thesis/actions already assembled
+
+CONTEXT
+- Widget shell already had Numerics + Thesis subframes + hyOasHandoffActions
+- assembleHyOasWidget relocates chart/basis/detail/handoff — no re-scaffold
+- Plan gap polish: panel header glance + chrome parity with Cockpit/Radar
+
+CHANGES
+- index.html — #hyOasPanelMeta in HY OAS Proxy header
+- js/console_ia_shell.js — syncHyOasPanelMeta (lead · reading) + MutationObserver
+- css/console_ia.css — hy-oas min-height + meta chrome
+- tests/koyfin_widget_shell.test.mjs — meta + Here's Why/Compare/Export asserts
+
+QA
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] transmission_radar.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] wmc_ia_integration.test.mjs PASS
+- [x] build_web.sh OK → dist/
+- [x] committed with Chunk 4
+
+NEXT SESSION
+- Browser-verify HY OAS meta after mission read
+- PR-6 Flipchart polish only if gaps (no re-scaffold)
+```
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 4 (Radar + Risk Curve polish)
+
+```text
+CHUNK ID: Koyfin-PR-4
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Sibling Radar + Risk Curve cards; panel meta on Radar (no re-scaffold)
+
+CONTEXT
+- Widget grid + relocateNodes already had wf-panel--radar / wf-panel--risk-curve
+- Plan gap: transmission_radar.js panel header meta (summary · weakest)
+- Left rail keeps Curve · summary + CV code; full curve is grid card
+
+CHANGES
+- index.html — #radarPanelMeta in Transmission Signal Radar header
+- js/transmission_radar.js — syncPanelMeta() on render; BUILD 1.2.0-CHUNK11-PANEL-META
+- css/console_ia.css — radar/curve min-height + meta chrome; hide double .radar-title in #iaRadarHost
+- tests — transmission_radar + koyfin_widget_shell panel / sibling asserts
+
+QA
+- [x] transmission_radar.test.mjs PASS
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] scan_kpi_strip.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] build_web.sh OK → dist/
+- [x] committed with Chunk 5
+
+NEXT SESSION
+- Browser-verify Radar meta after hydrate
+- PR-6 Flipchart polish only if gaps (after Chunk 5)
+```
 
 ---
 

@@ -2751,9 +2751,9 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
   background: var(--wf-canvas-bg);
 }
 .wf-panel--risk-cockpit { grid-area: cockpit; min-height: var(--wf-panel-min-h); }
-.wf-panel--risk-curve { grid-area: curve; }
-.wf-panel--radar { grid-area: radar; }
-.wf-panel--hy-oas { grid-area: hyoas; }
+.wf-panel--risk-curve { grid-area: curve; min-height: var(--wf-panel-min-h); }
+.wf-panel--radar { grid-area: radar; min-height: var(--wf-panel-min-h); }
+.wf-panel--hy-oas { grid-area: hyoas; min-height: var(--wf-panel-min-h); }
 .wf-panel--flipchart { grid-area: flip; }
 .wf-panel--depth { grid-area: depth; }
 
@@ -2772,6 +2772,52 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 }
 .wf-panel--risk-cockpit > .wf-panel__body--flush {
   min-height: 0;
+}
+
+/* Chunk 4 — Radar + Risk Curve sibling cards: shared header meta chrome */
+.wf-panel--radar > .wf-panel__header,
+.wf-panel--risk-curve > .wf-panel__header {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wf-panel--radar .wf-panel__meta {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-panel--radar > .wf-panel__body--flush,
+.wf-panel--risk-curve > .wf-panel__body--flush {
+  min-height: 0;
+}
+/* Panel title owns the name; avoid double h2 inside widget host */
+#iaRadarHost .transmission-radar .radar-title {
+  display: none;
+}
+#iaRadarHost .transmission-radar .radar-head {
+  margin-bottom: 8px;
+}
+
+/* Chunk 5 — HY OAS: header meta + one-card chrome (numerics / thesis / actions already assembled) */
+.wf-panel--hy-oas > .wf-panel__header {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wf-panel--hy-oas .wf-panel__meta {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-panel--hy-oas > .wf-panel__body--flush {
+  min-height: 0;
+}
+#iaHyOasHost .hy-oas-handoff-actions.wf-panel__actions {
+  margin-top: 0;
 }
 
 body.ia-layer-scan .ia-center-canvas,

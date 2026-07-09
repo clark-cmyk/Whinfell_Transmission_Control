@@ -1,9 +1,10 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (handoff · Chunks 1–3 committed)  
+**Last updated:** July 9, 2026 (handoff · Chunks 4–5 committed)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip · feature **`825d9f4`** (Koyfin Chunks 1–3)  
+**HEAD:** `main` · Koyfin Chunks 4–5 (radar + HY OAS panel meta)  
+
 
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
@@ -15,7 +16,7 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9)
+## NEW SESSION — start here (Jul 9 · after Chunks 4–5)
 
 ### Rules (non-negotiable)
 
@@ -29,42 +30,43 @@
 
 | Item | State |
 |------|--------|
-| Branch | `main` (tip = this handoff · parent feature `825d9f4`) |
-| Working tree | **Clean** (only untracked noise below) |
+| Branch | `main` |
+| Working tree | **Clean** after Chunks 4–5 commit (untracked noise ok) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` (ok to leave) |
 | Remote | Not pushed this session — push only if Clark asks |
 
-### Shipped on HEAD (Chunks 1–3) — **DONE · committed**
+### Shipped / ready (Chunks 1–5)
 
-| Chunk | Goal | Key change |
-|-------|------|------------|
-| **1** | TopShell heal | `relocateTopBar()` · dist = root via `build_web.sh` |
-| **2** | Left icons-only | Drop `display:none` on collapsed left body · RC/RD/HY… codes · 44px rail |
-| **3** | Risk Cockpit polish | `#riskCockpitPanelMeta` · `syncPanelMeta()` Score · Gate · Regime |
+| Chunk | Goal | Key change | Status |
+|-------|------|------------|--------|
+| **1** | TopShell heal | `relocateTopBar()` · dist = root via `build_web.sh` | **Done · committed** |
+| **2** | Left icons-only | Drop `display:none` on collapsed left body · RC/RD/HY… codes · 44px rail | **Done · committed** |
+| **3** | Risk Cockpit polish | `#riskCockpitPanelMeta` · `syncPanelMeta()` Score · Gate · Regime | **Done · committed** |
+| **4** | Radar + Risk Curve | Sibling `wf-panel`s · `#radarPanelMeta` · hide double title · min-heights | **Done · committed** |
+| **5** | HY OAS proxy | Structure pre-existed · `#hyOasPanelMeta` · `syncHyOasPanelMeta` · chrome | **Done · committed** |
 
-**Tests at ship:** `koyfin_widget_shell` · `scan_kpi_strip` · `phase16_integration` · `shell_shortcuts` — PASS
+**Tests (Chunks 4–5):** `transmission_radar` · `koyfin_widget_shell` · `phase16_integration` · `wmc_ia_integration` — PASS
 
-**Note:** Plan completeness table is **stale**. Root already has widget grid + PR-4…7 structure. Do **not** re-scaffold. Verify in browser, then polish gaps only.
+**Note:** Plan completeness table is **stale**. Root already has widget grid + PR-6…7 structure. Do **not** re-scaffold. Polish gaps only.
 
 ### Next action for new session
 
-**→ Browser-verify 1–3 (if not done), then Chunk 4 (PR-4): Radar + Risk Curve polish**
+**→ Browser-verify after hydrate, then Chunk 6 (PR-6): Flipchart polish only if gaps**
 
 | Goal | Detail |
 |------|--------|
-| Browser first | Left collapse codes · top strip · cockpit meta after hydrate · Light mode |
-| Chunk 4 | Radar + Risk Curve sibling cards in grid — **structure exists**; polish only if gaps |
-| Acceptance (plan) | Radar + curve are sibling `wf-panel`s; left nav keeps shortcuts; curve not only buried in rail |
+| Browser | Radar meta · HY OAS meta after mission read · Here's Why / Compare / Export still work |
+| Chunk 6 | Flipchart card structure exists — polish only if gaps |
 | Out of scope | Light theme unify (Chunk 8) · widget rewrites · transaction codes |
 
-**PR-4 files (if polish needed):** `index.html` · `css/console_ia.css` · `js/console_ia_shell.js` · `js/transmission_radar.js` · `tests/transmission_radar.test.mjs` / `koyfin_widget_shell.test.mjs`
+**PR-6 files (if polish needed):** `index.html` · `css/console_ia.css` · `js/console_ia_shell.js` · flipchart hosts · `tests/koyfin_widget_shell.test.mjs`
 
 ### Recommended open commands
 
 ```bash
 cd ~/Desktop/Whinfell_Transmission_Control
-git log -2 --oneline   # handoff docs · 825d9f4 Chunks 1–3
+git log -2 --oneline   # Chunks 4–5 · prior 1–3
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
 # hard-refresh http://127.0.0.1:8765/
@@ -72,7 +74,7 @@ node tests/koyfin_widget_shell.test.mjs
 node tests/transmission_radar.test.mjs
 ```
 
-Browser checklist: slim topbar · left **RC/RD/…** codes · Risk Cockpit **header meta** · Radar + Curve cards in grid.
+Browser checklist: Cockpit / Radar / **HY OAS** panel meta · Numerics + Thesis · handoff actions · left **HY** code.
 
 ---
 
@@ -85,9 +87,9 @@ Specs: UI Optimization Plan + Report + Light Theme Spec.
 | PR-1 | 1 | Unify TopShell into IA shell · dist = root | **Done** Jul 9 |
 | PR-2 | 2 | Collapsible top + left (icons-only left fix) | **Done** Jul 9 |
 | PR-3 | 3 | Risk Cockpit `wf-panel` polish | **Done** Jul 9 (panel meta + chrome lock) |
-| PR-4 | 4 | Radar + Risk Curve dashboard row | Structure exists — polish only · **Next** |
-| PR-5 | 5 | HY OAS proxy widget | Structure exists — polish only |
-| PR-6 | 6 | Flipchart widget | Structure exists — polish only |
+| PR-4 | 4 | Radar + Risk Curve dashboard row | **Done** Jul 9 (panel meta · no re-scaffold) |
+| PR-5 | 5 | HY OAS proxy widget | **Done** Jul 9 (panel meta · handoff row locked) |
+| PR-6 | 6 | Flipchart widget | Structure exists — polish only · **Next** |
 | PR-7 | 7 | Depth & Ladders widget | Structure exists; Playwright depth test timeout open |
 | PR-8 | 8 | Light theme unify (`--wf-*` vs `main.css` dual system) | Tokens in `console_ia.css`; dual palette still |
 
@@ -154,7 +156,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec.
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0 | **Koyfin Chunk 4** — Radar + Risk Curve polish | **High · active UI track** | BUILD | Sibling cards OK in `dist/` · tests · no re-scaffold |
+| 0 | **Koyfin Chunk 6** — Flipchart polish only if gaps | **High · active UI track** | BUILD | Structure OK · no re-scaffold · tests |
+| 0a | **Koyfin Chunks 4–5** — Radar + HY OAS panel meta | **Done · committed** | BUILD | meta lines · tests PASS |
 | 0b | **Koyfin Chunks 1–3** committed | **Done** `825d9f4` | BUILD | Committed on `main` |
 | 1 | **Live desk walk-through** — ratings in `Desk_Feedback_Log.md` | **High · go-live gate** | Clark · Wes | All 5 nodes + UI/docs rated |
 | 2 | **Push / desk stack** when ready | **Medium** | Clark | `825d9f4` on remote if desired · no thrash |
