@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C4 control set shipped · next C5)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` · C4 pending commit · tree dirty (C4 only)
+**HEAD:** `main` tip **`a770a19`** · C4 code **`a770a19`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main · C4 control set · working tree clean after commit
+Repo: Whinfell_Transmission_Control · main tip a770a19 · C4 a770a19 · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C4 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C4 (tokens · density · nav · panel · control set).
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` |
-| Last UI commit | `feat(ui): COMET C4 topbar control set` (this session) |
-| Working tree | C4 source · clean after commit |
+| Branch | `main` tip **`a770a19`** |
+| Last UI commit | `feat(ui): COMET C4 topbar control set` |
+| Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -60,7 +60,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
 | **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `7860c49` |
 | **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | `1e431df` |
-| **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | this session |
+| **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | `a770a19` |
 
 **Tests at C4 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
