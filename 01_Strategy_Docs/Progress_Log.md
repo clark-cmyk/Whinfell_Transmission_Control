@@ -1,7 +1,19 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (Koyfin UI Chunk 3 · Risk Cockpit panel meta)
+**Last updated:** July 9, 2026 (handoff · Chunks 1–3 @ 825d9f4)
+
+---
+
+## July 9, 2026 — Session handoff (Chunks 1–3 committed)
+
+```text
+HEAD: 825d9f4 feat(ui): Koyfin Chunks 1–3 — topbar heal, icons-only left, cockpit meta
+SHIPPED: PR-1 relocateTopBar · PR-2 left icons-only · PR-3 cockpit panel meta
+WORKING TREE: clean (untracked noise only)
+NEXT SESSION: browser-verify → Chunk 4 Radar + Risk Curve polish only if gaps
+START: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
+```
 
 ---
 
@@ -27,11 +39,10 @@ QA
 - [x] koyfin_widget_shell.test.mjs PASS
 - [x] phase16_integration.test.mjs PASS
 - [x] build_web.sh OK
+- [x] committed in 825d9f4 with Chunks 1–2
 
 NEXT SESSION
-- Browser-verify Chunks 1–3
-- Commit Chunk 1–3 when Clark ready
-- PR-4 Radar + Risk Curve polish only if gaps
+- Browser-verify · PR-4 Radar + Risk Curve polish only if gaps
 ```
 
 ---
