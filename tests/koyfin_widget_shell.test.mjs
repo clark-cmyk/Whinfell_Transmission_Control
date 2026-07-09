@@ -134,6 +134,28 @@ function runShellJsChecks() {
     'COMET C2 nav radius uses --wf-radius-control'
   );
   assert(!css.includes('.wtc-nav-item'), 'COMET C2 must not introduce .wtc-nav-item class fork');
+  // COMET C3 — widget card chrome lock (.wf-panel* only; radius 8 · border · header/body gap)
+  assert(
+    /\.wf-panel\s*\{[^}]*border-radius:\s*var\(--wf-radius-widget\)/s.test(css),
+    'COMET C3 .wf-panel radius uses --wf-radius-widget'
+  );
+  assert(
+    /\.wf-panel\s*\{[^}]*border:\s*1px solid var\(--wf-border\)/s.test(css),
+    'COMET C3 .wf-panel border uses --wf-border'
+  );
+  assert(
+    /\.wf-panel__header\s*\{[^}]*padding:\s*0 var\(--wf-gap-3\)/s.test(css),
+    'COMET C3 panel header padding uses --wf-gap-3'
+  );
+  assert(
+    /\.wf-panel__body\s*\{[^}]*padding:\s*var\(--wf-gap-3\)/s.test(css),
+    'COMET C3 panel body padding uses --wf-gap-3'
+  );
+  assert(
+    /\.wf-panel\s*\{[^}]*display:\s*flex[\s\S]*?flex-direction:\s*column/s.test(css),
+    'COMET C3 .wf-panel is flex column card shell'
+  );
+  assert(!css.includes('.wtc-widget'), 'COMET C3 must not introduce .wtc-widget class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

@@ -3,6 +3,7 @@
  * COMET C0 — token bridge: COMET slate → --wf-*; --ia-* aliases; no .wtc-* fork.
  * COMET C1 — shell density: --wf-header-h / rail-canvas gap-padding via .ia-* /.wf-* only.
  * COMET C2 — nav hover/active: .wf-nav-item slate states via --wf-* (no .wtc-* fork).
+ * COMET C3 — widget card chrome: .wf-panel* radius-widget · border · header/body gap via --wf-*.
  */
 
 :root {
@@ -541,7 +542,7 @@ body.ia-left-collapsed .wf-nav-list {
   background: transparent;
 }
 
-/* Chunk B — center canvas panel framing */
+/* Chunk B — center canvas panel framing · COMET C3 card chrome lock */
 .wf-panel-grid {
   display: grid;
   gap: 12px;
@@ -552,10 +553,12 @@ body.ia-left-collapsed .wf-nav-list {
 .wf-panel {
   background: var(--wf-panel-bg);
   border: 1px solid var(--wf-border);
-  border-radius: var(--wf-radius-md);
+  border-radius: var(--wf-radius-widget);
   box-shadow: var(--wf-shadow-sm);
   overflow: clip;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 .wf-panel.is-active {
   border-color: rgba(103, 167, 255, 0.30);
@@ -572,21 +575,23 @@ body.ia-left-collapsed .wf-nav-list {
   background: var(--wf-accent);
 }
 
-/* Chunk C — panel headers */
+/* Chunk C — panel headers · C3 header/body gap via --wf-* */
 .wf-panel__header {
-  min-height: 38px;
+  min-height: 36px;
   display: flex;
   flex-wrap: wrap;
-  row-gap: 6px;
+  row-gap: var(--wf-gap-1);
+  column-gap: var(--wf-gap-2);
   align-items: center;
   align-content: flex-start;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 0 var(--wf-gap-3);
+  flex-shrink: 0;
   background: var(--wf-panel-bg-2);
   border-bottom: 1px solid var(--wf-divider);
 }
 .wf-panel__title {
-  font-size: 14px;
+  font-size: var(--wf-text-sm);
   font-weight: 600;
   line-height: 1.2;
   color: var(--wf-text);
@@ -597,15 +602,17 @@ body.ia-left-collapsed .wf-nav-list {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: var(--wf-gap-2);
+  font-size: var(--wf-text-xxs);
   color: var(--wf-text-3);
   flex-shrink: 1;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 .wf-panel__body {
-  padding: 12px;
+  padding: var(--wf-gap-3);
+  flex: 1;
+  min-height: 0;
 }
 .wf-panel__body--flush {
   padding: 0;
@@ -613,9 +620,10 @@ body.ia-left-collapsed .wf-nav-list {
 .wf-panel__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
   align-items: center;
-  padding: 8px 12px;
+  padding: var(--wf-gap-2) var(--wf-gap-3);
+  flex-shrink: 0;
   border-top: 1px solid var(--wf-divider);
   background: var(--wf-panel-bg-2);
 }
@@ -2845,7 +2853,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 /* Chunk 3 — Risk Cockpit card: one panel chrome, body flush into tile layout */
 .wf-panel--risk-cockpit > .wf-panel__header {
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
 }
 .wf-panel--risk-cockpit .wf-panel__meta {
   font-variant-numeric: tabular-nums;
@@ -2863,7 +2871,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 .wf-panel--radar > .wf-panel__header,
 .wf-panel--risk-curve > .wf-panel__header {
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
 }
 .wf-panel--radar .wf-panel__meta {
   font-variant-numeric: tabular-nums;
@@ -2888,7 +2896,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 /* Chunk 5 — HY OAS: header meta + one-card chrome (numerics / thesis / actions already assembled) */
 .wf-panel--hy-oas > .wf-panel__header {
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
 }
 .wf-panel--hy-oas .wf-panel__meta {
   font-variant-numeric: tabular-nums;
@@ -2908,7 +2916,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 /* Chunk 6 — Flipchart: header meta + one-card chrome (pager + implications already assembled) */
 .wf-panel--flipchart > .wf-panel__header {
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
 }
 .wf-panel--flipchart .wf-panel__meta {
   font-variant-numeric: tabular-nums;
@@ -2925,7 +2933,7 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
 /* Chunk 7 — Depth & Ladders: header meta + chrome (status row + viz region already assembled) */
 .wf-panel--depth > .wf-panel__header {
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: var(--wf-gap-2);
 }
 .wf-panel--depth .wf-panel__meta {
   font-variant-numeric: tabular-nums;

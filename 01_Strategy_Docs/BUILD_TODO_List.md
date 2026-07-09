@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (COMET C2 nav shipped · next C3)  
+**Last updated:** July 9, 2026 (COMET C3 card chrome shipped · next C4)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`f0d599a`** · C2 code **`7860c49`** · tree clean (noise untracked only)
+**HEAD:** `main` · C3 code pending commit · tree dirty (C3 only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,16 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C2)
+## NEW SESSION — start here (Jul 9 · after COMET C3)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip f0d599a · C2 7860c49 · working tree clean
+Repo: Whinfell_Transmission_Control · main · C3 card chrome · working tree clean after commit
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C2 entry)
-Shipped: Koyfin PR-1…7 + COMET C0–C2 (tokens · density · nav hover/active).
-Next: COMET C3 — widget card chrome lock (.wf-panel* only). radius 8 · border · header/body gap via --wf-*.
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C3 entry)
+Shipped: Koyfin PR-1…7 + COMET C0–C3 (tokens · density · nav · panel chrome).
+Next: COMET C4 — search + primary/secondary actions as control set (topbar utilities · .console-chip / btn).
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`f0d599a`** |
-| Last UI commit | `feat(ui): COMET C2 nav hover/active` |
-| Working tree | **Clean** (source) |
+| Branch | `main` |
+| Last UI commit | `feat(ui): COMET C3 widget card chrome` (pending / this session) |
+| Working tree | C3 source edits · then clean after commit |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -59,21 +59,22 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
 | **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
 | **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `7860c49` |
+| **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | this session |
 
-**Tests at C2 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
+**Tests at C3 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
 ### Next action for new session
 
-**→ COMET C3 — widget card chrome lock** (`.wf-panel*` only)
+**→ COMET C4 — search + primary/secondary actions as control set**
 
 | Goal | Detail |
 |------|--------|
-| **C3 (do this)** | Card radius **8** (`--wf-radius-widget`) · border · header/body gap consistency |
-| Primary file | `css/console_ia.css` · `.wf-panel` / `__header` / `__body` / panel variants |
-| After C3 | C4 controls · C5 chips · C6 links |
-| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · chart canvas · nav rework |
+| **C4 (do this)** | Topbar utilities · `.console-chip` / btn classes as control set (radius-control · border tokens) |
+| Primary file | `css/console_ia.css` · topbar chips / search / action buttons |
+| After C4 | C5 chips · C6 links |
+| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · chart canvas · panel rework |
 
-**C3 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced
+**C4 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced · re-open C3 panel chrome
 
 **Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
 
@@ -89,7 +90,7 @@ cd dist && python3 -m http.server 8765
 node tests/koyfin_widget_shell.test.mjs
 ```
 
-Browser checklist: dark slate · left nav hover/active · icons-only **DP/FL/RC…** · denser 44px header · Flipchart/Depth meta · light theme · no layout thrash.
+Browser checklist: dark slate · cards radius **8** · consistent panel header/body · left nav hover/active · icons-only **DP/FL/RC…** · denser 44px header · light theme · no layout thrash.
 
 ---
 
@@ -110,7 +111,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **COMET** | C0 | Token bridge | **Done** Jul 9 |
 | **COMET** | C1 | Shell density (header/padding tokens) | **Done** Jul 9 |
 | **COMET** | C2 | Nav hover/active | **Done** Jul 9 |
-| **COMET** | C3–C6 | Cards · controls · chips · links | **Next** — C3 card chrome lock |
+| **COMET** | C3 | Widget card chrome lock | **Done** Jul 9 |
+| **COMET** | C4–C6 | Controls · chips · links | **Next** — C4 control set |
 
 ### Known gaps (do not re-break)
 
@@ -163,8 +165,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **C0** | Token bridge: map COMET palette → `--wf-*` / light | `css/console_ia.css` `:root` + `[data-theme="light"]` | **Done** Jul 9 |
 | **C1** | Shell density: header 44px feel · rail/canvas gap/padding | top frame · left frame · canvas padding | **Done** Jul 9 |
 | **C2** | Nav item + section title polish (hover/active) | left nav list · view shortcuts | **Done** Jul 9 |
-| **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | **Next** · PR-3…7 structure |
-| **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | C0 |
+| **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | **Done** Jul 9 |
+| **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | **Next** · C0 |
 | **C5** | Chip variants ok/warn/risk + status strip height | chips · pipeline strip · regime pills | C0 |
 | **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | C3–C5 |
 | **C7** | Optional responsive @900px | media query only | after C1–C3 stable |
@@ -225,7 +227,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0f | **COMET C3** — widget card chrome lock (`.wf-panel*`) | **High · next UI track** | BUILD | radius-widget · border · header/body gap · no `.wtc-*` |
+| 0g | **COMET C4** — search + control set | **High · next UI track** | BUILD | topbar utilities · chip/btn radius-control · no `.wtc-*` |
+| 0f | **COMET C3** — widget card chrome lock (`.wf-panel*`) | **Done** | BUILD | radius-widget · border · header/body gap · tests PASS |
 | 0e | **COMET C2** — nav hover/active | **Done** | BUILD | control-bg hover · panel-bg-3 active · tests PASS |
 | 0d2 | **COMET C1** — shell density | **Done** `a69ad00` | BUILD | header-h applied · tests PASS |
 | 0d | **COMET CSS C0** — token bridge | **Done** | BUILD | `--wf-*` slate + `--ia-*` bridge · tests PASS |

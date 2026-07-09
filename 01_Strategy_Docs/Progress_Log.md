@@ -1,7 +1,38 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C2 nav · next C3)
+**Last updated:** July 9, 2026 (COMET C3 card chrome · next C4)
+
+---
+
+## July 9, 2026 — COMET CSS C3 (widget card chrome lock)
+
+```text
+CHUNK ID: COMET-C3
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: .wf-panel* card chrome — radius 8 · border token · header/body gap via --wf-*; no .wtc-* fork
+
+CONTEXT
+- Spec §7 widget cards (design language only)
+- C2 nav done; C3 is panel chrome only (no re-scaffold)
+
+CHANGES
+- css/console_ia.css
+  · .wf-panel: border-radius --wf-radius-widget (8) · flex column · border --wf-border
+  · .wf-panel__header: padding gap-3 · row/column-gap tokens · min-height 36 · flex-shrink 0
+  · .wf-panel__body: padding gap-3 · flex 1 · flush stays 0
+  · .wf-panel__actions / __meta / __title: gap + type tokens
+  · widget variant headers gap → --wf-gap-2
+- tests/koyfin_widget_shell.test.mjs — C3 radius/border/header/body + no .wtc-widget asserts
+
+QA
+- [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [ ] browser-verify card radius 8 · header/body gap · dark + light
+
+NEXT SESSION
+- COMET C4 search + primary/secondary controls — see BUILD_TODO handoff
+```
 
 ---
 
