@@ -1,13 +1,33 @@
-/** Merge Task Force compute_gpu feed from hydration bundle into WMC_DATA */
+/** Merge Task Force compute_gpu feed from hydration bundle into WMC_DATA.
+ * Raw hydration load is owned by The Ark (WTM_Ark) — no direct fetch here.
+ */
 window.WMC = window.WMC || {};
 
 WMC.Hydrate = {
+  /**
+   * Load hydration via Ark and merge compute_gpu into WMC_DATA.
+   * @param {string} [url] unused legacy arg (path owned by Ark); kept for call-site compat
+   * @returns {Promise<boolean>}
+   */
   async load(url = 'data/hydration/latest.json') {
     try {
-      const bust = `${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
-      const res = await fetch(bust, { cache: 'no-store' });
-      if (!res.ok) return false;
-      const bundle = await res.json();
+      const ark = window.WTM_Ark;
+      if (!ark || typeof ark.loadHydration !== 'function') {
+        console.warn('[WMC Hydrate] WTM_Ark unavailable — hydration load skipped');
+        return false;
+      }
+
+      // Prefer Ark cache when warm (DeskOps/core may already have loaded).
+      const force = !ark.getHydration?.();
+      const result = await ark.loadHydration({ force });
+      const bundle = (result && result.ok && result.data)
+        ? result.data
+        : (ark.getHydration?.() || null);
+      if (!bundle || typeof bundle !== 'object') return false;
+
+      // url kept for API compat; Ark owns the canonical path.
+      void url;
+
       const feed = window.WTM_TaskForceFeed;
       if (!feed?.mergeWmcData) return false;
       const panels = bundle.task_force_panels || feed.extractTaskForcePanels?.(bundle.task_force);

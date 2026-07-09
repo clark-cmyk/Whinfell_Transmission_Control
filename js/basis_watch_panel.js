@@ -20,10 +20,11 @@
 (function basisWatchPanel(global) {
   'use strict';
 
-  const BW_BUILD = '3.3-BASISWATCH-SOURCE-ALIGN-2026-07-08';
+  const BW_BUILD = '3.4-BASISWATCH-ARK-IO-2026-07-09';
   const THEME_COLORS = { dark: '#090d12', light: '#eef1f5' };
   const PREFS_KEY = 'whinfell_basiswatch_prefs';
   const THEME_KEY = 'whinfell_tc_theme';
+  /** Documented paths — raw loads owned by WTM_Ark only (no direct fetch here). */
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
   /** CME-style floor — do not annualize ultra-short DTE (avoids 500%+ noise on 1d front). */
@@ -541,9 +542,17 @@
     return `${base}?${q.toString()}`;
   }
 
+  /** When true, next ensureCurveHistory forces Ark re-fetch (set by invalidateCurveCache). */
+  let forceNextCurveLoad = false;
+
+  function getArk() {
+    return global.WTM_Ark || null;
+  }
+
   function invalidateCurveCache() {
     curveCache = null;
     curveFetchPromise = null;
+    forceNextCurveLoad = true;
   }
 
   async function reloadHydration(state) {
@@ -551,7 +560,8 @@
     if (location.protocol === 'file:') {
       return { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
     }
-    const bundle = await loadHydrationBundle();
+    // Force re-load through Ark so desk refresh stays current (Ark may already be warm).
+    const bundle = await loadHydrationBundle({ force: true });
     if (!bundle) {
       return { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
     }
@@ -568,27 +578,73 @@
     return refresh(target, hooks || {});
   }
 
+  /**
+   * Curve history via The Ark only (no direct fetch).
+   * Local curveCache still avoids repeat work within the panel.
+   */
   async function ensureCurveHistory() {
     if (curveCache) return curveCache;
     if (curveFetchPromise) return curveFetchPromise;
     if (location.protocol === 'file:') {
       curveCache = { records: [] };
+      forceNextCurveLoad = false;
       return curveCache;
     }
-    curveFetchPromise = fetch(`${CURVE_URL}?_=${Date.now()}`, { cache: 'no-store' })
-      .then(r => (r.ok ? r.json() : { records: [] }))
-      .then(data => { curveCache = data || { records: [] }; return curveCache; })
-      .catch(() => { curveCache = { records: [] }; return curveCache; });
+
+    const force = forceNextCurveLoad;
+    forceNextCurveLoad = false;
+
+    curveFetchPromise = (async () => {
+      const ark = getArk();
+      if (!ark || typeof ark.loadCurveHistory !== 'function') {
+        console.warn('[BasisWatch] WTM_Ark unavailable — curve load skipped');
+        curveCache = { records: [] };
+        return curveCache;
+      }
+      try {
+        // Force when cache was invalidated; otherwise reuse Ark cache if warm.
+        const needForce = force || !ark.getCurveHistory?.();
+        const result = await ark.loadCurveHistory({ force: needForce });
+        if (result && result.ok && result.data) {
+          curveCache = result.data;
+        } else {
+          curveCache = ark.getCurveHistory?.() || { records: [] };
+        }
+        if (!curveCache || typeof curveCache !== 'object') curveCache = { records: [] };
+        return curveCache;
+      } catch (err) {
+        console.warn('[BasisWatch] Ark curve load failed', err);
+        curveCache = { records: [] };
+        return curveCache;
+      } finally {
+        curveFetchPromise = null;
+      }
+    })();
+
     return curveFetchPromise;
   }
 
-  async function loadHydrationBundle() {
+  /**
+   * Hydration bundle via The Ark only (no direct fetch).
+   * @param {{ force?: boolean }} [options]
+   */
+  async function loadHydrationBundle(options) {
     if (location.protocol === 'file:') return null;
+    const opts = options || {};
+    const ark = getArk();
+    if (!ark || typeof ark.loadHydration !== 'function') {
+      console.warn('[BasisWatch] WTM_Ark unavailable — hydration load skipped');
+      return null;
+    }
     try {
-      const res = await fetch(`${HYDRATION_URL}?_=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) return null;
-      return await res.json();
-    } catch { return null; }
+      const force = opts.force !== undefined ? !!opts.force : !ark.getHydration?.();
+      const result = await ark.loadHydration({ force });
+      if (result && result.ok && result.data) return result.data;
+      return ark.getHydration?.() || null;
+    } catch (err) {
+      console.warn('[BasisWatch] Ark hydration load failed', err);
+      return null;
+    }
   }
 
   function recordsForRoot(records, root) {
@@ -1736,6 +1792,17 @@
 
     el('btnBwExportCsv')?.addEventListener('click', () => exportCsv(getState()));
     el('btnBwExportPng')?.addEventListener('click', () => exportPng(getState()));
+    el('btnBwArticulate')?.addEventListener('click', () => {
+      const articulate = global.WTM_Articulate;
+      if (!articulate || typeof articulate.runBasisWatch !== 'function') {
+        console.warn('[BasisWatch] WTM_Articulate unavailable');
+        if (typeof global.showToast === 'function') global.showToast('Articulate not loaded');
+        return;
+      }
+      articulate.runBasisWatch(getState()).catch((err) => {
+        console.warn('[BasisWatch] Articulate failed', err);
+      });
+    });
     el('btnBwBarchart')?.addEventListener('click', () => {
       window.open(DESK_LINKS.barchart, '_blank', 'noopener');
     });

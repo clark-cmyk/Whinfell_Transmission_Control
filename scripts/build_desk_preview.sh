@@ -31,6 +31,7 @@ fi
 for req in \
   index.html css/main.css css/ai_compute.css css/ui_polish.css css/basis_watch.css \
   js/bootstrap.js js/core.js js/desk_china_ladder_models.js \
+  js/ark.js js/ark_ia_panel.js js/articulate.js js/a_ia_panel.js \
   js/basis_watch_analytics.js js/basis_watch_panel.js \
   js/ai_compute_data.js js/ai_compute_panel.js js/v15_desk_data.js js/v15_desk_panel.js js/ui_polish.js \
   css/v15_desk.css \

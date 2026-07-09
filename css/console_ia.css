@@ -1518,6 +1518,14 @@ body.ia-layer-dig.ia-dig-view-midwest-crush .ia-center-canvas .ia-midwest-crush-
   border-color: rgba(224, 179, 90, 0.34);
   box-shadow: inset 0 0 0 1px rgba(224, 179, 90, 0.14), var(--wf-shadow-sm);
 }
+body.ia-layer-dig.ia-dig-view-ark .ia-center-canvas .ia-ark-host {
+  border-color: rgba(224, 179, 90, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(224, 179, 90, 0.14), var(--wf-shadow-sm);
+}
+body.ia-layer-dig.ia-dig-view-a .ia-center-canvas .ia-a-host {
+  border-color: rgba(224, 179, 90, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(224, 179, 90, 0.14), var(--wf-shadow-sm);
+}
 body.ia-layer-iterate .ia-center-canvas #iaScanHost .transmission-radar {
   border-color: var(--wf-border);
   box-shadow: var(--wf-shadow-sm);
@@ -1644,7 +1652,9 @@ body.ia-layer-iterate #iaDigHost {
 .ia-scan-host > .transmission-radar,
 .ia-cockpit-host > #nodeCockpitZone,
 .ia-dig-host > .basis-watch-panel,
-.ia-dig-host > .ia-midwest-crush-host {
+.ia-dig-host > .ia-midwest-crush-host,
+.ia-dig-host > .ia-ark-host,
+.ia-dig-host > .ia-a-host {
   flex: 1;
   min-height: 0;
 }
@@ -2273,7 +2283,19 @@ body.ia-layer-dig.ia-dig-view-midwest-crush .ia-center-canvas .ia-midwest-crush-
 body.ia-layer-dig.ia-dig-view-midwest-crush #basisWatchPanel {
   display: none !important;
 }
+body.ia-layer-dig.ia-dig-view-midwest-crush .ia-ark-host {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-midwest-crush .ia-a-host {
+  display: none !important;
+}
 body.ia-layer-dig.ia-dig-view-basis-watch .ia-midwest-crush-host {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-basis-watch .ia-ark-host {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-basis-watch .ia-a-host {
   display: none !important;
 }
 .ia-midwest-crush-head {
@@ -2334,6 +2356,190 @@ body.ia-layer-dig.ia-dig-view-basis-watch .ia-midwest-crush-host {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ── The Ark (Dig embed) ── */
+.ia-ark-host {
+  flex: 1;
+  min-height: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+body.ia-layer-dig.ia-dig-view-ark .ia-center-canvas .ia-ark-host {
+  display: flex;
+}
+body.ia-layer-dig.ia-dig-view-ark #basisWatchPanel {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-ark .ia-midwest-crush-host {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-ark .ia-a-host {
+  display: none !important;
+}
+.ia-ark-head {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--ia-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+.ia-ark-title-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ia-ark-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ia-text);
+}
+.ia-ark-sub {
+  font-size: 12px;
+  color: var(--ia-muted);
+}
+.ia-ark-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ia-ark-btn {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--ia-border);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--ia-text);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.ia-ark-btn:hover {
+  background: rgba(94, 179, 255, 0.1);
+  border-color: rgba(94, 179, 255, 0.35);
+}
+.ia-ark-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px 24px;
+}
+
+/* ── Articulate A page (Dig embed) ── */
+.ia-a-host {
+  flex: 1;
+  min-height: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+body.ia-layer-dig.ia-dig-view-a .ia-center-canvas .ia-a-host {
+  display: flex;
+}
+body.ia-layer-dig.ia-dig-view-a #basisWatchPanel {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-a .ia-midwest-crush-host {
+  display: none !important;
+}
+body.ia-layer-dig.ia-dig-view-a .ia-ark-host {
+  display: none !important;
+}
+.ia-a-head {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--ia-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+.ia-a-title-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ia-a-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ia-text);
+}
+.ia-a-sub {
+  font-size: 12px;
+  color: var(--ia-muted);
+}
+.ia-a-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ia-a-btn {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--ia-border);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--ia-text);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+}
+.ia-a-btn:hover {
+  background: rgba(94, 179, 255, 0.1);
+  border-color: rgba(94, 179, 255, 0.35);
+}
+.ia-a-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px 24px;
+}
+.ia-a-sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.ia-a-sessions-table th,
+.ia-a-sessions-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--ia-border);
+  vertical-align: top;
+}
+.ia-a-sessions-table th {
+  color: var(--ia-muted);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.ia-a-empty {
+  color: var(--ia-muted);
+  font-size: 12px;
+  margin: 12px 0;
+}
+.ia-a-preview {
+  max-width: 28rem;
+  color: var(--ia-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .wmc-page--ia-embed {
   max-width: none;
   margin: 0;
@@ -4028,6 +4234,8 @@ body.ia-left-collapsed [data-ia-layer="dig"]::before { content: "D"; }
 body.ia-left-collapsed [data-ia-layer="iterate"]::before { content: "I"; }
 body.ia-left-collapsed #btnIaBasisWatch::before { content: "BW"; }
 body.ia-left-collapsed #btnIaMidwestCrush::before { content: "MC"; }
+body.ia-left-collapsed #btnIaArk::before { content: "ARK"; }
+body.ia-left-collapsed #btnIaA::before { content: "A"; }
 body.ia-left-collapsed #btnIaBangBangDa::before { content: "BB"; }
 body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
 

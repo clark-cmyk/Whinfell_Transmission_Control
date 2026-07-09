@@ -187,6 +187,8 @@ window.DICTIONARY_BADGE_DEFAULT = {
               <nav class="ia-specialized-tools-nav wf-nav-list" aria-label="Tools">
                 <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaBasisWatch" data-ia-dig-view="basis_watch" data-shortcut="b" data-shortcut-mod="alt" aria-pressed="false" title="CME-style basis &amp; implied rate · Dig layer (Alt+B)">BasisWatch</button>
                 <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaMidwestCrush" data-ia-dig-view="midwest_crush" data-shortcut="m" data-shortcut-mod="alt" aria-pressed="false" title="Midwest GPU crush · cross-asset spreads · Dig layer (Alt+M)">Midwest Compute Crush</button>
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaArk" data-ia-dig-view="ark" data-shortcut="k" data-shortcut-mod="alt" aria-pressed="false" title="The Ark · data SSOT control dashboard · Dig layer (Alt+K)">ARK</button>
+                <button type="button" class="ia-specialized-tool-btn wf-nav-item" id="btnIaA" data-ia-dig-view="a_page" data-shortcut="a" data-shortcut-mod="alt" aria-pressed="false" title="Articulate history · past analysis sessions · Dig layer (Alt+A)">A</button>
                 <a href="bang_bang_da_machine.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaBangBangDa" target="_blank" rel="noopener noreferrer" title="RV Z-score scanner · Bang Bang Da v1.2">Bang Bang Da ↗</a>
                 <a href="whinfell-transmission-ladder-deep-dive.html" class="ia-specialized-tool-btn wf-nav-item ia-specialized-tool-link" id="btnIaLadderDeepDive" target="_blank" rel="noopener noreferrer" title="Interactive transmission ladder deep dive">Ladder deep dive ↗</a>
               </nav>
@@ -426,6 +428,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
       </div>
       <div class="bw-head-group bw-head-group--utility" aria-label="Utilities">
         <div class="bw-utility-cluster" role="group" aria-label="Export">
+          <button type="button" id="btnBwArticulate" class="bw-btn bw-btn--utility" title="Articulate · copy trader analysis prompt (A)">A</button>
           <button type="button" id="btnBwExportCsv" class="bw-btn bw-btn--utility" title="Export BasisWatch table CSV">Export CSV</button>
           <button type="button" id="btnBwExportPng" class="bw-btn bw-btn--utility" title="Export chart PNG">Export PNG</button>
         </div>
@@ -537,6 +540,35 @@ window.DICTIONARY_BADGE_DEFAULT = {
           <div class="wmc-panel" id="trades-root"></div>
         </section>
       </div>
+    </div>
+  </section>
+  <section id="iaArkHost" class="ia-ark-host zone-hidden" aria-label="The Ark" data-agent-surface="ia-ark">
+    <header class="ia-ark-head">
+      <div class="ia-ark-title-block">
+        <span class="ia-ark-title">ARK</span>
+        <span class="ia-ark-sub">Single source of truth · data inventory</span>
+      </div>
+      <div class="ia-ark-actions">
+        <button type="button" class="ia-ark-btn" id="btnArkFixWithLlm" title="Copy diagnostic prompt for LLM">Fix with LLM</button>
+      </div>
+    </header>
+    <div class="ia-ark-viewport" id="iaArkViewport">
+      <!-- Chunk 9: ark_ia_panel renders sources table here -->
+    </div>
+  </section>
+  <section id="iaAHost" class="ia-a-host zone-hidden" aria-label="Articulate history" data-agent-surface="ia-a">
+    <header class="ia-a-head">
+      <div class="ia-a-title-block">
+        <span class="ia-a-title">A</span>
+        <span class="ia-a-sub">Articulate · past analysis sessions</span>
+      </div>
+      <div class="ia-a-actions">
+        <button type="button" class="ia-a-btn" id="btnARefresh" title="Reload session history">Refresh</button>
+        <button type="button" class="ia-a-btn" id="btnAClearLog" title="Clear all Articulate log entries">Clear log</button>
+      </div>
+    </header>
+    <div class="ia-a-viewport" id="iaAViewport">
+      <!-- a_ia_panel renders session history table here -->
     </div>
   </section>
         </div>
@@ -1166,6 +1198,10 @@ window.DICTIONARY_BADGE_DEFAULT = {
   <script src="midwest_compute/wmc-risk.js"></script>
   <script src="js/wmc_ia_panel.js"></script>
   <script src="js/console_ia_shell.js"></script>
+  <script src="js/ark.js"></script>
+  <script src="js/ark_ia_panel.js"></script>
+  <script src="js/articulate.js"></script>
+  <script src="js/a_ia_panel.js"></script>
   <script src="js/core.js"></script>
   <script src="js/ai_compute_data.js"></script>
   <script src="js/ai_compute_panel.js"></script>

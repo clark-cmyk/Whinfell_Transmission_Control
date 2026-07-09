@@ -4,7 +4,7 @@
 (function deskDataOps(global) {
   'use strict';
 
-  const BUILD = '1.2-DESK-OPS-FULL-HYDRATE-2026-07-09';
+  const BUILD = '1.3-DESK-OPS-ARK-STAMP-2026-07-09';
   const REFRESH_BTN_ID = 'btnDeskRefresh';
   const COLLECT_BTN_ID = 'btnMorningCollect';
 
@@ -17,6 +17,10 @@
       if (state && typeof state === 'object') return state;
     }
     return global.appState || {};
+  }
+
+  function getArk() {
+    return global.WTM_Ark || null;
   }
 
   function notify(msg) {
@@ -71,41 +75,83 @@
     return { ok: !!out, as_of: null, snapshot_id: null, freshness_status: null };
   }
 
+  /**
+   * Stamp authority: The Ark getStamp() when available (SSOT after load).
+   * Falls back to a prior normalizeStamp result.
+   */
+  function stampFromArk(fallback) {
+    const base = fallback || { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
+    const ark = getArk();
+    if (!ark || typeof ark.getStamp !== 'function') return base;
+
+    const s = ark.getStamp() || {};
+    const hasHydration = typeof ark.getHydration === 'function' && !!ark.getHydration();
+    const hasStamp = !!(s.as_of || s.snapshot_id || s.freshness_status || s.lastRefreshedAt);
+    return {
+      ok: !!(base.ok || hasHydration || hasStamp),
+      as_of: s.as_of || base.as_of || null,
+      snapshot_id: s.snapshot_id || base.snapshot_id || null,
+      freshness_status: s.freshness_status || base.freshness_status || null,
+    };
+  }
+
+  /**
+   * Ensure Ark hydration cache is warm (single raw load path).
+   * Does not apply UI state — callers use deploy hydrate / BW / WMC apply layers.
+   */
+  async function warmArkHydration(force) {
+    const ark = getArk();
+    if (!ark || typeof ark.loadHydration !== 'function') return null;
+    try {
+      return await ark.loadHydration({ force: force !== false });
+    } catch (err) {
+      console.warn('[DeskOps] Ark loadHydration skipped', err);
+      return null;
+    }
+  }
+
   async function refreshHydration() {
     /** @type {{ ok: boolean, as_of?: string|null, snapshot_id?: string|null, freshness_status?: string|null }} */
     let stamp = { ok: false, as_of: null, snapshot_id: null, freshness_status: null };
 
-    // Main desk: full deploy hydrate first so cockpits + toast stamps match latest.json.
-    // (BasisWatch partial merge alone used to short-circuit and skip this path.)
+    // Main desk: deploy hydrate (core → Ark single fetch) so cockpits + toast stamps match latest.json.
     if (typeof global.WTM_reloadDeployHydration === 'function') {
       try {
         const out = await global.WTM_reloadDeployHydration({ force: true, detail: true });
-        stamp = normalizeStamp(out);
+        stamp = stampFromArk(normalizeStamp(out));
         if (stamp.ok) {
-          // Keep embedded/standalone BW state warm without replacing stamp authority.
+          // Keep embedded/standalone BW state warm without replacing Ark stamp authority.
           if (typeof global.WTM_BasisWatch?.reloadHydration === 'function') {
             try {
-              const bwOut = await global.WTM_BasisWatch.reloadHydration(resolveDeskState());
-              const bwStamp = normalizeStamp(bwOut);
-              stamp.as_of = stamp.as_of || bwStamp.as_of;
-              stamp.snapshot_id = stamp.snapshot_id || bwStamp.snapshot_id;
-              stamp.freshness_status = stamp.freshness_status || bwStamp.freshness_status;
+              await global.WTM_BasisWatch.reloadHydration(resolveDeskState());
             } catch (err) {
               console.warn('[DeskOps] BasisWatch hydration sync skipped', err);
             }
           }
-          return stamp;
+          return stampFromArk(stamp);
         }
       } catch (err) {
         console.warn('[DeskOps] hydration refresh skipped', err);
       }
     }
 
-    // Standalone BasisWatch (or deploy path unavailable): panel-local merge.
+    // Standalone / no core: warm Ark first (SSOT load), then panel apply layers.
+    const arkLoaded = await warmArkHydration(true);
+    if (arkLoaded && arkLoaded.ok) {
+      stamp = stampFromArk(normalizeStamp(arkLoaded));
+    }
+
     if (typeof global.WTM_BasisWatch?.reloadHydration === 'function') {
       try {
         const bwOut = await global.WTM_BasisWatch.reloadHydration(resolveDeskState());
-        stamp = normalizeStamp(bwOut);
+        const bwStamp = normalizeStamp(bwOut);
+        // Ark stamp wins when present; BW only fills gaps before Ark rewires (Chunk 12).
+        stamp = stampFromArk({
+          ok: stamp.ok || bwStamp.ok,
+          as_of: stamp.as_of || bwStamp.as_of,
+          snapshot_id: stamp.snapshot_id || bwStamp.snapshot_id,
+          freshness_status: stamp.freshness_status || bwStamp.freshness_status,
+        });
         if (stamp.ok) return stamp;
       } catch (err) {
         console.warn('[DeskOps] BasisWatch hydration reload skipped', err);
@@ -114,13 +160,19 @@
 
     if (global.WMC?.Hydrate?.load) {
       try {
-        stamp.ok = !!(await global.WMC.Hydrate.load());
+        const wmcOk = !!(await global.WMC.Hydrate.load());
+        stamp = stampFromArk({
+          ok: stamp.ok || wmcOk,
+          as_of: stamp.as_of,
+          snapshot_id: stamp.snapshot_id,
+          freshness_status: stamp.freshness_status,
+        });
         return stamp;
       } catch (err) {
         console.warn('[DeskOps] WMC hydrate skipped', err);
       }
     }
-    return stamp;
+    return stampFromArk(stamp);
   }
 
   async function refreshWmc() {
@@ -170,13 +222,26 @@
     };
     try {
       const hyd = await refreshHydration();
+      // Prefer live Ark stamp for toasts (SSOT) after hydration coordination.
+      const arkStamp = stampFromArk(hyd);
       results.hydration = !!(hyd && hyd.ok);
-      results.as_of = hyd?.as_of || null;
-      results.snapshot_id = hyd?.snapshot_id || null;
-      results.freshness_status = hyd?.freshness_status || null;
+      results.as_of = arkStamp.as_of || hyd?.as_of || null;
+      results.snapshot_id = arkStamp.snapshot_id || hyd?.snapshot_id || null;
+      results.freshness_status = arkStamp.freshness_status || hyd?.freshness_status || null;
       results.curve = await refreshBasisWatch();
       results.wmc = await refreshWmc();
       results.surfaces = refreshToolSurfaces();
+
+      // Re-read Ark stamp after curve/WMC (they may warm Ark in later chunks).
+      const finalStamp = stampFromArk({
+        ok: results.hydration,
+        as_of: results.as_of,
+        snapshot_id: results.snapshot_id,
+        freshness_status: results.freshness_status,
+      });
+      results.as_of = finalStamp.as_of;
+      results.snapshot_id = finalStamp.snapshot_id;
+      results.freshness_status = finalStamp.freshness_status;
 
       const any = results.hydration || results.curve || results.wmc || results.surfaces;
       const stampBit = results.snapshot_id
@@ -258,6 +323,8 @@
     REFRESH_BTN_ID,
     COLLECT_BTN_ID,
     resolveDeskState,
+    stampFromArk,
+    warmArkHydration,
     refreshAllDeskData,
     triggerDeskRefresh,
     refreshBasisWatch,

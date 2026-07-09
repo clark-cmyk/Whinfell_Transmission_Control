@@ -14,6 +14,8 @@
   const DIG_VIEW_CLASS = {
     basis_watch: 'ia-dig-view-basis-watch',
     midwest_crush: 'ia-dig-view-midwest-crush',
+    ark: 'ia-dig-view-ark',
+    a_page: 'ia-dig-view-a',
   };
 
   const VIEW_SHORTCUT_REGISTRY = Object.freeze({
@@ -387,22 +389,45 @@
     });
   }
 
+  function syncDigPanelActivation(viewKey) {
+    if (viewKey === 'midwest_crush') {
+      global.WTM_WmcIaPanel?.activate?.();
+    } else {
+      global.WTM_WmcIaPanel?.deactivate?.();
+    }
+    if (viewKey === 'ark') {
+      global.WTM_ArkIaPanel?.activate?.();
+    } else {
+      global.WTM_ArkIaPanel?.deactivate?.();
+    }
+    if (viewKey === 'a_page') {
+      global.WTM_AIaPanel?.activate?.();
+    } else {
+      global.WTM_AIaPanel?.deactivate?.();
+    }
+  }
+
   function setDigView(view) {
     const key = DIG_VIEW_CLASS[view] ? view : 'basis_watch';
     activeDigView = key;
     applyDigViewClasses();
     syncDigViewUi();
-
-    if (key === 'midwest_crush') {
-      global.WTM_WmcIaPanel?.activate?.();
-    } else {
-      global.WTM_WmcIaPanel?.deactivate?.();
-    }
+    syncDigPanelActivation(key);
   }
 
   function selectMidwestCrush() {
     setLayer('dig');
     setDigView('midwest_crush');
+  }
+
+  function selectArk() {
+    setLayer('dig');
+    setDigView('ark');
+  }
+
+  function selectAPage() {
+    setLayer('dig');
+    setDigView('a_page');
   }
 
   function selectBasisWatch() {
@@ -453,14 +478,12 @@
       applyDigViewClasses();
       syncDigViewUi();
       global.WTM_WmcIaPanel?.deactivate?.();
+      global.WTM_ArkIaPanel?.deactivate?.();
+      global.WTM_AIaPanel?.deactivate?.();
     } else {
       applyDigViewClasses();
       syncDigViewUi();
-      if (activeDigView === 'midwest_crush') {
-        global.WTM_WmcIaPanel?.activate?.();
-      } else {
-        global.WTM_WmcIaPanel?.deactivate?.();
-      }
+      syncDigPanelActivation(activeDigView);
     }
   }
 
@@ -469,7 +492,8 @@
       tab.addEventListener('click', () => {
         const layer = tab.dataset.iaLayer;
         if (!layer) return;
-        if (layer === 'dig' && activeDigView === 'midwest_crush') {
+        // Preserve specialized dig views when re-selecting Dig tab.
+        if (layer === 'dig' && (activeDigView === 'midwest_crush' || activeDigView === 'ark' || activeDigView === 'a_page')) {
           setLayer('dig');
           return;
         }
@@ -485,6 +509,8 @@
         const view = btn.dataset.iaDigView;
         if (view === 'midwest_crush') selectMidwestCrush();
         else if (view === 'basis_watch') selectBasisWatch();
+        else if (view === 'ark') selectArk();
+        else if (view === 'a_page') selectAPage();
         else {
           setLayer('dig');
           setDigView(view);
@@ -665,6 +691,8 @@
     setLayer,
     setDigView,
     selectMidwestCrush,
+    selectArk,
+    selectAPage,
     selectBasisWatch,
     focusWidget,
     syncLayer,

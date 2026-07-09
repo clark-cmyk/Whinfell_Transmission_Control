@@ -13,6 +13,8 @@ function assert(cond, msg) {
 }
 
 function loadBasisWatch(fetchImpl) {
+  // Curve/hydration loads go through The Ark only.
+  const arkSrc = fs.readFileSync(path.join(ROOT, 'js/ark.js'), 'utf8');
   const analyticsSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_analytics.js'), 'utf8');
   const panelSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_panel.js'), 'utf8');
   let fetchCalls = 0;
@@ -46,7 +48,9 @@ function loadBasisWatch(fetchImpl) {
     }),
   };
   sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
   const ctx = vm.createContext(sandbox);
+  vm.runInContext(arkSrc, ctx, { filename: 'ark.js' });
   vm.runInContext(analyticsSrc, ctx, { filename: 'basis_watch_analytics.js' });
   vm.runInContext(panelSrc, ctx, { filename: 'basis_watch_panel.js' });
   return { sandbox, getFetchCalls: () => fetchCalls };

@@ -15,6 +15,11 @@ cp "${ROOT}/css/main.css" "$OUT/css/main.css"
 cp "${ROOT}/css/console_ia.css" "$OUT/css/console_ia.css"
 cp "${ROOT}/css/transmission_radar.css" "$OUT/css/transmission_radar.css"
 cp "${ROOT}/js/bootstrap.js" "$OUT/js/bootstrap.js"
+# The Ark + Articulate (SSOT data layer + intelligence; all four required)
+cp "${ROOT}/js/ark.js" "$OUT/js/ark.js"
+cp "${ROOT}/js/ark_ia_panel.js" "$OUT/js/ark_ia_panel.js"
+cp "${ROOT}/js/articulate.js" "$OUT/js/articulate.js"
+cp "${ROOT}/js/a_ia_panel.js" "$OUT/js/a_ia_panel.js"
 cp "${ROOT}/js/core.js" "$OUT/js/core.js"
 cp "${ROOT}/js/desk_china_ladder_models.js" "$OUT/js/desk_china_ladder_models.js"
 [[ -f "${ROOT}/js/desk_chart_links.js" ]] && cp "${ROOT}/js/desk_chart_links.js" "$OUT/js/desk_chart_links.js"
@@ -124,6 +129,10 @@ for req in \
   css/console_ia.css \
   css/transmission_radar.css \
   js/bootstrap.js \
+  js/ark.js \
+  js/ark_ia_panel.js \
+  js/articulate.js \
+  js/a_ia_panel.js \
   js/core.js \
   js/desk_china_ladder_models.js \
   js/data_states.js \
@@ -191,6 +200,46 @@ grep -q 'WTM_IaShell' "$OUT/js/console_ia_shell.js" || {
 
 grep -q 'wtm-ia-shell' "$OUT/index.html" || {
   echo "build: IA shell markup missing from index.html" >&2
+  exit 1
+}
+
+grep -q 'WTM_Ark' "$OUT/js/ark.js" || {
+  echo "build: WTM_Ark missing from ark.js" >&2
+  exit 1
+}
+
+grep -q 'WTM_ArkIaPanel' "$OUT/js/ark_ia_panel.js" || {
+  echo "build: WTM_ArkIaPanel missing from ark_ia_panel.js" >&2
+  exit 1
+}
+
+grep -q 'WTM_Articulate' "$OUT/js/articulate.js" || {
+  echo "build: WTM_Articulate missing from articulate.js" >&2
+  exit 1
+}
+
+grep -q 'WTM_AIaPanel' "$OUT/js/a_ia_panel.js" || {
+  echo "build: WTM_AIaPanel missing from a_ia_panel.js" >&2
+  exit 1
+}
+
+grep -q 'js/ark.js' "$OUT/index.html" || {
+  echo "build: index.html missing js/ark.js script tag" >&2
+  exit 1
+}
+
+grep -q 'js/ark_ia_panel.js' "$OUT/index.html" || {
+  echo "build: index.html missing js/ark_ia_panel.js script tag" >&2
+  exit 1
+}
+
+grep -q 'js/articulate.js' "$OUT/index.html" || {
+  echo "build: index.html missing js/articulate.js script tag" >&2
+  exit 1
+}
+
+grep -q 'js/a_ia_panel.js' "$OUT/index.html" || {
+  echo "build: index.html missing js/a_ia_panel.js script tag" >&2
   exit 1
 }
 

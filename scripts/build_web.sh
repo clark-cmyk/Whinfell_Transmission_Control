@@ -91,6 +91,10 @@ for req in \
   crypto_analytics/ca-app.js \
   js/wmc_ia_panel.js \
   js/publish_web_panel.js \
+  js/ark.js \
+  js/ark_ia_panel.js \
+  js/articulate.js \
+  js/a_ia_panel.js \
   data/hydration/latest.json \
   .nojekyll; do
   if [[ ! -f "$OUT/$req" ]]; then

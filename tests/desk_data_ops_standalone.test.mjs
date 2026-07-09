@@ -13,6 +13,8 @@ function assert(cond, msg) {
 }
 
 function loadDeskOpsWithBasisWatch() {
+  // Ark must load first — BasisWatch / desk ops no longer fetch market JSON directly.
+  const arkSrc = fs.readFileSync(path.join(ROOT, 'js/ark.js'), 'utf8');
   const analyticsSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_analytics.js'), 'utf8');
   const panelSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_panel.js'), 'utf8');
   const deskOpsSrc = fs.readFileSync(path.join(ROOT, 'js/desk_data_ops.js'), 'utf8');
@@ -26,6 +28,8 @@ function loadDeskOpsWithBasisWatch() {
   let reloadHydrationState = null;
   let hydrationFetchCount = 0;
   let curveFetchCount = 0;
+  /** 1 = standalone fixture · 2 = main-desk deploy fixture (Ark SSOT). */
+  let hydrationPhase = 1;
 
   const sandbox = {
     window: {},
@@ -51,6 +55,17 @@ function loadDeskOpsWithBasisWatch() {
       const path = String(url);
       if (path.includes('data/hydration/latest.json')) {
         hydrationFetchCount += 1;
+        if (hydrationPhase === 2) {
+          return {
+            ok: true,
+            json: async () => ({
+              as_of: '2026-07-09T14:37:30+00:00',
+              snapshot_id: 'global-2026-07-09-raw2wtm-01',
+              freshness_status: 'fresh',
+              crypto_sleeve: { assets: { btc_spot_usd: { last_price: 102000 } } },
+            }),
+          };
+        }
         return {
           ok: true,
           json: async () => ({
@@ -73,9 +88,12 @@ function loadDeskOpsWithBasisWatch() {
       throw new Error(`unexpected fetch ${path}`);
     },
   };
+  sandbox.setHydrationPhase = (n) => { hydrationPhase = n; };
   sandbox.window = sandbox;
+  sandbox.globalThis = sandbox;
 
   const ctx = vm.createContext(sandbox);
+  vm.runInContext(arkSrc, ctx, { filename: 'ark.js' });
   vm.runInContext(analyticsSrc, ctx, { filename: 'basis_watch_analytics.js' });
   vm.runInContext(panelSrc, ctx, { filename: 'basis_watch_panel.js' });
   vm.runInContext(deskOpsSrc, ctx, { filename: 'desk_data_ops.js' });
@@ -135,14 +153,17 @@ async function run() {
   assert(full.results.snapshot_id === 'global-2026-07-08-test-01', 'full refresh carries snapshot_id');
 
   // Main desk: when deploy hydrate exists, it runs first and fills stamp (no BW short-circuit).
+  // Mirror core → Ark: force-load new bundle so getStamp() matches deploy result.
   let deployCalls = 0;
   sandbox.WTM_reloadDeployHydration = async () => {
     deployCalls += 1;
+    sandbox.setHydrationPhase(2);
+    const loaded = await sandbox.WTM_Ark.loadHydration({ force: true });
     return {
-      ok: true,
-      as_of: '2026-07-09T14:37:30+00:00',
-      snapshot_id: 'global-2026-07-09-raw2wtm-01',
-      freshness_status: 'fresh',
+      ok: !!(loaded && loaded.ok),
+      as_of: loaded?.as_of || null,
+      snapshot_id: loaded?.snapshot_id || null,
+      freshness_status: loaded?.freshness_status || null,
     };
   };
   const mainStamp = await ops.refreshHydration();

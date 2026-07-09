@@ -139,6 +139,7 @@
           </select>
         </div>
         <div class="flex gap-2 ml-auto">
+          <button id="btnBbdmArticulate" type="button" class="px-3 py-1.5 text-sm rounded bg-desk-accent/20 border border-desk-accent/40 text-desk-accent hover:bg-desk-accent/30 transition" title="Articulate · copy trader analysis prompt">A</button>
           <button id="btnExport" type="button" class="px-3 py-1.5 text-sm rounded bg-desk-accent/20 border border-desk-accent/40 text-desk-accent hover:bg-desk-accent/30 transition">⬇ Export report</button>
         </div>
       </section>
@@ -225,21 +226,15 @@
     </footer>
   </div>
 
+  <script src="js/ark.js"></script>
+  <script src="js/articulate.js"></script>
   <script src="js/bbdm_litmus_table.js"></script>
   <script>
   (function () {
     'use strict';
 
     const API_BASE = 'http://127.0.0.1:8766';
-    const REPORT_PATHS = [
-      'bang_bang_da/bang_bang_da_report.json',
-      './bang_bang_da/bang_bang_da_report.json',
-    ];
-    const HYDRATION_PATHS = [
-      'docs/data/hydration/latest.json',
-      './docs/data/hydration/latest.json',
-      'data/hydration/latest.json',
-    ];
+    /** Static report/hydration paths are owned by WTM_Ark (no raw-file fetch here). */
 
     let report = null;
     let sortDesc = true;
@@ -279,15 +274,26 @@
       return { green: 'text-green-400 border-green-500/40', amber: 'text-amber-400 border-amber-500/40', red: 'text-red-400 border-red-500/40' }[zone] || 'text-desk-muted';
     }
 
-    async function fetchFirst(paths) {
-      for (const p of paths) {
-        try {
-          const bust = `${p}${p.includes('?') ? '&' : '?'}_=${Date.now()}`;
-          const r = await fetch(bust, { cache: 'no-store' });
-          if (r.ok) return await r.json();
-        } catch (_) { /* file:// or missing */ }
+    function getArk() {
+      return window.WTM_Ark || null;
+    }
+
+    /** Static BBDM report JSON via The Ark only. */
+    async function loadReportViaArk(force) {
+      const ark = getArk();
+      if (!ark || typeof ark.loadBbdmReport !== 'function') {
+        console.warn('[BBDM] WTM_Ark unavailable — static report load skipped');
+        return null;
       }
-      return null;
+      try {
+        const needForce = force !== false;
+        const result = await ark.loadBbdmReport({ force: needForce });
+        if (result && result.ok && result.data) return result.data;
+        return ark.getBbdmReport?.() || null;
+      } catch (err) {
+        console.warn('[BBDM] Ark report load failed', err);
+        return null;
+      }
     }
 
     function applyFilters(trades) {
@@ -459,11 +465,13 @@
 
     async function fetchReport(windowDays) {
       const wd = windowDays || Number($('windowSelect').value) || 60;
+      // Live calculator API is ops RPC (not a raw data file) — optional when :8766 is up.
       try {
         const r = await fetch(`${API_BASE}/api/report?window=${wd}`, { cache: 'no-store' });
         if (r.ok) return await r.json();
       } catch (_) { /* API offline */ }
-      return fetchFirst(REPORT_PATHS);
+      // Static report file: The Ark only.
+      return loadReportViaArk(true);
     }
 
     function renderLitmusMounts() {
@@ -492,14 +500,28 @@
     }
 
     async function loadHydrationMeta() {
-      const hyd = await fetchFirst(HYDRATION_PATHS);
-      if (!hyd) return null;
-      return {
-        as_of: hyd.as_of || null,
-        snapshot_id: hyd.snapshot_id || null,
-        freshness_status: hyd.freshness_status || null,
-        score: hyd.global?.whinfell_score ?? null,
-      };
+      const ark = getArk();
+      if (!ark || typeof ark.loadHydration !== 'function') {
+        console.warn('[BBDM] WTM_Ark unavailable — hydration meta skipped');
+        return null;
+      }
+      try {
+        const force = !ark.getHydration?.();
+        const result = await ark.loadHydration({ force });
+        const hyd = (result && result.ok && result.data)
+          ? result.data
+          : (ark.getHydration?.() || null);
+        if (!hyd) return null;
+        return {
+          as_of: hyd.as_of || null,
+          snapshot_id: hyd.snapshot_id || null,
+          freshness_status: hyd.freshness_status || null,
+          score: hyd.global?.whinfell_score ?? null,
+        };
+      } catch (err) {
+        console.warn('[BBDM] Ark hydration meta failed', err);
+        return null;
+      }
     }
 
     async function loadReport() {
@@ -533,6 +555,20 @@
 
     window.addEventListener('whinfell-desk-refresh', () => { loadReport(); });
     $('btnExport').addEventListener('click', () => { if (report) exportReport(); });
+    $('btnBbdmArticulate')?.addEventListener('click', () => {
+      if (!report) {
+        console.warn('[BBDM] Articulate: no report loaded');
+        return;
+      }
+      const articulate = window.WTM_Articulate;
+      if (!articulate || typeof articulate.runBbdm !== 'function') {
+        console.warn('[BBDM] WTM_Articulate unavailable');
+        return;
+      }
+      articulate.runBbdm(report).catch((err) => {
+        console.warn('[BBDM] Articulate failed', err);
+      });
+    });
     $('btnCloseDetail').addEventListener('click', () => {
       selectedId = null;
       $('detailPanel').classList.add('hidden');
