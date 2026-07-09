@@ -28,6 +28,7 @@ CHANGES
 QA
 - [x] koyfin_widget_shell · depth_ladders_widget · phase16 · shell_shortcuts PASS
 - [x] build_web.sh OK
+- [x] committed in 1e431df
 - [ ] browser-verify card radius 8 · header/body gap · dark + light
 
 NEXT SESSION

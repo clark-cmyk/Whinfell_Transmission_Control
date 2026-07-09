@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C3 card chrome shipped · next C4)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` · C3 code pending commit · tree dirty (C3 only)
+**HEAD:** `main` tip **`1e431df`** · C3 code **`1e431df`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main · C3 card chrome · working tree clean after commit
+Repo: Whinfell_Transmission_Control · main tip 1e431df · C3 1e431df · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C3 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C3 (tokens · density · nav · panel chrome).
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` |
-| Last UI commit | `feat(ui): COMET C3 widget card chrome` (pending / this session) |
-| Working tree | C3 source edits · then clean after commit |
+| Branch | `main` tip **`1e431df`** |
+| Last UI commit | `feat(ui): COMET C3 widget card chrome lock` |
+| Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -59,7 +59,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C0** | Token bridge | COMET slate → `--wf-*` · `--ia-*` alias · density *tokens only* | `38f23a3` |
 | **C1** | Shell density | `--ia-top-h`→header-h · topbar 44px · rail/canvas/grid gaps · strip-h | `a69ad00` |
 | **C2** | Nav hover/active | `.wf-nav-item` hover control-bg · active panel-bg-3 · radius-control | `7860c49` |
-| **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | this session |
+| **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | `1e431df` |
 
 **Tests at C3 ship:** `koyfin_widget_shell` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
