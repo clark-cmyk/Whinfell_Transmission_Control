@@ -1,7 +1,42 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C6 links + forms · next C7)
+**Last updated:** July 9, 2026 (COMET C7 responsive @900px · COMET track complete)
+
+---
+
+## July 9, 2026 — COMET CSS C7 (optional responsive @900px)
+
+```text
+CHUNK ID: COMET-C7
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Optional media query stack nav + dashboard under 900px; map only · no class fork
+
+CONTEXT
+- Spec §12 responsive (design language only)
+- C6 links/forms done; C7 is media query only (no business JS)
+
+CHANGES
+- css/console_ia.css
+  · @media (max-width: 900px)
+  · .ia-workspace → single column stack (nav / canvas / right)
+  · .ia-left-frame full-width + bottom border token
+  · .ia-left-body restore + horizontal wrap (overrides ≤1024 hide)
+  · denser .ia-center-canvas / .ia-widget-grid padding
+  · .ia-widget-grid single-column template areas
+  · .ia-right-frame under canvas
+- tests/koyfin_widget_shell.test.mjs — C7 responsive asserts
+- tests/top_utility_registry.test.mjs — C7 CSS locks
+
+QA
+- [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK (pending this session)
+- [ ] committed
+- [ ] browser-verify ≤900 stack · wrap nav · 1-col widgets · 1440 unchanged
+
+NEXT SESSION
+- COMET track complete · live desk / PR-8 light unify / optional hasRcZones boot fix
+```
 
 ---
 
@@ -34,7 +69,7 @@ QA
 - [ ] browser-verify accent links · form radius 4 · dark + light
 
 NEXT SESSION
-- COMET C7 optional responsive @900px — see BUILD_TODO handoff
+- COMET C7 optional responsive @900px — **shipped** (see C7 entry above)
 ```
 
 ---

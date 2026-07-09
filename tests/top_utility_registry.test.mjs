@@ -209,4 +209,20 @@ assert(
 assert(!/\.wtc-link[\s{,.-]/.test(css), 'COMET C6 no .wtc-link fork');
 assert(!/\.wtc-field[\s{,.-]/.test(css), 'COMET C6 no .wtc-field fork');
 
+/* COMET C7 — optional responsive @900px locks */
+assert(
+  /@media\s*\(\s*max-width:\s*900px\s*\)/.test(css),
+  'COMET C7 @media max-width 900px'
+);
+assert(
+  /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-workspace[\s\S]*?grid-template-columns:\s*1fr/s.test(css),
+  'COMET C7 stack workspace single column'
+);
+assert(
+  /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-widget-grid[\s\S]*?grid-template-columns:\s*1fr/s.test(css),
+  'COMET C7 stack widget grid single column'
+);
+assert(!/\.wtc-main[\s{,.-]/.test(css), 'COMET C7 no .wtc-main fork');
+assert(!/\.wtc-dashboard[\s{,.-]/.test(css), 'COMET C7 no .wtc-dashboard fork');
+
 console.log('top_utility_registry.test.mjs — all assertions passed');

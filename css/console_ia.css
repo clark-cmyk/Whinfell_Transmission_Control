@@ -7,6 +7,7 @@
  * COMET C4 — topbar control set: .console-chip / .btn-console via --wf-radius-control · control tokens.
  * COMET C5 — chip ok/warn/risk variants · pipeline status strip --wf-status-strip-h · regime pills.
  * COMET C6 — desk links toolbar (Koyfin/Barchart/Docs) · panel form field normalize.
+ * COMET C7 — optional responsive @900px: stack nav + dashboard (media query only).
  */
 
 :root {
@@ -4043,6 +4044,82 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
       "hyoas hyoas"
       "flip flip"
       "depth depth";
+  }
+}
+
+/* ── COMET C7 — optional responsive @900px (map COMET §12; no class fork)
+ * Spec: stack main · full-width wrap nav · denser dashboard · single-column rows.
+ * Map: .ia-workspace · .ia-left-frame/.ia-left-body · .ia-center-canvas/.ia-widget-grid.
+ * Placed after 1024/1280 MQs so cascade wins; overrides left-body display:none at ≤1024.
+ */
+@media (max-width: 900px) {
+  /* stack main: nav → canvas → right rail */
+  .ia-workspace,
+  body.ia-left-collapsed .ia-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  /* full-width nav band; bottom divider replaces side rail edge */
+  .ia-left-frame {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--wf-border);
+    border-radius: 0;
+  }
+  .ia-left-frame.wf-rail--left {
+    border-radius: 0;
+  }
+
+  /* restore body (overrides ≤1024 hide) · horizontal wrap like COMET nav row */
+  .ia-left-body,
+  body.ia-left-collapsed .ia-left-body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+  }
+
+  .ia-left-body .wf-rail-section,
+  body.ia-left-collapsed .ia-left-body .wf-rail-section {
+    flex: 1 1 auto;
+    min-width: min(160px, 100%);
+  }
+
+  .ia-left-body .wf-nav-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--wf-gap-1);
+  }
+
+  /* denser dashboard padding (COMET 8px 10px) */
+  .ia-center-canvas {
+    padding: var(--wf-gap-2) 10px;
+  }
+
+  /* single-column widget rows (map multi-col rows → 1fr) */
+  .ia-widget-grid {
+    padding: var(--wf-gap-2) 10px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "cockpit"
+      "curve"
+      "radar"
+      "hyoas"
+      "flip"
+      "depth";
+  }
+
+  /* right rail drops under canvas; top edge replaces side edge */
+  .ia-right-frame {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--wf-border);
+    max-height: min(280px, 40vh);
   }
 }
 

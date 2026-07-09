@@ -242,6 +242,34 @@ function runShellJsChecks() {
   );
   assert(!/\.wtc-link[\s{,.-]/.test(css), 'COMET C6 must not introduce .wtc-link class fork');
   assert(!/\.wtc-field[\s{,.-]/.test(css), 'COMET C6 must not introduce .wtc-field class fork');
+  // COMET C7 — optional responsive @900px (stack nav + dashboard; media query only)
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)/.test(css),
+    'COMET C7 has @media (max-width: 900px)'
+  );
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-workspace[\s\S]*?grid-template-columns:\s*1fr/s.test(css),
+    'COMET C7 stacks .ia-workspace to single column'
+  );
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-left-frame[\s\S]*?border-right:\s*none[\s\S]*?border-bottom:\s*1px solid var\(--wf-border\)/s.test(css),
+    'COMET C7 nav band full-width with bottom border token'
+  );
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-left-body[\s\S]*?flex-direction:\s*row[\s\S]*?flex-wrap:\s*wrap/s.test(css),
+    'COMET C7 nav body horizontal wrap'
+  );
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-center-canvas[\s\S]*?padding:\s*var\(--wf-gap-2\)\s+10px/s.test(css),
+    'COMET C7 denser dashboard padding on .ia-center-canvas'
+  );
+  assert(
+    /@media\s*\(\s*max-width:\s*900px\s*\)\s*\{[\s\S]*?\.ia-widget-grid[\s\S]*?grid-template-columns:\s*1fr/s.test(css),
+    'COMET C7 widget grid single column'
+  );
+  assert(!/\.wtc-main[\s{,.-]/.test(css), 'COMET C7 must not introduce .wtc-main class fork');
+  assert(!/\.wtc-dashboard[\s{,.-]/.test(css), 'COMET C7 must not introduce .wtc-dashboard class fork');
+  assert(!/\.wtc-row[\s{,.-]/.test(css), 'COMET C7 must not introduce .wtc-row class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

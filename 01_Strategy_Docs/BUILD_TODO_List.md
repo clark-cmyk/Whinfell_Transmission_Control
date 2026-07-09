@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (COMET C6 links + forms shipped · next C7)  
+**Last updated:** July 9, 2026 (COMET C7 responsive @900px shipped · COMET track complete)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`0f49c87`** · C6 code **`cf5c57e`** · tree clean (noise untracked only)
+**HEAD:** `main` tip TBD after C7 commit · C7 code pending · tree dirty until commit
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,16 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C6)
+## NEW SESSION — start here (Jul 9 · after COMET C7)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 0f49c87 · C6 cf5c57e · working tree clean
+Repo: Whinfell_Transmission_Control · main · COMET C0–C7 complete · working tree clean after C7 commit
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C6 entry)
-Shipped: Koyfin PR-1…7 + COMET C0–C6 (tokens · density · nav · panel · control · chips · links/forms).
-Next: COMET C7 — optional responsive @900px (stack nav + dashboard).
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C7 entry)
+Shipped: Koyfin PR-1…7 + COMET C0–C7 (tokens · density · nav · panel · control · chips · links/forms · responsive@900).
+Next: PR-8 light unify / live desk walk-through / scan_kpi_strip hasRcZones boot note as needed.
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`0f49c87`** |
-| Last UI commit | `feat(ui): COMET C6 links toolbar + form fields` |
-| Working tree | **Clean** (source) |
+| Branch | `main` |
+| Last UI commit | `feat(ui): COMET C7 optional responsive @900px` |
+| Working tree | **Clean** after C7 commit |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -63,21 +63,19 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | `a770a19` |
 | **C5** | Chip variants + strip height | `.console-chip--ok/warn/risk` · pipeline strip 24px · regime pills | `4dae71f` |
 | **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | `cf5c57e` |
+| **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | TBD |
 
-**Tests at C6 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
+**Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
 ### Next action for new session
 
-**→ COMET C7 — optional responsive @900px**
+**→ COMET track complete · desk / light unify**
 
 | Goal | Detail |
 |------|--------|
-| **C7 (do this)** | Optional media query: stack nav + dashboard under 900px |
-| Primary file | `css/console_ia.css` · media query only |
-| After C7 | COMET track complete · PR-8 light unify / live desk as needed |
-| Out of scope now | `.wtc-*` DOM · widget re-scaffold · re-open C3–C6 |
-
-**C7 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced · re-open C6 links/forms
+| **Done** | C0–C7 COMET CSS map complete |
+| **Next** | Live desk walk-through · PR-8 light unify as needed · optional boot fix |
+| Out of scope | `.wtc-*` DOM · widget re-scaffold · re-open C0–C7 |
 
 **Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
 
@@ -93,7 +91,7 @@ cd dist && python3 -m http.server 8765
 node tests/koyfin_widget_shell.test.mjs
 ```
 
-Browser checklist: dark slate · accent Koyfin/Barchart/Docs links · form fields radius **4** · control chips · status chips · pipeline strip **24px** · cards radius **8** · left nav · 44px header · light theme · no layout thrash.
+Browser checklist: dark slate · ≤900 stack nav+widgets · accent links · form radius **4** · chips · strip **24px** · cards radius **8** · 44px header · light theme · no layout thrash.
 
 ---
 
@@ -118,7 +116,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **COMET** | C4 | Topbar control set | **Done** Jul 9 |
 | **COMET** | C5 | Chip variants + status strip | **Done** Jul 9 |
 | **COMET** | C6 | Links · form fields | **Done** Jul 9 |
-| **COMET** | C7 | Optional responsive @900px | **Next** |
+| **COMET** | C7 | Optional responsive @900px | **Done** Jul 9 |
 
 ### Known gaps (do not re-break)
 
@@ -162,7 +160,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | 9 KPI chips / tags | `.wtc-chip*` | `.console-chip--ok/warn/risk` · regime tags | **Done** C5 — variants + regime tokens |
 | 10 Links toolbar | `.wtc-link` · link-row | Koyfin/Barchart/Docs strip · desk links | **Done** C6 |
 | 11 Freshness strip | `.wtc-status-strip` (24px) | `.ia-top-pipeline-strip` · header freshness | **Done** C5 — strip-h 24px collapsed |
-| 12 Responsive | stack nav @900px | optional; not blocking desk 1440 | **Open** — C7 |
+| 12 Responsive | stack nav @900px | optional; not blocking desk 1440 | **Done** C7 |
 
 ### COMET implementation chunks (queued)
 
@@ -175,7 +173,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | **Done** Jul 9 |
 | **C5** | Chip variants ok/warn/risk + status strip height | chips · pipeline strip · regime pills | **Done** Jul 9 |
 | **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | **Done** Jul 9 |
-| **C7** | Optional responsive @900px | media query only | **Next** |
+| **C7** | Optional responsive @900px | media query only | **Done** Jul 9 |
 
 **Acceptance (COMET track overall):** Desk at 1440 looks denser/cleaner Koyfin-like; single token system; no second shell class tree; keyboard + relocateNodes + widget hosts unchanged.
 
@@ -233,7 +231,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0j | **COMET C7** — optional responsive @900px | **Medium · next UI track** | BUILD | stack nav/dashboard under 900 · media query only · tests PASS |
+| 0j | **COMET C7** — optional responsive @900px | **Done** | BUILD | stack nav/dashboard under 900 · media query only · tests PASS |
 | 0i | **COMET C6** — links row + form field normalize | **Done** | BUILD | accent toolbar links · form radius-control · tests PASS |
 | 0h | **COMET C5** — chip variants ok/warn/risk + strip height | **Done** | BUILD | chip--ok/warn/risk · pipeline strip 24px · regime pills · tests PASS |
 | 0g | **COMET C4** — search + control set | **Done** | BUILD | topbar chip/btn radius-control · primary=ok · tests PASS |
@@ -251,7 +249,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | 4 | **Collect agent auto-start** — LaunchAgent on login | **Medium** | BUILD | Agent on `:8767` without manual Terminal tab |
 | 5 | **Post-collect hydration** — auto `copy_hydration_bundle.sh` + import prompt | **Medium** | BUILD | Collect button → fresh bundle → WTC import nudge |
 | 6 | **Morning runbook** — Quick Ref for `.command` + collect agent | **Low** | BUILD | `Whinfell_Quick_Reference_v1.5.md` matches Care Package Jul 5 workflow |
-| 7 | **COMET C7** — optional responsive @900px | **Low** | BUILD | Media query only after C1–C3 stable |
+| 7 | **COMET C7** — optional responsive @900px | **Done** | BUILD | Media query only after C1–C3 stable |
 
 ---
 
