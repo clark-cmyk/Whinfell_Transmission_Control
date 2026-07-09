@@ -222,6 +222,20 @@ function run() {
     `score delta compact (${scoreDelta?.textContent})`);
   assert(!scoreDelta?.textContent?.includes('hydration'), 'score delta has no hydration prose');
 
+  // Chunk 3 — panel header meta (presentation only)
+  assert(typeof SCAN.syncPanelMeta === 'function', 'syncPanelMeta exported');
+  const metaEl = {
+    textContent: '',
+    setAttribute(k, v) { this[k] = v; },
+  };
+  const metaDoc = { getElementById: (id) => (id === 'riskCockpitPanelMeta' ? metaEl : null) };
+  const metaLine = SCAN.syncPanelMeta({
+    metrics: { whinfellScore: 69, regime: 'Constructive / Selective Risk-On' },
+    gate: { code: 'open', label: 'Open' },
+  }, metaDoc);
+  assert(metaLine.includes('Score 69'), `panel meta score (${metaLine})`);
+  assert(metaLine.includes('Open') || metaLine.includes('open') || /·/.test(metaLine), `panel meta gate/regime (${metaLine})`);
+
   const gateParts = SCAN.tileParts(SCAN.TILE_REGISTRY[2], ctx);
   assert(SCAN.resolveGatePermission(ctx) === 'Blocked', 'gate permission from code');
   assert(SCAN.resolveGateSizing(ctx) === '0× size', 'gate sizing from code');

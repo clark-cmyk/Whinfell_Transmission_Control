@@ -14,7 +14,7 @@
   --ia-top-h: 72px;
   --ia-top-h-collapsed: 28px;
   --ia-left-w: 168px;
-  --ia-left-w-collapsed: 32px;
+  --ia-left-w-collapsed: 44px;
   --ia-bottom-h: 88px;
 
   /* Koyfin framing tokens (Chunks A–B) */
@@ -344,8 +344,31 @@
   height: 100%;
   overflow: hidden;
 }
-body.ia-left-collapsed .ia-workspace { grid-template-columns: var(--ia-left-w-collapsed) 1fr; }
-body.ia-left-collapsed .ia-left-body { display: none; }
+/* Icons-only left rail: keep body visible (display:none killed RC/RD/HY codes). */
+body.ia-left-collapsed .ia-workspace {
+  grid-template-columns: var(--ia-left-w-collapsed) 1fr min(280px, 28vw);
+}
+body.ia-left-collapsed .ia-left-body {
+  display: flex;
+  padding: 4px 2px;
+  gap: 4px;
+  overflow-x: hidden;
+}
+body.ia-left-collapsed .ia-left-bar {
+  padding: 4px 2px;
+  justify-content: center;
+}
+body.ia-left-collapsed .ia-left-bar .ia-frame-toggle {
+  transform: rotate(180deg);
+}
+body.ia-left-collapsed .wf-rail-section {
+  border-color: transparent;
+  background: transparent;
+}
+body.ia-left-collapsed .wf-nav-list {
+  padding: 2px;
+  gap: 2px;
+}
 
 .ia-left-frame {
   border-right: 1px solid var(--wf-border);
@@ -2727,12 +2750,29 @@ body.ia-shell-active #commandBar.ia-stowed-source { display: none !important; }
   padding: var(--wf-gap-3);
   background: var(--wf-canvas-bg);
 }
-.wf-panel--risk-cockpit { grid-area: cockpit; }
+.wf-panel--risk-cockpit { grid-area: cockpit; min-height: var(--wf-panel-min-h); }
 .wf-panel--risk-curve { grid-area: curve; }
 .wf-panel--radar { grid-area: radar; }
 .wf-panel--hy-oas { grid-area: hyoas; }
 .wf-panel--flipchart { grid-area: flip; }
 .wf-panel--depth { grid-area: depth; }
+
+/* Chunk 3 — Risk Cockpit card: one panel chrome, body flush into tile layout */
+.wf-panel--risk-cockpit > .wf-panel__header {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wf-panel--risk-cockpit .wf-panel__meta {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  max-width: 58%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wf-panel--risk-cockpit > .wf-panel__body--flush {
+  min-height: 0;
+}
 
 body.ia-layer-scan .ia-center-canvas,
 body.ia-layer-iterate .ia-center-canvas {
@@ -3465,30 +3505,45 @@ body.ia-layer-dig .ia-center-canvas {
 }
 
 body.ia-left-collapsed .ia-left-bar span { display: none; }
-body.ia-left-collapsed .wf-rail-section__label,
+body.ia-left-collapsed .wf-rail-section__label {
+  display: none;
+}
 body.ia-left-collapsed .ia-view-shortcut,
 body.ia-left-collapsed .ia-layer-tab,
 body.ia-left-collapsed .ia-specialized-tool-btn,
 body.ia-left-collapsed .ia-risk-curve-summary {
   font-size: 0;
+  line-height: 0;
   padding: 0;
   min-height: 28px;
+  width: 100%;
   justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
 }
 body.ia-left-collapsed .ia-view-shortcut::before,
-body.ia-left-collapsed .ia-layer-tab::before {
+body.ia-left-collapsed .ia-layer-tab::before,
+body.ia-left-collapsed .ia-specialized-tool-btn::before,
+body.ia-left-collapsed .ia-risk-curve-summary::before {
   font-size: 11px;
+  line-height: 1;
   font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--wf-text-2);
 }
 body.ia-left-collapsed [data-ia-view-shortcut="risk_cockpit"]::before { content: "RC"; }
 body.ia-left-collapsed [data-ia-view-shortcut="transmission_radar"]::before { content: "RD"; }
 body.ia-left-collapsed [data-ia-view-shortcut="hy_oas"]::before { content: "HY"; }
 body.ia-left-collapsed [data-ia-view-shortcut="flipchart"]::before { content: "FL"; }
 body.ia-left-collapsed [data-ia-view-shortcut="depth_ladders"]::before { content: "DP"; }
+body.ia-left-collapsed [data-ia-view-shortcut="risk_curve"]::before { content: "CV"; }
 body.ia-left-collapsed [data-ia-layer="scan"]::before { content: "S"; }
 body.ia-left-collapsed [data-ia-layer="dig"]::before { content: "D"; }
 body.ia-left-collapsed [data-ia-layer="iterate"]::before { content: "I"; }
+body.ia-left-collapsed #btnIaBasisWatch::before { content: "BW"; }
+body.ia-left-collapsed #btnIaMidwestCrush::before { content: "MC"; }
+body.ia-left-collapsed #btnIaBangBangDa::before { content: "BB"; }
+body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
 
 @media (max-width: 1280px) {
   .ia-widget-grid {

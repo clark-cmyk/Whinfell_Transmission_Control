@@ -1,10 +1,119 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 7, 2026 (Bang Bang Da v1.2 · rv_history · eth_calendar enrich)  
-**Repo:** `Whinfell_Transmission_Control`
-**Build:** `1.5-BUILD-COUSINS-2026-07-05-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
-**Handoff:** `08_Deliverables/Whinfell_Care_Package_20260705.md`
+**Last updated:** July 9, 2026 (Koyfin UI Chunk 3 · Risk Cockpit panel meta)  
+**Repo:** `Whinfell_Transmission_Control`  
+**HEAD:** `589995f` + uncommitted Chunk 1–3  
+**Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
+**Handoff specs:**  
+- `Whinfell UI Optimization Plan.md.txt`  
+- `Whinfell Transmission Control — UI Optimization Report for GROK.txt`  
+- `Whinfell Transmission Control — Light Theme Spec for GROK.txt` *(truncated on disk)*  
+- Care package context: local failed layout thrash → **reverted to consolidation**; **small verified changes only**
+
+---
+
+## NEW SESSION — start here (Jul 9)
+
+### Rules (non-negotiable)
+
+1. **Serve `dist/` only:** `bash scripts/build_web.sh` then `cd dist && python3 -m http.server 8765`
+2. Edit **root** sources (`index.html`, `css/`, `js/`) → rebuild → hard-refresh browser
+3. **One chunk / one concern per step** · max ~6 files · run tests before next edit
+4. No Python one-off HTML rewrites without `import re` / targeting the wrong tree
+5. Prefer `git restore` over stacking failed CSS experiments
+
+### Git / working tree
+
+| Item | State |
+|------|--------|
+| Branch | `main` @ `589995f` (consolidate 20260708) |
+| Uncommitted (Chunk 1–3) | `js/console_ia_shell.js` · `js/scan_kpi_strip.js` · `css/console_ia.css` · `index.html` · tests · TODO + Progress log |
+| `dist/` | **gitignored** — always rebuild after source changes |
+| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` (ok to leave) |
+
+### Chunk 1 status — **DONE**
+
+| Acceptance | Result |
+|------------|--------|
+| Single shell = TopShell + LeftNav + MainContent | **Done** |
+| `relocateTopBar()` heals orphaned topbar | **Added** in `js/console_ia_shell.js` |
+| Tests | **PASS** |
+
+### Chunk 2 status — **DONE** (this session)
+
+| Acceptance | Result |
+|------------|--------|
+| Remove `body.ia-left-collapsed .ia-left-body { display: none }` | **Fixed** — body stays `display:flex` |
+| Left → codes/icons visible (RC/RD/HY/FL/DP/S/D/I/BW/MC/BB/LD/CV) | **Done** in `css/console_ia.css` |
+| Tooltips on collapsed items | Layer tab `title`s added; view/tools already had titles |
+| Collapsed width usable | `--ia-left-w-collapsed: 44px` |
+| Right rail preserved when left collapsed | 3-col grid kept |
+| `aria-expanded` / label on left toggle | **Done** in `setLeftCollapsed` |
+| Tests | **PASS** — `koyfin_widget_shell` · `phase16_integration` · `shell_shortcuts` + build_web |
+
+**Note:** Plan doc completeness table is **stale**. Root already has widget grid + most of PR-3…7 structure; do **not** re-scaffold. Browser-verify collapse, then polish only if needed.
+
+### Chunk 3 status — **DONE** (this session)
+
+| Acceptance | Result |
+|------------|--------|
+| Risk Cockpit = one `wf-panel` card | **Already present** · locked in tests |
+| Consistent header/body chrome | Header meta + min-height · body flush into tile layout |
+| KPI tiles 4–6 still render | **6 tiles** · `scan_kpi_strip` PASS |
+| Live panel meta | `syncPanelMeta` → Score · Gate · Regime in `#riskCockpitPanelMeta` |
+
+### Next action for new session
+
+**→ Browser-verify Chunks 1–3, commit, then PR-4 only if Radar/Curve gaps**
+
+| Goal | Detail |
+|------|--------|
+| Browser | Left codes · top strip · Risk Cockpit meta updates after hydrate |
+| Commit | Chunk 1–3 together when Clark ready |
+| PR-4 | Radar + Risk Curve row — structure exists; polish only if needed |
+
+**Out of scope until Chunk 8:** light theme dual-system unify.
+
+### Recommended verify on session open
+
+```bash
+bash scripts/build_web.sh
+cd dist && python3 -m http.server 8765
+# hard-refresh http://127.0.0.1:8765/
+node tests/koyfin_widget_shell.test.mjs
+node tests/scan_kpi_strip.test.mjs
+```
+
+Browser checklist: slim topbar · left collapse codes · **Risk Cockpit header meta** · widget grid.
+
+---
+
+## Koyfin UI Optimization (dashboard grid) — PR track
+
+Specs: UI Optimization Plan + Report + Light Theme Spec.
+
+| PR | Chunk | Goal | Status |
+|----|-------|------|--------|
+| PR-1 | 1 | Unify TopShell into IA shell · dist = root | **Done** Jul 9 |
+| PR-2 | 2 | Collapsible top + left (icons-only left fix) | **Done** Jul 9 |
+| PR-3 | 3 | Risk Cockpit `wf-panel` polish | **Done** Jul 9 (panel meta + chrome lock) |
+| PR-4 | 4 | Radar + Risk Curve dashboard row | Structure exists — polish only · **Next** |
+| PR-5 | 5 | HY OAS proxy widget | Structure exists — polish only |
+| PR-6 | 6 | Flipchart widget | Structure exists — polish only |
+| PR-7 | 7 | Depth & Ladders widget | Structure exists; Playwright depth test timeout open |
+| PR-8 | 8 | Light theme unify (`--wf-*` vs `main.css` dual system) | Tokens in `console_ia.css`; dual palette still |
+
+### Known gaps (do not re-break)
+
+| Gap | Priority |
+|-----|----------|
+| Left collapse hides body (icons-only dead) | **Fixed Chunk 2** |
+| Dual light systems (`main.css` vs `--wf-*` GROK tokens) | P1 — Chunk 8 |
+| `depth_ladders_widget` Playwright timeout | P2 investigate (BOOT?) |
+| Transaction / output codes on nav | Deferred |
+| Operator Precision placement | Deferred (not in DOM) |
+| Light Theme Spec file truncated (~70 lines) | Complete before full Chunk 8 |
 
 ---
 
@@ -58,8 +167,10 @@
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
+| 0 | **Koyfin Chunk 2–3** — left icons-only + Risk Cockpit meta | **Done** Jul 9 | BUILD | Browser-verify remaining |
+| 0b | **Commit Chunk 1–3** — shell harden + collapse + cockpit meta | **High** | BUILD | Committed on `main` (or stacked branch) |
 | 1 | **Live desk walk-through** — ratings in `Desk_Feedback_Log.md` | **High · go-live gate** | Clark · Wes | All 5 nodes + UI/docs rated |
-| 2 | **Commit Phase 2.3 stack** | **High** | BUILD | Boot fix + collect UI + chain + hydration bundle committed · clean `git status` on `main` |
+| 2 | **Commit remaining Phase 2.3 / desk stack** | **High** | BUILD | Clean verified state · no thrash on `main` |
 | 3 | **Task Force live Grok chain** | **Medium** | BUILD | Manual 12-step run → `--merge` → replace specialist stubs with live TxIntegrator |
 | 4 | **Collect agent auto-start** — LaunchAgent on login | **Medium** | BUILD | Agent on `:8767` without manual Terminal tab |
 | 5 | **Post-collect hydration** — auto `copy_hydration_bundle.sh` + import prompt | **Medium** | BUILD | Collect button → fresh bundle → WTC import nudge |

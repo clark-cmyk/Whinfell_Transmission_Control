@@ -42,6 +42,19 @@
     return true;
   }
 
+  /**
+   * Chunk 1 — ensure TopShell: console-topbar lives inside ia-top-frame body.
+   * No-op when markup is already correct; heals orphaned/legacy topbars.
+   */
+  function relocateTopBar() {
+    const host = el('iaTopBody');
+    if (!host || typeof document === 'undefined' || !document.querySelector) return false;
+    const topbar = document.querySelector('header.console-topbar');
+    if (!topbar || topbar.parentElement === host) return false;
+    host.appendChild(topbar);
+    return true;
+  }
+
   function syncDepthLaddersStatus() {
     const hydrationEl = el('depthStatusHydration');
     const freshnessEl = el('depthStatusFreshness');
@@ -113,6 +126,7 @@
   }
 
   function relocateNodes() {
+    relocateTopBar();
     moveNode('scanKpiStrip', 'iaRiskCockpitHost');
     moveNode('nodeRail', 'iaRiskCurveHost');
     moveNode('transmissionRadar', 'iaRadarHost');
@@ -222,6 +236,9 @@
   function setLeftCollapsed(collapsed) {
     const on = Boolean(collapsed);
     document.body.classList.toggle('ia-left-collapsed', on);
+    const btn = el('btnIaLeftCollapse');
+    btn?.setAttribute('aria-expanded', on ? 'false' : 'true');
+    btn?.setAttribute('aria-label', on ? 'Expand left rail' : 'Collapse left rail');
     const prefs = readCollapsePrefs();
     prefs.left = on;
     writeCollapsePrefs(prefs);
@@ -508,6 +525,7 @@
   global.WTM_IaShell = {
     activateShell,
     relocateNodes,
+    relocateTopBar,
     assembleDepthLaddersWidget,
     syncDepthLaddersStatus,
     setLayer,

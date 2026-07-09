@@ -176,9 +176,9 @@ window.DICTIONARY_BADGE_DEFAULT = {
           <section class="wf-rail-section">
             <div class="wf-rail-section__label">Console layer</div>
             <div class="ia-layer-tabs wf-nav-list" id="iaLayerTabs" role="tablist" aria-label="Console layer">
-              <button type="button" class="ia-layer-tab wf-nav-item ia-layer-tab--active" data-ia-layer="scan" role="tab" aria-selected="true">Scan</button>
-              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="dig" role="tab" aria-selected="false">Dig</button>
-              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="iterate" role="tab" aria-selected="false">Iterate</button>
+              <button type="button" class="ia-layer-tab wf-nav-item ia-layer-tab--active" data-ia-layer="scan" role="tab" aria-selected="true" title="Scan layer">Scan</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="dig" role="tab" aria-selected="false" title="Dig layer">Dig</button>
+              <button type="button" class="ia-layer-tab wf-nav-item" data-ia-layer="iterate" role="tab" aria-selected="false" title="Iterate layer">Iterate</button>
             </div>
           </section>
           <section class="wf-rail-section ia-specialized-tools-section">
@@ -201,7 +201,10 @@ window.DICTIONARY_BADGE_DEFAULT = {
       <main class="ia-center-canvas" id="iaCenterCanvas" aria-label="Primary analytical workspace">
         <div id="iaWidgetGrid" class="wf-panel-grid ia-widget-grid" data-agent-surface="ia-widget-grid">
           <article id="widgetRiskCockpit" class="wf-panel wf-panel--risk-cockpit" data-widget="risk_cockpit">
-            <header class="wf-panel__header"><span class="wf-panel__title">Risk Cockpit</span></header>
+            <header class="wf-panel__header">
+              <span class="wf-panel__title">Risk Cockpit</span>
+              <span class="wf-panel__meta" id="riskCockpitPanelMeta" aria-live="polite">—</span>
+            </header>
             <div class="wf-panel__body wf-panel__body--flush" id="iaRiskCockpitHost"></div>
           </article>
           <article id="widgetRiskCurve" class="wf-panel wf-panel--risk-curve" data-widget="risk_curve">

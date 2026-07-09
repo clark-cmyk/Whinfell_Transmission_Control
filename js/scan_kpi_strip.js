@@ -761,6 +761,26 @@
     return ensureCardLayout(mount, document);
   }
 
+  /** Chunk 3 — live summary in .wf-panel__header meta (presentation only). */
+  function syncPanelMeta(ctx, doc) {
+    const document = doc || global.document;
+    const meta = document?.getElementById?.('riskCockpitPanelMeta');
+    if (!meta) return '';
+    const scoreRaw = ctx?.metrics?.whinfellScore;
+    const score = !isMissingNumber(scoreRaw) ? String(scoreRaw) : '—';
+    const gate = resolveGatePermission(ctx) || '—';
+    const regimeRaw = String(ctx?.metrics?.regime || '').trim();
+    const regime = regimeRaw
+      ? (regimeRaw.length > 28 ? `${regimeRaw.slice(0, 27)}…` : regimeRaw)
+      : '—';
+    const line = `Score ${score} · ${gate} · ${regime}`;
+    meta.textContent = line;
+    if (typeof meta.setAttribute === 'function') {
+      meta.setAttribute('title', `Risk score ${score}; gate ${gate}; regime ${regimeRaw || '—'}`);
+    }
+    return line;
+  }
+
   function renderStrip(ctx, mountEl) {
     const doc = global.document;
     const mount = doc.getElementById(MOUNT_ID)
@@ -777,6 +797,7 @@
     for (const tile of TILE_REGISTRY) {
       out[tile.id] = applyTile(tile, ctx, rootMount, doc);
     }
+    out.panelMeta = syncPanelMeta(ctx, doc);
     return out;
   }
 
@@ -809,6 +830,7 @@
     resolveFaceDelta,
     tileParts,
     ensureMount,
+    syncPanelMeta,
     renderStrip,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -22,6 +22,8 @@ function runHtmlChecks() {
   assert(html.includes('id="btnIaTopCollapse"'), 'top collapse toggle present');
   assert(html.includes('id="iaWidgetGrid"'), 'widget grid present');
   assert(html.includes('id="widgetRiskCockpit"'), 'Risk Cockpit widget present');
+  assert(html.includes('wf-panel--risk-cockpit'), 'Risk Cockpit uses wf-panel chrome');
+  assert(html.includes('id="riskCockpitPanelMeta"'), 'Risk Cockpit panel meta present');
   assert(html.includes('id="widgetRiskCurve"'), 'Risk Curve widget present');
   assert(html.includes('id="widgetTransmissionRadar"'), 'Radar widget present');
   assert(html.includes('id="widgetHyOas"'), 'HY OAS widget present');
@@ -51,6 +53,7 @@ function runShellJsChecks() {
   const shellSrc = fs.readFileSync(path.join(ROOT, 'js/console_ia_shell.js'), 'utf8');
   assert(shellSrc.includes('VIEW_SHORTCUT_REGISTRY'), 'VIEW_SHORTCUT_REGISTRY export');
   assert(shellSrc.includes('focusWidget'), 'focusWidget helper');
+  assert(shellSrc.includes('relocateTopBar'), 'Chunk 1 relocateTopBar helper');
   assert(shellSrc.includes('iaRiskCockpitHost'), 'risk cockpit relocation');
   assert(shellSrc.includes('iaRiskCurveHost'), 'risk curve relocation');
   assert(shellSrc.includes('iaRadarHost'), 'radar relocation');
@@ -72,6 +75,7 @@ function runShellJsChecks() {
   assert(css.includes(':root[data-theme="light"]'), 'light theme tokens');
   assert(css.includes('--wf-bg-page'), 'wf-bg-page token');
   assert(css.includes('.ia-widget-grid'), 'widget grid CSS');
+  assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.hy-oas-subsection'), 'HY OAS subsection CSS');
   assert(css.includes('.hy-oas-handoff-actions'), 'HY OAS handoff actions CSS');
   assert(css.includes('.flipchart-slide-index'), 'Flipchart slide index CSS');
@@ -80,6 +84,16 @@ function runShellJsChecks() {
   assert(css.includes('.ladder-viz-region'), 'Ladder viz region CSS');
   assert(css.includes('.ia-top-phase-tag'), 'collapsed phase tag CSS');
   assert(css.includes('[data-collapsed="true"] .ia-top-pipeline-strip'), 'collapsed pipeline strip CSS');
+  // Chunk 2 — icons-only left rail (must not hide .ia-left-body when collapsed)
+  assert(
+    !/body\.ia-left-collapsed\s+\.ia-left-body\s*\{\s*display:\s*none/.test(css),
+    'collapsed left body must not use display:none (icons-only rail)',
+  );
+  assert(css.includes('body.ia-left-collapsed [data-ia-view-shortcut="risk_cockpit"]::before'), 'RC icon code');
+  assert(css.includes('body.ia-left-collapsed [data-ia-view-shortcut="transmission_radar"]::before'), 'RD icon code');
+  assert(css.includes('body.ia-left-collapsed [data-ia-view-shortcut="hy_oas"]::before'), 'HY icon code');
+  assert(css.includes('body.ia-left-collapsed #btnIaBasisWatch::before'), 'BW specialized tool code');
+  assert(css.includes('--ia-left-w-collapsed'), 'collapsed left width token');
 }
 
 function runActivatorCheck() {

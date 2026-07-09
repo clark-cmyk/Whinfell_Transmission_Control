@@ -1,7 +1,103 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 7, 2026 (desk ops unify · specialized tools · ladder/BBD fixes)
+**Last updated:** July 9, 2026 (Koyfin UI Chunk 3 · Risk Cockpit panel meta)
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 3 (Risk Cockpit panel polish)
+
+```text
+CHUNK ID: Koyfin-PR-3
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Risk Cockpit as one wf-panel card with live header meta
+
+CONTEXT
+- Widget shell + rc-widget-card layout already at consolidation
+- Polish only: panel meta + chrome lock (no tile content rewrite)
+
+CHANGES
+- index.html — #riskCockpitPanelMeta in Risk Cockpit wf-panel header
+- js/scan_kpi_strip.js — syncPanelMeta() Score · Gate · Regime on renderStrip
+- css/console_ia.css — cockpit min-height + meta ellipsis
+- tests — koyfin_widget_shell + scan_kpi_strip panel meta asserts
+
+QA
+- [x] scan_kpi_strip.test.mjs PASS
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] build_web.sh OK
+
+NEXT SESSION
+- Browser-verify Chunks 1–3
+- Commit Chunk 1–3 when Clark ready
+- PR-4 Radar + Risk Curve polish only if gaps
+```
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 2 (left icons-only collapse)
+
+```text
+CHUNK ID: Koyfin-PR-2
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Collapsed left rail shows codes/icons, not blank (display:none bug)
+
+CONTEXT
+- Chunk 1 relocated topbar; icons-only CSS already existed at bottom of console_ia.css
+- Early rule body.ia-left-collapsed .ia-left-body { display: none } hid the whole rail
+
+CHANGES
+- css/console_ia.css — remove display:none; keep flex body; 44px collapsed width;
+  3-col workspace when left collapsed; RC/RD/HY/FL/DP/S/D/I + BW/MC/BB/LD/CV codes
+- index.html — title tooltips on Scan/Dig/Iterate layer tabs
+- js/console_ia_shell.js — setLeftCollapsed aria-expanded + aria-label
+- tests/koyfin_widget_shell.test.mjs — assert no display:none on collapsed left body
+
+QA
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] shell_shortcuts.test.mjs PASS
+- [x] build_web.sh OK
+
+NEXT SESSION
+- Browser-verify: left collapse codes + top strip + expand labels
+- Commit Chunk 1+2 when Clark ready
+- Then PR-3 Risk Cockpit polish only if gaps remain
+```
+
+---
+
+## July 9, 2026 — Koyfin UI Chunk 1 (TopShell / dist heal)
+
+```text
+CHUNK ID: Koyfin-PR-1
+PHASE: UI Optimization (Koyfin dashboard track)
+GOAL: Unified TopShell · stop serving stale dist · small verified steps only
+
+CONTEXT
+- Prior session thrash (whinfell-* classes, inline topbar, codes, Operator Precision) broke UI
+- Reverted to consolidation HEAD 589995f
+- Root already had full shell + widget grid; dist/ (gitignored) had experimental inline topbar
+
+CHANGES
+- bash scripts/build_web.sh — resync dist/index.html from root (btnTheme · slim topbar · utility mount)
+- js/console_ia_shell.js — relocateTopBar() ensures header.console-topbar → #iaTopBody
+- tests/koyfin_widget_shell.test.mjs — assert relocateTopBar present
+- 01_Strategy_Docs/BUILD_TODO_List.md — NEW SESSION handoff + PR track
+
+QA
+- [x] koyfin_widget_shell.test.mjs PASS
+- [x] phase16_integration.test.mjs PASS
+- [x] shell_shortcuts.test.mjs PASS
+- [x] scan_kpi_strip.test.mjs PASS
+- [x] root index.html md5 == dist/index.html
+
+NEXT SESSION
+- Chunk 2: fix body.ia-left-collapsed .ia-left-body { display: none } vs icons-only rules
+- Then browser-verify collapse; only then Chunk 3+ polish if still needed
+- Commit Chunk 1 when Clark ready
+```
 
 ---
 
