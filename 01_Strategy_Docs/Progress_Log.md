@@ -1,7 +1,40 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C5 chips + strip · next C6)
+**Last updated:** July 9, 2026 (COMET C6 links + forms · next C7)
+
+---
+
+## July 9, 2026 — COMET CSS C6 (links + form fields)
+
+```text
+CHUNK ID: COMET-C6
+PHASE: UI Optimization (Koyfin-style shell CSS)
+GOAL: Desk links toolbar (Koyfin/Barchart/Docs) · panel form field normalize via --wf-*; no class fork
+
+CONTEXT
+- Spec §10 links toolbar + §8 form controls (design language only)
+- C5 chips/strip done; C6 is links + forms only (no business JS)
+
+CHANGES
+- css/console_ia.css
+  · .console-chip--external → accent toolbar link + underline hover
+  · #btnDeskDocs / DD badge accent toolbar treatment
+  · Tools strip: Koyfin+Barchart side-by-side inline row
+  · BW Sources + Midwest outbound links accentized
+  · .ia-selectors · bw-view-settings · operator-inputs: label/input/select/textarea normalize
+  · light theme parity
+- tests/koyfin_widget_shell.test.mjs — C6 link/form asserts
+- tests/top_utility_registry.test.mjs — C6 CSS locks
+
+QA
+- [x] koyfin_widget_shell · top_utility_registry · depth_ladders · phase16 · shell_shortcuts PASS
+- [x] build_web.sh OK
+- [ ] browser-verify accent links · form radius 4 · dark + light
+
+NEXT SESSION
+- COMET C7 optional responsive @900px — see BUILD_TODO handoff
+```
 
 ---
 

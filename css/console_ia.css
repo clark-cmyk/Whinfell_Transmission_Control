@@ -6,6 +6,7 @@
  * COMET C3 — widget card chrome: .wf-panel* radius-widget · border · header/body gap via --wf-*.
  * COMET C4 — topbar control set: .console-chip / .btn-console via --wf-radius-control · control tokens.
  * COMET C5 — chip ok/warn/risk variants · pipeline status strip --wf-status-strip-h · regime pills.
+ * COMET C6 — desk links toolbar (Koyfin/Barchart/Docs) · panel form field normalize.
  */
 
 :root {
@@ -915,20 +916,26 @@ body.ia-shell-active .ia-dd-audit-btn {
   min-height: 34px;
 }
 
+/* C6 — left-rail selectors (form field normalize; see also full C6 block) */
 .ia-selectors label {
-  display: block;
-  font-size: 12px;
-  color: var(--ia-muted);
-  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--wf-text-xxs);
+  color: var(--wf-text-3);
+  font-weight: 500;
+  margin-bottom: var(--wf-gap-1);
 }
 .ia-selectors select {
   width: 100%;
-  font-size: 12px;
-  padding: 3px 4px;
-  border-radius: 4px;
-  border: 1px solid var(--ia-border);
-  background: var(--ia-shell-bg);
-  color: var(--ia-text);
+  font-size: var(--wf-text-xxs);
+  padding: var(--wf-gap-1) 6px;
+  border-radius: var(--wf-radius-control);
+  border: 1px solid var(--wf-control-border);
+  background: var(--wf-control-bg);
+  color: var(--wf-text);
+  box-sizing: border-box;
+  font-family: inherit;
 }
 .ia-dd-btn {
   margin-top: auto;
@@ -2502,104 +2509,136 @@ body.ia-layer-dig.ia-dig-view-basis-watch .ia-midwest-crush-host {
   color: var(--ia-muted);
   font-style: normal;
 }
-/* Chunk G — external tool bridges */
+/* ── COMET C6 — desk links toolbar (map COMET §10; no class fork) ──
+ * Koyfin / Barchart / Docs as accent toolbar items under Tools strip.
+ */
 body.ia-shell-active .console-tech-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 4px;
+  gap: var(--wf-gap-1);
 }
 body.ia-shell-active #tcConsoleBuildBadge { order: 1; }
 body.ia-shell-active #ddVersionBadge { order: 2; }
 body.ia-shell-active #btnDeskDocs { order: 3; }
 body.ia-shell-active #btnMorningCollect { order: 4; }
 body.ia-shell-active #btnWorkspaceToggle { order: 24; }
+/* Docs — toolbar link treatment (opens desk docs panel) */
+body.ia-shell-active #btnDeskDocs {
+  color: var(--wf-accent);
+  background: transparent;
+  border-color: transparent;
+  font-weight: 500;
+}
+body.ia-shell-active #btnDeskDocs:hover {
+  color: var(--wf-accent);
+  background: var(--wf-accent-soft);
+  border-color: transparent;
+  text-decoration: underline;
+}
+/* DD meta badge is a dictionary link — accent underline toolbar style */
+body.ia-shell-active #ddVersionBadge.console-chip--meta,
+body.ia-shell-active a#ddVersionBadge {
+  color: var(--wf-accent);
+  border-color: transparent;
+  background: transparent;
+  text-decoration: none;
+}
+body.ia-shell-active #ddVersionBadge.console-chip--meta:hover,
+body.ia-shell-active a#ddVersionBadge:hover {
+  color: var(--wf-accent);
+  background: var(--wf-accent-soft);
+  text-decoration: underline;
+}
 body.ia-shell-active .console-tech-meta::after {
   content: "Tools";
   order: 19;
   flex: 1 1 100%;
-  min-height: 28px;
+  min-height: 22px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  margin-top: 4px;
-  border: 1px solid var(--wf-border);
-  border-bottom: 1px solid var(--wf-divider);
-  border-radius: var(--wf-radius-md) var(--wf-radius-md) 0 0;
-  background: rgba(255, 255, 255, 0.02);
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0 var(--wf-gap-2);
+  margin-top: var(--wf-gap-1);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--wf-text-3);
   box-sizing: border-box;
 }
+/* Inline toolbar row: Koyfin + Barchart side-by-side */
 body.ia-shell-active .console-tech-meta a.console-chip--external {
   order: 20;
-  flex: 1 1 100%;
+  flex: 1 1 calc(50% - var(--wf-gap-1));
   margin: 0;
-  padding: 0;
-  border: 1px solid var(--wf-border);
-  border-radius: 0;
-  border-top: none;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 0 var(--wf-gap-2);
+  border: 1px solid var(--wf-control-border);
+  border-radius: var(--wf-radius-control);
+  background: transparent;
   color: transparent;
   font-size: 0;
-  min-height: 34px;
-  display: flex;
+  min-height: 28px;
+  height: auto;
+  display: inline-flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--wf-gap-1);
   text-decoration: none;
   box-sizing: border-box;
 }
 body.ia-shell-active #headerLinkBarchart {
   order: 21;
-  border-radius: 0 0 var(--wf-radius-md) var(--wf-radius-md);
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 body.ia-shell-active .console-tech-meta a.console-chip--external:hover {
-  border-color: var(--wf-border-strong);
-  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--wf-accent);
+  background: var(--wf-accent-soft);
   color: transparent;
   text-decoration: none;
 }
 body.ia-shell-active .console-tech-meta a.console-chip--external::after {
   content: "↗";
-  font-size: 12px;
+  font-size: var(--wf-text-xxs);
   font-weight: 600;
-  color: var(--wf-text-3);
+  color: var(--wf-accent);
   flex-shrink: 0;
-  margin: 0 10px 0 8px;
+  margin: 0;
   line-height: 1;
 }
 body.ia-shell-active #headerLinkKoyfin::before {
   content: "Open Koyfin";
-  font-size: var(--wf-text-xs);
+  font-size: var(--wf-text-xxs);
   font-weight: 500;
-  color: var(--wf-text-2);
+  color: var(--wf-accent);
   flex: 1;
-  padding-left: 10px;
   display: flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 28px;
+  text-decoration: inherit;
 }
 body.ia-shell-active #headerLinkBarchart::before {
   content: "Open Barchart";
-  font-size: var(--wf-text-xs);
+  font-size: var(--wf-text-xxs);
   font-weight: 500;
-  color: var(--wf-text-2);
+  color: var(--wf-accent);
   flex: 1;
-  padding-left: 10px;
   display: flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 28px;
+  text-decoration: inherit;
+}
+body.ia-shell-active .console-tech-meta a.console-chip--external:hover::before {
+  text-decoration: underline;
 }
 
-/* Basis Watch — Tools frame + outbound links */
+/* Basis Watch — Sources toolbar (C6 accent links) */
 .ia-center-canvas .basis-watch-head .bw-external-disclosure {
-  border: 1px solid var(--wf-border);
-  border-radius: var(--wf-radius-md);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--wf-control-border);
+  border-radius: var(--wf-radius-control);
+  background: transparent;
   overflow: clip;
   padding: 0;
   min-width: 148px;
@@ -2608,10 +2647,10 @@ body.ia-shell-active #headerLinkBarchart::before {
   min-height: 28px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 var(--wf-gap-2);
   margin: 0;
   border-bottom: 1px solid var(--wf-divider);
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
   font-size: 0;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -2626,11 +2665,11 @@ body.ia-shell-active #headerLinkBarchart::before {
 .ia-center-canvas .bw-external-summary::after {
   content: "Sources";
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--wf-text-3);
-  opacity: 0.65;
+  opacity: 0.75;
 }
 .ia-center-canvas .bw-external-disclosure[open] .bw-external-summary {
   border-bottom: 1px solid var(--wf-divider);
@@ -2639,14 +2678,14 @@ body.ia-shell-active #headerLinkBarchart::before {
 .ia-center-canvas .bw-external-disclosure #btnBwKoyfin {
   width: 100%;
   margin: 0;
-  padding: 0 10px;
+  padding: 0 var(--wf-gap-2);
   border: none;
   border-radius: 0;
   border-top: 1px solid var(--wf-divider);
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
   color: transparent;
   font-size: 0;
-  min-height: 34px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2656,24 +2695,27 @@ body.ia-shell-active #headerLinkBarchart::before {
 }
 .ia-center-canvas .bw-external-disclosure #btnBwBarchart:hover,
 .ia-center-canvas .bw-external-disclosure #btnBwKoyfin:hover {
-  border-color: var(--wf-divider);
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--wf-accent-soft);
 }
 .ia-center-canvas .bw-external-disclosure #btnBwBarchart::before,
 .ia-center-canvas .bw-external-disclosure #btnBwKoyfin::before {
-  font-size: var(--wf-text-xs);
+  font-size: var(--wf-text-xxs);
   font-weight: 500;
-  color: var(--wf-text-2);
+  color: var(--wf-accent);
   flex: 1;
+}
+.ia-center-canvas .bw-external-disclosure #btnBwBarchart:hover::before,
+.ia-center-canvas .bw-external-disclosure #btnBwKoyfin:hover::before {
+  text-decoration: underline;
 }
 .ia-center-canvas .bw-external-disclosure #btnBwBarchart::after,
 .ia-center-canvas .bw-external-disclosure #btnBwKoyfin::after {
   content: "↗";
-  font-size: 12px;
+  font-size: var(--wf-text-xxs);
   font-weight: 600;
-  color: var(--wf-text-3);
+  color: var(--wf-accent);
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: var(--wf-gap-1);
 }
 .ia-center-canvas .bw-external-disclosure #btnBwBarchart::before {
   content: "Open Barchart";
@@ -2682,39 +2724,42 @@ body.ia-shell-active #headerLinkBarchart::before {
   content: "Open Koyfin";
 }
 
-/* Midwest Compute — outbound pop-out distinct from local actions */
+/* Midwest Compute — outbound link toolbar style */
 .ia-center-canvas .ia-midwest-crush-btn--link {
-  min-height: 34px;
+  min-height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 0 10px;
-  border: 1px solid var(--wf-divider);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
+  gap: var(--wf-gap-1);
+  padding: 0 var(--wf-gap-2);
+  border: 1px solid var(--wf-control-border);
+  border-radius: var(--wf-radius-control);
+  background: transparent;
   color: transparent;
   font-size: 0;
   text-decoration: none;
   box-sizing: border-box;
 }
 .ia-center-canvas .ia-midwest-crush-btn--link:hover {
-  border-color: var(--wf-border-strong);
-  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--wf-accent);
+  background: var(--wf-accent-soft);
   color: transparent;
   text-decoration: none;
 }
 .ia-center-canvas .ia-midwest-crush-btn--link::before {
   content: "Open full page";
-  font-size: var(--wf-text-xs);
+  font-size: var(--wf-text-xxs);
   font-weight: 500;
-  color: var(--wf-text-2);
+  color: var(--wf-accent);
+}
+.ia-center-canvas .ia-midwest-crush-btn--link:hover::before {
+  text-decoration: underline;
 }
 .ia-center-canvas .ia-midwest-crush-btn--link::after {
   content: "↗";
-  font-size: 12px;
+  font-size: var(--wf-text-xxs);
   font-weight: 600;
-  color: var(--wf-text-3);
+  color: var(--wf-accent);
 }
 
 /* ── Chunk 02 — slim header (default; IA shell not required) ── */
@@ -2819,10 +2864,18 @@ span.console-chip:hover {
   border-color: var(--wf-ok);
   background: var(--wf-ok-soft);
 }
+/* External desk links — refined by C6 as accent toolbar items */
 .console-chip--external {
-  color: var(--wf-text-2);
+  color: var(--wf-accent);
   background: transparent;
-  border-color: var(--wf-control-border);
+  border-color: transparent;
+  font-weight: 500;
+}
+.console-chip--external:hover {
+  color: var(--wf-accent);
+  background: var(--wf-accent-soft);
+  border-color: transparent;
+  text-decoration: underline;
 }
 .console-chip--action,
 .console-chip--default {
@@ -2921,6 +2974,83 @@ span.console-chip--risk:hover {
   color: var(--wf-risk);
   border-color: var(--wf-risk);
   background: var(--wf-risk-soft);
+}
+
+/* ── COMET C6 — panel form field normalize (map COMET §8; no class fork) ──
+ * Labels + input/select/textarea inside IA shell / dig / BasisWatch settings.
+ */
+.ia-center-canvas .bw-view-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--wf-gap-2);
+}
+.ia-center-canvas .bw-view-settings label,
+.ia-center-canvas .bw-view-settings .bw-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--wf-text-xxs);
+  color: var(--wf-text-3);
+  font-weight: 500;
+  min-width: 0;
+}
+.ia-center-canvas .bw-view-settings select,
+body.ia-shell-active .operator-inputs input:not([type="range"]),
+body.ia-shell-active .operator-inputs select,
+body.ia-shell-active .operator-inputs textarea,
+.ia-right-rail-host .operator-inputs input:not([type="range"]),
+.ia-right-rail-host .operator-inputs select,
+.ia-right-rail-host .operator-inputs textarea {
+  width: 100%;
+  border-radius: var(--wf-radius-control);
+  border: 1px solid var(--wf-control-border);
+  background: var(--wf-control-bg);
+  color: var(--wf-text);
+  font-size: var(--wf-text-xxs);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: var(--wf-gap-1) 6px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+body.ia-shell-active .operator-inputs,
+.ia-right-rail-host .operator-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wf-gap-2);
+}
+body.ia-shell-active .operator-inputs label,
+.ia-right-rail-host .operator-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--wf-text-xxs);
+  color: var(--wf-text-3);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+body.ia-shell-active .operator-inputs textarea,
+.ia-right-rail-host .operator-inputs textarea {
+  min-height: 60px;
+  resize: vertical;
+  line-height: 1.4;
+}
+body.ia-shell-active .operator-inputs input[type="range"],
+.ia-right-rail-host .operator-inputs input[type="range"] {
+  width: 100%;
+  accent-color: var(--wf-accent);
+}
+body.ia-shell-active .operator-inputs input:focus,
+body.ia-shell-active .operator-inputs select:focus,
+body.ia-shell-active .operator-inputs textarea:focus,
+.ia-center-canvas .bw-view-settings select:focus,
+.ia-selectors select:focus {
+  outline: none;
+  border-color: var(--wf-accent);
+  box-shadow: 0 0 0 1px var(--wf-accent-soft);
 }
 
 /* Chunk H — breakpoint + zoom QA */
@@ -4131,6 +4261,60 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
 :root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip.regime-stressed .rc-footer-chip__value,
 :root[data-theme="light"] #iaRiskCockpitHost .rc-footer-chip__hint.regime-stressed {
   color: var(--wf-warn);
+}
+/* C6 light — desk links + form fields */
+:root[data-theme="light"] .console-chip--external,
+:root[data-theme="light"] body.ia-shell-active #btnDeskDocs,
+:root[data-theme="light"] body.ia-shell-active #ddVersionBadge.console-chip--meta,
+:root[data-theme="light"] body.ia-shell-active a#ddVersionBadge {
+  color: var(--wf-accent-teal, var(--wf-accent));
+  background: transparent;
+  border-color: transparent;
+}
+:root[data-theme="light"] .console-chip--external:hover,
+:root[data-theme="light"] body.ia-shell-active #btnDeskDocs:hover,
+:root[data-theme="light"] body.ia-shell-active #ddVersionBadge.console-chip--meta:hover,
+:root[data-theme="light"] body.ia-shell-active a#ddVersionBadge:hover {
+  color: var(--wf-accent-teal, var(--wf-accent));
+  background: var(--wf-accent-soft);
+  text-decoration: underline;
+}
+:root[data-theme="light"] body.ia-shell-active #headerLinkKoyfin::before,
+:root[data-theme="light"] body.ia-shell-active #headerLinkBarchart::before,
+:root[data-theme="light"] body.ia-shell-active .console-tech-meta a.console-chip--external::after,
+:root[data-theme="light"] .ia-center-canvas .bw-external-disclosure #btnBwBarchart::before,
+:root[data-theme="light"] .ia-center-canvas .bw-external-disclosure #btnBwKoyfin::before,
+:root[data-theme="light"] .ia-center-canvas .bw-external-disclosure #btnBwBarchart::after,
+:root[data-theme="light"] .ia-center-canvas .bw-external-disclosure #btnBwKoyfin::after,
+:root[data-theme="light"] .ia-center-canvas .ia-midwest-crush-btn--link::before,
+:root[data-theme="light"] .ia-center-canvas .ia-midwest-crush-btn--link::after {
+  color: var(--wf-accent-teal, var(--wf-accent));
+}
+:root[data-theme="light"] body.ia-shell-active .console-tech-meta a.console-chip--external,
+:root[data-theme="light"] .ia-center-canvas .basis-watch-head .bw-external-disclosure,
+:root[data-theme="light"] .ia-center-canvas .ia-midwest-crush-btn--link {
+  border-color: var(--wf-border-card);
+  background: transparent;
+}
+:root[data-theme="light"] body.ia-shell-active .console-tech-meta a.console-chip--external:hover,
+:root[data-theme="light"] .ia-center-canvas .ia-midwest-crush-btn--link:hover {
+  border-color: var(--wf-accent-teal, var(--wf-accent));
+  background: var(--wf-accent-soft);
+}
+:root[data-theme="light"] .ia-selectors select,
+:root[data-theme="light"] .ia-center-canvas .bw-view-settings select,
+:root[data-theme="light"] body.ia-shell-active .operator-inputs input:not([type="range"]),
+:root[data-theme="light"] body.ia-shell-active .operator-inputs select,
+:root[data-theme="light"] body.ia-shell-active .operator-inputs textarea {
+  background: var(--wf-bg-card);
+  border-color: var(--wf-border-card);
+  color: var(--wf-text-primary);
+}
+:root[data-theme="light"] .ia-selectors label,
+:root[data-theme="light"] .ia-center-canvas .bw-view-settings label,
+:root[data-theme="light"] .ia-center-canvas .bw-view-settings .bw-field-label,
+:root[data-theme="light"] body.ia-shell-active .operator-inputs label {
+  color: var(--wf-text-muted);
 }
 :root[data-theme="light"] .whinfell-logo-text {
   color: var(--wf-accent-green);

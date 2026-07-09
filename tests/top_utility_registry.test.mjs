@@ -197,4 +197,16 @@ assert(
 );
 assert(!/\.wtc-chip[\s{,.-]/.test(css), 'COMET C5 no .wtc-chip fork');
 
+/* COMET C6 — desk links + form field locks */
+assert(
+  /\.console-chip--external\s*\{[^}]*color:\s*var\(--wf-accent\)/s.test(css),
+  'COMET C6 external link accent'
+);
+assert(
+  /\.ia-selectors select\s*\{[^}]*border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+  'COMET C6 form select radius-control'
+);
+assert(!/\.wtc-link[\s{,.-]/.test(css), 'COMET C6 no .wtc-link fork');
+assert(!/\.wtc-field[\s{,.-]/.test(css), 'COMET C6 no .wtc-field fork');
+
 console.log('top_utility_registry.test.mjs — all assertions passed');

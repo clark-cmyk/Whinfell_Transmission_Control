@@ -214,6 +214,34 @@ function runShellJsChecks() {
   );
   assert(!/\.wtc-chip[\s{,.-]/.test(css), 'COMET C5 must not introduce .wtc-chip class fork');
   assert(!/\.wtc-status-strip[\s{,.-]/.test(css), 'COMET C5 must not introduce .wtc-status-strip class fork');
+  // COMET C6 — links toolbar + form field normalize
+  assert(
+    /\.console-chip--external\s*\{[^}]*color:\s*var\(--wf-accent\)/s.test(css),
+    'COMET C6 .console-chip--external uses --wf-accent'
+  );
+  assert(
+    /#headerLinkKoyfin::before[\s\S]{0,200}?color:\s*var\(--wf-accent\)/s.test(css),
+    'COMET C6 Open Koyfin label uses --wf-accent'
+  );
+  assert(
+    /#btnDeskDocs[\s\S]{0,200}?color:\s*var\(--wf-accent\)/s.test(css),
+    'COMET C6 Docs toolbar uses --wf-accent'
+  );
+  assert(
+    /\.ia-selectors select\s*\{[^}]*border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C6 ia-selectors select uses --wf-radius-control'
+  );
+  assert(
+    /body\.ia-shell-active \.operator-inputs select[\s\S]{0,280}?border-radius:\s*var\(--wf-radius-control\)/s.test(css)
+      || /\.operator-inputs select[\s\S]{0,200}?border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C6 operator-inputs select uses --wf-radius-control'
+  );
+  assert(
+    /\.ia-center-canvas \.bw-view-settings select[\s\S]{0,400}?border-radius:\s*var\(--wf-radius-control\)/s.test(css),
+    'COMET C6 bw-view-settings select uses --wf-radius-control'
+  );
+  assert(!/\.wtc-link[\s{,.-]/.test(css), 'COMET C6 must not introduce .wtc-link class fork');
+  assert(!/\.wtc-field[\s{,.-]/.test(css), 'COMET C6 must not introduce .wtc-field class fork');
   assert(css.includes('.wf-panel--risk-cockpit'), 'Risk Cockpit panel grid area');
   assert(css.includes('.wf-panel--radar'), 'Radar panel grid area');
   assert(css.includes('.wf-panel--risk-curve'), 'Risk Curve panel grid area');

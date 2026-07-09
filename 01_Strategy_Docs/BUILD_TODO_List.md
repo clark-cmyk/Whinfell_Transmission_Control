@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (COMET C5 chips + strip shipped · next C6)  
+**Last updated:** July 9, 2026 (COMET C6 links + forms shipped · next C7)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`58081c7`** · C5 code **`4dae71f`** · tree clean (noise untracked only)
+**HEAD:** `main` tip **`TBD after commit`** · C6 code pending · tree dirty until ship
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,16 +15,16 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · after COMET C5)
+## NEW SESSION — start here (Jul 9 · after COMET C6)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 58081c7 · C5 4dae71f · working tree clean
+Repo: Whinfell_Transmission_Control · main · C6 shipped · working tree clean after commit
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C5 entry)
-Shipped: Koyfin PR-1…7 + COMET C0–C5 (tokens · density · nav · panel · control set · chips/strip).
-Next: COMET C6 — links row (Koyfin / Barchart / Docs) + form field normalize.
+Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C6 entry)
+Shipped: Koyfin PR-1…7 + COMET C0–C6 (tokens · density · nav · panel · control · chips · links/forms).
+Next: COMET C7 — optional responsive @900px (stack nav + dashboard).
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -41,9 +41,9 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`58081c7`** |
-| Last UI commit | `feat(ui): COMET C5 chip variants + status strip` |
-| Working tree | **Clean** (source) |
+| Branch | `main` (C6 ship pending / see tip after commit) |
+| Last UI commit | `feat(ui): COMET C6 links toolbar + form fields` |
+| Working tree | **Clean** after C6 commit |
 | `dist/` | **gitignored** — always rebuild after source changes |
 | Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` (inbox; canonical is under `01_Strategy_Docs/`) |
 | Remote | Not pushed this session — push only if Clark asks |
@@ -62,21 +62,22 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C3** | Widget card chrome | `.wf-panel` radius-widget · border · header/body gap tokens | `1e431df` |
 | **C4** | Topbar control set | `.console-chip` / `.btn-console` radius-control · primary=ok | `a770a19` |
 | **C5** | Chip variants + strip height | `.console-chip--ok/warn/risk` · pipeline strip 24px · regime pills | `4dae71f` |
+| **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | (this ship) |
 
-**Tests at C5 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
+**Tests at C6 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK
 
 ### Next action for new session
 
-**→ COMET C6 — links row (Koyfin / Barchart / Docs) + form field normalize**
+**→ COMET C7 — optional responsive @900px**
 
 | Goal | Detail |
 |------|--------|
-| **C6 (do this)** | Desk link strip as toolbar items · panel form field normalize (label/input/select) |
-| Primary file | `css/console_ia.css` · desk links · HY OAS / dig form surfaces |
-| After C6 | C7 optional responsive @900px |
-| Out of scope now | `.wtc-*` DOM · widget re-scaffold · PR-8 full light unify · transaction codes · re-open C3–C5 |
+| **C7 (do this)** | Optional media query: stack nav + dashboard under 900px |
+| Primary file | `css/console_ia.css` · media query only |
+| After C7 | COMET track complete · PR-8 light unify / live desk as needed |
+| Out of scope now | `.wtc-*` DOM · widget re-scaffold · re-open C3–C6 |
 
-**C6 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced · re-open C5 chips/strip
+**C7 do-not:** change business JS · re-scaffold grid · hard-code new hex · touch `main.css` dual system unless forced · re-open C6 links/forms
 
 **Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
 
@@ -92,7 +93,7 @@ cd dist && python3 -m http.server 8765
 node tests/koyfin_widget_shell.test.mjs
 ```
 
-Browser checklist: dark slate · control chips radius **4** · primary green Collect · status ok/warn/risk chips · collapsed pipeline strip **24px** · regime pills tokenized · cards radius **8** · left nav · denser 44px header · light theme · no layout thrash.
+Browser checklist: dark slate · accent Koyfin/Barchart/Docs links · form fields radius **4** · control chips · status chips · pipeline strip **24px** · cards radius **8** · left nav · 44px header · light theme · no layout thrash.
 
 ---
 
@@ -116,7 +117,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **COMET** | C3 | Widget card chrome lock | **Done** Jul 9 |
 | **COMET** | C4 | Topbar control set | **Done** Jul 9 |
 | **COMET** | C5 | Chip variants + status strip | **Done** Jul 9 |
-| **COMET** | C6 | Links · form fields | **Next** |
+| **COMET** | C6 | Links · form fields | **Done** Jul 9 |
+| **COMET** | C7 | Optional responsive @900px | **Next** |
 
 ### Known gaps (do not re-break)
 
@@ -156,11 +158,11 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | 5 Nav items | `.wtc-nav-item` · section titles | `.wf-nav-item` · `.ia-view-shortcut` · specialized tools | **Partial** — icons-only codes done (Chunk 2) |
 | 6 Widget grid rows | `.wtc-row` / 3col / full | `.ia-widget-grid` · `grid-template-areas` | **Mostly done** — Koyfin PR-1…6 |
 | 7 Widget cards | `.wtc-widget` · header/body | `.wf-panel` · `__header` / `__body` / `__meta` | **Mostly done** — meta polish 3–6 |
-| 8 Form controls | `.wtc-field` · input/select | HY OAS / dig hosts · mission controls | **Open** — normalize inside panels |
+| 8 Form controls | `.wtc-field` · input/select | HY OAS / dig hosts · mission controls | **Done** C6 |
 | 9 KPI chips / tags | `.wtc-chip*` | `.console-chip--ok/warn/risk` · regime tags | **Done** C5 — variants + regime tokens |
-| 10 Links toolbar | `.wtc-link` · link-row | Koyfin/Barchart/Docs strip · desk links | **Open** — C6 toolbar item styling |
+| 10 Links toolbar | `.wtc-link` · link-row | Koyfin/Barchart/Docs strip · desk links | **Done** C6 |
 | 11 Freshness strip | `.wtc-status-strip` (24px) | `.ia-top-pipeline-strip` · header freshness | **Done** C5 — strip-h 24px collapsed |
-| 12 Responsive | stack nav @900px | optional; not blocking desk 1440 | **Deferred** |
+| 12 Responsive | stack nav @900px | optional; not blocking desk 1440 | **Open** — C7 |
 
 ### COMET implementation chunks (queued)
 
@@ -172,8 +174,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | **C3** | Widget card chrome lock (radius 8 · border · header/body gap) | `.wf-panel*` only | **Done** Jul 9 |
 | **C4** | Search + primary/secondary actions as control set | topbar utilities · `.console-chip` / btn classes | **Done** Jul 9 |
 | **C5** | Chip variants ok/warn/risk + status strip height | chips · pipeline strip · regime pills | **Done** Jul 9 |
-| **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | **Next** · C3–C5 |
-| **C7** | Optional responsive @900px | media query only | after C1–C3 stable |
+| **C6** | Links row (Koyfin / Barchart / Docs) + form field normalize | desk link strip · panel forms | **Done** Jul 9 |
+| **C7** | Optional responsive @900px | media query only | **Next** |
 
 **Acceptance (COMET track overall):** Desk at 1440 looks denser/cleaner Koyfin-like; single token system; no second shell class tree; keyboard + relocateNodes + widget hosts unchanged.
 
@@ -231,7 +233,8 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 
 | # | Goal | Priority | Owner | Done when |
 |---|------|----------|-------|-----------|
-| 0i | **COMET C6** — links row + form field normalize | **High · next UI track** | BUILD | desk Koyfin/Barchart/Docs links · panel form fields · no `.wtc-*` |
+| 0j | **COMET C7** — optional responsive @900px | **Medium · next UI track** | BUILD | stack nav/dashboard under 900 · media query only · tests PASS |
+| 0i | **COMET C6** — links row + form field normalize | **Done** | BUILD | accent toolbar links · form radius-control · tests PASS |
 | 0h | **COMET C5** — chip variants ok/warn/risk + strip height | **Done** | BUILD | chip--ok/warn/risk · pipeline strip 24px · regime pills · tests PASS |
 | 0g | **COMET C4** — search + control set | **Done** | BUILD | topbar chip/btn radius-control · primary=ok · tests PASS |
 | 0f | **COMET C3** — widget card chrome lock (`.wf-panel*`) | **Done** | BUILD | radius-widget · border · header/body gap · tests PASS |
