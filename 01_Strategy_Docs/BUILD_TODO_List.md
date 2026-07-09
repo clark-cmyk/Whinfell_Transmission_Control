@@ -3,7 +3,7 @@
 **Maintained by:** BUILD Cousins  
 **Last updated:** July 9, 2026 (COMET C2 nav shipped · next C3)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip — run `git log -1 --oneline` · C2 code **`7860c49`** · tree clean (noise untracked only)
+**HEAD:** `main` tip **`f0d599a`** · C2 code **`7860c49`** · tree clean (noise untracked only)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -20,7 +20,7 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 7860c49 · working tree clean
+Repo: Whinfell_Transmission_Control · main tip f0d599a · C2 7860c49 · working tree clean
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C2 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C2 (tokens · density · nav hover/active).
@@ -41,7 +41,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`7860c49`** |
+| Branch | `main` tip **`f0d599a`** |
 | Last UI commit | `feat(ui): COMET C2 nav hover/active` |
 | Working tree | **Clean** (source) |
 | `dist/` | **gitignored** — always rebuild after source changes |
