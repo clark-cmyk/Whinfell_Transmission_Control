@@ -1,7 +1,42 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (atomic hydration H1–H3 · tip `def1cd7`)
+**Last updated:** July 9, 2026 (rebuild + dist smoke · tip `f52ff1b`)
+
+---
+
+## July 9, 2026 — Rebuild + dist smoke (go-live preflight)
+
+```text
+CHUNK ID: DESK-smoke-rebuild
+PHASE: Go-live gate
+GOAL: Confirm dist serves RENDER SUCCESS + published 07-08 hydration after H1–H3
+STATUS: CLOSED — no code change · strategy pin this close-out
+
+CONTEXT
+- BUILD_TODO next #1 after hydration H1–H3 = rebuild + smoke
+- Working tree clean at tip f52ff1b
+- WMC ?_= leftover already present in midwest_compute/wmc-hydrate.js (committed)
+
+QA
+- [x] test_atomic_hydration_publish · safe_boot_render · refresh_render_guard · auto_collect_panel PASS
+- [x] run_desk_probes · freshness_indicators · rv_horizon_fallback PASS
+- [x] bash scripts/build_web.sh OK · stamp 2026-07-09T14:38:31Z
+- [x] dist/data/hydration/latest.json snapshot=global-2026-07-08-raw2wtm-01 · freshness=fresh · as_of=2026-07-08T03:56:43+00:00
+- [x] Playwright headless hard-refresh ×5 — all RENDER SUCCESS · lastRenderOk=true · Pipeline: Fresh · 0 page errors
+- [ ] Operator COMET/Chrome ratings (Desk_Feedback_Log)
+
+KNOWN GAP (not smoke blocker)
+- live latest.json has no task_force block
+- data/hydration/task_force.json still snapshot global-2026-07-04-raw2wtm-01 (score 69 stubs)
+- phase23_console · task_force_wtm_export · task_force_panel_feed FAIL until TF re-gather/merge on 07-08
+- Do NOT merge stale 07-04 TF over raw2wtm score 58
+
+NEXT SESSION
+1. Live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live)
+2. Task Force --gatherer on 07-08 · specialists/stubs · --merge · re-copy hydration
+3. Optional PR-8 light unify only if walk-through needs it
+```
 
 ---
 
@@ -35,11 +70,12 @@ QA
 - [x] smoke copy_hydration_bundle → 07-08 snapshot dual dest
 - [x] committed def1cd7
 - [x] build_web dist smoke this close-out (docs/data/dist snapshot parity 07-08)
+- [x] post-H1–H3 rebuild + Playwright ×5 (see DESK-smoke-rebuild)
 - [ ] COMET / live desk operator ratings
 
 NEXT SESSION
 1. Live desk walk-through / Desk_Feedback_Log ratings (go-live)
-2. Optional: commit midwest_compute/wmc-hydrate.js ?_= leftover
+2. Task Force re-merge on 07-08 (do not paste 07-04 stubs over score 58)
 3. Do not re-open boot badge for data-staleness
 ```
 
