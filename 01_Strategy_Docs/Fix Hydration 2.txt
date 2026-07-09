@@ -1,0 +1,34 @@
+# Status: FIXED (2026-07-09) — committed def1cd7 · H1 atomic publish · H2 UI stamps · H3 tests
+
+You are BUILD assistant for Whinfell Transmission Control. Implement Atomic Hydration Publish — production-ready refresh/hydration process so "Collect + Refresh" never reverts to old data.
+
+**Problem Summary**:
+- Current hydration often copies stale bundle from archive.
+- No atomic update → partial or old data on refresh.
+- UI sometimes shows old version after collect.
+
+**Requirements (Best Practices)**:
+- Idempotent collect → normalize → hydrate pipeline.
+- Atomic publish: write to .tmp file, validate, then mv (or versioned + symlink to latest.json).
+- latest.json always has: as_of, snapshot_id, freshness_status, sources_manifest.
+- One primary "Collect + Refresh All" button + per-module options.
+- UI force-reloads data with cache-bust (?v=timestamp or no-store).
+- Clear status (last refresh time, freshness badge).
+- Agent job results drive UI toasts and renderAll.
+- Fallback to terminal remains.
+- No breaking existing collect paths.
+
+**Files (micro-chunk)**:
+- whinfell_pipeline/auto_download/ (orchestrator + daily --chain) — produce fresh stamped latest.json.
+- scripts/ (new publish_hydration.sh or update copy_hydration_bundle.sh) — atomic + stamp.
+- js/auto_collect_panel.js + data load code — force reload + status.
+- scripts/build*.sh — reliable pick-up.
+- Tests: freshness assertions.
+
+**Output**:
+- Full terminal sequence starting with cd ~/Desktop/Whinfell_Transmission_Control
+- Exact code changes/diffs (file by file)
+- Verification commands (browser + tests)
+- How to test "no revert to old version"
+
+Start with diagnosis from current code, then deliver minimal safe changes. Prioritize atomicity and observability.
