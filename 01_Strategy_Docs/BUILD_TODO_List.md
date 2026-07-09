@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (TF+BW+BBDM residual closed · operator walk-through next)  
+**Last updated:** July 9, 2026 (TODO pin + push · operator walk-through next)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`d68289c`** · TF re-merge **`c93ba07`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`** · C7 code **`3ecf23d`**  
+**HEAD:** `main` tip **`3105694`** · code **`d68289c`** · TF re-merge **`c93ba07`** · hydration **`def1cd7`/`35fb486`** · refresh guard **`7b4aee5`**  
 **Live snapshot:** **`global-2026-07-09-raw2wtm-01`** · TF `validation_status=complete` · BBDM gate score **50** (not 07-06 / 38)
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
@@ -21,12 +21,12 @@
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip d68289c
+Repo: Whinfell_Transmission_Control · main tip 3105694 (code d68289c)
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: Desk_Feedback_Log.md · Progress_Log.md · Refresh Bug.txt (FIXED) · Fix Hydration 2.txt (FIXED)
 Shipped: FALLBACK guard · atomic hydration · TF on global-2026-07-09-raw2wtm-01 (complete) ·
   full-desk Refresh hydrate + BW dual stamps · BBDM re-score 07-09 (score 50, cache-bust+no-store) ·
-  residual re-verify + dist smoke ×3 RENDER SUCCESS
+  residual re-verify + dist smoke ×3 RENDER SUCCESS · strategy pin pushed to GitHub
 Next: (1) live desk walk-through / operator ratings → Desk_Feedback_Log.md (go-live gate ONLY)
      (2) optional PR-8 light unify only if walk-through needs it
 Do NOT re-open boot badge · atomic publish · TF re-merge · BBDM 07-06 gate without new bug
@@ -46,14 +46,14 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`d68289c`** (desk full hydrate + BW stamps + BBDM 07-09) · strategy pin this close-out |
+| Branch | `main` tip **`3105694`** (strategy pin) · code **`d68289c`** (desk full hydrate + BW + BBDM) |
 | TF re-merge | **`c93ba07`** on `global-2026-07-09-raw2wtm-01` · `validation_status=complete` |
 | Hydration publish | **`def1cd7`/`35fb486`** `Atomic Hydration Publish H1-H3` |
 | Refresh guard commit | **`7b4aee5`** sticky RENDER FALLBACK recovery |
-| Working tree | Clean after strategy pin · only untracked `collect.log` noise |
+| Working tree | Clean · only untracked `collect.log` / local notes noise |
 | `dist/` | **gitignored** — rebuilt Jul 9 residual smoke · stamp `2026-07-09T15:03:46Z` |
 | WMC `?_=` leftover | **Already in tree** — `midwest_compute/wmc-hydrate.js` cache-bust + `no-store` |
-| Remote | Not pushed this session — push only if Clark asks |
+| Remote | **`origin/main`** pushed Jul 9 (tip includes TF + BW + BBDM + strategy pin) |
 
 ### Shipped
 
@@ -456,6 +456,6 @@ python3 scripts/bang_bang_da_server.py   # :8766 — keep running for UI window 
 curl -s "http://127.0.0.1:8766/api/report?window=60" | python3 -m json.tool | head
 ```
 
-**Session close (Jul 9 residual):** code tip **`d68289c`** · strategy pin this close-out · TF on **`global-2026-07-09-raw2wtm-01`** complete · full-desk Refresh + BW dual stamps + BBDM score 50 · dist smoke ×3 **RENDER SUCCESS** · **Next gate** = operator ratings only (`Desk_Feedback_Log.md`).
+**Session close (Jul 9 residual):** tip **`3105694`** · code **`d68289c`** · TF on **`global-2026-07-09-raw2wtm-01`** complete · full-desk Refresh + BW dual stamps + BBDM score 50 · dist smoke ×3 **RENDER SUCCESS** · pushed to GitHub · **Next gate** = operator ratings only (`Desk_Feedback_Log.md`).
 
 **Desk smoke:** `bash scripts/build_web.sh` · `cd dist && python3 -m http.server 8765` · hard-refresh `/?boot_log=1` · badge **RENDER SUCCESS** · optional `?safe_boot=1` · Collect CSVs needs agent `:8767`.
