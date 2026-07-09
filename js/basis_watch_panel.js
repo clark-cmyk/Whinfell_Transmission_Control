@@ -20,7 +20,8 @@
 (function basisWatchPanel(global) {
   'use strict';
 
-  const BW_BUILD = '3.4-BASISWATCH-ARK-IO-2026-07-09';
+  /** Chunk 17 — standalone Whinfell_BasisWatch.html loads via WTM_Ark only. */
+  const BW_BUILD = '3.5-BASISWATCH-STANDALONE-ARK-2026-07-09';
   const THEME_COLORS = { dark: '#090d12', light: '#eef1f5' };
   const PREFS_KEY = 'whinfell_basiswatch_prefs';
   const THEME_KEY = 'whinfell_tc_theme';
@@ -1822,6 +1823,20 @@
     window.addEventListener('resize', () => renderPanel(hooks.getState()));
   }
 
+  /**
+   * Surface Ark / protocol status on the standalone status chip.
+   * Raw data always loads through WTM_Ark when protocol allows fetch.
+   */
+  function setStandaloneStatus(kind, text) {
+    const chip = el('bwStatusChip');
+    if (!chip) return;
+    chip.textContent = text || '—';
+    chip.classList.remove('bw-status-chip--live', 'bw-status-chip--snapshot');
+    // Reuse existing chip chrome: live = green, snapshot/warn = amber.
+    if (kind === 'live') chip.classList.add('bw-status-chip--live');
+    else chip.classList.add('bw-status-chip--snapshot');
+  }
+
   async function initStandalone() {
     initTheme();
     const params = new URLSearchParams(location.search);
@@ -1839,7 +1854,22 @@
       provenance: {},
     };
 
-    const bundle = await loadHydrationBundle();
+    // Chunk 17: standalone page requires The Ark for hydration + curve.
+    const ark = getArk();
+    const onFile = location.protocol === 'file:';
+    if (!ark) {
+      console.error('[BasisWatch] Chunk 17: WTM_Ark missing — include js/ark.js before basis_watch_panel.js');
+      setStandaloneStatus('warn', 'Ark missing');
+    } else if (onFile) {
+      // Browsers block fetch of local JSON under file:; serve via http (dist/).
+      console.warn('[BasisWatch] file: protocol — serve Whinfell_BasisWatch.html over http so Ark can load data/');
+      setStandaloneStatus('warn', 'Serve via http');
+    } else {
+      setStandaloneStatus('live', 'Live');
+    }
+
+    // Hydration + curve only via WTM_Ark (loadHydrationBundle / ensureCurveHistory).
+    const bundle = await loadHydrationBundle({ force: true });
     if (bundle) mergeHydrationBundle(standaloneState, bundle);
 
     stateGetter = () => standaloneState;
@@ -1847,6 +1877,17 @@
     wireControls(() => standaloneState, {});
     await ensureCurveHistory();
     await refresh(standaloneState, {});
+
+    // Confirm stamp after Ark loads (standalone single-page boot).
+    if (ark && typeof ark.getStamp === 'function' && !onFile) {
+      const stamp = ark.getStamp() || {};
+      if (stamp.snapshot_id || stamp.as_of) {
+        setStandaloneStatus('live', stamp.snapshot_id ? 'Live · Ark' : 'Live');
+      } else if (!bundle) {
+        setStandaloneStatus('warn', 'No hydration');
+      }
+    }
+
     window.addEventListener('resize', () => renderPanel(standaloneState));
 
     window.addEventListener('whinfell-desk-refresh', () => {

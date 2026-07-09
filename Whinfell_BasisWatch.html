@@ -105,6 +105,8 @@
     <span>CME-inspired basis &amp; implied rate · desk hydration</span>
   </footer>
 
+  <!-- Chunk 17: The Ark SSOT must load before BasisWatch / desk ops (no raw market fetch elsewhere). -->
+  <script src="js/ark.js"></script>
   <script src="js/task_force_panel_feed.js"></script>
   <script src="js/basis_watch_analytics.js"></script>
   <script src="js/basis_watch_panel.js"></script>
@@ -112,6 +114,9 @@
   <script src="js/auto_collect_panel.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      if (!window.WTM_Ark) {
+        console.error('[BasisWatch standalone] WTM_Ark missing — include js/ark.js before panel scripts');
+      }
       if (window.WTM_DeskOps?.mountDeskOpsBar) {
         WTM_DeskOps.mountDeskOpsBar('#deskOpsMount', { backHref: './index.html' });
       }
