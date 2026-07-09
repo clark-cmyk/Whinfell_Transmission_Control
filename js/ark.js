@@ -8,13 +8,18 @@
 (function arkModule(global) {
   'use strict';
 
-  const BUILD = 'ARK-1.1.0-SOURCES-2026-07-09';
+  const BUILD = 'ARK-1.2.0-CHUNK18-2026-07-09';
 
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
   const BBDM_REPORT_URLS = Object.freeze([
     'bang_bang_da/bang_bang_da_report.json',
     './bang_bang_da/bang_bang_da_report.json',
+  ]);
+  /** CoinGlass / Litmus market stub (BBDM v2). */
+  const COINGLASS_URLS = Object.freeze([
+    'bang_bang_da/litmus/crypto_market.json',
+    './bang_bang_da/litmus/crypto_market.json',
   ]);
 
   /** @type {object|null} */
@@ -23,6 +28,8 @@
   let curveCache = null;
   /** @type {object|null} */
   let bbdmReportCache = null;
+  /** @type {object|null} */
+  let coinglassCache = null;
   /** @type {string|null} */
   let lastRefreshedAt = null;
 
@@ -45,6 +52,7 @@
   sources.set('hydration', makeSource('hydration', HYDRATION_URL));
   sources.set('curve', makeSource('curve', CURVE_URL));
   sources.set('bbdm_report', makeSource('bbdm_report', BBDM_REPORT_URLS[0]));
+  sources.set('coinglass_perp', makeSource('coinglass_perp', COINGLASS_URLS[0]));
 
   function isFileProtocol() {
     try {
@@ -275,11 +283,53 @@
   }
 
   /**
+   * Load CoinGlass / Litmus crypto_market JSON (path cascade).
+   * @param {{ force?: boolean }} [options]
+   */
+  async function loadCoinglass(options) {
+    const opts = options || {};
+    const force = opts.force !== false;
+
+    if (!force && coinglassCache) {
+      return okResult(coinglassCache);
+    }
+
+    if (isFileProtocol()) {
+      setSourceStatus('coinglass_perp', 'unavailable', 'file: protocol cannot fetch data files', COINGLASS_URLS[0]);
+      return failResult('file: protocol cannot fetch data files');
+    }
+
+    const fetched = await fetchJsonFirst(COINGLASS_URLS.slice());
+    if (!fetched.ok) {
+      setSourceStatus('coinglass_perp', 'error', fetched.error, COINGLASS_URLS[0]);
+      return failResult(fetched.error);
+    }
+
+    coinglassCache = fetched.data;
+    lastRefreshedAt = new Date().toISOString();
+    // Stub docs may be pending_coinglass — still "ok" as published artifact.
+    const dataStatus = coinglassCache && (coinglassCache.data_status || coinglassCache.stub_status || coinglassCache.status);
+    // File present counts as ok for Ark inventory; stub/pending flagged in error note for desk.
+    const note = dataStatus && /pending|stub|missing/i.test(String(dataStatus))
+      ? `data_status=${dataStatus}`
+      : null;
+    setSourceStatus('coinglass_perp', 'ok', note, fetched.url || COINGLASS_URLS[0]);
+    notify({ type: 'coinglass_perp', ok: true, source: 'coinglass_perp' });
+    return okResult(coinglassCache);
+  }
+
+  /** @returns {object|null} */
+  function getCoinglass() {
+    return coinglassCache;
+  }
+
+
+  /**
    * Inventory of registered data sources for the ARK page.
    * @returns {Array<{ id: string, url: string, status: string, lastSuccessAt: string|null, error: string|null }>}
    */
   function getSources() {
-    return ['hydration', 'curve', 'bbdm_report'].map((id) => cloneSource(sources.get(id)));
+    return ['hydration', 'curve', 'bbdm_report', 'coinglass_perp'].map((id) => cloneSource(sources.get(id)));
   }
 
   /**
@@ -319,6 +369,8 @@
     getCurveHistory: getCurveHistory,
     loadBbdmReport: loadBbdmReport,
     getBbdmReport: getBbdmReport,
+    loadCoinglass: loadCoinglass,
+    getCoinglass: getCoinglass,
     getSources: getSources,
     getStamp: getStamp,
     subscribe: subscribe,

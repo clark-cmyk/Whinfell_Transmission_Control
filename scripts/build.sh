@@ -51,7 +51,34 @@ cp "${ROOT}/js/console_ia_shell.js" "$OUT/js/console_ia_shell.js"
 cp "${ROOT}/js/shell_shortcuts.js" "$OUT/js/shell_shortcuts.js"
 cp "${ROOT}/js/wmc_ia_panel.js" "$OUT/js/wmc_ia_panel.js"
 cp "${ROOT}/js/publish_web_panel.js" "$OUT/js/publish_web_panel.js"
+# BBDM + desk ops companions used by Bang Bang Da page
+[[ -f "${ROOT}/css/bbdm_ia.css" ]] && cp "${ROOT}/css/bbdm_ia.css" "$OUT/css/bbdm_ia.css"
+[[ -f "${ROOT}/js/bbdm_litmus_table.js" ]] && cp "${ROOT}/js/bbdm_litmus_table.js" "$OUT/js/bbdm_litmus_table.js"
+[[ -f "${ROOT}/js/bbdm_ia_shell.js" ]] && cp "${ROOT}/js/bbdm_ia_shell.js" "$OUT/js/bbdm_ia_shell.js"
 [[ -f "${ROOT}/Whinfell_BasisWatch.html" ]] && cp "${ROOT}/Whinfell_BasisWatch.html" "$OUT/"
+# Chunk 18 — Bang Bang Da page + static report (Ark bbdm_report path)
+[[ -f "${ROOT}/bang_bang_da_machine.html" ]] && cp "${ROOT}/bang_bang_da_machine.html" "$OUT/bang_bang_da_machine.html"
+if [[ -d "${ROOT}/bang_bang_da" ]]; then
+  mkdir -p "$OUT/bang_bang_da/litmus"
+  [[ -f "${ROOT}/bang_bang_da/bang_bang_da_report.json" ]] && cp "${ROOT}/bang_bang_da/bang_bang_da_report.json" "$OUT/bang_bang_da/"
+  [[ -f "${ROOT}/bang_bang_da/README.md" ]] && cp "${ROOT}/bang_bang_da/README.md" "$OUT/bang_bang_da/" 2>/dev/null || true
+  # Coinglass / litmus stubs (Ark coinglass_perp + BBDM Litmus)
+  if [[ -d "${ROOT}/bang_bang_da/litmus" ]]; then
+    cp "${ROOT}/bang_bang_da/litmus/"*.json "$OUT/bang_bang_da/litmus/" 2>/dev/null || true
+  fi
+  echo "==> Copied bang_bang_da/ (report + litmus)"
+fi
+# Standalone tool pages (major desk surfaces)
+for PAGE in Whinfell_Midwest_Compute_Crush.html Crypto_Analytics.html; do
+  [[ -f "${ROOT}/${PAGE}" ]] && cp "${ROOT}/${PAGE}" "$OUT/${PAGE}" && echo "==> Copied ${PAGE}"
+done
+for DIR in midwest_compute crypto_analytics; do
+  if [[ -d "${ROOT}/${DIR}" ]]; then
+    rm -rf "$OUT/${DIR}"
+    cp -R "${ROOT}/${DIR}" "$OUT/${DIR}"
+    echo "==> Copied ${DIR}/"
+  fi
+done
 
 touch "$OUT/.nojekyll"
 date -u +"%Y-%m-%dT%H:%M:%SZ" > "$OUT/BUILD_STAMP.txt"
@@ -133,6 +160,8 @@ for req in \
   js/ark_ia_panel.js \
   js/articulate.js \
   js/a_ia_panel.js \
+  bang_bang_da_machine.html \
+  bang_bang_da/bang_bang_da_report.json \
   js/core.js \
   js/desk_china_ladder_models.js \
   js/data_states.js \

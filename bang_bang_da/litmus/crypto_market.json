@@ -3,7 +3,7 @@
   "adapter_version": "2.0.0-chunk17",
   "data_status": "stub",
   "source": "coinglass",
-  "as_of": "2026-07-07T22:17:53+00:00",
+  "as_of": "2026-07-09T22:55:15+00:00",
   "export_id": "coinglass_perp_market",
   "trade_ids": [
     "btc_basis",

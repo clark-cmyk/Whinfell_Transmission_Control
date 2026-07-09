@@ -97,6 +97,8 @@ async function run() {
     assert(typeof Ark.getCurveHistory === 'function', 'getCurveHistory');
     assert(typeof Ark.loadBbdmReport === 'function', 'loadBbdmReport');
     assert(typeof Ark.getBbdmReport === 'function', 'getBbdmReport');
+    assert(typeof Ark.loadCoinglass === 'function', 'loadCoinglass');
+    assert(typeof Ark.getCoinglass === 'function', 'getCoinglass');
     assert(typeof Ark.getSources === 'function', 'getSources');
     assert(typeof Ark.subscribe === 'function', 'subscribe');
   }
@@ -119,7 +121,7 @@ async function run() {
 
     assert(Ark.getHydration() === null, 'cache empty before load');
     const stamp0 = Ark.getStamp();
-    assert(stamp0.sources.length === 3, 'three source rows initially');
+    assert(stamp0.sources.length === 4, 'four source rows initially');
     assert(sourceById(stamp0.sources, 'hydration').status === 'unavailable', 'initial hydration unavailable');
     assert(stamp0.as_of === null, 'initial stamp empty');
 
@@ -137,7 +139,7 @@ async function run() {
     assert(stamp.snapshot_id === bundle.snapshot_id, 'getStamp snapshot_id');
     assert(stamp.freshness_status === 'fresh', 'getStamp freshness');
     assert(stamp.lastRefreshedAt && typeof stamp.lastRefreshedAt === 'string', 'lastRefreshedAt set');
-    assert(stamp.sources.length === 3, 'three source rows after load');
+    assert(stamp.sources.length === 4, 'four source rows after load');
     const hyd = sourceById(stamp.sources, 'hydration');
     assert(hyd && hyd.id === 'hydration', 'hydration source id');
     assert(hyd.status === 'ok', 'hydration source status ok');
@@ -364,22 +366,24 @@ async function run() {
         'latest.json': { as_of: 'a', snapshot_id: 's', freshness_status: 'fresh' },
         'barchart_curve_history.json': { records: [] },
         'bang_bang_da_report.json': { scores: [] },
+        'crypto_market.json': { data_status: 'live', export_id: 'coinglass_perp_market', tables: {} },
       }),
     });
 
     const initial = Ark.getSources();
-    assert(initial.length === 3, 'getSources length 3');
-    assert(initial.map((s) => s.id).join(',') === 'hydration,curve,bbdm_report', 'source id order');
+    assert(initial.length === 4, 'getSources length 4');
+    assert(initial.map((s) => s.id).join(',') === 'hydration,curve,bbdm_report,coinglass_perp', 'source id order');
     assert(initial.every((s) => s.status === 'unavailable'), 'all start unavailable');
 
     await Ark.loadHydration({ force: true });
     await Ark.loadCurveHistory({ force: true });
     await Ark.loadBbdmReport({ force: true });
+    await Ark.loadCoinglass({ force: true });
 
     const after = Ark.getSources();
     assert(after.every((s) => s.status === 'ok'), 'all ok after loads');
     assert(after.every((s) => s.lastSuccessAt), 'lastSuccessAt set');
-    assert(Ark.getStamp().sources.length === 3, 'getStamp uses full inventory');
+    assert(Ark.getStamp().sources.length === 4, 'getStamp uses full inventory');
   }
 
   // --- subscribe / unsubscribe ---
@@ -442,9 +446,10 @@ async function run() {
     assert(getFetchCount() === 0 && !fetched, 'file: no network for curve/bbdm');
     assert(sourceById(Ark.getSources(), 'curve').status === 'unavailable', 'curve unavailable file:');
     assert(sourceById(Ark.getSources(), 'bbdm_report').status === 'unavailable', 'bbdm unavailable file:');
+    assert(sourceById(Ark.getSources(), 'coinglass_perp').status === 'unavailable', 'coinglass unavailable file:');
   }
 
-  console.log('PASS ark.test.mjs — hydration + curve + bbdm + getSources + subscribe');
+  console.log('PASS ark.test.mjs — hydration + curve + bbdm + coinglass + getSources + subscribe');
 }
 
 run().catch((err) => {

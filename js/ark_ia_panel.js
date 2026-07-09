@@ -95,6 +95,7 @@
       '- data/hydration/latest.json',
       '- data/barchart/v1/barchart_curve_history.json',
       '- bang_bang_da/bang_bang_da_report.json',
+      '- bang_bang_da/litmus/crypto_market.json (CoinGlass / Litmus)',
       '',
       '**Environment notes**',
       `- location.protocol: ${global.location?.protocol || 'unknown'}`,
@@ -213,6 +214,7 @@
     if (typeof ark.loadHydration === 'function') tasks.push(ark.loadHydration({ force: true }));
     if (typeof ark.loadCurveHistory === 'function') tasks.push(ark.loadCurveHistory({ force: true }));
     if (typeof ark.loadBbdmReport === 'function') tasks.push(ark.loadBbdmReport({ force: true }));
+    if (typeof ark.loadCoinglass === 'function') tasks.push(ark.loadCoinglass({ force: true }));
     try {
       await Promise.all(tasks);
     } catch (err) {
