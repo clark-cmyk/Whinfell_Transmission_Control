@@ -110,7 +110,40 @@ function loadScanModule() {
   return sandbox.WTM_ScanKpiStrip;
 }
 
+function asHtmlCollection(items) {
+  /** Array-like only — no .find / .some / .forEach (real HTMLCollection shape). */
+  const col = { length: items.length };
+  for (let i = 0; i < items.length; i += 1) col[i] = items[i];
+  return col;
+}
+
 function run() {
+  // Boot fix lock: HTMLCollection is not an Array — never call .some/.find on .children
+  const stripSrc = fs.readFileSync(path.join(ROOT, 'js', 'scan_kpi_strip.js'), 'utf8');
+  assert(/function childList\s*\(/.test(stripSrc), 'childList helper present for HTMLCollection');
+  assert(/Array\.from\(\s*kids\s*\)/.test(stripSrc), 'childList uses Array.from');
+  assert(
+    !/\(\s*layout\?\.children\s*\|\|\s*\[\s*\]\s*\)\.some/.test(stripSrc),
+    'hasRcZones must not call .some on layout.children',
+  );
+  assert(
+    !/\(\s*layout\?\.children\s*\|\|\s*\[\s*\]\s*\)\.find/.test(stripSrc),
+    'findRcZone must not call .find on layout.children',
+  );
+  assert(
+    !/\(\s*mount\?\.children\s*\|\|\s*\[\s*\]\s*\)\.find/.test(stripSrc),
+    'findTilesLayout must not call .find on mount.children',
+  );
+  assert(
+    !/\(\s*node\?\.children\s*\|\|\s*\[\s*\]\s*\)\.forEach/.test(stripSrc),
+    'collectScanTiles must not call .forEach on node.children',
+  );
+  // Sanity: HTMLCollection-like lacks Array methods; Array.from still works
+  const probe = asHtmlCollection([{ dataset: { rcZone: 'header' } }]);
+  assert(typeof probe.some !== 'function', 'HTMLCollection-like has no .some');
+  assert(typeof probe.find !== 'function', 'HTMLCollection-like has no .find');
+  assert(Array.from(probe).some((c) => c.dataset?.rcZone) === true, 'Array.from restores .some');
+
   const SCAN = loadScanModule();
   assert(SCAN?.BUILD?.includes('CHUNK07'), 'scan strip build stamp');
   assert(SCAN.STATE_CLASS_POOLS?.riskZone?.includes('risk-zone-amber'), 'risk zone state pool');
@@ -279,6 +312,7 @@ function run() {
     `rendered=${tiles.length}`,
     `score=${valueEl?.textContent}`,
     `gate_state=${gateTile?.dataset?.dataState}`,
+    'htmlcollection_safe=1',
   ].join('\n'));
 }
 

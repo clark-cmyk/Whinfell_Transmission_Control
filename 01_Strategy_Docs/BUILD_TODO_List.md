@@ -24,7 +24,7 @@ Repo: Whinfell_Transmission_Control · main tip 4895c0f · C7 3ecf23d · working
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
 Also: 01_Strategy_Docs/COMET_CSS_Refactor_Spec.md + Progress_Log.md (C7 entry)
 Shipped: Koyfin PR-1…7 + COMET C0–C7 (tokens · density · nav · panel · control · chips · links/forms · responsive@900).
-Next: PR-8 light unify / live desk walk-through / scan_kpi_strip hasRcZones boot note as needed.
+Next: PR-8 light unify / live desk walk-through as needed.
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -77,7 +77,7 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **Next** | Live desk walk-through · PR-8 light unify as needed · optional boot fix |
 | Out of scope | `.wtc-*` DOM · widget re-scaffold · re-open C0–C7 |
 
-**Known boot note (separate):** `scan_kpi_strip.js` `hasRcZones` uses `layout.children.some` on HTMLCollection → `renderAll` can fail (cockpit meta stuck). Fix only if still open and blocking.
+**Boot fix (done):** `scan_kpi_strip.js` `childList()` via `Array.from` — no more `.some`/`.find`/`.forEach` on HTMLCollection (cockpit meta stuck).
 
 ### Recommended open commands
 

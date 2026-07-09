@@ -1,7 +1,33 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (COMET C7 responsive @900px · COMET track complete)
+**Last updated:** July 9, 2026 (scan_kpi_strip HTMLCollection boot fix · COMET C7 complete)
+
+---
+
+## July 9, 2026 — Boot fix: scan_kpi_strip HTMLCollection
+
+```text
+CHUNK ID: BOOT-hasRcZones
+PHASE: Stability
+GOAL: Stop renderAll / cockpit meta fail from HTMLCollection lacking Array methods
+
+CONTEXT
+- Known note: hasRcZones used (layout.children || []).some — HTMLCollection has no .some
+- Same bug on findRcZone (.find), findTilesLayout (.find), collectScanTiles (.forEach)
+
+CHANGES
+- js/scan_kpi_strip.js — childList() → Array.from(node.children); all child walks use it
+- tests/scan_kpi_strip.test.mjs — source locks + HTMLCollection-like probe
+
+QA
+- [x] scan_kpi_strip · phase16 · koyfin_widget_shell PASS
+- [ ] committed
+- [ ] browser hard-refresh · cockpit meta paints
+
+NEXT SESSION
+- live desk / PR-8 light unify
+```
 
 ---
 
@@ -35,7 +61,7 @@ QA
 - [ ] browser-verify ≤900 stack · wrap nav · 1-col widgets · 1440 unchanged
 
 NEXT SESSION
-- COMET track complete · live desk / PR-8 light unify / optional hasRcZones boot fix
+- COMET track complete · hasRcZones boot fix **shipped** · live desk / PR-8 light unify
 ```
 
 ---
@@ -374,7 +400,7 @@ QA
 - [ ] commit (not requested this turn)
 
 NOTE
-- scan_kpi_strip hasRcZones HTMLCollection.some can break renderAll (cockpit meta) — separate
+- scan_kpi_strip hasRcZones HTMLCollection.some can break renderAll (cockpit meta) — **fixed** (BOOT-hasRcZones)
 
 NEXT SESSION
 - Commit Chunk 6 if desired

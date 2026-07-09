@@ -505,9 +505,16 @@
     return node;
   }
 
+  /** HTMLCollection is array-like but has no .find/.some/.forEach — never call those on .children. */
+  function childList(node) {
+    const kids = node?.children;
+    if (!kids) return [];
+    return Array.from(kids);
+  }
+
   function findTilesLayout(mount, doc) {
     return doc.getElementById(TILES_ID)
-      || (mount?.children || []).find((c) => c.id === TILES_ID)
+      || childList(mount).find((c) => c.id === TILES_ID)
       || mount?.querySelector?.(`#${TILES_ID}`)
       || null;
   }
@@ -516,20 +523,20 @@
     const tiles = [];
     const walk = (node) => {
       if (node?.dataset?.scanTile) tiles.push(node);
-      (node?.children || []).forEach(walk);
+      childList(node).forEach(walk);
     };
     walk(layout);
     return tiles;
   }
 
   function findRcZone(layout, zoneName) {
-    return (layout?.children || []).find((c) => c.dataset?.rcZone === zoneName)
+    return childList(layout).find((c) => c.dataset?.rcZone === zoneName)
       || layout?.querySelector?.(`[data-rc-zone="${zoneName}"]`)
       || null;
   }
 
   function hasRcZones(layout) {
-    return (layout?.children || []).some((c) => c.dataset?.rcZone);
+    return childList(layout).some((c) => c.dataset?.rcZone);
   }
 
   function ensureCardLayout(mount, doc) {
