@@ -1,9 +1,9 @@
 # BUILD TODO List — Whinfell Transmission Control
 
 **Maintained by:** BUILD Cousins  
-**Last updated:** July 9, 2026 (refresh guard close-out · committed `7b4aee5`)  
+**Last updated:** July 9, 2026 (atomic hydration publish H1–H3 · `def1cd7`)  
 **Repo:** `Whinfell_Transmission_Control`  
-**HEAD:** `main` tip **`3c4ccf0`** · refresh guard **`7b4aee5`** · C7 code **`3ecf23d`** · working tree clean for guard sources
+**HEAD:** `main` tip **`def1cd7`** · hydration **`def1cd7`** · refresh guard **`7b4aee5`** · C7 code **`3ecf23d`**
 
 **Build:** `1.5-BUILD-COUSINS-2026-07-04-PHASE23` · **Hydration:** `1.3.0` · **Auto-download:** `0.4.2` · **Collect agent:** `0.1.0` · **Task Force:** `1.1.0`  
 **Handoff specs:**  
@@ -15,17 +15,18 @@
 
 ---
 
-## NEW SESSION — start here (Jul 9 · refresh guard closed)
+## NEW SESSION — start here (Jul 9 · hydration atomic publish closed)
 
 ### Paste block (drop into next session)
 
 ```text
-Repo: Whinfell_Transmission_Control · main tip 3c4ccf0 · refresh guard COMMITTED 7b4aee5
+Repo: Whinfell_Transmission_Control · main tip def1cd7
 Read: 01_Strategy_Docs/BUILD_TODO_List.md → "NEW SESSION — start here"
-Also: Refresh Bug.txt (FIXED) · Progress_Log.md · Fix the refresh-hydration.txt (NEXT track)
-Shipped: sticky RENDER FALLBACK fix · bootstrap 30s poll · null-safe command bar · refresh_render_guard test
-Next: (1) build_web.sh + hard-refresh smoke if not just done (2) live desk walk-through / operator ratings
-     (3) hydration micro-chunk 1: atomic publish of latest.json — do NOT retouch boot badge
+Also: Refresh Bug.txt (FIXED 7b4aee5) · Fix Hydration 2.txt (H1–H3 on def1cd7) · Progress_Log.md
+Shipped: sticky FALLBACK guard · atomic hydration publish (dual dest + sources_manifest + UI stamps)
+Next: (1) build_web.sh if not just run (2) live desk walk-through / operator ratings (go-live)
+     (3) optional leftover: midwest_compute/wmc-hydrate.js ?_= cache-bust if not committed
+Do NOT re-open boot badge for data-staleness · do NOT re-open publish atomicity without new bug
 Rules: edit root → build_web.sh → serve dist only · one chunk · tests after · no .wtc-* fork · no re-scaffold.
 ```
 
@@ -42,13 +43,12 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 
 | Item | State |
 |------|--------|
-| Branch | `main` tip **`3c4ccf0`** |
-| Refresh guard commit | **`7b4aee5`** `fix(boot): recover sticky RENDER FALLBACK after hard-refresh` |
-| Last UI commit | `feat(ui): utility labels cleanup + desk workspace width` (`3c4ccf0`) |
-| Working tree | **Clean** for guard sources · untracked noise only (notes / backups / logo) |
-| Pending paths | Strategy doc pin (this close-out) · optional hydration track |
+| Branch | `main` tip **`def1cd7`** |
+| Hydration publish | **`def1cd7`** `Atomic Hydration Publish H1-H3` |
+| Refresh guard commit | **`7b4aee5`** sticky RENDER FALLBACK recovery |
+| Working tree | Strategy pin this close-out · optional `midwest_compute/wmc-hydrate.js` leftover |
 | `dist/` | **gitignored** — rebuild required before desk smoke |
-| Untracked noise | layout-refactor notes · `index.html.backup.*` · `whinfell_logo/` · root `COMET CSS Refactor Spec.txt` · `Fix the refresh-hydration.txt` |
+| Untracked noise | `Fix Hydration 2.txt` · notes / backups / logo |
 | Remote | Not pushed this session — push only if Clark asks |
 
 ### Shipped
@@ -68,25 +68,28 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 | **C6** | Links + form fields | accent toolbar links · selectors/operator/bw fields radius-control | `cf5c57e` |
 | **C7** | Responsive @900px | stack `.ia-workspace` · wrap nav · 1-col widget grid · denser canvas pad | `3ecf23d` |
 | **Refresh guard** | Sticky FALLBACK + boot poll | `logConsoleGuard` · recover SUCCESS · 30s poll · null-safe cmd bar | **`7b4aee5`** |
+| **Hydration H1–H3** | Atomic publish + UI stamps | tmp+validate+replace · dual docs/data · `sources_manifest` · toast stamps | **`def1cd7`** |
 
 **Tests at C7 ship:** `koyfin_widget_shell` · `top_utility_registry` · `depth_ladders_widget` · `phase16_integration` · `shell_shortcuts` — PASS · `build_web.sh` OK  
-**Tests at refresh guard:** `safe_boot_render` · `refresh_render_guard` — PASS (browser recovery also PASS)
+**Tests at refresh guard:** `safe_boot_render` · `refresh_render_guard` — PASS  
+**Tests at hydration H1–H3:** `test_atomic_hydration_publish` · enrich v2 · auto_collect_panel — PASS
 
 ### Next action for new session
 
-**→ Rebuild dist if needed · live desk walk-through · then hydration atomic publish (separate track)**
+**→ Live desk walk-through / operator ratings (go-live gate)**
 
 | Priority | Goal | Detail |
 |----------|------|--------|
-| **1** | Rebuild + smoke | `bash scripts/build_web.sh` · serve `dist/` · hard-refresh ×5 · badge = SUCCESS only |
+| **1** | Rebuild + smoke | `bash scripts/build_web.sh` · serve `dist/` · Refresh data shows `global-2026-07-08…` stamps |
 | **2** | Live desk walk-through | Operator ratings → `08_Deliverables/Desk_Feedback_Log.md` (go-live gate) |
-| **3 (next track)** | Hydration atomic publish | `Fix the refresh-hydration.txt` · temp+rename `latest.json` · **no boot badge edits** |
+| **3 (optional)** | Commit WMC `?_=` leftover | `midwest_compute/wmc-hydrate.js` if still dirty |
 | **4 (optional)** | PR-8 light unify | `--wf-*` vs `main.css` dual system — only if walk-through needs it |
-| Out of scope | `.wtc-*` DOM · widget re-scaffold · re-open C0–C7 · re-open refresh badge policy |
+| Out of scope | `.wtc-*` DOM · re-open C0–C7 · re-open boot badge · re-open atomic publish without new bug |
 
-**Boot fixes (done):**
+**Boot / data fixes (done):**
 - `scan_kpi_strip.js` `childList()` via `Array.from` — HTMLCollection methods
-- **Refresh guard** — sticky `RENDER FALLBACK` recovery · bootstrap poll 3s→30s · null-safe `renderCommandBar` · `?boot_log=1` → `window.__WTM_BOOT_GUARD` · commit **`7b4aee5`**
+- **Refresh guard** — sticky `RENDER FALLBACK` recovery · commit **`7b4aee5`**
+- **Atomic hydration** — `copy_hydration_bundle.sh` dual dest · enrich `os.replace` · Collect/Refresh stamp toasts · commit **`def1cd7`**
 
 ### Recommended open commands
 
@@ -94,15 +97,16 @@ Rules: edit root → build_web.sh → serve dist only · one chunk · tests afte
 cd ~/Desktop/Whinfell_Transmission_Control
 git status
 git log -1 --oneline
+python3 -m pytest tests/test_atomic_hydration_publish.py -q
 node tests/safe_boot_render.test.mjs
 node tests/refresh_render_guard.test.mjs
 bash scripts/build_web.sh
 cd dist && python3 -m http.server 8765
 # hard-refresh http://127.0.0.1:8765/?boot_log=1
-# expect #js-boot-check → RENDER SUCCESS (no sticky FALLBACK)
+# Refresh data → toast/badge as_of/snapshot for global-2026-07-08-raw2wtm-01
 ```
 
-Browser checklist: **RENDER SUCCESS** flash then hide · hydrated widgets · dark slate · ≤900 stack · no sticky FALLBACK.
+Browser checklist: **RENDER SUCCESS** · hydrated widgets · freshness stamp matches published snapshot · no sticky FALLBACK · Collect/Refresh toast shows snapshot_id.
 
 ---
 
@@ -358,7 +362,7 @@ Specs: UI Optimization Plan + Report + Light Theme Spec + **COMET CSS Refactor S
 | Commit + rebuild dist (refresh guard) | **Done** — `7b4aee5` · `build_web.sh` · dist smoke ×5 PASS | BUILD |
 | Live desk walk-through | **In progress** | Clark · Wes |
 | Operator ratings | **Pending · go-live gate** | → `Desk_Feedback_Log.md` |
-| Hydration atomic publish (next track) | **Queued** | `Fix the refresh-hydration.txt` |
+| Hydration atomic publish (H1–H3) | **Done** — `def1cd7` · dual atomic write · `sources_manifest` · UI stamps | BUILD |
 
 ---
 

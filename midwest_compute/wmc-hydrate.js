@@ -4,7 +4,8 @@ window.WMC = window.WMC || {};
 WMC.Hydrate = {
   async load(url = 'data/hydration/latest.json') {
     try {
-      const res = await fetch(url, { cache: 'no-store' });
+      const bust = `${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
+      const res = await fetch(bust, { cache: 'no-store' });
       if (!res.ok) return false;
       const bundle = await res.json();
       const feed = window.WTM_TaskForceFeed;

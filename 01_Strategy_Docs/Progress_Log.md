@@ -1,7 +1,47 @@
 # Whinfell Transmission Control — Progress Log
 
 **Started:** June 26, 2026  
-**Last updated:** July 9, 2026 (refresh guard close-out · `7b4aee5` committed · tip `3c4ccf0`)
+**Last updated:** July 9, 2026 (atomic hydration H1–H3 · tip `def1cd7`)
+
+---
+
+## July 9, 2026 — Atomic Hydration Publish (Fix Hydration 2)
+
+```text
+CHUNK ID: HYDRATION-atomic-publish-H1-H3
+PHASE: Data reliability
+GOAL: Collect + Refresh never reverts to old/partial latest.json
+STATUS: CLOSED — committed def1cd7 · bundle published global-2026-07-08-raw2wtm-01
+
+CONTEXT
+- Publish was plain cp from archive; dual tree docs/ vs data/; no validate-before-swap
+- UI force-reload already had ?_=&no-store on core path — stale content was publish-side
+- TC lagged on 07-07 while Cousins had 07-08
+
+CHANGES
+- scripts/copy_hydration_bundle.sh — newest valid SRC · validate as_of/snapshot_id/freshness ·
+  sources_manifest from ingest_provenance · dual atomic write docs/ + data/
+- scripts/enrich_hydration_rv.py — os.replace · dual data/ mirror
+- scripts/sync_live_desk_data.sh — atomic_mirror_json for dist
+- js/core.js · desk_data_ops.js · auto_collect_panel.js — stamp return + Collect/Refresh toasts
+- js/basis_watch_panel.js — no-store on curve/hydration fetch
+- tests/test_atomic_hydration_publish.py — dual dest · prior kept on bad SRC · sources_manifest
+- Fix Hydration 2.txt — task record (root)
+
+QA
+- [x] test_atomic_hydration_publish PASS
+- [x] test_enrich_hydration_rv_v2 PASS
+- [x] auto_collect_panel · safe_boot · refresh_render_guard PASS
+- [x] smoke copy_hydration_bundle → 07-08 snapshot dual dest
+- [x] committed def1cd7
+- [x] build_web dist smoke this close-out (docs/data/dist snapshot parity 07-08)
+- [ ] COMET / live desk operator ratings
+
+NEXT SESSION
+1. Live desk walk-through / Desk_Feedback_Log ratings (go-live)
+2. Optional: commit midwest_compute/wmc-hydrate.js ?_= leftover
+3. Do not re-open boot badge for data-staleness
+```
 
 ---
 
