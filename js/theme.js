@@ -63,14 +63,22 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  /** Solid surface-2 tokens — must match css/theme.css (not text@4% wash). */
+  const SURFACE_2 = Object.freeze({
+    dark: '#242424',
+    light: '#EEF1EC',
+    nature: '#E6EDE8',
+  });
+
   function deriveTokens(theme) {
     return {
       muted: withAlpha(theme.text, 0.6),
       border: withAlpha(theme.text, 0.12),
       chartGrid: withAlpha(theme.text, 0.07),
+      chartAxis: withAlpha(theme.text, 0.6),
       chartLine: theme.accent,
       accentSoft: withAlpha(theme.accent, 0.14),
-      surface2: theme.id === 'dark' ? '#242424' : withAlpha(theme.text, 0.04),
+      surface2: SURFACE_2[theme.id] || SURFACE_2.dark,
     };
   }
 
@@ -85,6 +93,7 @@
     root.style.setProperty('--wtm-muted', derived.muted);
     root.style.setProperty('--wtm-border', derived.border);
     root.style.setProperty('--wtm-chart-grid', derived.chartGrid);
+    root.style.setProperty('--wtm-chart-axis', derived.chartAxis);
     root.style.setProperty('--wtm-chart-line', derived.chartLine);
     root.style.setProperty('--wtm-accent-soft', derived.accentSoft);
     root.style.setProperty('--wtm-surface-2', derived.surface2);
@@ -118,29 +127,6 @@
     const bwSelect = doc.getElementById('bwThemeSelect');
     if (bwSelect && bwSelect.value !== id) {
       bwSelect.value = id;
-    }
-
-    const btn = doc.getElementById('btnTheme');
-    if (btn) {
-      const theme = THEMES[id] || THEMES.dark;
-      btn.textContent = theme.label;
-      if (typeof btn.setAttribute === 'function') {
-        btn.setAttribute('aria-pressed', id !== 'dark' ? 'true' : 'false');
-        btn.setAttribute('data-theme-id', id);
-      }
-    }
-
-    const bwBtn = doc.getElementById('btnBwTheme');
-    if (bwBtn) {
-      const label = bwBtn.querySelector?.('.bw-theme-label');
-      const theme = THEMES[id] || THEMES.dark;
-      if (label) label.textContent = theme.label;
-      else if ('textContent' in bwBtn) bwBtn.textContent = theme.label;
-      if (typeof bwBtn.setAttribute === 'function') {
-        bwBtn.setAttribute('aria-pressed', id !== 'dark' ? 'true' : 'false');
-        bwBtn.setAttribute('data-theme-id', id);
-        bwBtn.title = `Theme: ${theme.label}`;
-      }
     }
 
     const themeColor = doc.getElementById('bwThemeColor');
@@ -177,19 +163,29 @@
     }
   }
 
-  function applyTheme(id) {
+  function applyTheme(id, options) {
+    const opts = options || {};
     const nextId = normalizeThemeId(id);
     const theme = THEMES[nextId];
+    const root = document?.documentElement;
+    const already =
+      !opts.force &&
+      currentId === nextId &&
+      root?.getAttribute?.('data-theme') === nextId;
+
     currentId = nextId;
 
-    if (document?.documentElement?.setAttribute) {
-      document.documentElement.setAttribute('data-theme', nextId);
+    if (root?.setAttribute) {
+      root.setAttribute('data-theme', nextId);
     }
 
     writeCssVars(theme);
     writeStoredThemeId(nextId);
     syncThemeControls(nextId);
-    dispatchThemeChange(theme);
+
+    if (!already) {
+      dispatchThemeChange(theme);
+    }
     return nextId;
   }
 
@@ -205,11 +201,32 @@
     return currentId;
   }
 
+  function isSelectWired(selectEl) {
+    if (!selectEl) return true;
+    if (selectEl.dataset && selectEl.dataset.wtmThemeWired === '1') return true;
+    if (typeof selectEl.getAttribute === 'function' && selectEl.getAttribute('data-wtm-theme-wired') === '1') {
+      return true;
+    }
+    return false;
+  }
+
+  function markSelectWired(selectEl) {
+    if (!selectEl) return;
+    if (selectEl.dataset) selectEl.dataset.wtmThemeWired = '1';
+    if (typeof selectEl.setAttribute === 'function') {
+      selectEl.setAttribute('data-wtm-theme-wired', '1');
+    }
+  }
+
+  /** Idempotent — safe to call from theme auto-boot, core, and BasisWatch. */
   function wireThemeSelect(selectEl) {
-    if (!selectEl || typeof selectEl.addEventListener !== 'function') return;
+    if (!selectEl || typeof selectEl.addEventListener !== 'function') return false;
+    if (isSelectWired(selectEl)) return false;
+    markSelectWired(selectEl);
     selectEl.addEventListener('change', () => {
       applyTheme(selectEl.value);
     });
+    return true;
   }
 
   function ensureSelectOptions(selectEl) {
@@ -226,6 +243,10 @@
     });
   }
 
+  /**
+   * Apply stored/URL theme and wire dropdowns once.
+   * Re-entrant: additional calls only re-sync controls + wire newly mounted selects.
+   */
   function initTheme(options) {
     const opts = options || {};
     let initial = opts.theme || null;

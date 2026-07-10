@@ -353,6 +353,23 @@ html[data-theme="nature"],
   color: var(--wtm-muted, rgba(255, 255, 255, 0.6));
 }
 
+/* Tailwind utility remaps — CDN config points at CSS vars; force accent classes */
+.text-wtm-accent { color: var(--wtm-accent) !important; }
+.border-wtm-accent { border-color: var(--wtm-accent) !important; }
+.bg-wtm-accent { background-color: var(--wtm-accent) !important; }
+.bg-wtm-accent\/10 { background-color: var(--wtm-accent-soft) !important; }
+.bg-wtm-accent\/20 { background-color: var(--wtm-accent-soft) !important; }
+.bg-wtm-accent\/30 { background-color: var(--wtm-accent-soft) !important; }
+.from-wtm-accent { --tw-gradient-from: var(--wtm-accent) !important; }
+.to-wtm-accent { --tw-gradient-to: var(--wtm-accent) !important; }
+.border-wtm-accent\/60 { border-color: var(--wtm-accent-soft) !important; }
+.hover\:bg-wtm-accent\/30:hover { background-color: var(--wtm-accent-soft) !important; }
+.text-wtm-muted { color: var(--wtm-muted) !important; }
+.bg-wtm-bg { background-color: var(--wtm-bg) !important; }
+.bg-wtm-surface { background-color: var(--wtm-surface) !important; }
+.bg-wtm-card { background-color: var(--wtm-surface-2) !important; }
+.border-wtm-border { border-color: var(--wtm-border) !important; }
+
 /* Light + nature body surfaces when theme active */
 html[data-theme="light"] body.bg-wtm-bg,
 html[data-theme="nature"] body.bg-wtm-bg {

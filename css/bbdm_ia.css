@@ -8,7 +8,7 @@
   --bbdm-border-strong: rgba(255, 255, 255, 0.14);
   --bbdm-muted: #8b9cb3;
   --bbdm-text: #e8eef5;
-  --bbdm-accent: #67a7ff;
+  --bbdm-accent: var(--wtm-accent, #228B22);
   --bbdm-accent-soft: rgba(103, 167, 255, 0.18);
   --bbdm-green: #3dd68c;
   --bbdm-left-w: 176px;

@@ -8,7 +8,7 @@
   --wmc-border-subtle: #1e2836;
   --wmc-text: #e8edf4;
   --wmc-muted: #8b9cb3;
-  --wmc-accent: #3d8bfd;
+  --wmc-accent: var(--wtm-accent, #228B22);
   --wmc-green: #3dd68c;
   --wmc-green-dim: rgba(61, 214, 140, 0.12);
   --wmc-amber: #f5a623;

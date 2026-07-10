@@ -2,7 +2,23 @@
 (function () {
   'use strict';
 
-  const COLORS = { accent: '#3d8bfd', green: '#3dd68c', amber: '#f5a623', red: '#f56565', muted: '#8b9cb3', grid: '#2a3548', bg: '#0b0f14' };
+  function themeColors() {
+    const accent = (window.WTM_Theme && typeof window.WTM_Theme.getAccent === 'function')
+      ? window.WTM_Theme.getAccent()
+      : '#228B22';
+    let bg = '#0A0A0A';
+    let muted = 'rgba(255,255,255,0.6)';
+    let grid = 'rgba(255,255,255,0.07)';
+    try {
+      const s = getComputedStyle(document.documentElement);
+      bg = s.getPropertyValue('--wtm-bg').trim() || bg;
+      muted = s.getPropertyValue('--wtm-muted').trim() || muted;
+      grid = s.getPropertyValue('--wtm-chart-grid').trim() || grid;
+    } catch (_) { /* ignore */ }
+    return { accent, green: '#3dd68c', amber: '#f5a623', red: '#f56565', muted, grid, bg };
+  }
+  /** @deprecated use themeColors() — kept for any external readers */
+  const COLORS = { accent: '#228B22', green: '#3dd68c', amber: '#f5a623', red: '#f56565', muted: '#8b9cb3', grid: '#2a3548', bg: '#0A0A0A' };
 
   let data = structuredClone(window.AI_COMPUTE_DEFAULTS || {});
 
@@ -23,6 +39,7 @@
 
   function drawLineChart(canvas, series, opts) {
     if (!canvas) return;
+    const COLORS = themeColors();
     const ctx = canvas.getContext('2d');
     const w = canvas.width = canvas.clientWidth * 2;
     const h = canvas.height = canvas.clientHeight * 2;
@@ -66,6 +83,7 @@
 
   function drawBasisBtc(canvas, points) {
     if (!canvas) return;
+    const COLORS = themeColors();
     const ctx = canvas.getContext('2d');
     const w = canvas.width = canvas.clientWidth * 2;
     const h = canvas.height = canvas.clientHeight * 2;
@@ -106,6 +124,7 @@
 
   function drawVolSurface(canvas, surface) {
     if (!canvas || !surface) return;
+    const COLORS = themeColors();
     const ctx = canvas.getContext('2d');
     const w = canvas.width = canvas.clientWidth * 2;
     const h = canvas.height = canvas.clientHeight * 2;
@@ -191,6 +210,7 @@
 
   function drawCrushTrade(canvas, curve, basisPts) {
     if (!canvas) return;
+    const COLORS = themeColors();
     const ctx = canvas.getContext('2d');
     const w = canvas.width = canvas.clientWidth * 2;
     const h = canvas.height = canvas.clientHeight * 2;
@@ -214,7 +234,7 @@
     basisPts.forEach((p, i) => { const x = pad.l + i * xStep; const y = yB(p.btc_ret); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
     ctx.stroke();
     ctx.fillStyle = COLORS.muted; ctx.font = '8px monospace';
-    ctx.fillText('Crush: GPU fwd (blue) vs BTC % (amber)', pad.l, 10);
+    ctx.fillText('Crush: GPU fwd (accent) vs BTC % (amber)', pad.l, 10);
   }
 
   function renderCharts() {

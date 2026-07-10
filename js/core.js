@@ -7051,6 +7051,10 @@ function applyConsoleTheme(theme) {
   return next;
 }
 
+/**
+ * Theme ownership: WTM_Theme auto-boot + select change wiring.
+ * Core only re-syncs (idempotent) and redraws charts on wtm:themechange.
+ */
 function initConsoleTheme() {
   if (typeof WTM_Theme !== 'undefined' && WTM_Theme.initTheme) {
     return WTM_Theme.initTheme();
@@ -7060,10 +7064,21 @@ function initConsoleTheme() {
   return applyConsoleTheme(stored);
 }
 
+function redrawChartsForThemeChange() {
+  try {
+    if (typeof renderNodeCockpitShell === 'function' && typeof appState !== 'undefined' && appState) {
+      renderNodeCockpitShell(appState);
+    }
+  } catch (_) { /* ignore */ }
+  try {
+    if (typeof renderFlipchartState === 'function') renderFlipchartState();
+  } catch (_) { /* ignore */ }
+}
+
 initConsoleTheme();
-el('themeSelect')?.addEventListener('change', (e) => {
-  applyConsoleTheme(e.target?.value || 'dark');
-});
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('wtm:themechange', redrawChartsForThemeChange);
+}
 
 el('btnSignalDetail')?.addEventListener('click', () => setSignalDetailOpen(true));
 el('btnCloseSignalDetail')?.addEventListener('click', () => setSignalDetailOpen(false));

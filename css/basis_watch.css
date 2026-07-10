@@ -255,8 +255,8 @@ html {
   font-weight: 600;
 }
 .bw-btn--saved {
-  border-color: var(--bw-accent, #3d8bfd);
-  color: var(--bw-accent, #3d8bfd);
+  border-color: var(--bw-accent, var(--wtm-accent, #228B22));
+  color: var(--bw-accent, var(--wtm-accent, #228B22));
 }
 
 .bw-chart-legend {
@@ -376,7 +376,7 @@ html {
   font-size: 18px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--bw-accent, #3d8bfd);
+  color: var(--bw-accent, var(--wtm-accent, #228B22));
   letter-spacing: -0.02em;
 }
 .bw-dual-col-meta {
@@ -420,7 +420,7 @@ html[data-theme="light"] .bw-dual-table tr.bw-dual-row--extreme td,
   background: rgba(196, 95, 32, 0.1);
 }
 .bw-dual-table tr.bw-row-front td {
-  box-shadow: inset 3px 0 0 var(--bw-accent, #3d8bfd);
+  box-shadow: inset 3px 0 0 var(--bw-accent, var(--wtm-accent, #228B22));
 }
 .bw-dual-empty {
   margin: 8px 0 0;

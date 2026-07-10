@@ -654,30 +654,20 @@
   function applyTheme(theme) {
     const next = normalizeBwThemeId(theme);
     if (global.WTM_Theme && typeof global.WTM_Theme.applyTheme === 'function') {
-      global.WTM_Theme.applyTheme(next);
-      return next;
+      return global.WTM_Theme.applyTheme(next);
     }
     if (document.documentElement?.setAttribute) {
       document.documentElement.setAttribute('data-theme', next);
     }
     const select = el('bwThemeSelect') || el('themeSelect');
     if (select && select.value !== next) select.value = next;
-    const btn = el('btnBwTheme');
-    if (btn) {
-      const label = btn.querySelector('.bw-theme-label');
-      const pretty = next.charAt(0).toUpperCase() + next.slice(1);
-      if (label) label.textContent = pretty;
-      else btn.textContent = pretty;
-      btn.setAttribute('aria-pressed', next !== 'dark' ? 'true' : 'false');
-      btn.setAttribute('data-theme-id', next);
-      btn.title = `Theme: ${pretty}`;
-    }
     const themeColor = el('bwThemeColor');
     if (themeColor) themeColor.setAttribute('content', THEME_COLORS[next] || THEME_COLORS.dark);
     try { localStorage.setItem(THEME_KEY, next); } catch { /* ignore */ }
     return next;
   }
 
+  /** Idempotent — WTM_Theme owns select wiring; re-call only mounts late selects. */
   function initTheme() {
     if (global.WTM_Theme && typeof global.WTM_Theme.initTheme === 'function') {
       return global.WTM_Theme.initTheme();
@@ -2191,21 +2181,10 @@
       reloadCurve(getState(), hooks);
     });
 
-    el('bwThemeSelect')?.addEventListener('change', (e) => {
-      const next = normalizeBwThemeId(e.target?.value);
-      applyTheme(next);
-      renderPanel(getState());
-    });
-
-    el('btnBwTheme')?.addEventListener('click', () => {
-      const order = ['dark', 'light', 'nature'];
-      const cur = normalizeBwThemeId(document.documentElement.getAttribute('data-theme') || 'dark');
-      const next = order[(order.indexOf(cur) + 1) % order.length];
-      applyTheme(next);
-      renderPanel(getState());
-    });
-
-    if (typeof global.addEventListener === 'function') {
+    /* Theme select change is owned by WTM_Theme.wireThemeSelect (idempotent).
+       Chart/panel re-paint listens once to wtm:themechange. */
+    if (typeof global.addEventListener === 'function' && !global.__wtmBwThemeListener) {
+      global.__wtmBwThemeListener = true;
       global.addEventListener('wtm:themechange', () => {
         try { renderPanel(getState()); } catch { /* ignore */ }
       });

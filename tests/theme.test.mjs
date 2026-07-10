@@ -62,6 +62,7 @@ class ElementShim {
   setAttribute(name, value) {
     this._attrs[name] = String(value);
     if (name === 'data-theme') this.dataset.theme = String(value);
+    if (name === 'data-wtm-theme-wired') this.dataset.wtmThemeWired = String(value);
   }
 
   getAttribute(name) {
@@ -201,9 +202,11 @@ assert(html.style.getPropertyValue('--wtm-surface') === '#FFFFFF', '--wtm-surfac
 assert(html.style.getPropertyValue('--wtm-text') === '#1F2937', '--wtm-text written');
 assert(html.style.getPropertyValue('--wtm-accent') === '#228B22', '--wtm-accent written');
 assert(html.style.getPropertyValue('--wtm-chart-line') === '#228B22', '--wtm-chart-line = accent');
+assert(html.style.getPropertyValue('--wtm-chart-axis'), '--wtm-chart-axis written');
 assert(html.style.getPropertyValue('--wtm-muted'), '--wtm-muted derived');
 assert(html.style.getPropertyValue('--wtm-border'), '--wtm-border derived');
 assert(html.style.getPropertyValue('--wtm-chart-grid'), '--wtm-chart-grid derived');
+assert(html.style.getPropertyValue('--wtm-surface-2') === '#EEF1EC', 'light surface-2 solid #EEF1EC');
 
 WTM.applyTheme('nature');
 assert(html.getAttribute('data-theme') === 'nature', 'data-theme=nature');
@@ -211,11 +214,13 @@ assert(storage.getItem('whinfell_tc_theme') === 'nature', 'localStorage nature')
 assert(WTM.getAccent() === '#1E6B2B', 'nature accent #1E6B2B');
 assert(html.style.getPropertyValue('--wtm-bg') === '#F1F5F2', 'nature bg');
 assert(html.style.getPropertyValue('--wtm-accent') === '#1E6B2B', 'nature accent var');
+assert(html.style.getPropertyValue('--wtm-surface-2') === '#E6EDE8', 'nature surface-2 solid #E6EDE8');
 
 WTM.applyTheme('dark');
 assert(html.getAttribute('data-theme') === 'dark', 'data-theme=dark');
 assert(storage.getItem('whinfell_tc_theme') === 'dark', 'localStorage dark');
 assert(WTM.getAccent() === '#228B22', 'dark accent');
+assert(html.style.getPropertyValue('--wtm-surface-2') === '#242424', 'dark surface-2 solid');
 
 /* Invalid id normalizes to dark */
 assert(WTM.normalizeThemeId('neon') === 'dark', 'invalid → dark');
@@ -230,6 +235,14 @@ const initId = WTM.initTheme();
 assert(initId === 'nature', `initTheme reads storage → nature got ${initId}`);
 assert(html.getAttribute('data-theme') === 'nature', 'init sets data-theme nature');
 assert(themeSelect.value === 'nature', 'themeSelect synced to nature');
+
+/* Idempotent wire — double initTheme must not stack change listeners */
+const changeCountBefore = (themeSelect._listeners.change || []).length;
+WTM.initTheme();
+WTM.initTheme();
+const changeCountAfter = (themeSelect._listeners.change || []).length;
+assert(changeCountAfter === changeCountBefore, `wireThemeSelect idempotent (${changeCountBefore} → ${changeCountAfter})`);
+assert(themeSelect.getAttribute('data-wtm-theme-wired') === '1' || themeSelect.dataset.wtmThemeWired === '1', 'select marked wired');
 
 /* Markup: index.html theme select + options + user chip */
 const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
@@ -268,6 +281,29 @@ assert(!themeCss.includes('#5eb3ff'), 'no neon blue in theme.css');
 const bwCss = fs.readFileSync(path.join(ROOT, 'css/basis_watch.css'), 'utf8');
 assert(!bwCss.includes('#5eb3ff'), 'basis_watch.css drops #5eb3ff');
 assert(bwCss.includes('--wtm-accent') || bwCss.includes('#228B22'), 'BW uses forest accent bridge');
+assert(!bwCss.includes('#3d8bfd'), 'basis_watch.css drops #3d8bfd');
+
+/* main chrome + nature parity with light surface remaps */
+const mainCss = fs.readFileSync(path.join(ROOT, 'css/main.css'), 'utf8');
+const consoleCss = fs.readFileSync(path.join(ROOT, 'css/console_ia.css'), 'utf8');
+const lightMain = (mainCss.match(/data-theme="light"/g) || []).length;
+const natureMain = (mainCss.match(/data-theme="nature"/g) || []).length;
+assert(natureMain >= lightMain, `main.css nature (${natureMain}) >= light (${lightMain}) selectors`);
+const lightConsole = (consoleCss.match(/data-theme="light"/g) || []).length;
+const natureConsole = (consoleCss.match(/data-theme="nature"/g) || []).length;
+assert(natureConsole >= lightConsole * 0.9, `console_ia nature (${natureConsole}) ~ light (${lightConsole})`);
+assert(!mainCss.includes('#3d8bfd'), 'main.css drops hardcoded #3d8bfd');
+assert(!mainCss.includes('#5eb3ff'), 'main.css drops #5eb3ff');
+assert(mainCss.includes('var(--wtm-accent') || mainCss.includes('#228B22'), 'main uses forest accent');
+
+/* Tailwind config uses CSS vars for accent */
+assert(indexHtml.includes("accent: 'var(--wtm-accent)'") || indexHtml.includes('accent: "var(--wtm-accent)"') || indexHtml.includes('var(--wtm-accent)'), 'tailwind accent → CSS var');
+assert(!indexHtml.includes("accent: '#3d8bfd'"), 'tailwind no neon #3d8bfd');
+
+/* Core listens for chart redraw on theme change */
+const coreJs = fs.readFileSync(path.join(ROOT, 'js/core.js'), 'utf8');
+assert(coreJs.includes('wtm:themechange'), 'core listens wtm:themechange');
+assert(coreJs.includes('redrawChartsForThemeChange') || coreJs.includes('renderNodeCockpitShell'), 'core redraws cockpit on theme');
 
 /* top_utility registry theme account */
 const utilCode = fs.readFileSync(path.join(ROOT, 'js/top_utility_registry.js'), 'utf8');
@@ -281,4 +317,7 @@ console.log([
   `accent_dark=${WTM.THEMES.dark.accent}`,
   `accent_nature=${WTM.THEMES.nature.accent}`,
   `init=${initId}`,
+  `main light/nature=${lightMain}/${natureMain}`,
+  `console light/nature=${lightConsole}/${natureConsole}`,
+  `wire_listeners=${changeCountAfter}`,
 ].join('\n'));

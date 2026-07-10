@@ -1,7 +1,7 @@
 .v15-desk-panel { font-size: 10px; }
 .v15-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
 .v15-card { background: #111820; border: 1px solid #2a3548; border-radius: 8px; padding: 10px; }
-.v15-card h4 { margin: 0 0 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #3d8bfd; }
+.v15-card h4 { margin: 0 0 6px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--wtm-accent, #228B22); }
 .v15-metric { font-size: 14px; font-weight: 800; color: #e8eef5; }
 .v15-muted { color: #8b9cb3; font-size: 9px; }
 .v15-table { width: 100%; border-collapse: collapse; font-size: 9px; }

@@ -77,7 +77,13 @@ WMC.Utils = {
     ctx.moveTo(0, ch * 0.5);
     ctx.lineTo(cw, ch * 0.5);
     ctx.stroke();
-    ctx.strokeStyle = '#3d8bfd';
+    ctx.strokeStyle = (typeof window !== 'undefined' && window.WTM_Theme && typeof window.WTM_Theme.getAccent === 'function')
+      ? window.WTM_Theme.getAccent()
+      : (typeof getComputedStyle === 'function'
+        ? (getComputedStyle(document.documentElement).getPropertyValue('--wtm-chart-line').trim()
+          || getComputedStyle(document.documentElement).getPropertyValue('--wtm-accent').trim()
+          || '#228B22')
+        : '#228B22');
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     pts.forEach((v, i) => {
