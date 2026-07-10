@@ -33,6 +33,9 @@
   let activeDigView = 'basis_watch';
   let activated = false;
   let focusClearTimer = null;
+  /** Monotonic gen for deferred Dig→Scan focus; invalidates stale rAF/timeout callbacks. */
+  let focusGen = 0;
+  let focusDeferTimer = null;
 
   function el(id) { return document.getElementById(id); }
 
@@ -296,7 +299,16 @@
     const widget = widgetId ? el(widgetId) : null;
     if (!widget) return false;
 
+    // Invalidate any in-flight Dig→Scan deferred focus (rapid View clicks / Tools re-entry).
+    const gen = ++focusGen;
+    if (focusDeferTimer) {
+      global.clearTimeout(focusDeferTimer);
+      focusDeferTimer = null;
+    }
+
     const applyScrollHighlight = () => {
+      if (gen !== focusGen) return;
+
       document.querySelectorAll('.ia-view-shortcut, .ia-risk-curve-summary').forEach((btn) => {
         const on = btn.dataset.iaViewShortcut === shortcutKey;
         btn.classList.toggle('is-active', on);
@@ -310,6 +322,7 @@
       widget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       if (focusClearTimer) global.clearTimeout(focusClearTimer);
       focusClearTimer = global.setTimeout(() => {
+        if (gen !== focusGen) return;
         document.querySelectorAll('#iaWidgetGrid .wf-panel.is-active').forEach((panel) => {
           if (panel.id !== widgetId) panel.classList.remove('is-active');
         });
@@ -322,11 +335,17 @@
       return true;
     }
 
-    // Dig/Iterate hide #iaWidgetGrid — switch to Scan, wait for layout, then focus.
+    // Dig hides #iaWidgetGrid; Iterate keeps it visible in a split layout —
+    // always switch to Scan, then wait for layout before focus.
     setLayer('scan');
     global.requestAnimationFrame(() => {
+      if (gen !== focusGen) return;
       global.requestAnimationFrame(() => {
-        global.setTimeout(applyScrollHighlight, 50);
+        if (gen !== focusGen) return;
+        focusDeferTimer = global.setTimeout(() => {
+          focusDeferTimer = null;
+          applyScrollHighlight();
+        }, 50);
       });
     });
     return true;
