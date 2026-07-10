@@ -3481,18 +3481,19 @@ body.ia-shell-active .operator-inputs textarea:focus,
   min-height: 0;
 }
 
+/* Chunk 30 — layer-scoped winners must stay scrollable (not overflow:hidden) */
 body.ia-layer-scan .ia-center-canvas,
 body.ia-layer-iterate .ia-center-canvas {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 body.ia-layer-dig .ia-center-canvas {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 #iaRiskCockpitHost .scan-kpi-strip {

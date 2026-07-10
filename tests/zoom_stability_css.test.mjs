@@ -8,7 +8,8 @@
  * Fail if:
  *   - zoom: or transform: scale on html / body / .wtm-ia-shell
  *   - flex chain missing min-height: 0 (shell → center → dig host)
- *   - critical center canvas / basis-watch main still overflow: clip/hidden only
+ *   - critical center canvas / basis-watch main still overflow: clip/hidden
+ *     including layer-scoped cascade winners (body.ia-layer-*)
  *   - LWC factory missing ResizeObserver → chart.resize path
  */
 import fs from 'node:fs';
@@ -42,6 +43,62 @@ function ruleBody(css, selectorRe) {
   const re = new RegExp(selectorRe.source + '\\s*\\{([^}]*)\\}', selectorRe.flags.includes('i') ? 'i' : '');
   const m = src.match(re);
   return m ? m[1] : null;
+}
+
+/**
+ * Collect all rule blocks whose selector list ends with subjectSelector
+ * (e.g. `.ia-center-canvas`) as the subject — not as an ancestor of a descendant.
+ * Skips rules like `.ia-center-canvas .basis-watch-main`.
+ */
+function allSubjectRuleBodies(css, subjectClass) {
+  const src = stripComments(css);
+  const results = [];
+  // Match rule headers ending with the subject class before `{`
+  // Subject may be after combinators (body.ia-layer-scan .ia-center-canvas)
+  // but not followed by another simple selector (space + . or # or tag).
+  const re = /([^{}@][^{]*)\{([^}]*)\}/g;
+  let m;
+  while ((m = re.exec(src)) !== null) {
+    const header = m[1].trim();
+    const body = m[2];
+    // Split comma-separated selectors; keep rule if any selector's subject is subjectClass
+    const selectors = header.split(',').map((s) => s.trim()).filter(Boolean);
+    const targetsSubject = selectors.some((sel) => {
+      // Last compound selector in the chain (after final space/combinator)
+      const parts = sel.split(/[\s>+~]+/).filter(Boolean);
+      const last = parts[parts.length - 1] || '';
+      // last must include the class and not be something else only
+      if (!last.includes(subjectClass)) return false;
+      // Subject compound may be `.ia-center-canvas` or `div.ia-center-canvas`
+      // Reject if last still has descendant-looking extras (shouldn't after split)
+      return new RegExp(`(^|[.#:])${subjectClass.replace('.', '\\.')}(?![\\w-])`).test(last)
+        || last === subjectClass
+        || last.endsWith(subjectClass);
+    });
+    if (targetsSubject) {
+      results.push({ header, body, selectors });
+    }
+  }
+  return results;
+}
+
+function overflowDecls(body) {
+  const out = [];
+  if (!body) return out;
+  const re = /(overflow(?:-x|-y)?)\s*:\s*([^;]+);/gi;
+  let m;
+  while ((m = re.exec(body)) !== null) {
+    out.push({ prop: m[1].toLowerCase(), value: m[2].trim().toLowerCase() });
+  }
+  return out;
+}
+
+function isScrollableOverflow(value) {
+  return /^(auto|scroll|overlay)$/i.test(value);
+}
+
+function isClipOrHidden(value) {
+  return /^(hidden|clip)$/i.test(value);
 }
 
 function hasDecl(body, prop, valueRe) {
@@ -119,6 +176,70 @@ function testScrollableCriticalRegions() {
   );
   assert(!hasDecl(center, 'overflow', /^(hidden|clip)$/i), '.ia-center-canvas must not use overflow: hidden|clip');
 
+  // Cascade gate: every rule whose SUBJECT is .ia-center-canvas must not
+  // reintroduce overflow: hidden|clip (layer-scoped winners included).
+  const subjectRules = allSubjectRuleBodies(consoleCss, '.ia-center-canvas');
+  assert(subjectRules.length >= 2, 'expected base + layer-scoped .ia-center-canvas rules');
+
+  const layersSeen = { scan: false, dig: false, iterate: false };
+  for (const rule of subjectRules) {
+    const decls = overflowDecls(rule.body);
+    for (const d of decls) {
+      // shorthand overflow or overflow-y controlling block scroll
+      if (d.prop === 'overflow' || d.prop === 'overflow-y') {
+        assert(
+          !isClipOrHidden(d.value),
+          `.ia-center-canvas subject rule must not use ${d.prop}: ${d.value} — ` +
+            `header: ${rule.header.replace(/\s+/g, ' ').slice(0, 120)}`
+        );
+        if (isScrollableOverflow(d.value) || d.value === 'visible') {
+          /* ok */
+        } else {
+          // reject other non-scroll values that would clip (e.g. none is invalid anyway)
+          assert(
+            isScrollableOverflow(d.value),
+            `.ia-center-canvas subject overflow must be scrollable, got ${d.prop}: ${d.value} ` +
+              `(${rule.header.replace(/\s+/g, ' ').slice(0, 100)})`
+          );
+        }
+      }
+    }
+
+    const h = rule.header;
+    if (/body\.ia-layer-scan/.test(h) && /\.ia-center-canvas/.test(h)) layersSeen.scan = true;
+    if (/body\.ia-layer-dig(?![\w-])/.test(h) && /\.ia-center-canvas/.test(h)) layersSeen.dig = true;
+    if (/body\.ia-layer-iterate/.test(h) && /\.ia-center-canvas/.test(h)) layersSeen.iterate = true;
+  }
+
+  // Explicit layer-scoped rules must exist and be scrollable (cascade winners)
+  for (const layer of ['scan', 'dig', 'iterate']) {
+    assert(layersSeen[layer], `body.ia-layer-${layer} .ia-center-canvas rule must exist`);
+  }
+
+  // Direct assert on layer rule bodies (last match wins style; all must be auto)
+  for (const layer of ['scan', 'dig', 'iterate']) {
+    const layerRules = subjectRules.filter((r) =>
+      new RegExp(`body\\.ia-layer-${layer}(?![\\w-])`).test(r.header) &&
+      r.selectors.some((sel) => {
+        const parts = sel.split(/[\s>+~]+/).filter(Boolean);
+        const last = parts[parts.length - 1] || '';
+        return last.includes('.ia-center-canvas');
+      })
+    );
+    assert(layerRules.length >= 1, `layer ${layer}: at least one .ia-center-canvas subject rule`);
+    for (const r of layerRules) {
+      const decls = overflowDecls(r.body);
+      const blockOverflow = decls.filter((d) => d.prop === 'overflow' || d.prop === 'overflow-y');
+      if (blockOverflow.length === 0) continue; // inherits base auto — ok
+      for (const d of blockOverflow) {
+        assert(
+          isScrollableOverflow(d.value),
+          `body.ia-layer-${layer} .ia-center-canvas must be overflow:auto (got ${d.prop}: ${d.value})`
+        );
+      }
+    }
+  }
+
   // basis-watch main — console embed and standalone
   const embedMain = ruleBody(consoleCss, /\.ia-center-canvas\s+\.basis-watch-main/);
   if (embedMain) {
@@ -127,6 +248,36 @@ function testScrollableCriticalRegions() {
         hasDecl(embedMain, 'overflow-y', /^(auto|scroll|overlay)$/i),
       '.ia-center-canvas .basis-watch-main must be scrollable'
     );
+  }
+
+  // Embed main: no later rule may re-hide (scan all subject rules for .basis-watch-main under center)
+  const mainSubjectish = [];
+  {
+    const re = /([^{}@][^{]*)\{([^}]*)\}/g;
+    let m;
+    while ((m = re.exec(consoleCss)) !== null) {
+      const header = m[1].trim();
+      if (/\.basis-watch-main\b/.test(header) && !/\.basis-watch-main[\w-]/.test(header)) {
+        // subject ends with basis-watch-main
+        const selectors = header.split(',').map((s) => s.trim());
+        const isSubject = selectors.some((sel) => {
+          const parts = sel.split(/[\s>+~]+/).filter(Boolean);
+          const last = parts[parts.length - 1] || '';
+          return /\.basis-watch-main$/.test(last) || last === '.basis-watch-main';
+        });
+        if (isSubject) mainSubjectish.push({ header, body: m[2] });
+      }
+    }
+  }
+  for (const r of mainSubjectish) {
+    for (const d of overflowDecls(r.body)) {
+      if (d.prop === 'overflow' || d.prop === 'overflow-y') {
+        assert(
+          !isClipOrHidden(d.value),
+          `.basis-watch-main must not use ${d.prop}: ${d.value} (${r.header.replace(/\s+/g, ' ').slice(0, 80)})`
+        );
+      }
+    }
   }
 
   const bwMain = ruleBody(bwCss, /\.basis-watch-main/);
