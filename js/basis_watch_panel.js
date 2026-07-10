@@ -25,9 +25,14 @@
    * when curve quote dates lag (stale Barchart nodes).
    */
   const BW_BUILD = '3.9-BASISWATCH-ARK-ETH-ASSET-SPLIT-2026-07-09';
-  const THEME_COLORS = { dark: '#090d12', light: '#eef1f5' };
+  /** Shared with WTM_Theme — Chunk 26 Dark / Light / Nature. */
+  const THEME_KEY = (global.WTM_Theme && global.WTM_Theme.STORAGE_KEY) || 'whinfell_tc_theme';
+  const THEME_COLORS = {
+    dark: '#0A0A0A',
+    light: '#F8F9F6',
+    nature: '#F1F5F2',
+  };
   const PREFS_KEY = 'whinfell_basiswatch_prefs';
-  const THEME_KEY = 'whinfell_tc_theme';
   /** Documented paths — raw loads owned by WTM_Ark only (no direct fetch here). */
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
@@ -610,17 +615,29 @@
   function getChartTheme() {
     const s = getComputedStyle(document.documentElement);
     const v = name => s.getPropertyValue(name).trim() || undefined;
+    const accent = (global.WTM_Theme && typeof global.WTM_Theme.getAccent === 'function')
+      ? global.WTM_Theme.getAccent()
+      : (v('--wtm-chart-line') || v('--wtm-accent') || v('--bw-accent') || '#228B22');
     return {
-      grid: v('--bw-chart-grid') || 'rgba(255,255,255,0.07)',
-      axis: v('--bw-chart-axis') || '#8b9aab',
-      spotLine: v('--bw-chart-spot-line') || 'rgba(94,179,255,0.55)',
-      spotLabel: v('--bw-chart-spot-label') || '#9ec5f0',
+      grid: v('--bw-chart-grid') || v('--wtm-chart-grid') || 'rgba(255,255,255,0.07)',
+      axis: v('--bw-chart-axis') || v('--wtm-chart-axis') || v('--wtm-muted') || '#8b9aab',
+      spotLine: v('--bw-chart-spot-line') || v('--wtm-accent-soft') || 'rgba(34,139,34,0.35)',
+      spotLabel: v('--bw-chart-spot-label') || v('--wtm-muted') || '#8b9aab',
       curve: v('--bw-chart-curve') || '#e07b39',
-      front: v('--bw-chart-front') || '#3d8bfd',
-      node: v('--bw-chart-node') || '#c5d0dc',
-      muted: v('--bw-muted') || '#8b9aab',
-      empty: v('--bw-muted') || '#8b9aab',
+      front: v('--bw-chart-front') || v('--wtm-chart-line') || accent,
+      node: v('--bw-chart-node') || v('--wtm-muted') || '#c5d0dc',
+      muted: v('--bw-muted') || v('--wtm-muted') || '#8b9aab',
+      empty: v('--bw-muted') || v('--wtm-muted') || '#8b9aab',
     };
+  }
+
+  function normalizeBwThemeId(theme) {
+    if (global.WTM_Theme && typeof global.WTM_Theme.normalizeThemeId === 'function') {
+      return global.WTM_Theme.normalizeThemeId(theme);
+    }
+    const key = String(theme || 'dark').toLowerCase();
+    if (key === 'light' || key === 'nature' || key === 'dark') return key;
+    return 'dark';
   }
 
   function loadPrefs() {
@@ -635,30 +652,42 @@
   }
 
   function applyTheme(theme) {
-    const next = theme === 'light' ? 'light' : 'dark';
+    const next = normalizeBwThemeId(theme);
+    if (global.WTM_Theme && typeof global.WTM_Theme.applyTheme === 'function') {
+      global.WTM_Theme.applyTheme(next);
+      return next;
+    }
     if (document.documentElement?.setAttribute) {
       document.documentElement.setAttribute('data-theme', next);
     }
+    const select = el('bwThemeSelect') || el('themeSelect');
+    if (select && select.value !== next) select.value = next;
     const btn = el('btnBwTheme');
     if (btn) {
       const label = btn.querySelector('.bw-theme-label');
-      if (label) label.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
-      else btn.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
-      btn.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
-      btn.title = next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      const pretty = next.charAt(0).toUpperCase() + next.slice(1);
+      if (label) label.textContent = pretty;
+      else btn.textContent = pretty;
+      btn.setAttribute('aria-pressed', next !== 'dark' ? 'true' : 'false');
+      btn.setAttribute('data-theme-id', next);
+      btn.title = `Theme: ${pretty}`;
     }
     const themeColor = el('bwThemeColor');
     if (themeColor) themeColor.setAttribute('content', THEME_COLORS[next] || THEME_COLORS.dark);
     try { localStorage.setItem(THEME_KEY, next); } catch { /* ignore */ }
+    return next;
   }
 
   function initTheme() {
+    if (global.WTM_Theme && typeof global.WTM_Theme.initTheme === 'function') {
+      return global.WTM_Theme.initTheme();
+    }
     const params = new URLSearchParams(location.search);
     let theme = params.get('theme');
     if (!theme) {
       try { theme = localStorage.getItem(THEME_KEY) || 'dark'; } catch { theme = 'dark'; }
     }
-    applyTheme(theme);
+    return applyTheme(theme);
   }
 
   function popOutUrl(state) {
@@ -2162,15 +2191,25 @@
       reloadCurve(getState(), hooks);
     });
 
-    el('btnBwTheme')?.addEventListener('click', () => {
-      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-      const next = cur === 'dark' ? 'light' : 'dark';
+    el('bwThemeSelect')?.addEventListener('change', (e) => {
+      const next = normalizeBwThemeId(e.target?.value);
       applyTheme(next);
       renderPanel(getState());
-      if (typeof global.dispatchEvent === 'function') {
-        try { global.dispatchEvent(new CustomEvent('whinfell-theme-change', { detail: { theme: next } })); } catch { /* ignore */ }
-      }
     });
+
+    el('btnBwTheme')?.addEventListener('click', () => {
+      const order = ['dark', 'light', 'nature'];
+      const cur = normalizeBwThemeId(document.documentElement.getAttribute('data-theme') || 'dark');
+      const next = order[(order.indexOf(cur) + 1) % order.length];
+      applyTheme(next);
+      renderPanel(getState());
+    });
+
+    if (typeof global.addEventListener === 'function') {
+      global.addEventListener('wtm:themechange', () => {
+        try { renderPanel(getState()); } catch { /* ignore */ }
+      });
+    }
 
     document.querySelectorAll('.bw-view-tab').forEach(btn => {
       btn.addEventListener('click', () => {

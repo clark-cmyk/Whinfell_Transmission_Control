@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Whinfell WTM BasisWatch — CME-style crypto futures basis, implied rate, and TradFi cross-asset bridge." />
-  <meta name="theme-color" content="#090d12" id="bwThemeColor" />
+  <meta name="theme-color" content="#0A0A0A" id="bwThemeColor" />
   <title>WTM BasisWatch &amp; Implied Rate — Whinfell</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/basis_watch.css" />
   <link rel="stylesheet" href="css/desk_ops.css" />
 </head>
@@ -23,10 +24,18 @@
     <div class="bw-topbar-actions">
       <span id="bwStatusChip" class="bw-status-chip bw-status-chip--live">Live</span>
       <span id="bwBuildBadge" class="bw-status-chip" style="color:var(--bw-muted)">—</span>
-      <button type="button" id="btnBwTheme" class="bw-btn bw-btn--theme" aria-pressed="false" title="Toggle light / dark theme">
-        <span class="bw-theme-icon" aria-hidden="true">☀</span>
-        <span class="bw-theme-label">Light mode</span>
-      </button>
+      <label class="console-theme-label" for="bwThemeSelect">
+        <span class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0">Theme</span>
+        <select id="bwThemeSelect" class="console-theme-select bw-theme-select" title="Theme" aria-label="Theme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="nature">Nature</option>
+        </select>
+      </label>
+      <span class="console-user-chip" title="Account" aria-label="Account">
+        <span class="console-user-chip__icon" aria-hidden="true">◎</span>
+        <span class="console-user-chip__label">Desk</span>
+      </span>
     </div>
   </header>
   <div id="deskOpsMount"></div>
@@ -108,6 +117,7 @@
   </footer>
 
   <!-- Chunk 17: The Ark SSOT must load before BasisWatch / desk ops (no raw market fetch elsewhere). -->
+  <script src="js/theme.js"></script>
   <script src="js/time_format.js"></script>
   <script src="js/ark.js"></script>
   <script src="js/task_force_panel_feed.js"></script>

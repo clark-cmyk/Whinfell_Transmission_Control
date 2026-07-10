@@ -1,0 +1,376 @@
+/**
+ * WTM Theme tokens — Chunk 26
+ * Dark / Light / Nature primaries + derived muted/border/chart vars.
+ * Forest accents only — no neon blue / AI purple-cyan stacks.
+ */
+
+:root {
+  /* Primaries (Dark default) */
+  --wtm-bg: #0A0A0A;
+  --wtm-surface: #1A1A1A;
+  --wtm-surface-2: #242424;
+  --wtm-text: #FFFFFF;
+  --wtm-accent: #228B22;
+  --wtm-accent-soft: rgba(34, 139, 34, 0.14);
+  --wtm-muted: rgba(255, 255, 255, 0.6);
+  --wtm-border: rgba(255, 255, 255, 0.12);
+  --wtm-chart-grid: rgba(255, 255, 255, 0.07);
+  --wtm-chart-line: #228B22;
+  --wtm-chart-axis: rgba(255, 255, 255, 0.6);
+
+  color-scheme: dark;
+}
+
+html[data-theme="dark"],
+:root[data-theme="dark"] {
+  --wtm-bg: #0A0A0A;
+  --wtm-surface: #1A1A1A;
+  --wtm-surface-2: #242424;
+  --wtm-text: #FFFFFF;
+  --wtm-accent: #228B22;
+  --wtm-accent-soft: rgba(34, 139, 34, 0.14);
+  --wtm-muted: rgba(255, 255, 255, 0.6);
+  --wtm-border: rgba(255, 255, 255, 0.12);
+  --wtm-chart-grid: rgba(255, 255, 255, 0.07);
+  --wtm-chart-line: #228B22;
+  --wtm-chart-axis: rgba(255, 255, 255, 0.6);
+  color-scheme: dark;
+}
+
+html[data-theme="light"],
+:root[data-theme="light"] {
+  --wtm-bg: #F8F9F6;
+  --wtm-surface: #FFFFFF;
+  --wtm-surface-2: #EEF1EC;
+  --wtm-text: #1F2937;
+  --wtm-accent: #228B22;
+  --wtm-accent-soft: rgba(34, 139, 34, 0.12);
+  --wtm-muted: rgba(31, 41, 55, 0.6);
+  --wtm-border: rgba(31, 41, 55, 0.12);
+  --wtm-chart-grid: rgba(31, 41, 55, 0.07);
+  --wtm-chart-line: #228B22;
+  --wtm-chart-axis: rgba(31, 41, 55, 0.6);
+  color-scheme: light;
+}
+
+html[data-theme="nature"],
+:root[data-theme="nature"] {
+  --wtm-bg: #F1F5F2;
+  --wtm-surface: #FFFFFF;
+  --wtm-surface-2: #E6EDE8;
+  --wtm-text: #1F2937;
+  --wtm-accent: #1E6B2B;
+  --wtm-accent-soft: rgba(30, 107, 43, 0.12);
+  --wtm-muted: rgba(31, 41, 55, 0.6);
+  --wtm-border: rgba(31, 41, 55, 0.12);
+  --wtm-chart-grid: rgba(31, 41, 55, 0.07);
+  --wtm-chart-line: #1E6B2B;
+  --wtm-chart-axis: rgba(31, 41, 55, 0.6);
+  color-scheme: light;
+}
+
+/* ── Bridge: main.css legacy tokens ── */
+:root,
+html[data-theme="dark"],
+:root[data-theme="dark"] {
+  --bg: var(--wtm-bg);
+  --surface: var(--wtm-surface);
+  --surface-2: var(--wtm-surface-2);
+  --text: var(--wtm-text);
+  --muted: var(--wtm-muted);
+  --border: var(--wtm-border);
+  --wtm-accent-bridge: var(--wtm-accent);
+}
+
+html[data-theme="light"],
+:root[data-theme="light"],
+html[data-theme="nature"],
+:root[data-theme="nature"] {
+  --bg: var(--wtm-bg);
+  --surface: var(--wtm-surface);
+  --surface-2: var(--wtm-surface-2);
+  --text: var(--wtm-text);
+  --muted: var(--wtm-muted);
+  --border: var(--wtm-border);
+}
+
+/* ── Bridge: console_ia --wf-* / --ia-* accents onto forest ── */
+:root,
+html[data-theme="dark"],
+:root[data-theme="dark"] {
+  --wf-shell-bg: var(--wtm-bg);
+  --wf-rail-bg: var(--wtm-bg);
+  --wf-canvas-bg: var(--wtm-bg);
+  --wf-panel-bg: var(--wtm-surface);
+  --wf-panel-bg-2: var(--wtm-surface-2);
+  --wf-panel-bg-3: var(--wtm-surface-2);
+  --wf-control-bg: var(--wtm-surface);
+  --wf-text: var(--wtm-text);
+  --wf-text-2: var(--wtm-muted);
+  --wf-accent: var(--wtm-accent);
+  --wf-accent-soft: var(--wtm-accent-soft);
+  --wf-border: var(--wtm-border);
+  --wf-bg-page: var(--wtm-bg);
+  --wf-bg-card: var(--wtm-surface);
+  --wf-bg-subtle: var(--wtm-surface-2);
+  --ia-shell-bg: var(--wtm-bg);
+  --ia-surface: var(--wtm-surface);
+  --ia-text: var(--wtm-text);
+  --ia-muted: var(--wtm-muted);
+  --ia-border: var(--wtm-border);
+  --ia-accent: var(--wtm-accent);
+  --ia-green: var(--wtm-accent);
+}
+
+html[data-theme="light"],
+:root[data-theme="light"] {
+  --wf-shell-bg: var(--wtm-bg);
+  --wf-rail-bg: var(--wtm-surface);
+  --wf-canvas-bg: var(--wtm-bg);
+  --wf-panel-bg: var(--wtm-surface);
+  --wf-panel-bg-2: var(--wtm-surface-2);
+  --wf-panel-bg-3: var(--wtm-surface-2);
+  --wf-control-bg: var(--wtm-surface-2);
+  --wf-text: var(--wtm-text);
+  --wf-text-2: var(--wtm-muted);
+  --wf-text-3: var(--wtm-muted);
+  --wf-accent: var(--wtm-accent);
+  --wf-accent-soft: var(--wtm-accent-soft);
+  --wf-border: var(--wtm-border);
+  --wf-border-strong: rgba(31, 41, 55, 0.22);
+  --wf-bg-page: var(--wtm-bg);
+  --wf-bg-card: var(--wtm-surface);
+  --wf-bg-subtle: var(--wtm-surface-2);
+  --wf-ok: var(--wtm-accent);
+  --ia-shell-bg: var(--wtm-bg);
+  --ia-surface: var(--wtm-surface);
+  --ia-text: var(--wtm-text);
+  --ia-muted: var(--wtm-muted);
+  --ia-border: var(--wtm-border);
+  --ia-accent: var(--wtm-accent);
+  --ia-green: var(--wtm-accent);
+}
+
+html[data-theme="nature"],
+:root[data-theme="nature"] {
+  --wf-shell-bg: var(--wtm-bg);
+  --wf-rail-bg: var(--wtm-surface);
+  --wf-canvas-bg: var(--wtm-bg);
+  --wf-panel-bg: var(--wtm-surface);
+  --wf-panel-bg-2: var(--wtm-surface-2);
+  --wf-panel-bg-3: var(--wtm-surface-2);
+  --wf-control-bg: var(--wtm-surface-2);
+  --wf-text: var(--wtm-text);
+  --wf-text-2: var(--wtm-muted);
+  --wf-text-3: var(--wtm-muted);
+  --wf-accent: var(--wtm-accent);
+  --wf-accent-soft: var(--wtm-accent-soft);
+  --wf-border: var(--wtm-border);
+  --wf-border-strong: rgba(31, 41, 55, 0.22);
+  --wf-bg-page: var(--wtm-bg);
+  --wf-bg-card: var(--wtm-surface);
+  --wf-bg-subtle: var(--wtm-surface-2);
+  --wf-ok: var(--wtm-accent);
+  --ia-shell-bg: var(--wtm-bg);
+  --ia-surface: var(--wtm-surface);
+  --ia-text: var(--wtm-text);
+  --ia-muted: var(--wtm-muted);
+  --ia-border: var(--wtm-border);
+  --ia-accent: var(--wtm-accent);
+  --ia-green: var(--wtm-accent);
+}
+
+/* ── Bridge: BasisWatch --bw-* (overrides neon blue) ── */
+:root,
+html[data-theme="dark"],
+:root[data-theme="dark"] {
+  --bw-bg: var(--wtm-bg);
+  --bw-bg-gradient: none;
+  --bw-surface: var(--wtm-surface);
+  --bw-surface-2: var(--wtm-surface-2);
+  --bw-surface-glass: var(--wtm-surface);
+  --bw-border: var(--wtm-border);
+  --bw-border-strong: var(--wtm-accent-soft);
+  --bw-text: var(--wtm-text);
+  --bw-muted: var(--wtm-muted);
+  --bw-accent: var(--wtm-accent);
+  --bw-accent-dim: var(--wtm-accent);
+  --bw-accent-soft: var(--wtm-accent-soft);
+  --bw-chart-bg: rgba(0, 0, 0, 0.28);
+  --bw-chart-grid: var(--wtm-chart-grid);
+  --bw-chart-axis: var(--wtm-chart-axis);
+  --bw-chart-spot-line: var(--wtm-accent-soft);
+  --bw-chart-spot-label: var(--wtm-muted);
+  --bw-chart-curve: #c45f20;
+  --bw-chart-front: var(--wtm-chart-line);
+  --bw-chart-node: var(--wtm-muted);
+  --bw-btn-bg: rgba(255, 255, 255, 0.04);
+  --bw-btn-hover: var(--wtm-accent-soft);
+  --bw-row-front: var(--wtm-accent-soft);
+}
+
+html[data-theme="light"],
+:root[data-theme="light"] {
+  --bw-bg: var(--wtm-bg);
+  --bw-bg-gradient: none;
+  --bw-surface: var(--wtm-surface);
+  --bw-surface-2: var(--wtm-surface-2);
+  --bw-surface-glass: var(--wtm-surface);
+  --bw-border: var(--wtm-border);
+  --bw-border-strong: var(--wtm-accent-soft);
+  --bw-text: var(--wtm-text);
+  --bw-muted: var(--wtm-muted);
+  --bw-accent: var(--wtm-accent);
+  --bw-accent-dim: var(--wtm-accent);
+  --bw-accent-soft: var(--wtm-accent-soft);
+  --bw-chart-bg: var(--wtm-surface-2);
+  --bw-chart-grid: var(--wtm-chart-grid);
+  --bw-chart-axis: var(--wtm-chart-axis);
+  --bw-chart-spot-line: var(--wtm-accent-soft);
+  --bw-chart-spot-label: var(--wtm-accent);
+  --bw-chart-curve: #c45f20;
+  --bw-chart-front: var(--wtm-chart-line);
+  --bw-chart-node: var(--wtm-text);
+  --bw-btn-bg: rgba(31, 41, 55, 0.04);
+  --bw-btn-hover: var(--wtm-accent-soft);
+  --bw-row-front: var(--wtm-accent-soft);
+  --bw-flat: var(--wtm-accent);
+}
+
+html[data-theme="nature"],
+:root[data-theme="nature"] {
+  --bw-bg: var(--wtm-bg);
+  --bw-bg-gradient: none;
+  --bw-surface: var(--wtm-surface);
+  --bw-surface-2: var(--wtm-surface-2);
+  --bw-surface-glass: var(--wtm-surface);
+  --bw-border: var(--wtm-border);
+  --bw-border-strong: var(--wtm-accent-soft);
+  --bw-text: var(--wtm-text);
+  --bw-muted: var(--wtm-muted);
+  --bw-accent: var(--wtm-accent);
+  --bw-accent-dim: var(--wtm-accent);
+  --bw-accent-soft: var(--wtm-accent-soft);
+  --bw-chart-bg: var(--wtm-surface-2);
+  --bw-chart-grid: var(--wtm-chart-grid);
+  --bw-chart-axis: var(--wtm-chart-axis);
+  --bw-chart-spot-line: var(--wtm-accent-soft);
+  --bw-chart-spot-label: var(--wtm-accent);
+  --bw-chart-curve: #c45f20;
+  --bw-chart-front: var(--wtm-chart-line);
+  --bw-chart-node: var(--wtm-text);
+  --bw-btn-bg: rgba(31, 41, 55, 0.04);
+  --bw-btn-hover: var(--wtm-accent-soft);
+  --bw-row-front: var(--wtm-accent-soft);
+  --bw-flat: var(--wtm-accent);
+}
+
+/* ── Theme switcher + account chip (top-right) ── */
+.console-topbar-zone--actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.console-theme-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.console-theme-select,
+#themeSelect,
+#bwThemeSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  height: var(--console-topbar-chip-height, 26px);
+  min-height: 24px;
+  padding: 0 22px 0 8px;
+  border-radius: var(--wf-radius-control, 4px);
+  border: 1px solid var(--wtm-border, rgba(255, 255, 255, 0.12));
+  background-color: var(--wtm-surface, #1A1A1A);
+  background-image: linear-gradient(45deg, transparent 50%, var(--wtm-muted) 50%),
+    linear-gradient(135deg, var(--wtm-muted) 50%, transparent 50%);
+  background-position: calc(100% - 10px) calc(50% - 2px), calc(100% - 6px) calc(50% - 2px);
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+  color: var(--wtm-text, #FFFFFF);
+  font-size: var(--type-label-size, 12px);
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  max-width: 7.5rem;
+}
+
+.console-theme-select:hover,
+#themeSelect:hover,
+#bwThemeSelect:hover {
+  border-color: var(--wtm-accent, #228B22);
+}
+
+.console-theme-select:focus,
+#themeSelect:focus,
+#bwThemeSelect:focus {
+  outline: 1px solid var(--wtm-accent, #228B22);
+  outline-offset: 1px;
+}
+
+.console-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--console-topbar-chip-height, 26px);
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--wtm-border, rgba(255, 255, 255, 0.12));
+  background: var(--wtm-surface, #1A1A1A);
+  color: var(--wtm-text, #FFFFFF);
+  font-size: var(--type-label-size, 12px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.console-user-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--wtm-accent-soft, rgba(34, 139, 34, 0.14));
+  color: var(--wtm-accent, #228B22);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.console-user-chip__label {
+  color: var(--wtm-muted, rgba(255, 255, 255, 0.6));
+}
+
+/* Light + nature body surfaces when theme active */
+html[data-theme="light"] body.bg-wtm-bg,
+html[data-theme="nature"] body.bg-wtm-bg {
+  background-color: var(--wtm-bg) !important;
+  color: var(--wtm-text) !important;
+}
+
+html[data-theme="light"] body.bw-standalone,
+html[data-theme="nature"] body.bw-standalone {
+  background: var(--wtm-bg);
+  background-image: none;
+  color: var(--wtm-text);
+}
+
+/* Nature reuses light-shell component overrides where present */
+html[data-theme="nature"] .wf-panel,
+html[data-theme="nature"] .ia-top-frame,
+html[data-theme="nature"] .ia-left-frame {
+  background: var(--wtm-surface);
+  border-color: var(--wtm-border);
+}

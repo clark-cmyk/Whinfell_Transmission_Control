@@ -52,7 +52,7 @@ function loadModule() {
 
   const actionIds = [
     'btnImportHydration', 'btnImport', 'btnExport',
-    'btnExportPipeline', 'btnSave', 'btnTheme',
+    'btnExportPipeline', 'btnSave',
   ];
   const actionEls = {};
   actionIds.forEach((id) => {
@@ -97,7 +97,9 @@ const { WTM, metaMount, actionEls } = loadModule();
 
 assert(WTM, 'WTM_TopUtility exported');
 assert(WTM.TOP_UTILITY_REGISTRY.length === 10, 'ten tech-meta utilities');
-assert(WTM.ACTION_BUTTON_REGISTRY.length === 6, 'six action buttons');
+assert(WTM.ACTION_BUTTON_REGISTRY.length === 5, 'five action buttons (theme is #themeSelect)');
+assert(WTM.THEME_ACCOUNT_REGISTRY?.length === 2, 'theme + account registry');
+assert(WTM.THEME_ACCOUNT_REGISTRY.find((e) => e.domId === 'themeSelect'), 'themeSelect registered');
 
 assert(WTM.HEADER_LAYOUT?.compactMeta === true, 'header compact meta enabled');
 

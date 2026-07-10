@@ -146,14 +146,35 @@
     },
   ]);
 
-  /** Action row — import, export, save, theme. */
+  /** Action row — import, export, save (theme lives in top-right #themeSelect cluster). */
   const ACTION_BUTTON_REGISTRY = Object.freeze([
     { id: 'btnImportHydration', tier: 'action', variant: 'accent', label: 'Import hydration' },
     { id: 'btnImport', tier: 'action', variant: 'primary', label: 'Import WTM' },
     { id: 'btnExport', tier: 'action', variant: 'default', label: 'Export' },
     { id: 'btnExportPipeline', tier: 'action', variant: 'default', label: 'Pipeline bundle' },
     { id: 'btnSave', tier: 'action', variant: 'save', label: 'Save' },
-    { id: 'btnTheme', tier: 'action', variant: 'default', label: 'Light mode' },
+  ]);
+
+  /** Chunk 26 — theme dropdown + account chip (stable top-right home). */
+  const THEME_ACCOUNT_REGISTRY = Object.freeze([
+    {
+      id: 'theme',
+      domId: 'themeSelect',
+      kind: 'select',
+      options: Object.freeze([
+        { value: 'dark', label: 'Dark' },
+        { value: 'light', label: 'Light' },
+        { value: 'nature', label: 'Nature' },
+      ]),
+      title: 'Console theme',
+    },
+    {
+      id: 'account',
+      domId: 'consoleUserChip',
+      kind: 'chip',
+      label: 'Desk',
+      title: 'Account',
+    },
   ]);
 
   function chipClasses(entry) {
@@ -273,6 +294,7 @@
     VARIANT_SUFFIX,
     TOP_UTILITY_REGISTRY,
     ACTION_BUTTON_REGISTRY,
+    THEME_ACCOUNT_REGISTRY,
     chipClasses,
     actionButtonClasses,
     resolveUtilityLabel,

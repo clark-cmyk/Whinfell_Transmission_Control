@@ -5004,18 +5004,35 @@ function formatChartValue(val, unit) {
 }
 
 function getChartTheme() {
-  const light = document.documentElement.getAttribute('data-theme') === 'light';
+  const themeId = document.documentElement.getAttribute('data-theme') || 'dark';
+  const lightish = themeId === 'light' || themeId === 'nature';
+  const accent = (typeof WTM_Theme !== 'undefined' && WTM_Theme.getAccent)
+    ? WTM_Theme.getAccent()
+    : (themeId === 'nature' ? '#1E6B2B' : '#228B22');
+  let grid;
+  let muted;
+  let axisText;
+  let label;
+  try {
+    const s = getComputedStyle(document.documentElement);
+    grid = s.getPropertyValue('--wtm-chart-grid').trim();
+    muted = s.getPropertyValue('--wtm-muted').trim();
+    axisText = s.getPropertyValue('--wtm-chart-axis').trim() || muted;
+    label = s.getPropertyValue('--wtm-text').trim();
+  } catch (_) {
+    /* ignore */
+  }
   return {
-    grid: light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.12)',
-    axisText: light ? '#374151' : '#c5d0dc',
-    label: light ? '#1a2332' : '#e8edf3',
-    muted: light ? '#5a6578' : '#9eacbb',
-    barHi: light ? 'rgba(200,80,60,0.88)' : 'rgba(255,140,105,0.92)',
-    barLo: light ? 'rgba(40,140,80,0.88)' : 'rgba(79,179,122,0.92)',
-    barMid: light ? 'rgba(50,100,180,0.85)' : 'rgba(76,142,217,0.88)',
-    zeroLine: light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.22)',
-    activeBand: light ? 'rgba(50,100,180,0.14)' : 'rgba(76,142,217,0.14)',
-    line: light ? 'rgba(180,130,40,0.75)' : 'rgba(214,163,74,0.65)',
+    grid: grid || (lightish ? 'rgba(31,41,55,0.07)' : 'rgba(255,255,255,0.07)'),
+    axisText: axisText || (lightish ? '#1F2937' : '#c5d0dc'),
+    label: label || (lightish ? '#1F2937' : '#e8edf3'),
+    muted: muted || (lightish ? 'rgba(31,41,55,0.6)' : '#9eacbb'),
+    barHi: lightish ? 'rgba(200,80,60,0.88)' : 'rgba(255,140,105,0.92)',
+    barLo: lightish ? 'rgba(40,140,80,0.88)' : 'rgba(79,179,122,0.92)',
+    barMid: lightish ? 'rgba(34,139,34,0.75)' : 'rgba(34,139,34,0.72)',
+    zeroLine: lightish ? 'rgba(31,41,55,0.2)' : 'rgba(255,255,255,0.22)',
+    activeBand: lightish ? 'rgba(34,139,34,0.12)' : 'rgba(34,139,34,0.14)',
+    line: accent,
   };
 }
 
@@ -7018,33 +7035,34 @@ async function copyText(text, btn, label) {
   setTimeout(() => btn.textContent = o || label, 2000);
 }
 
-const THEME_STORAGE_KEY = 'whinfell_tc_theme';
+const THEME_STORAGE_KEY = (typeof WTM_Theme !== 'undefined' && WTM_Theme.STORAGE_KEY)
+  ? WTM_Theme.STORAGE_KEY
+  : 'whinfell_tc_theme';
 
 function applyConsoleTheme(theme) {
-  const next = theme === 'light' ? 'light' : 'dark';
-  if (!document.documentElement?.setAttribute) return;
-  document.documentElement.setAttribute('data-theme', next);
-  const btn = el('btnTheme');
-  if (btn) {
-    btn.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
-    if (typeof btn.setAttribute === 'function') {
-      btn.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
-    }
+  if (typeof WTM_Theme !== 'undefined' && WTM_Theme.applyTheme) {
+    return WTM_Theme.applyTheme(theme);
   }
+  const allowed = { dark: true, light: true, nature: true };
+  const next = allowed[theme] ? theme : 'dark';
+  if (!document.documentElement?.setAttribute) return next;
+  document.documentElement.setAttribute('data-theme', next);
   try { localStorage.setItem(THEME_STORAGE_KEY, next); } catch (_) { /* private browsing */ }
-  if (typeof WTM_BasisWatch !== 'undefined' && WTM_BasisWatch.applyTheme) WTM_BasisWatch.applyTheme(next);
+  return next;
 }
 
 function initConsoleTheme() {
+  if (typeof WTM_Theme !== 'undefined' && WTM_Theme.initTheme) {
+    return WTM_Theme.initTheme();
+  }
   let stored = 'dark';
   try { stored = localStorage.getItem(THEME_STORAGE_KEY) || 'dark'; } catch (_) { /* ignore */ }
-  applyConsoleTheme(stored);
+  return applyConsoleTheme(stored);
 }
 
 initConsoleTheme();
-el('btnTheme')?.addEventListener('click', () => {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  applyConsoleTheme(current === 'dark' ? 'light' : 'dark');
+el('themeSelect')?.addEventListener('change', (e) => {
+  applyConsoleTheme(e.target?.value || 'dark');
 });
 
 el('btnSignalDetail')?.addEventListener('click', () => setSignalDetailOpen(true));

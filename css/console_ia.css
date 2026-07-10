@@ -33,9 +33,9 @@
   --wf-text-3: #64748b;
   --wf-text-inverse: #0b1120;
 
-  /* Accent + status (COMET primary green + desk amber/red) */
-  --wf-accent: #67a7ff;
-  --wf-accent-soft: rgba(103, 167, 255, 0.18);
+  /* Accent + status — Chunk 26 forest brand (no neon blue) */
+  --wf-accent: var(--wtm-accent, #228B22);
+  --wf-accent-soft: var(--wtm-accent-soft, rgba(34, 139, 34, 0.14));
   --wf-ok: #22c55e;
   --wf-ok-strong: #16a34a;
   --wf-ok-fg: #0b1120;
@@ -4415,8 +4415,8 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --wf-text: var(--wf-text-primary);
   --wf-text-2: var(--wf-text-secondary);
   --wf-text-3: var(--wf-text-muted);
-  --wf-accent: var(--wf-accent-teal);
-  --wf-accent-soft: rgba(46, 134, 171, 0.14);
+  --wf-accent: var(--wtm-accent, #228B22);
+  --wf-accent-soft: var(--wtm-accent-soft, rgba(34, 139, 34, 0.12));
 
   /* Status (Whinfell light greens + shared warn/risk) */
   --wf-ok: var(--wf-accent-green);
@@ -4448,7 +4448,7 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --ia-text: var(--wf-text-primary);
   --ia-green: var(--wf-accent-green);
   --ia-green-dim: var(--wf-ok-soft);
-  --ia-accent: var(--wf-accent-teal);
+  --ia-accent: var(--wtm-accent, #228B22);
   --ia-amber: var(--wf-warn);
   --ia-red: var(--wf-risk);
   --ia-top-h: var(--wf-header-h);
@@ -4457,9 +4457,55 @@ body.ia-left-collapsed #btnIaLadderDeepDive::before { content: "LD"; }
   --ia-left-w-collapsed: var(--wf-rail-w-collapsed);
 }
 
+/* Chunk 26 — Nature mirrors light shell surfaces (deeper green accent via --wtm-*) */
+:root[data-theme="nature"] {
+  --wf-bg-page: var(--wtm-bg, #F1F5F2);
+  --wf-bg-card: var(--wtm-surface, #FFFFFF);
+  --wf-bg-subtle: var(--wtm-surface-2, #E6EDE8);
+  --wf-text-primary: var(--wtm-text, #1F2937);
+  --wf-text-secondary: var(--wtm-muted, rgba(31, 41, 55, 0.6));
+  --wf-text-muted: var(--wtm-muted, rgba(31, 41, 55, 0.6));
+  --wf-text-inverse: #FFFFFF;
+  --wf-accent-green: var(--wtm-accent, #1E6B2B);
+  --wf-border-card: var(--wtm-border, rgba(31, 41, 55, 0.12));
+  --wf-border-subtle: rgba(31, 41, 55, 0.18);
+  --wf-shell-bg: var(--wf-bg-page);
+  --wf-rail-bg: var(--wf-bg-card);
+  --wf-canvas-bg: var(--wf-bg-page);
+  --wf-panel-bg: var(--wf-bg-card);
+  --wf-panel-bg-2: var(--wf-bg-subtle);
+  --wf-panel-bg-3: var(--wf-bg-subtle);
+  --wf-control-bg: var(--wf-bg-subtle);
+  --wf-control-border: var(--wf-border-card);
+  --wf-border: var(--wf-border-card);
+  --wf-border-strong: var(--wf-border-subtle);
+  --wf-divider: var(--wf-border-card);
+  --wf-divider-strong: var(--wf-border-subtle);
+  --wf-text: var(--wf-text-primary);
+  --wf-text-2: var(--wf-text-secondary);
+  --wf-text-3: var(--wf-text-muted);
+  --wf-accent: var(--wtm-accent, #1E6B2B);
+  --wf-accent-soft: var(--wtm-accent-soft, rgba(30, 107, 43, 0.12));
+  --wf-ok: var(--wtm-accent, #1E6B2B);
+  --wf-ok-strong: #165522;
+  --wf-ok-fg: #FFFFFF;
+  --wf-ok-soft: var(--wtm-accent-soft, rgba(30, 107, 43, 0.12));
+  --ia-shell-bg: var(--wf-bg-page);
+  --ia-surface: var(--wf-bg-card);
+  --ia-border: var(--wf-border-card);
+  --ia-muted: var(--wf-text-muted);
+  --ia-text: var(--wf-text-primary);
+  --ia-green: var(--wtm-accent, #1E6B2B);
+  --ia-green-dim: var(--wf-ok-soft);
+  --ia-accent: var(--wtm-accent, #1E6B2B);
+}
+
 :root[data-theme="light"] .wf-panel,
 :root[data-theme="light"] .ia-top-frame,
-:root[data-theme="light"] .ia-left-frame {
+:root[data-theme="light"] .ia-left-frame,
+:root[data-theme="nature"] .wf-panel,
+:root[data-theme="nature"] .ia-top-frame,
+:root[data-theme="nature"] .ia-left-frame {
   background: var(--wf-bg-card);
   border-color: var(--wf-border-card);
 }

@@ -41,6 +41,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
     body { font-family: "Segoe UI", system-ui, sans-serif; }
     .hidden, .zone-hidden, .panel-hidden { display: none !important; }
   </style>
+    <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/console_ia.css">
     <link rel="stylesheet" href="css/ai_compute.css">
@@ -150,7 +151,20 @@ window.DICTIONARY_BADGE_DEFAULT = {
               <button id="btnExport" type="button">Export</button>
               <button id="btnExportPipeline" type="button">Pipeline bundle</button>
               <button id="btnSave" type="button">Save</button>
-              <button type="button" id="btnTheme" aria-pressed="false" title="Toggle dark / light console theme">Light mode</button>
+            </div>
+            <div class="console-theme-account" data-theme-account-mount aria-label="Theme and account">
+              <label class="console-theme-label" for="themeSelect">
+                <span class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0">Theme</span>
+                <select id="themeSelect" class="console-theme-select" title="Console theme" aria-label="Theme">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                  <option value="nature">Nature</option>
+                </select>
+              </label>
+              <span id="consoleUserChip" class="console-user-chip" title="Account" aria-label="Account">
+                <span class="console-user-chip__icon" aria-hidden="true">◎</span>
+                <span class="console-user-chip__label">Desk</span>
+              </span>
             </div>
           </div>
         </header>
@@ -1177,6 +1191,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
 
   <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
 
+<script src="js/theme.js"></script>
 <script src="js/time_format.js"></script>
 <script src="js/desk_china_ladder_models.js"></script>
   <script src="js/task_force_panel_feed.js"></script>
