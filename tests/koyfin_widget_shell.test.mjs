@@ -60,6 +60,16 @@ function runHtmlChecks() {
   assert(html.includes('data-ia-view-shortcut="risk_cockpit"'), 'view shortcut buttons present');
   assert(html.includes('id="iaRiskCurveSummary"'), 'compact risk curve summary in left rail');
 
+  // Chunk 27 — ARK single refresh button + Tools entry markup locks
+  const arkRefreshAllMatches = html.match(/id="btnArkRefreshAll"/g) || [];
+  assert(arkRefreshAllMatches.length === 1, 'exactly one #btnArkRefreshAll');
+  assert(!html.includes('id="btnArkRefreshInventory"'), 'no legacy btnArkRefreshInventory');
+  assert(!html.includes('id="btnArkForceRefresh"'), 'no legacy btnArkForceRefresh');
+  assert(!html.includes('id="btnArkRefreshCurve"'), 'no legacy btnArkRefreshCurve');
+  assert(html.includes('id="btnIaArk"'), 'Tools ARK entry #btnIaArk present');
+  assert(html.includes('id="btnIaA"'), 'Tools A entry #btnIaA present');
+  assert(html.includes('id="btnIaMidwestCrush"'), 'Tools Midwest Crush #btnIaMidwestCrush present');
+
   const headerInsideShell = /<div[^>]*id="wtmIaShell"[\s\S]*<header[^>]*class="console-topbar/.test(html);
   assert(headerInsideShell, 'console-topbar nested inside wtmIaShell');
 
@@ -71,6 +81,15 @@ function runShellJsChecks() {
   const shellSrc = fs.readFileSync(path.join(ROOT, 'js/console_ia_shell.js'), 'utf8');
   assert(shellSrc.includes('VIEW_SHORTCUT_REGISTRY'), 'VIEW_SHORTCUT_REGISTRY export');
   assert(shellSrc.includes('focusWidget'), 'focusWidget helper');
+  // Chunk 27 — Views from Dig: setLayer('scan') then double rAF + 50ms before scroll
+  assert(
+    /function focusWidget[\s\S]*?setLayer\(['"]scan['"]\)/.test(shellSrc),
+    'focusWidget calls setLayer(scan) when leaving Dig/Iterate'
+  );
+  assert(
+    /function focusWidget[\s\S]*?requestAnimationFrame/.test(shellSrc),
+    'focusWidget uses requestAnimationFrame after layer switch'
+  );
   assert(shellSrc.includes('relocateTopBar'), 'Chunk 1 relocateTopBar helper');
   assert(shellSrc.includes('iaRiskCockpitHost'), 'risk cockpit relocation');
   assert(shellSrc.includes('iaRiskCurveHost'), 'risk curve relocation');

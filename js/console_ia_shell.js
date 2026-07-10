@@ -286,28 +286,49 @@
     writeCollapsePrefs(prefs);
   }
 
+  /**
+   * Chunk 27 — Views (Scan widgets): ensure Scan layer, then scroll/highlight.
+   * Side effect: leaving Dig deactivates specialized hosts (ARK / A / WMC get
+   * zone-hidden via setLayer ≠ dig). Tools re-entry re-activates them. Expected — not a bug.
+   */
   function focusWidget(shortcutKey) {
     const widgetId = VIEW_SHORTCUT_REGISTRY[shortcutKey];
     const widget = widgetId ? el(widgetId) : null;
     if (!widget) return false;
 
-    document.querySelectorAll('.ia-view-shortcut, .ia-risk-curve-summary').forEach((btn) => {
-      const on = btn.dataset.iaViewShortcut === shortcutKey;
-      btn.classList.toggle('is-active', on);
-      btn.setAttribute('aria-current', on ? 'true' : 'false');
-    });
-
-    document.querySelectorAll('#iaWidgetGrid .wf-panel').forEach((panel) => {
-      panel.classList.toggle('is-active', panel.id === widgetId);
-    });
-
-    widget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (focusClearTimer) global.clearTimeout(focusClearTimer);
-    focusClearTimer = global.setTimeout(() => {
-      document.querySelectorAll('#iaWidgetGrid .wf-panel.is-active').forEach((panel) => {
-        if (panel.id !== widgetId) panel.classList.remove('is-active');
+    const applyScrollHighlight = () => {
+      document.querySelectorAll('.ia-view-shortcut, .ia-risk-curve-summary').forEach((btn) => {
+        const on = btn.dataset.iaViewShortcut === shortcutKey;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-current', on ? 'true' : 'false');
       });
-    }, 2400);
+
+      document.querySelectorAll('#iaWidgetGrid .wf-panel').forEach((panel) => {
+        panel.classList.toggle('is-active', panel.id === widgetId);
+      });
+
+      widget.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (focusClearTimer) global.clearTimeout(focusClearTimer);
+      focusClearTimer = global.setTimeout(() => {
+        document.querySelectorAll('#iaWidgetGrid .wf-panel.is-active').forEach((panel) => {
+          if (panel.id !== widgetId) panel.classList.remove('is-active');
+        });
+      }, 2400);
+    };
+
+    // Already Scan: single synchronous scroll/highlight (no double-fire).
+    if (activeLayer === 'scan') {
+      applyScrollHighlight();
+      return true;
+    }
+
+    // Dig/Iterate hide #iaWidgetGrid — switch to Scan, wait for layout, then focus.
+    setLayer('scan');
+    global.requestAnimationFrame(() => {
+      global.requestAnimationFrame(() => {
+        global.setTimeout(applyScrollHighlight, 50);
+      });
+    });
     return true;
   }
 

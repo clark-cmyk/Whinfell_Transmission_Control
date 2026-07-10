@@ -484,7 +484,7 @@
           if (job.status === 'done' || job.status === 'failed' || job.status === 'error') break;
         }
         if (!job || job.status !== 'done') {
-          // Always attempt CSV rebuild so Force Refresh still updates the curve.
+          // Always attempt CSV rebuild so Refresh All Data still updates the curve.
           if (forceMode) {
             notify('Live fetch timed out — rebuilding from drop CSV…');
             return refreshCurveFromWatchlist({ fetchLive: false, force: true });
