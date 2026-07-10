@@ -4,7 +4,7 @@
 (function deskDataOps(global) {
   'use strict';
 
-  const BUILD = '1.5-DESK-OPS-CHUNK23-CURVE-FORCE-2026-07-09';
+  const BUILD = '1.6-DESK-OPS-REFRESH-ALL-ARK-2026-07-10';
   const REFRESH_BTN_ID = 'btnDeskRefresh';
   const COLLECT_BTN_ID = 'btnMorningCollect';
   /** Local collect agent ports — Chunk 23 probes for curve-capable agent. */
@@ -300,16 +300,61 @@
     return signaled;
   }
 
+  /**
+   * Force-load every Ark source (hydration · curve · BBDM · coinglass · corporate_gm).
+   * @returns {Promise<Record<string, boolean>|null>}
+   */
+  async function refreshAllArkSources() {
+    const ark = getArk();
+    if (!ark) return null;
+    try {
+      if (typeof ark.loadAll === 'function') {
+        return await ark.loadAll({ force: true });
+      }
+      if (typeof ark.invalidateAll === 'function') ark.invalidateAll();
+      const status = {
+        hydration: false,
+        curve: false,
+        bbdm: false,
+        coinglass: false,
+        corporate_gm: false,
+      };
+      const tasks = [];
+      if (typeof ark.loadHydration === 'function') {
+        tasks.push(ark.loadHydration({ force: true }).then((r) => { status.hydration = !!(r && r.ok); }));
+      }
+      if (typeof ark.loadCurveHistory === 'function') {
+        tasks.push(ark.loadCurveHistory({ force: true }).then((r) => { status.curve = !!(r && r.ok); }));
+      }
+      if (typeof ark.loadBbdmReport === 'function') {
+        tasks.push(ark.loadBbdmReport({ force: true }).then((r) => { status.bbdm = !!(r && r.ok); }));
+      }
+      if (typeof ark.loadCoinglass === 'function') {
+        tasks.push(ark.loadCoinglass({ force: true }).then((r) => { status.coinglass = !!(r && r.ok); }));
+      }
+      if (typeof ark.loadCorporateGm === 'function') {
+        tasks.push(ark.loadCorporateGm({ force: true }).then((r) => { status.corporate_gm = !!(r && r.ok); }));
+      }
+      await Promise.all(tasks);
+      return status;
+    } catch (err) {
+      console.warn('[DeskOps] refreshAllArkSources', err);
+      return null;
+    }
+  }
+
   async function refreshAllDeskData(options = {}) {
     if (refreshBusy) {
       notify('Refresh already running');
       return { ok: false, mode: 'busy' };
     }
     refreshBusy = true;
+    const silent = !!(options.silent || options.quiet);
     const results = {
       hydration: false,
       curve: false,
       curveRebuild: null,
+      arkSources: null,
       wmc: false,
       surfaces: false,
       as_of: null,
@@ -317,16 +362,35 @@
       freshness_status: null,
     };
     try {
-      const hyd = await refreshHydration();
+      // Full Ark inventory first (unless ARK page already force-loaded everything).
+      if (!options.skipArkLoad) {
+        results.arkSources = await refreshAllArkSources();
+      }
+
+      const hyd = options.skipArkLoad
+        ? (getArk()?.getHydration?.()
+          ? { ok: true, ...stampFromArk({ ok: true }) }
+          : await refreshHydration())
+        : await refreshHydration();
       // Prefer live Ark stamp for toasts (SSOT) after hydration coordination.
       const arkStamp = stampFromArk(hyd);
-      results.hydration = !!(hyd && hyd.ok);
+      results.hydration = !!(hyd && hyd.ok) || !!(results.arkSources && results.arkSources.hydration);
       results.as_of = arkStamp.as_of || hyd?.as_of || null;
       results.snapshot_id = arkStamp.snapshot_id || hyd?.snapshot_id || null;
       results.freshness_status = arkStamp.freshness_status || hyd?.freshness_status || null;
 
       // Chunk 22: rebuild curve JSON from latest watchlist before Ark reloads it.
-      results.curveRebuild = await rebuildCurveFromWatchlist();
+      if (!options.skipCurveRebuild) {
+        results.curveRebuild = await rebuildCurveFromWatchlist();
+        // After disk rebuild, force Ark curve re-read.
+        if (typeof getArk()?.invalidateCurveHistory === 'function') {
+          getArk().invalidateCurveHistory();
+        }
+        if (typeof getArk()?.loadCurveHistory === 'function') {
+          const cr = await getArk().loadCurveHistory({ force: true });
+          if (cr?.ok && results.arkSources) results.arkSources.curve = true;
+        }
+      }
       results.curve = await refreshBasisWatch();
       results.wmc = await refreshWmc();
       results.surfaces = refreshToolSurfaces();
@@ -342,7 +406,9 @@
       results.snapshot_id = finalStamp.snapshot_id;
       results.freshness_status = finalStamp.freshness_status;
 
-      const any = results.hydration || results.curve || results.wmc || results.surfaces;
+      const arkAny = results.arkSources
+        && Object.values(results.arkSources).some(Boolean);
+      const any = results.hydration || results.curve || results.wmc || results.surfaces || arkAny;
       const asOfLabel = results.as_of
         ? (typeof global.WTM_formatLocalStamp === 'function'
           ? global.WTM_formatLocalStamp(results.as_of)
@@ -354,11 +420,14 @@
       const btnBit = results.curveRebuild?.ok && results.curveRebuild.BTN26_close != null
         ? ` · BTN26 $${Number(results.curveRebuild.BTN26_close).toLocaleString('en-US')}`
         : '';
-      if (!options.silent) {
+      const arkBit = arkAny
+        ? ` · ark:${Object.entries(results.arkSources).filter(([, v]) => v).map(([k]) => k).join('+')}`
+        : '';
+      if (!silent) {
         if (results.hydration && results.curve) {
-          notify(`Desk data refreshed — hydration + BasisWatch curve${btnBit}${stampBit}`);
+          notify(`Desk data refreshed — all sources${btnBit}${arkBit}${stampBit}`);
         } else if (any) {
-          notify(`Desk data refreshed — partial${btnBit}${stampBit} (some panels may need publish/collect)`);
+          notify(`Desk data refreshed — partial${btnBit}${arkBit}${stampBit} (some panels may need publish/collect)`);
         } else {
           notify('Refresh complete — no live data paths (check hydration / curve JSON)');
         }
@@ -443,6 +512,7 @@
     stampFromArk,
     warmArkHydration,
     rebuildCurveFromWatchlist,
+    refreshAllArkSources,
     refreshAllDeskData,
     triggerDeskRefresh,
     refreshBasisWatch,

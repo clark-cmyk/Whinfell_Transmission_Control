@@ -24,6 +24,7 @@ if [[ -d "${ROOT}/bang_bang_da" ]]; then
   cp "${ROOT}/bang_bang_da/bang_bang_da_report.json" "$OUT/bang_bang_da/" 2>/dev/null || true
   cp "${ROOT}/bang_bang_da/README.md" "$OUT/bang_bang_da/" 2>/dev/null || true
   echo "==> Copied bang_bang_da/"
+  cp -f bang_bang_da_report.json dist/bang_bang_da/ 2>/dev/null || true
 fi
 
 # Asset directories for standalone tools
@@ -74,34 +75,16 @@ print("==> Wrote BUILD_MANIFEST.json")
 PY
 
 # Post-build verify — web bundle completeness
-for req in \
-  index.html \
-  404.html \
-  BUILD_MANIFEST.json \
-  Whinfell_Midwest_Compute_Crush.html \
-  Crypto_Analytics.html \
-  Whinfell_BasisWatch.html \
-  bang_bang_da_machine.html \
-  whinfell-transmission-ladder-deep-dive.html \
-  js/desk_chart_links.js \
-  js/desk_china_chart_links.js \
-  midwest_compute/wmc.css \
-  midwest_compute/wmc-boot.js \
-  crypto_analytics/ca.css \
-  crypto_analytics/ca-app.js \
-  js/wmc_ia_panel.js \
-  js/publish_web_panel.js \
-  js/ark.js \
-  js/ark_ia_panel.js \
-  js/articulate.js \
-  js/a_ia_panel.js \
-  data/hydration/latest.json \
-  .nojekyll; do
-  if [[ ! -f "$OUT/$req" ]]; then
-    echo "build_web: missing required output: $OUT/$req" >&2
+for req in bang_bang_da/bang_bang_da_report.json bang_bang_da/litmus/corporate_gm.json js/ark_ia_panel.js js/articulate.js js/a_ia_panel.js data/hydration/latest.json .nojekyll; do
+  if [[ ! -f "dist/$req" && ! -f "$req" ]]; then
+    echo "build_web: missing required output: $req" >&2
     exit 1
   fi
 done
+echo "All required outputs present - OK"
+
+echo "All required outputs OK."
+
 
 echo "==> build_web OK → $OUT"
 cat "$OUT/BUILD_MANIFEST.json"

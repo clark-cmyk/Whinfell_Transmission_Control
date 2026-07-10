@@ -1,0 +1,118 @@
+{
+  "version": "0.1.0",
+  "as_of": "2026-07-10T03:13:58.156275+00:00",
+  "drop_dir": "/Users/clarksonwthornburgh/Downloads/whinfell_drop",
+  "manifest_root": "/Users/clarksonwthornburgh/.grok/worktrees/desktop-whinfell-transmission-control/2026-07-09-3139f0a1",
+  "manifest_path": "/Users/clarksonwthornburgh/.grok/worktrees/desktop-whinfell-transmission-control/2026-07-09-3139f0a1/whinfell_pipeline/collection_manifest.yaml",
+  "pipeline_root": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control",
+  "export_count": 6,
+  "ready_count": 6,
+  "required_ready": true,
+  "missing_required": [],
+  "exports": [
+    {
+      "id": "koyfin_rates",
+      "saved_view": "WTM-Rates-Credit",
+      "source": "koyfin",
+      "url": "https://app.koyfin.com/myw/575998c3-3ba1-4572-b46b-9477f374c6f1",
+      "ready": true,
+      "matched_files": [
+        "koyfin_WTM-Rates-Credit_2026.07.09_09.14.15.777.csv",
+        "koyfin_WTM-Rates-Credit_2026.07.09_09.52.39.860.csv",
+        "koyfin_WTM-Rates-Credit_2026.07.09_10.01.19.204.csv",
+        "koyfin_WTM-Rates-Credit_2026.07.09_10.05.53.772.csv",
+        "koyfin_WTM-Rates-Credit_2026.07.09_10.09.40.076.csv",
+        "rates_20260709_0937.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    },
+    {
+      "id": "koyfin_equities",
+      "saved_view": "WTM-Equities-Breadth",
+      "source": "koyfin",
+      "url": "https://app.koyfin.com/myw/495e878c-8a1f-4371-9c9d-ed256743b1a4",
+      "ready": true,
+      "matched_files": [
+        "equities_20260709_0937.csv",
+        "koyfin_WTM-Equities-Breadth_2026.07.09_09.14.24.141.csv",
+        "koyfin_WTM-Equities-Breadth_2026.07.09_09.52.47.743.csv",
+        "koyfin_WTM-Equities-Breadth_2026.07.09_10.01.27.695.csv",
+        "koyfin_WTM-Equities-Breadth_2026.07.09_10.06.01.073.csv",
+        "koyfin_WTM-Equities-Breadth_2026.07.09_10.09.48.504.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    },
+    {
+      "id": "koyfin_import_core",
+      "saved_view": "WTM-Import-Core",
+      "source": "koyfin",
+      "url": "https://app.koyfin.com/myw/70789aa7-8084-4e4c-85d3-09f9b78dcd3a",
+      "ready": true,
+      "matched_files": [
+        "credit_20260709_0937.csv",
+        "koyfin_WTM-Import-Core_2026.07.09_09.14.07.509.csv",
+        "koyfin_WTM-Import-Core_2026.07.09_09.52.31.275.csv",
+        "koyfin_WTM-Import-Core_2026.07.09_10.01.10.782.csv",
+        "koyfin_WTM-Import-Core_2026.07.09_10.05.45.950.csv",
+        "koyfin_WTM-Import-Core_2026.07.09_10.09.31.396.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    },
+    {
+      "id": "koyfin_china",
+      "saved_view": "WTM-China-Policy",
+      "source": "koyfin",
+      "url": "https://app.koyfin.com/myw/52364942-af46-4fc0-98b3-ff7d340e7284",
+      "ready": true,
+      "matched_files": [
+        "china_policy_20260709_0937.csv",
+        "koyfin_WTM-China-Policy_2026.07.09_09.14.20.114.csv",
+        "koyfin_WTM-China-Policy_2026.07.09_09.52.43.612.csv",
+        "koyfin_WTM-China-Policy_2026.07.09_10.01.23.513.csv",
+        "koyfin_WTM-China-Policy_2026.07.09_10.05.57.477.csv",
+        "koyfin_WTM-China-Policy_2026.07.09_10.09.44.417.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    },
+    {
+      "id": "barchart_futures_intraday",
+      "saved_view": "WTM-Futures-Intraday",
+      "source": "barchart",
+      "url": "https://www.barchart.com/my/watchlist?viewName=197689",
+      "ready": true,
+      "matched_files": [
+        "futures_intraday_20260709_0936.csv",
+        "futures_intraday_20260709_1845.csv",
+        "futures_intraday_20260710_001827.csv",
+        "futures_intraday_20260710_021402.csv",
+        "futures_intraday_20260710_025225.csv",
+        "futures_intraday_20260710_030105.csv",
+        "futures_intraday_20260710_030541.csv",
+        "futures_intraday_20260710_030927.csv",
+        "watchlist-wtm-canonical-universe-intraday-07-09-2026.csv",
+        "watchlist-wtm-canonical-universe-intraday-07-10-2026.csv",
+        "watchlist-wtm-futures-daily-intraday-07-09-2026.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    },
+    {
+      "id": "koyfin_flows_global",
+      "saved_view": "WTM-Flows-Global",
+      "source": "koyfin",
+      "url": "https://app.koyfin.com/myw/afb1f314-4de4-47b6-b02f-0de2601b62b9",
+      "ready": true,
+      "matched_files": [
+        "WTM-Flows-Global.csv",
+        "flows_20260709_0937.csv"
+      ],
+      "validation": "ok",
+      "replace_me": false
+    }
+  ],
+  "mode": "scaffold_v1"
+}

@@ -16,7 +16,7 @@ from urllib.parse import urlparse
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PORT = 8767
-AGENT_VERSION = "0.3.0-chunk23-curve-force"
+AGENT_VERSION = "0.4.0-litmus-refresh-2026-07-10"
 
 _jobs: dict[str, dict] = {}
 _jobs_lock = threading.Lock()
@@ -135,6 +135,10 @@ class CollectAgentHandler(BaseHTTPRequestHandler):
             ]
             self._spawn_job("curve-fetch-and-refresh", cmd, cwd=REPO_ROOT)
             return
+        if path == "/v1/litmus/refresh":
+            # Sync: CoinGlass/public + Koyfin flows → crypto_market + BBDM litmus block.
+            self._litmus_refresh_sync(body)
+            return
         if path == "/v1/collect/terminal":
             self._open_terminal()
             return
@@ -218,6 +222,73 @@ class CollectAgentHandler(BaseHTTPRequestHandler):
             self._send_json(400, {"ok": False, "error": str(exc)})
         except Exception as exc:  # noqa: BLE001
             self._send_json(500, {"ok": False, "error": str(exc)})
+
+    def _litmus_refresh_sync(self, body: dict) -> None:
+        """Rebuild Litmus crypto market + BBDM report litmus block; sync into dist/ if present."""
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
+        drop = Path(body.get("drop") or _drop_dir())
+        out: dict = {"ok": False, "drop": str(drop)}
+        try:
+            from datetime import datetime, timezone
+
+            from whinfell_pipeline.bbdm_report_builder import build_litmus_block
+            from whinfell_pipeline.coinglass_perp import ingest_crypto_market
+
+            crypto_doc = ingest_crypto_market(drop_dir=drop if drop.is_dir() else None)
+            out["crypto_data_status"] = crypto_doc.get("data_status")
+            out["crypto_as_of"] = crypto_doc.get("as_of")
+            btc_etf = None
+            eth_etf = None
+            for asset, block in (crypto_doc.get("assets") or {}).items():
+                for sig in block.get("signals") or []:
+                    if sig.get("signal_id") == "etf_flows":
+                        if asset == "BTC":
+                            btc_etf = sig.get("open_interest_usd")
+                        elif asset == "ETH":
+                            eth_etf = sig.get("open_interest_usd")
+            out["btc_etf_flow_usd"] = btc_etf
+            out["eth_etf_flow_usd"] = eth_etf
+
+            report_path = REPO_ROOT / "bang_bang_da" / "bang_bang_da_report.json"
+            if report_path.is_file():
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+                report["litmus"] = build_litmus_block(REPO_ROOT)
+                report["generated_at"] = (
+                    datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.")
+                    + f"{datetime.now(timezone.utc).microsecond // 1000:03d}Z"
+                )
+                report_path.write_text(
+                    json.dumps(report, indent=2) + "\n", encoding="utf-8"
+                )
+                out["report_updated"] = True
+                out["litmus_tables"] = len((report.get("litmus") or {}).get("tables") or [])
+            else:
+                out["report_updated"] = False
+                out["report_error"] = "bang_bang_da_report.json missing"
+
+            # Mirror into dist so the served desk sees the same JSON without a full rebuild.
+            dist_root = REPO_ROOT / "dist" / "bang_bang_da"
+            if dist_root.is_dir():
+                import shutil
+
+                litmus_src = REPO_ROOT / "bang_bang_da" / "litmus"
+                dist_litmus = dist_root / "litmus"
+                dist_litmus.mkdir(parents=True, exist_ok=True)
+                if litmus_src.is_dir():
+                    for src in litmus_src.glob("*.json"):
+                        shutil.copy2(src, dist_litmus / src.name)
+                if report_path.is_file():
+                    shutil.copy2(report_path, dist_root / "bang_bang_da_report.json")
+                out["dist_synced"] = True
+            else:
+                out["dist_synced"] = False
+
+            out["ok"] = True
+            self._send_json(200, out)
+        except Exception as exc:  # noqa: BLE001
+            out["error"] = str(exc)
+            self._send_json(500, out)
 
     def _spawn_job(self, label: str, cmd: list[str], cwd: Path | None = None) -> None:
         job_id = uuid.uuid4().hex[:12]

@@ -8,7 +8,7 @@
 (function arkModule(global) {
   'use strict';
 
-  const BUILD = 'ARK-1.5.0-CHUNK24-REFRESH-ALL-2026-07-09';
+  const BUILD = 'ARK-1.6.0-REFRESH-ALL-SOURCES-2026-07-10';
 
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
@@ -21,6 +21,20 @@
     'bang_bang_da/litmus/crypto_market.json',
     './bang_bang_da/litmus/crypto_market.json',
   ]);
+  /** Koyfin corporate GM → Litmus Midwest tables. */
+  const CORPORATE_GM_URLS = Object.freeze([
+    'bang_bang_da/litmus/corporate_gm.json',
+    './bang_bang_da/litmus/corporate_gm.json',
+  ]);
+
+  /** Canonical inventory order for ARK page + loadAll. */
+  const SOURCE_IDS = Object.freeze([
+    'hydration',
+    'curve',
+    'bbdm_report',
+    'coinglass_perp',
+    'corporate_gm',
+  ]);
 
   /** @type {object|null} */
   let hydrationCache = null;
@@ -30,6 +44,8 @@
   let bbdmReportCache = null;
   /** @type {object|null} */
   let coinglassCache = null;
+  /** @type {object|null} */
+  let corporateGmCache = null;
   /** @type {string|null} */
   let lastRefreshedAt = null;
 
@@ -53,6 +69,7 @@
   sources.set('curve', makeSource('curve', CURVE_URL));
   sources.set('bbdm_report', makeSource('bbdm_report', BBDM_REPORT_URLS[0]));
   sources.set('coinglass_perp', makeSource('coinglass_perp', COINGLASS_URLS[0]));
+  sources.set('corporate_gm', makeSource('corporate_gm', CORPORATE_GM_URLS[0]));
 
   function isFileProtocol() {
     try {
@@ -329,6 +346,10 @@
       return failResult('file: protocol cannot fetch data files');
     }
 
+    if (force) {
+      coinglassCache = null;
+    }
+
     const fetched = await fetchJsonFirst(COINGLASS_URLS.slice());
     if (!fetched.ok) {
       setSourceStatus('coinglass_perp', 'error', fetched.error, COINGLASS_URLS[0]);
@@ -353,13 +374,109 @@
     return coinglassCache;
   }
 
+  /**
+   * Load Litmus Midwest corporate_gm JSON (path cascade).
+   * @param {{ force?: boolean }} [options]
+   */
+  async function loadCorporateGm(options) {
+    const opts = options || {};
+    const force = opts.force !== false;
+
+    if (!force && corporateGmCache) {
+      return okResult(corporateGmCache);
+    }
+
+    if (isFileProtocol()) {
+      setSourceStatus('corporate_gm', 'unavailable', 'file: protocol cannot fetch data files', CORPORATE_GM_URLS[0]);
+      return failResult('file: protocol cannot fetch data files');
+    }
+
+    if (force) {
+      corporateGmCache = null;
+    }
+
+    const fetched = await fetchJsonFirst(CORPORATE_GM_URLS.slice());
+    if (!fetched.ok) {
+      setSourceStatus('corporate_gm', 'error', fetched.error, CORPORATE_GM_URLS[0]);
+      return failResult(fetched.error);
+    }
+
+    corporateGmCache = fetched.data;
+    lastRefreshedAt = new Date().toISOString();
+    const dataStatus = corporateGmCache
+      && (corporateGmCache.data_status || corporateGmCache.status);
+    const note = dataStatus && /pending|stub|missing/i.test(String(dataStatus))
+      ? `data_status=${dataStatus}`
+      : null;
+    setSourceStatus('corporate_gm', 'ok', note, fetched.url || CORPORATE_GM_URLS[0]);
+    notify({ type: 'corporate_gm', ok: true, source: 'corporate_gm' });
+    return okResult(corporateGmCache);
+  }
+
+  /** @returns {object|null} */
+  function getCorporateGm() {
+    return corporateGmCache;
+  }
+
+  /**
+   * Drop all in-memory caches so the next loadAll / force load hits disk.
+   */
+  function invalidateAll() {
+    hydrationCache = null;
+    curveCache = null;
+    bbdmReportCache = null;
+    coinglassCache = null;
+    corporateGmCache = null;
+    SOURCE_IDS.forEach((id) => {
+      const prev = sources.get(id) || makeSource(id, '');
+      sources.set(id, {
+        id: id,
+        url: prev.url,
+        status: prev.status === 'ok' ? 'stale' : prev.status,
+        lastSuccessAt: prev.lastSuccessAt,
+        error: null,
+      });
+    });
+    notify({ type: 'invalidate_all', ok: true, source: 'all' });
+  }
+
+  /**
+   * Force-load every registered source (consolidated refresh).
+   * @param {{ force?: boolean }} [options]
+   * @returns {Promise<Record<string, boolean>>}
+   */
+  async function loadAll(options) {
+    const opts = options || {};
+    const force = opts.force !== false;
+    if (force) {
+      invalidateAll();
+    }
+    const status = {
+      hydration: false,
+      curve: false,
+      bbdm: false,
+      coinglass: false,
+      corporate_gm: false,
+    };
+    const tasks = [
+      loadHydration({ force: true }).then((r) => { status.hydration = !!(r && r.ok); }),
+      loadCurveHistory({ force: true }).then((r) => { status.curve = !!(r && r.ok); }),
+      loadBbdmReport({ force: true }).then((r) => { status.bbdm = !!(r && r.ok); }),
+      loadCoinglass({ force: true }).then((r) => { status.coinglass = !!(r && r.ok); }),
+      loadCorporateGm({ force: true }).then((r) => { status.corporate_gm = !!(r && r.ok); }),
+    ];
+    await Promise.all(tasks);
+    lastRefreshedAt = new Date().toISOString();
+    notify({ type: 'load_all', ok: true, source: 'all', status: status });
+    return status;
+  }
 
   /**
    * Inventory of registered data sources for the ARK page.
    * @returns {Array<{ id: string, url: string, status: string, lastSuccessAt: string|null, error: string|null }>}
    */
   function getSources() {
-    return ['hydration', 'curve', 'bbdm_report', 'coinglass_perp'].map((id) => cloneSource(sources.get(id)));
+    return SOURCE_IDS.map((id) => cloneSource(sources.get(id) || makeSource(id, '')));
   }
 
   /**
@@ -409,15 +526,20 @@
 
   const api = {
     BUILD: BUILD,
+    SOURCE_IDS: SOURCE_IDS,
     loadHydration: loadHydration,
     getHydration: getHydration,
     loadCurveHistory: loadCurveHistory,
     getCurveHistory: getCurveHistory,
     invalidateCurveHistory: invalidateCurveHistory,
+    invalidateAll: invalidateAll,
     loadBbdmReport: loadBbdmReport,
     getBbdmReport: getBbdmReport,
     loadCoinglass: loadCoinglass,
     getCoinglass: getCoinglass,
+    loadCorporateGm: loadCorporateGm,
+    getCorporateGm: getCorporateGm,
+    loadAll: loadAll,
     getSources: getSources,
     getStamp: getStamp,
     subscribe: subscribe,

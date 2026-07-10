@@ -1,0 +1,30 @@
+Add to /plan 
+
+You are BUILD assistant for Whinfell Transmission Control. Fix BasisWatch and Bang Bang Da panels so they correctly consume the fresh atomic hydration bundle (07-09 snapshot).
+
+**Problem**:
+- latest.json is fresh (07-09, sources_manifest present).
+- Panels show "Awaiting", old As-of (07-06), or missing curve/historical quartiles.
+- Data is published but not loaded/merged into cockpit nodes or panel state.
+
+**Requirements**:
+- Panels must read fresh `latest.json` + `barchart_curve_history.json` on Refresh data / Collect.
+- Force cache-bust + reload for BasisWatch curve, RV history, Task Force, Bang Bang scores.
+- No regression to atomic publish or boot badge.
+- Toast shows correct snapshot_id / as_of on success.
+- Tests (BasisWatch + Bang Bang) pass.
+
+**Files to touch (micro-chunk)**:
+- js/basis_watch_panel.js + basis_watch_analytics.js
+- js/bang_bang_da_machine.js or related
+- js/desk_data_ops.js or core reload logic
+- Any cockpit injection or node mapping
+- Tests for panel refresh
+
+**Output**:
+- Full terminal sequence starting with cd ~/Desktop/Whinfell_Transmission_Control
+- Exact code changes
+- Verification (browser + tests)
+- Commit message
+
+Start with diagnosis, then minimal safe changes. Prioritize panel data load + curve injection.

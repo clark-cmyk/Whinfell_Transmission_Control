@@ -1,0 +1,32 @@
+{
+  "meta_version": "1.0.0",
+  "collector_id": "comet-first-pass",
+  "collector_version": "1.0.0",
+  "pipeline_version": "1.0.0",
+  "source_file": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260709_1847.csv",
+  "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1847.csv",
+  "staged_at": "2026-07-10T03:43:50.578097+00:00",
+  "operator": "desk",
+  "source": "barchart",
+  "dataset": "futures_intraday",
+  "filename": "futures_intraday_20260709_1847.csv",
+  "sha256": "cea010592dac11d17a15c97e548fcb6e695cdb7d146432dffa79766bebfc00ad",
+  "status": "staged",
+  "errors": [],
+  "warnings": [],
+  "route": {
+    "source_class": "barchart_quote_snapshot",
+    "vendor": "barchart",
+    "priority": "",
+    "parser": "",
+    "output_kinds": [
+      "quote_snapshot",
+      "execution_l3"
+    ],
+    "vendor_format": "barchart_watchlist",
+    "symbols": [],
+    "canonical_assets": [],
+    "matched_by": "source_systems.barchart_quote_snapshot",
+    "warnings": []
+  }
+}

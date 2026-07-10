@@ -1,0 +1,33 @@
+{
+  "meta_version": "1.0.0",
+  "collector_id": "comet-first-pass",
+  "collector_version": "1.0.0",
+  "pipeline_version": "1.0.0",
+  "source_file": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2209.csv",
+  "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2209.csv",
+  "staged_at": "2026-07-10T03:43:50.607439+00:00",
+  "operator": "desk",
+  "source": "koyfin",
+  "dataset": "rates",
+  "filename": "rates_20260709_2209.csv",
+  "sha256": "e6ac8278c63554f85f2d4ee36bfabf4d2c763e3884ec2e5089bdbf61c9f22c46",
+  "status": "staged",
+  "errors": [],
+  "warnings": [
+    "optional headers absent: sq3_band, sq3_score"
+  ],
+  "route": {
+    "source_class": "unknown",
+    "vendor": "",
+    "priority": "",
+    "parser": "",
+    "output_kinds": [],
+    "vendor_format": "koyfin_snapshot",
+    "symbols": [],
+    "canonical_assets": [],
+    "matched_by": "",
+    "warnings": [
+      "no source_system match"
+    ]
+  }
+}

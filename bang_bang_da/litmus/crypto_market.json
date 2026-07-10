@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "adapter_version": "2.0.0-chunk17",
-  "data_status": "stub",
+  "adapter_version": "2.0.0-chunk17.4",
+  "data_status": "live",
   "source": "coinglass",
-  "as_of": "2026-07-09T22:55:15+00:00",
+  "as_of": "2026-07-10T14:07:12+00:00",
   "export_id": "coinglass_perp_market",
   "trade_ids": [
     "btc_basis",
@@ -27,37 +27,37 @@
         {
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 2.08e-05,
+          "open_interest_usd": 48319512062.53,
+          "status": "live"
         },
         {
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 7.17e-05,
+          "open_interest_usd": 786597650.0,
+          "status": "live"
         },
         {
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 2375772579.9,
+          "status": "live"
         },
         {
           "signal": "CF Benchmark",
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external"
+          "status": "expected_limitation"
         },
         {
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin"
+          "open_interest_usd": -95301696.51,
+          "status": "live"
         }
       ]
     },
@@ -76,37 +76,37 @@
         {
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 2.08e-05,
+          "open_interest_usd": 48319512062.53,
+          "status": "live"
         },
         {
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 7.17e-05,
+          "open_interest_usd": 786597650.0,
+          "status": "live"
         },
         {
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 2375772579.9,
+          "status": "live"
         },
         {
           "signal": "CF Benchmark",
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external"
+          "status": "expected_limitation"
         },
         {
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin"
+          "open_interest_usd": -95301696.51,
+          "status": "live"
         }
       ]
     },
@@ -125,37 +125,37 @@
         {
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.862e-05,
+          "open_interest_usd": 24779395901.54,
+          "status": "live"
         },
         {
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.7e-05,
+          "open_interest_usd": 275634563.0,
+          "status": "live"
         },
         {
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 1421133296.05,
+          "status": "live"
         },
         {
           "signal": "CF Benchmark",
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external"
+          "status": "expected_limitation"
         },
         {
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin"
+          "open_interest_usd": -52080427.85,
+          "status": "live"
         }
       ]
     },
@@ -174,37 +174,37 @@
         {
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.862e-05,
+          "open_interest_usd": 24779395901.54,
+          "status": "live"
         },
         {
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.7e-05,
+          "open_interest_usd": 275634563.0,
+          "status": "live"
         },
         {
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass"
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 1421133296.05,
+          "status": "live"
         },
         {
           "signal": "CF Benchmark",
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external"
+          "status": "expected_limitation"
         },
         {
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin"
+          "open_interest_usd": -52080427.85,
+          "status": "live"
         }
       ]
     }
@@ -219,30 +219,34 @@
           "signal_id": "perp_funding_aggregate",
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
-          "asset": "BTC"
+          "funding_rate": 2.08e-05,
+          "open_interest_usd": 48319512062.53,
+          "status": "live",
+          "source": "public_venues+coinglass_page",
+          "asset": "BTC",
+          "venue_panel": [
+            "bitget",
+            "gate"
+          ]
         },
         {
           "signal_id": "deribit",
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
+          "funding_rate": 7.17e-05,
+          "open_interest_usd": 786597650.0,
+          "status": "live",
+          "source": "deribit_public",
           "asset": "BTC"
         },
         {
           "signal_id": "hyperliquid",
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 2375772579.9,
+          "status": "live",
+          "source": "hyperliquid_public",
           "asset": "BTC"
         },
         {
@@ -251,8 +255,9 @@
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external",
-          "source": "external",
+          "status": "expected_limitation",
+          "source": "external_licensed",
+          "note": "CF Benchmarks (BRR/ETHUSD_RR) requires a licensed API subscription. Public probes: CryptoQuant funding chart/API blocked (auth), CoinGlass detailed funding API key-gated, Deribit public stats give venue index not CF reference rates. Status expected_limitation until desk keys CF or CoinGlass.",
           "asset": "BTC"
         },
         {
@@ -260,9 +265,9 @@
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin",
-          "source": "koyfin",
+          "open_interest_usd": -95301696.51,
+          "status": "live",
+          "source": "sosovalue_public",
           "asset": "BTC"
         }
       ]
@@ -276,30 +281,34 @@
           "signal_id": "perp_funding_aggregate",
           "signal": "Perp Funding (Aggregate)",
           "venue": "aggregate",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
-          "asset": "ETH"
+          "funding_rate": 1.862e-05,
+          "open_interest_usd": 24779395901.54,
+          "status": "live",
+          "source": "public_venues+coinglass_page",
+          "asset": "ETH",
+          "venue_panel": [
+            "bitget",
+            "gate"
+          ]
         },
         {
           "signal_id": "deribit",
           "signal": "Deribit",
           "venue": "deribit",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
+          "funding_rate": 1.7e-05,
+          "open_interest_usd": 275634563.0,
+          "status": "live",
+          "source": "deribit_public",
           "asset": "ETH"
         },
         {
           "signal_id": "hyperliquid",
           "signal": "Hyperliquid",
           "venue": "hyperliquid",
-          "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_coinglass",
-          "source": "coinglass",
+          "funding_rate": 1.25e-05,
+          "open_interest_usd": 1421133296.05,
+          "status": "live",
+          "source": "hyperliquid_public",
           "asset": "ETH"
         },
         {
@@ -308,8 +317,9 @@
           "venue": "cf_benchmark",
           "funding_rate": null,
           "open_interest_usd": null,
-          "status": "pending_external",
-          "source": "external",
+          "status": "expected_limitation",
+          "source": "external_licensed",
+          "note": "CF Benchmarks (BRR/ETHUSD_RR) requires a licensed API subscription. Public probes: CryptoQuant funding chart/API blocked (auth), CoinGlass detailed funding API key-gated, Deribit public stats give venue index not CF reference rates. Status expected_limitation until desk keys CF or CoinGlass.",
           "asset": "ETH"
         },
         {
@@ -317,9 +327,9 @@
           "signal": "ETF Flows",
           "venue": "etf",
           "funding_rate": null,
-          "open_interest_usd": null,
-          "status": "pending_koyfin",
-          "source": "koyfin",
+          "open_interest_usd": -52080427.85,
+          "status": "live",
+          "source": "sosovalue_public",
           "asset": "ETH"
         }
       ]
@@ -328,8 +338,37 @@
   "lineage": {
     "api_base": "https://open-api-v4.coinglass.com",
     "api_key_configured": false,
-    "fetched_at": null,
-    "fetch_errors": [],
-    "notes": "Set COINGLASS_API_KEY to enable live funding/OI fetch"
+    "fetched_at": "2026-07-10T14:07:12+00:00",
+    "fetch_errors": [
+      "etf_flows:koyfin_missing_ETH_in_flows_20260710_0802.csv;trying_sosovalue",
+      "etf_flows:koyfin_zero_BTC_in_flows_20260710_0802.csv;trying_sosovalue",
+      "cryptoquant:auth_required"
+    ],
+    "notes": null,
+    "live_signal_count": 8,
+    "fallback": "public_venues+koyfin_flows+sosovalue",
+    "sources_used": [
+      "bitget_public:BTC",
+      "bitget_public:ETH",
+      "coinglass_page_oi:BTC",
+      "coinglass_page_oi:ETH",
+      "deribit_public:BTC",
+      "deribit_public:ETH",
+      "gate_public:BTC",
+      "gate_public:ETH",
+      "hyperliquid_public:BTC",
+      "hyperliquid_public:ETH",
+      "koyfin_flows:flows_20260710_0802.csv",
+      "sosovalue_public:BTC",
+      "sosovalue_public:ETH"
+    ],
+    "expected_limitations": [
+      {
+        "signal_id": "cf_benchmark",
+        "status": "expected_limitation",
+        "detail": "CF Benchmarks (BRR/ETHUSD_RR) requires a licensed API subscription. Public probes: CryptoQuant funding chart/API blocked (auth), CoinGlass detailed funding API key-gated, Deribit public stats give venue index not CF reference rates. Status expected_limitation until desk keys CF or CoinGlass."
+      }
+    ],
+    "flows_file": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/flows_20260710_0802.csv"
   }
 }

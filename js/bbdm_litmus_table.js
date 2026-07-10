@@ -5,7 +5,7 @@
 (function bbdmLitmusTable(global) {
   'use strict';
 
-  const BUILD = 'BBDM-LITMUS-TABLE-CHUNK23';
+  const BUILD = 'BBDM-LITMUS-TABLE-CHUNK23.2-ARTICULATE';
 
   const COLUMN_REGISTRY = Object.freeze({
     company: { label: 'Company', format: 'text', group: 'midwest' },
@@ -88,8 +88,12 @@
     return null;
   }
 
+  function isEmptyCellValue(raw) {
+    return raw == null || raw === '';
+  }
+
   function formatCellValue(key, raw) {
-    if (raw == null || raw === '') return '—';
+    if (isEmptyCellValue(raw)) return '—';
     const fmt = COLUMN_REGISTRY[key]?.format || 'text';
     const n = Number(raw);
     switch (fmt) {
@@ -113,6 +117,21 @@
       default:
         return String(raw);
     }
+  }
+
+  /** Normalize a report row so every declared column has an explicit value. */
+  function hydrateRowForColumns(row, columns) {
+    const out = row && typeof row === 'object' ? { ...row } : {};
+    columns.forEach((col) => {
+      if (out[col] === undefined) out[col] = null;
+      if (col === 'cloud_multiplier' && isEmptyCellValue(out[col])) {
+        out[col] = 1.0;
+      }
+      if (col === 'status' && isEmptyCellValue(out[col])) {
+        out[col] = 'pending_koyfin';
+      }
+    });
+    return out;
   }
 
   function escapeCsvCell(value) {
@@ -219,6 +238,40 @@
       actions.appendChild(toggle);
     }
 
+    // Articulate A — per Litmus table section
+    const aBtn = global.document.createElement('button');
+    aBtn.type = 'button';
+    aBtn.className = 'bbdm-litmus-btn bbdm-litmus-btn--articulate';
+    aBtn.textContent = 'A';
+    aBtn.setAttribute('data-articulate-section', 'litmus-table');
+    aBtn.setAttribute('data-articulate-panel', tableId);
+    aBtn.setAttribute('data-articulate-module', 'Litmus');
+    aBtn.setAttribute(
+      'data-articulate-subject',
+      `Litmus · ${table?.title || tableId}`,
+    );
+    aBtn.setAttribute('title', 'Articulate · copy trader analysis prompt for this table');
+    aBtn.setAttribute('aria-label', `Articulate ${table?.title || 'Litmus table'}`);
+    const art = global.WTM_Articulate;
+    if (art && typeof art.registerButton === 'function') {
+      art.registerButton(aBtn, () => {
+        if (typeof art.contextFromLitmus === 'function') {
+          return art.contextFromLitmus(table, opts.litmus || null);
+        }
+        return {
+          panelId: tableId,
+          moduleName: 'Litmus',
+          subject: `Litmus · ${table?.title || tableId}`,
+          dataBlock: `(Litmus table ${tableId} · ${ (table?.rows || []).length } rows)`,
+        };
+      });
+    } else {
+      aBtn.addEventListener('click', () => {
+        console.warn('[Litmus] WTM_Articulate unavailable');
+      });
+    }
+    actions.appendChild(aBtn);
+
     const copyBtn = global.document.createElement('button');
     copyBtn.type = 'button';
     copyBtn.className = 'bbdm-litmus-btn bbdm-litmus-btn--copy';
@@ -254,6 +307,7 @@
       const th = global.document.createElement('th');
       th.scope = 'col';
       th.textContent = columnLabel(col);
+      th.dataset.litmusCol = col;
       if (isEditableColumn(col)) th.classList.add('bbdm-litmus-grid__editable-col');
       headRow.appendChild(th);
     });
@@ -271,14 +325,31 @@
       tbody.appendChild(tr);
     } else {
       rows.forEach((row, rowIndex) => {
+        const hydrated = hydrateRowForColumns(row, columns);
         const tr = global.document.createElement('tr');
         columns.forEach((col) => {
           const td = global.document.createElement('td');
+          td.dataset.litmusCol = col;
+          const raw = hydrated[col];
           if (isEditableColumn(col) && opts.editable !== false) {
-            td.appendChild(renderEditableInput(col, row, rowIndex, tableId));
+            td.appendChild(renderEditableInput(col, hydrated, rowIndex, tableId));
           } else {
-            td.textContent = formatCellValue(col, row?.[col]);
-            if (col === 'status') td.classList.add('bbdm-litmus-grid__status');
+            const text = formatCellValue(col, raw);
+            td.textContent = text;
+            if (isEmptyCellValue(raw) || text === '—') {
+              td.classList.add('bbdm-litmus-grid__empty-cell');
+            }
+            if (col === 'status') {
+              td.classList.add('bbdm-litmus-grid__status');
+              td.classList.add(`bbdm-litmus-grid__status--${String(raw || 'unknown').replace(/_/g, '-')}`);
+            }
+            if (col === 'regime_signal' && raw) {
+              td.classList.add('bbdm-litmus-grid__regime');
+              td.classList.add(`bbdm-litmus-grid__regime--${String(raw).replace(/_/g, '-')}`);
+            }
+            if (col === 'gm_z_3yr' && raw != null && raw !== '') {
+              td.classList.add('bbdm-litmus-grid__z');
+            }
           }
           tr.appendChild(td);
         });
@@ -303,11 +374,58 @@
   function renderLitmusBlock(litmus, opts = {}) {
     const root = global.document.createElement('div');
     root.className = 'bbdm-litmus-block' + (opts.compact ? ' bbdm-litmus-block--compact' : '');
+    root.setAttribute('data-articulate-block', 'litmus');
 
     const tables = filterTables(litmus, opts);
     const byTrade = litmus?.by_trade || {};
     const tradeId = opts.tradeId;
     const entry = tradeId ? byTrade[tradeId] : null;
+    const blockOpts = { ...opts, litmus };
+
+    // Block-level toolbar: always expose Articulate for the whole Litmus section
+    const toolbar = global.document.createElement('div');
+    toolbar.className = 'bbdm-litmus-block__toolbar';
+    const toolbarLabel = global.document.createElement('span');
+    toolbarLabel.className = 'bbdm-litmus-block__toolbar-label';
+    toolbarLabel.textContent = tradeId ? `Litmus · ${tradeId}` : 'Litmus';
+    toolbar.appendChild(toolbarLabel);
+
+    const blockA = global.document.createElement('button');
+    blockA.type = 'button';
+    blockA.className = 'bbdm-litmus-btn bbdm-litmus-btn--articulate';
+    blockA.textContent = 'A';
+    blockA.setAttribute('data-articulate-section', 'litmus-block');
+    blockA.setAttribute('data-articulate-panel', tradeId || 'litmus');
+    blockA.setAttribute('data-articulate-module', 'Litmus');
+    blockA.setAttribute(
+      'data-articulate-subject',
+      tradeId ? `Litmus · ${tradeId}` : 'Litmus · all tables',
+    );
+    blockA.setAttribute('title', 'Articulate · copy trader analysis prompt for Litmus');
+    blockA.setAttribute('aria-label', 'Articulate Litmus block');
+    const art = global.WTM_Articulate;
+    if (art && typeof art.registerButton === 'function') {
+      art.registerButton(blockA, () => {
+        if (tradeId && tables.length === 1 && typeof art.contextFromLitmus === 'function') {
+          return art.contextFromLitmus(tables[0], litmus);
+        }
+        if (typeof art.contextFromLitmusBlock === 'function') {
+          // Scope to filtered tables when tradeId is set
+          if (tradeId) {
+            return art.contextFromLitmusBlock({ ...litmus, tables });
+          }
+          return art.contextFromLitmusBlock(litmus);
+        }
+        return {
+          panelId: 'litmus',
+          moduleName: 'Litmus',
+          subject: 'Litmus',
+          dataBlock: `${tables.length} table(s)`,
+        };
+      });
+    }
+    toolbar.appendChild(blockA);
+    root.appendChild(toolbar);
 
     if (entry?.alignment || entry?.headline) {
       const meta = global.document.createElement('div');
@@ -351,7 +469,7 @@
     }
 
     tables.forEach((table) => {
-      root.appendChild(renderLitmusTable(table, opts));
+      root.appendChild(renderLitmusTable(table, blockOpts));
     });
     return root;
   }
@@ -401,6 +519,7 @@
     isEditableColumn,
     profileForColumns,
     formatCellValue,
+    hydrateRowForColumns,
     tableToTsv,
     copyTable,
     renderLitmusTable,

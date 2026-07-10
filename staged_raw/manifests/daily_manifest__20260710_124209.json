@@ -1,0 +1,26 @@
+{
+  "manifest_version": "1.0.0",
+  "runbook_version": "1.0.0",
+  "manifest_type": "daily",
+  "created_at": "2026-07-10T12:42:09.875055+00:00",
+  "operator": "desk",
+  "staged_root": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw",
+  "downloads_dir": "/Users/clarksonwthornburgh/Downloads/whinfell_drop",
+  "window": "today",
+  "stage_manifest": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/manifests/stage_manifest__20260710_124208.json",
+  "stage": {
+    "files_scanned": 7,
+    "files_staged": 6,
+    "files_quarantined": 1,
+    "files_skipped": 0
+  },
+  "collect_exit": 1,
+  "collect_stdout": "pipeline_staged_ingest_ok version=1.0.0\nstaged_root=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw\nfiles_found=6\nfiles_processed=5\nfiles_failed=1\nglobal_written=3\nchina_written=1\nexecution_records=0\ncrypto_ingested=0\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260710_0741.csv source=barchart dataset=futures_intraday adapter=- status=- archived=-\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260710_0741.csv: No Barchart execution fields found\nerror=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260710_0741.csv: no adapter matched staged CSV payload\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260710_0741.csv source=koyfin dataset=rates adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/archived/20260710T124208Z__rates_20260710_0741.csv\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260710_0741.csv: optional headers absent: sq3_band, sq3_score\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260710_0741.csv source=koyfin dataset=credit adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/archived/20260710T124208Z__credit_20260710_0741.csv\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260710_0741.csv: optional headers absent: sq3_band, sq3_score\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260710_0742.csv source=koyfin dataset=equities adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/archived/20260710T124208Z__equities_20260710_0742.csv\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260710_0742.csv: optional headers absent: sq3_band, sq3_score\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260710_0741.csv source=koyfin dataset=flows adapter=flows_fallback status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/archived/20260710T124209Z__flows_20260710_0741.csv\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260710_0741.csv: optional headers absent: key_observation, observation_id, regime_tag, sq3_band, sq3_score, timestamp, transmission_state, whinfell_score\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260710_0741.csv: flows_snapshot_1d_fallback\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260710_0741.csv: flows_sidecar tickers=15\nfile=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260710_0742.csv source=china_policy dataset=- adapter=legacy_parser status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/archived/20260710T124209Z__china_policy_20260710_0742.csv\nwarning=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260710_0742.csv: optional headers absent: dominant_theme\n",
+  "hydrate_exit": 0,
+  "hydrate_output": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/data/hydration/latest.json",
+  "export_path": null,
+  "errors": [
+    "collect failed"
+  ],
+  "chain_ok": false
+}

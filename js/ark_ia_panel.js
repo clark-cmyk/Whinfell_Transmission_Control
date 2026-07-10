@@ -5,7 +5,7 @@
 (function arkIaPanel(global) {
   'use strict';
 
-  const BUILD = 'ARK-IA-1.3.0-CHUNK24-REFRESH-ALL-2026-07-09';
+  const BUILD = 'ARK-IA-1.4.0-REFRESH-ALL-SOURCES-2026-07-10';
   /** Preferred ports — desk defaults to 8767; worktree/dev often runs 8768 when 8767 is occupied by an older agent. */
   const AGENT_PORTS = [8767, 8768, 8769];
   const AGENT_DEFAULT = 'http://127.0.0.1:8767';
@@ -324,54 +324,92 @@
       + renderSourcesTable(sources)
       + `<div class="ark-panel-block ark-panel-block--meta">`
       + `<p class="ark-help">The Ark is the single source of truth. Panels must not fetch raw data files.</p>`
-      + `<p class="ark-help"><strong>Refresh All Data</strong> rebuilds the curve from the watchlist (when agent is up), then force-loads hydration · curve · BBDM · CoinGlass into The Ark.</p>`
+      + `<p class="ark-help"><strong>Refresh All Data</strong> rebuilds curve + Litmus (when agent is up), then force-loads <em>every</em> Ark source: hydration · curve · BBDM · CoinGlass · corporate_gm — then fans out to desk panels.</p>`
       + `<p class="ark-help">Ark BUILD · <code>${escapeHtml(ark.BUILD || '—')}</code> · Panel · <code>${escapeHtml(BUILD)}</code></p>`
       + `</div>`
     );
   }
 
   /**
-   * Force-load all Ark sources into cache (no disk rebuild).
-   * @returns {Promise<{ hydration: boolean, curve: boolean, bbdm: boolean, coinglass: boolean }>}
+   * Force-load every Ark source into cache (no disk rebuild).
+   * @returns {Promise<Record<string, boolean>>}
    */
   async function refreshInventory() {
     const ark = getArk();
-    const status = { hydration: false, curve: false, bbdm: false, coinglass: false };
+    const status = {
+      hydration: false,
+      curve: false,
+      bbdm: false,
+      coinglass: false,
+      corporate_gm: false,
+    };
     if (!ark) {
       render();
       return status;
     }
-    if (typeof ark.invalidateCurveHistory === 'function') {
-      ark.invalidateCurveHistory();
-    }
     try {
-      const tasks = [];
-      if (typeof ark.loadHydration === 'function') {
-        tasks.push(ark.loadHydration({ force: true }).then((r) => { status.hydration = !!(r && r.ok); }));
+      if (typeof ark.loadAll === 'function') {
+        const loaded = await ark.loadAll({ force: true });
+        Object.assign(status, loaded || {});
+      } else {
+        if (typeof ark.invalidateAll === 'function') ark.invalidateAll();
+        else if (typeof ark.invalidateCurveHistory === 'function') ark.invalidateCurveHistory();
+        const tasks = [];
+        if (typeof ark.loadHydration === 'function') {
+          tasks.push(ark.loadHydration({ force: true }).then((r) => { status.hydration = !!(r && r.ok); }));
+        }
+        if (typeof ark.loadCurveHistory === 'function') {
+          tasks.push(ark.loadCurveHistory({ force: true }).then((r) => { status.curve = !!(r && r.ok); }));
+        }
+        if (typeof ark.loadBbdmReport === 'function') {
+          tasks.push(ark.loadBbdmReport({ force: true }).then((r) => { status.bbdm = !!(r && r.ok); }));
+        }
+        if (typeof ark.loadCoinglass === 'function') {
+          tasks.push(ark.loadCoinglass({ force: true }).then((r) => { status.coinglass = !!(r && r.ok); }));
+        }
+        if (typeof ark.loadCorporateGm === 'function') {
+          tasks.push(ark.loadCorporateGm({ force: true }).then((r) => { status.corporate_gm = !!(r && r.ok); }));
+        }
+        await Promise.all(tasks);
       }
-      if (typeof ark.loadCurveHistory === 'function') {
-        tasks.push(ark.loadCurveHistory({ force: true }).then((r) => { status.curve = !!(r && r.ok); }));
-      }
-      if (typeof ark.loadBbdmReport === 'function') {
-        tasks.push(ark.loadBbdmReport({ force: true }).then((r) => { status.bbdm = !!(r && r.ok); }));
-      }
-      if (typeof ark.loadCoinglass === 'function') {
-        tasks.push(ark.loadCoinglass({ force: true }).then((r) => { status.coinglass = !!(r && r.ok); }));
-      }
-      await Promise.all(tasks);
     } catch (err) {
       console.warn('[ArkIaPanel] inventory refresh', err);
     }
     render();
+    ensureActionButtons();
     return status;
   }
 
   /**
-   * Chunk 24 — one clean ARK action: curve rebuild (agent) + full Ark source reload.
+   * Agent-side Litmus rebuild (crypto market + report litmus block) when collect agent is up.
+   * Safe no-op if endpoint missing / agent offline.
+   */
+  async function rebuildLitmusViaAgent() {
+    try {
+      const agent = await resolveAgentBase(true);
+      if (!agent?.base) return { ok: false, offline: true };
+      const res = await agentFetch('/v1/litmus/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error === 'not_found') {
+        return { ok: false, error: data.error || `http_${res.status}` };
+      }
+      return { ok: !!data.ok, ...data };
+    } catch (err) {
+      return { ok: false, error: err?.message || String(err) };
+    }
+  }
+
+  /**
+   * One clean ARK action: curve rebuild + Litmus rebuild (agent) + full Ark source reload + desk fan-out.
    */
   async function refreshAllData() {
     notify('Refresh All Data…');
     let curveRebuild = null;
+    let litmusRebuild = null;
     try {
       // Prefer CSV rebuild (fast, reliable). Live fetch is optional bonus when agent supports it.
       curveRebuild = await refreshCurveFromWatchlist({ fetchLive: false, force: true });
@@ -379,12 +417,27 @@
       console.warn('[ArkIaPanel] curve rebuild during Refresh All', err);
     }
 
+    try {
+      litmusRebuild = await rebuildLitmusViaAgent();
+      if (litmusRebuild?.ok) {
+        notify('Litmus crypto + report rebuilt via collect agent');
+      }
+    } catch (err) {
+      console.warn('[ArkIaPanel] litmus rebuild during Refresh All', err);
+    }
+
+    // Always force-load every registered Ark source after disk-side rebuilds.
     const inv = await refreshInventory();
 
-    // Push consumers that listen for desk refresh.
+    // Push consumers that listen for desk refresh (hydration · BW · WMC · surfaces · BBDM).
     try {
       if (typeof global.WTM_DeskOps?.refreshAllDeskData === 'function') {
-        await global.WTM_DeskOps.refreshAllDeskData({ quiet: true });
+        await global.WTM_DeskOps.refreshAllDeskData({
+          silent: true,
+          quiet: true,
+          skipCurveRebuild: true,
+          skipArkLoad: true, // inventory already force-loaded every source
+        });
       } else {
         global.dispatchEvent?.(new CustomEvent('whinfell-desk-refresh', {
           detail: { source: 'ark-refresh-all' },
@@ -394,7 +447,17 @@
       console.warn('[ArkIaPanel] desk fan-out after Refresh All', err);
     }
 
+    // BBDM standalone / embed — re-read report from Ark if available.
+    try {
+      if (typeof global.WTM_Bbdm?.reloadReport === 'function') {
+        await global.WTM_Bbdm.reloadReport({ force: true });
+      }
+    } catch (err) {
+      console.warn('[ArkIaPanel] BBDM fan-out after Refresh All', err);
+    }
+
     render();
+    ensureActionButtons();
     const btnPx = curveRebuild?.BTN26_close != null
       ? `BTN26 $${Number(curveRebuild.BTN26_close).toLocaleString('en-US')}`
       : (getArk()?.getStamp?.()?.BTN26?.close != null
@@ -405,13 +468,67 @@
       inv.curve ? 'curve' : null,
       inv.bbdm ? 'bbdm' : null,
       inv.coinglass ? 'coinglass' : null,
+      inv.corporate_gm ? 'corporate_gm' : null,
+      litmusRebuild?.ok ? 'litmus-rebuild' : null,
     ].filter(Boolean);
     notify(
       parts.length
         ? `All data refreshed · ${btnPx} · ${parts.join(' · ')}`
         : `Refresh finished · ${btnPx} (some sources unavailable)`,
     );
-    return { ok: true, curveRebuild, inventory: inv };
+    return { ok: true, curveRebuild, litmusRebuild, inventory: inv };
+  }
+
+  /**
+   * Ensure ARK header action buttons exist and are visible (zone-hidden / dig thrash safe).
+   */
+  function ensureActionButtons() {
+    const host = el('iaArkHost');
+    if (host) {
+      host.classList.remove('zone-hidden');
+      host.removeAttribute('hidden');
+      host.setAttribute('aria-hidden', 'false');
+    }
+    let actions = host?.querySelector?.('.ia-ark-actions') || null;
+    if (host && !actions) {
+      actions = global.document.createElement('div');
+      actions.className = 'ia-ark-actions';
+      const head = host.querySelector('.ia-ark-head');
+      if (head) head.appendChild(actions);
+    }
+    if (!actions) return;
+
+    function ensureBtn(id, className, label, title) {
+      let btn = el(id);
+      if (btn) {
+        btn.hidden = false;
+        btn.style.display = '';
+        btn.removeAttribute('aria-hidden');
+        if (!btn.textContent?.trim()) btn.textContent = label;
+        return btn;
+      }
+      btn = global.document.createElement('button');
+      btn.type = 'button';
+      btn.id = id;
+      btn.className = className;
+      btn.textContent = label;
+      if (title) btn.title = title;
+      actions.appendChild(btn);
+      return btn;
+    }
+
+    ensureBtn(
+      'btnArkRefreshAll',
+      'ia-ark-btn ia-ark-btn--primary',
+      'Refresh All Data',
+      'Full Ark refresh: curve rebuild + Litmus rebuild (agent) + force-load every source + desk fan-out',
+    );
+    ensureBtn(
+      'btnArkFixWithLlm',
+      'ia-ark-btn',
+      'Fix with LLM',
+      'Copy diagnostic prompt for LLM',
+    );
   }
 
   /**
@@ -538,27 +655,34 @@
   }
 
   function wireControls() {
-    if (wired) return;
-    wired = true;
-
-    el('btnArkFixWithLlm')?.addEventListener('click', () => {
-      onFixWithLlm();
-    });
-
-    // Chunk 24 — single ARK action.
-    el('btnArkRefreshAll')?.addEventListener('click', () => {
-      const btn = el('btnArkRefreshAll');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Refreshing…';
-      }
-      refreshAllData().finally(() => {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = 'Refresh All Data';
-        }
+    ensureActionButtons();
+    const fixBtn = el('btnArkFixWithLlm');
+    if (fixBtn && !fixBtn._arkWired) {
+      fixBtn._arkWired = true;
+      fixBtn.addEventListener('click', () => {
+        onFixWithLlm();
       });
-    });
+    }
+
+    const refreshBtn = el('btnArkRefreshAll');
+    if (refreshBtn && !refreshBtn._arkWired) {
+      refreshBtn._arkWired = true;
+      refreshBtn.addEventListener('click', () => {
+        const btn = el('btnArkRefreshAll');
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'Refreshing…';
+        }
+        refreshAllData().finally(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Refresh All Data';
+          }
+          ensureActionButtons();
+        });
+      });
+    }
+    wired = true;
   }
 
   function ensureSubscribe() {
@@ -566,18 +690,27 @@
     if (!ark || typeof ark.subscribe !== 'function') return;
     if (unsubscribe) return;
     unsubscribe = ark.subscribe(() => {
-      if (active) render();
+      if (active) {
+        render();
+        ensureActionButtons();
+      }
     });
   }
 
   async function activate() {
     active = true;
     const host = el('iaArkHost');
-    if (host) host.classList.remove('zone-hidden');
+    if (host) {
+      host.classList.remove('zone-hidden');
+      host.removeAttribute('hidden');
+      host.setAttribute('aria-hidden', 'false');
+    }
 
+    ensureActionButtons();
     wireControls();
     ensureSubscribe();
     render();
+    ensureActionButtons();
     // Warm inventory once when opening the page (non-blocking).
     refreshInventory();
   }
@@ -585,7 +718,10 @@
   function deactivate() {
     active = false;
     const host = el('iaArkHost');
-    if (host) host.classList.add('zone-hidden');
+    if (host) {
+      host.classList.add('zone-hidden');
+      host.setAttribute('aria-hidden', 'true');
+    }
   }
 
   function isActive() {
@@ -605,8 +741,10 @@
     render: render,
     refreshInventory: refreshInventory,
     refreshAllData: refreshAllData,
+    rebuildLitmusViaAgent: rebuildLitmusViaAgent,
     refreshCurveFromWatchlist: refreshCurveFromWatchlist,
     resolveAgentBase: resolveAgentBase,
+    ensureActionButtons: ensureActionButtons,
     buildFixWithLlmPrompt: buildFixWithLlmPrompt,
     init: init,
   };

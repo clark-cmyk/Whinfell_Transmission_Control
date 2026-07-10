@@ -1,6 +1,6 @@
 {
   "bang_bang_da_version": "2.0.0",
-  "generated_at": "2026-07-10T00:23:29.982588Z",
+  "generated_at": "2026-07-10T14:35:02.920383Z",
   "as_of": "2026-07-09T14:37:30+00:00",
   "snapshot_id": "global-2026-07-09-raw2wtm-01",
   "window_days": 60,
@@ -1686,57 +1686,57 @@
           {
             "company": "Microsoft",
             "segment": "Intelligent Cloud",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 68.31,
+            "avg_gm_3yr": 66.6,
+            "gm_z_3yr": 0.8002,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Alphabet",
             "segment": "Google Cloud",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 60.37,
+            "avg_gm_3yr": 61.28,
+            "gm_z_3yr": 0.4394,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Amazon",
             "segment": "AWS",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 50.6,
+            "avg_gm_3yr": 52.43,
+            "gm_z_3yr": -0.0045,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Oracle",
             "segment": "OCI",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 65.82,
+            "avg_gm_3yr": 54.76,
+            "gm_z_3yr": 0.687,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Super Micro",
             "segment": "SMCI",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 8.39,
+            "avg_gm_3yr": 8.31,
+            "gm_z_3yr": -1.9221,
+            "quartile": "Q4",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           }
         ]
       },
@@ -1759,57 +1759,57 @@
           {
             "company": "Microsoft",
             "segment": "Intelligent Cloud",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 68.31,
+            "avg_gm_3yr": 66.6,
+            "gm_z_3yr": 0.8002,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Alphabet",
             "segment": "Google Cloud",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 60.37,
+            "avg_gm_3yr": 61.28,
+            "gm_z_3yr": 0.4394,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Amazon",
             "segment": "AWS",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 50.6,
+            "avg_gm_3yr": 52.43,
+            "gm_z_3yr": -0.0045,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Oracle",
             "segment": "OCI",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 65.82,
+            "avg_gm_3yr": 54.76,
+            "gm_z_3yr": 0.687,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Super Micro",
             "segment": "SMCI",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 8.39,
+            "avg_gm_3yr": 8.31,
+            "gm_z_3yr": -1.9221,
+            "quartile": "Q4",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           }
         ]
       },
@@ -1843,35 +1843,35 @@
           {
             "company": "Vistra",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 38.64,
+            "avg_gm_3yr": 44.79,
+            "gm_z_3yr": -0.3149,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Constellation Energy",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 23.26,
+            "avg_gm_3yr": 47.35,
+            "gm_z_3yr": -1.0366,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           },
           {
             "company": "Nvidia",
             "segment": "Data Center",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 74.15,
+            "avg_gm_3yr": 74.32,
+            "gm_z_3yr": 1.3514,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "rich",
+            "status": "live"
           }
         ],
         "tier": "secondary",
@@ -1907,35 +1907,35 @@
           {
             "company": "Vistra",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 38.64,
+            "avg_gm_3yr": 44.79,
+            "gm_z_3yr": -0.3149,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Constellation Energy",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 23.26,
+            "avg_gm_3yr": 47.35,
+            "gm_z_3yr": -1.0366,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           },
           {
             "company": "Nvidia",
             "segment": "Data Center",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 74.15,
+            "avg_gm_3yr": 74.32,
+            "gm_z_3yr": 1.3514,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "rich",
+            "status": "live"
           }
         ],
         "tier": "secondary",
@@ -1956,37 +1956,37 @@
           {
             "signal": "Perp Funding (Aggregate)",
             "venue": "aggregate",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 2.08e-05,
+            "open_interest_usd": 48319512062.53,
+            "status": "live"
           },
           {
             "signal": "Deribit",
             "venue": "deribit",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 7.17e-05,
+            "open_interest_usd": 786597650.0,
+            "status": "live"
           },
           {
             "signal": "Hyperliquid",
             "venue": "hyperliquid",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.25e-05,
+            "open_interest_usd": 2375772579.9,
+            "status": "live"
           },
           {
             "signal": "CF Benchmark",
             "venue": "cf_benchmark",
             "funding_rate": null,
             "open_interest_usd": null,
-            "status": "pending_external"
+            "status": "expected_limitation"
           },
           {
             "signal": "ETF Flows",
             "venue": "etf",
             "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_koyfin"
+            "open_interest_usd": -95301696.51,
+            "status": "live"
           }
         ]
       },
@@ -2005,37 +2005,37 @@
           {
             "signal": "Perp Funding (Aggregate)",
             "venue": "aggregate",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 2.08e-05,
+            "open_interest_usd": 48319512062.53,
+            "status": "live"
           },
           {
             "signal": "Deribit",
             "venue": "deribit",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 7.17e-05,
+            "open_interest_usd": 786597650.0,
+            "status": "live"
           },
           {
             "signal": "Hyperliquid",
             "venue": "hyperliquid",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.25e-05,
+            "open_interest_usd": 2375772579.9,
+            "status": "live"
           },
           {
             "signal": "CF Benchmark",
             "venue": "cf_benchmark",
             "funding_rate": null,
             "open_interest_usd": null,
-            "status": "pending_external"
+            "status": "expected_limitation"
           },
           {
             "signal": "ETF Flows",
             "venue": "etf",
             "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_koyfin"
+            "open_interest_usd": -95301696.51,
+            "status": "live"
           }
         ]
       },
@@ -2054,37 +2054,37 @@
           {
             "signal": "Perp Funding (Aggregate)",
             "venue": "aggregate",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.862e-05,
+            "open_interest_usd": 24779395901.54,
+            "status": "live"
           },
           {
             "signal": "Deribit",
             "venue": "deribit",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.7e-05,
+            "open_interest_usd": 275634563.0,
+            "status": "live"
           },
           {
             "signal": "Hyperliquid",
             "venue": "hyperliquid",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.25e-05,
+            "open_interest_usd": 1421133296.05,
+            "status": "live"
           },
           {
             "signal": "CF Benchmark",
             "venue": "cf_benchmark",
             "funding_rate": null,
             "open_interest_usd": null,
-            "status": "pending_external"
+            "status": "expected_limitation"
           },
           {
             "signal": "ETF Flows",
             "venue": "etf",
             "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_koyfin"
+            "open_interest_usd": -52080427.85,
+            "status": "live"
           }
         ]
       },
@@ -2103,37 +2103,37 @@
           {
             "signal": "Perp Funding (Aggregate)",
             "venue": "aggregate",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.862e-05,
+            "open_interest_usd": 24779395901.54,
+            "status": "live"
           },
           {
             "signal": "Deribit",
             "venue": "deribit",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.7e-05,
+            "open_interest_usd": 275634563.0,
+            "status": "live"
           },
           {
             "signal": "Hyperliquid",
             "venue": "hyperliquid",
-            "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_coinglass"
+            "funding_rate": 1.25e-05,
+            "open_interest_usd": 1421133296.05,
+            "status": "live"
           },
           {
             "signal": "CF Benchmark",
             "venue": "cf_benchmark",
             "funding_rate": null,
             "open_interest_usd": null,
-            "status": "pending_external"
+            "status": "expected_limitation"
           },
           {
             "signal": "ETF Flows",
             "venue": "etf",
             "funding_rate": null,
-            "open_interest_usd": null,
-            "status": "pending_koyfin"
+            "open_interest_usd": -52080427.85,
+            "status": "live"
           }
         ]
       }
@@ -2169,35 +2169,35 @@
           {
             "company": "Vistra",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 38.64,
+            "avg_gm_3yr": 44.79,
+            "gm_z_3yr": -0.3149,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Constellation Energy",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 23.26,
+            "avg_gm_3yr": 47.35,
+            "gm_z_3yr": -1.0366,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           },
           {
             "company": "Nvidia",
             "segment": "Data Center",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 74.15,
+            "avg_gm_3yr": 74.32,
+            "gm_z_3yr": 1.3514,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "rich",
+            "status": "live"
           }
         ],
         "tier": "secondary",
@@ -2233,35 +2233,35 @@
           {
             "company": "Vistra",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 38.64,
+            "avg_gm_3yr": 44.79,
+            "gm_z_3yr": -0.3149,
+            "quartile": "Q2",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "fair",
+            "status": "live"
           },
           {
             "company": "Constellation Energy",
             "segment": "Merchant Power",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 23.26,
+            "avg_gm_3yr": 47.35,
+            "gm_z_3yr": -1.0366,
+            "quartile": "Q3",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "cheap",
+            "status": "live"
           },
           {
             "company": "Nvidia",
             "segment": "Data Center",
-            "current_gm_pct": null,
-            "avg_gm_3yr": null,
-            "gm_z_3yr": null,
-            "quartile": null,
+            "current_gm_pct": 74.15,
+            "avg_gm_3yr": 74.32,
+            "gm_z_3yr": 1.3514,
+            "quartile": "Q1",
             "cloud_multiplier": 1.0,
-            "regime_signal": null,
-            "status": "pending_koyfin"
+            "regime_signal": "rich",
+            "status": "live"
           }
         ],
         "tier": "secondary",
@@ -2270,7 +2270,7 @@
     ],
     "by_trade": {
       "midwest_calendar": {
-        "alignment": "neutral",
+        "alignment": "confirm",
         "table_ids": [
           "midwest_calendar_primary",
           "midwest_calendar_secondary"
@@ -2278,7 +2278,7 @@
         "headline": null
       },
       "midwest_basis": {
-        "alignment": "neutral",
+        "alignment": "confirm",
         "table_ids": [
           "midwest_basis_primary",
           "midwest_basis_secondary"

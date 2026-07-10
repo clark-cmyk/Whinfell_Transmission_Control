@@ -54,11 +54,13 @@ def load_corporate_gm_doc(root: Path) -> dict[str, Any]:
 
 
 def load_crypto_market_doc(root: Path) -> dict[str, Any]:
-    """Load CoinGlass crypto market litmus stub (live fetch deferred to Chunk 17 env gate)."""
+    """Load crypto market Litmus doc; prefer on-disk live/partial over stub."""
     out_path = root / "bang_bang_da" / "litmus" / "crypto_market.json"
     if out_path.is_file():
         try:
-            return json.loads(out_path.read_text(encoding="utf-8"))
+            doc = json.loads(out_path.read_text(encoding="utf-8"))
+            if isinstance(doc, dict):
+                return doc
         except (OSError, json.JSONDecodeError):
             pass
     return build_crypto_market_stub()

@@ -681,20 +681,40 @@
 
     window.addEventListener('whinfell-desk-refresh', () => { loadReport(); });
     $('btnExport').addEventListener('click', () => { if (report) exportReport(); });
-    $('btnBbdmArticulate')?.addEventListener('click', () => {
-      if (!report) {
-        console.warn('[BBDM] Articulate: no report loaded');
-        return;
+    // Scan toolbar A — register via shared Articulate API (same path as Litmus blocks)
+    const bbdmA = $('btnBbdmArticulate');
+    if (bbdmA) {
+      bbdmA.setAttribute('data-articulate-section', 'bbdm-scan');
+      bbdmA.setAttribute('data-articulate-panel', 'bbdm');
+      bbdmA.setAttribute('data-articulate-module', 'Bang Bang Da');
+      const art = window.WTM_Articulate;
+      if (art && typeof art.registerButton === 'function') {
+        art.registerButton(bbdmA, () => {
+          if (!report) {
+            console.warn('[BBDM] Articulate: no report loaded');
+            return {
+              panelId: 'bbdm',
+              moduleName: 'Bang Bang Da',
+              subject: 'Bang Bang Da',
+              dataBlock: '(report not loaded)',
+            };
+          }
+          return typeof art.contextFromBbdm === 'function'
+            ? art.contextFromBbdm(report)
+            : { panelId: 'bbdm', moduleName: 'Bang Bang Da', dataBlock: '' };
+        });
+      } else {
+        bbdmA.addEventListener('click', () => {
+          if (!report || !window.WTM_Articulate?.runBbdm) {
+            console.warn('[BBDM] WTM_Articulate unavailable');
+            return;
+          }
+          window.WTM_Articulate.runBbdm(report).catch((err) => {
+            console.warn('[BBDM] Articulate failed', err);
+          });
+        });
       }
-      const articulate = window.WTM_Articulate;
-      if (!articulate || typeof articulate.runBbdm !== 'function') {
-        console.warn('[BBDM] WTM_Articulate unavailable');
-        return;
-      }
-      articulate.runBbdm(report).catch((err) => {
-        console.warn('[BBDM] Articulate failed', err);
-      });
-    });
+    }
     $('btnCloseDetail').addEventListener('click', () => {
       selectedId = null;
       $('detailPanel').classList.add('hidden');

@@ -1,0 +1,46 @@
+**Here is the detailed plan:**
+
+### WTC UI & Navigation Stabilization Plan — Phase 2.4
+
+**Goal**: Restore full navigation, fix BasisWatch ETH/BTC chart behavior, ensure zoom stability, and simplify ARK refresh controls.
+
+**Overall Acceptance Criteria**:
+- All left sidebar links work.
+- ARK page has exactly one "Refresh All Data" button.
+- BasisWatch shows correct BTC and ETH numbers, chart switches properly between tabs, and "A" button appears in focus view.
+- Historical percentile ranks (Q1/Median/Q3) are visible.
+- Page renders correctly at 100% zoom (Cmd +/- works without breaking layout).
+- Transmission Ladder page shows fresh data.
+- No regressions on Bang Bang Da or ARK.
+
+---
+
+### Phase 2.4 — Chunks
+
+**Chunk 26 — ARK & Sidebar Navigation**  
+- Reduce ARK page to single "Refresh All Data" button.  
+- Restore ARK and A in left sidebar.  
+- Make all "Views" section links functional.  
+- Acceptance: Sidebar links work, ARK has one button.
+
+**Chunk 27 — BasisWatch Fixes**  
+- Restore "A" (Articulate) button in focus view.  
+- Fix BTC/ETH tab switch (chart and data update correctly).  
+- Restore historical percentile rank display.  
+- Acceptance: ETH numbers correct, chart switches, ranks visible.
+
+**Chunk 28 — Zoom Stability**  
+- Audit and fix all major panels to use relative sizing (%, rem, flex, no fixed px).  
+- Remove any transform/zoom overrides.  
+- Acceptance: Page looks correct at 100% zoom and scales properly with Cmd +/-.
+
+**Chunk 29 — Transmission Ladder & Final Verification**  
+- Ensure Transmission Ladder page refreshes with latest data.  
+- Full hard-refresh test of all major pages.  
+- Acceptance: All pages load, navigation works, no zoom issues, numbers correct.
+
+---
+
+Would you like me to write the full text you can paste into BUILD for `/plan` now? 
+
+Just say **“write the plan”** and I’ll give you the complete ready-to-paste version.

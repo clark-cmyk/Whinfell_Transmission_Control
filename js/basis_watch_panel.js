@@ -2224,17 +2224,37 @@
 
     el('btnBwExportCsv')?.addEventListener('click', () => exportCsv(getState()));
     el('btnBwExportPng')?.addEventListener('click', () => exportPng(getState()));
-    el('btnBwArticulate')?.addEventListener('click', () => {
+    // Articulate A — shared registration (same path as Litmus / BBDM sections)
+    const bwA = el('btnBwArticulate');
+    if (bwA) {
+      bwA.setAttribute('data-articulate-section', 'basis_watch');
+      bwA.setAttribute('data-articulate-panel', 'basis_watch');
+      bwA.setAttribute('data-articulate-module', 'BasisWatch');
       const articulate = global.WTM_Articulate;
-      if (!articulate || typeof articulate.runBasisWatch !== 'function') {
-        console.warn('[BasisWatch] WTM_Articulate unavailable');
-        if (typeof global.showToast === 'function') global.showToast('Articulate not loaded');
-        return;
+      if (articulate && typeof articulate.registerButton === 'function') {
+        articulate.registerButton(bwA, () => {
+          if (typeof articulate.contextFromBasisWatch === 'function') {
+            return articulate.contextFromBasisWatch(getState());
+          }
+          return {
+            panelId: 'basis_watch',
+            moduleName: 'BasisWatch',
+            dataBlock: '(BasisWatch state unavailable)',
+          };
+        });
+      } else {
+        bwA.addEventListener('click', () => {
+          if (!articulate || typeof articulate.runBasisWatch !== 'function') {
+            console.warn('[BasisWatch] WTM_Articulate unavailable');
+            if (typeof global.showToast === 'function') global.showToast('Articulate not loaded');
+            return;
+          }
+          articulate.runBasisWatch(getState()).catch((err) => {
+            console.warn('[BasisWatch] Articulate failed', err);
+          });
+        });
       }
-      articulate.runBasisWatch(getState()).catch((err) => {
-        console.warn('[BasisWatch] Articulate failed', err);
-      });
-    });
+    }
     el('btnBwBarchart')?.addEventListener('click', () => {
       window.open(DESK_LINKS.barchart, '_blank', 'noopener');
     });

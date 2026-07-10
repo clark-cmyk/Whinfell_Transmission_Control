@@ -1,0 +1,119 @@
+#Chart Standards — All charts in the entire application must follow these exact rules:
+
+Use TradingView Lightweight Charts. Never use Chart.js, Recharts, or any other library.
+Apply theme-aware coloring: line colors must come from the current active theme’s accent color.
+Use clean candlestick or line charts only. No gradients, no glows, no rounded elements.
+Grid lines must be very subtle. Axes must scale tightly and cleanly to the data with minimal padding.
+
+#All charts must maintain correct scaling and layout when the browser is zoomed with Command +/-.”
+This is much more specific and should help reduce the Frankenstein problem you’re having.
+
+#Implement a proper theme system for WTC with a dropdown theme switcher in the top right corner. Create three clean themes using the following hex codes:
+Dark Theme:
+•  Background: #0A0A0A
+•  Surface: #1A1A1A
+•  Text Primary: #FFFFFF
+•  Accent: #228B22
+Light Theme:
+•  Background: #F8F9F6
+•  Surface: #FFFFFF
+•  Text Primary: #1F2937
+•  Accent: #228	B22
+Nature Theme:
+•  Background: #F1F5F2
+•  Surface: #FFFFFF
+•  Text Primary: #1F2937
+•  Accent: #1E6B2B
+All components must respect the active theme. The theme selection should persist between sessions. Never use bright neon colors or generic AI styling.”
+
+#####
+
+Whinfell Transmission Control — Senior UI Audit
+Phase 2.3 Operator Console | Assessed: 2026-07-09
+
+ZOOM TEST — CRITICAL FAILURE
+CMD+ (zoom in): ❌ No effect — layout does not scale CMD– (zoom out): ❌ No effect — layout does not scale CMD+0 (reset): ❌ No effect
+The entire page appears to have zoom: 1 hard-locked or is using a viewport transform/CSS override (likely transform: scale() or min-width + overflow: hidden on the root) that intercepts browser zoom and absorbs it with no reflow. This is a significant accessibility and usability defect. On a 4K monitor, users cannot zoom out to get more canvas. On a laptop, they cannot zoom into small-text areas. This violates WCAG 1.4.4 (Resize Text) and basic desktop UX expectations.[127.0.0]
+Root cause to investigate: Check for body { zoom: ... }, transform: scale() on a wrapper, user-scalable=no in the meta viewport tag, or a CSS clamp() / fixed-px layout that fights browser zoom.
+
+USABILITY ASSESSMENT
+1. Information Architecture — 7/10
+Strengths:
+* Left rail navigation is logically grouped: Views → Console Layer → Tools → Risk Curve Summary. The hierarchy makes sense for a power user.[127.0.0]
+* Top header bar consolidates operational controls (Import, Export, Save, Pipeline Bundle) and live pipeline status (Imported timestamp, build lock state) — good separation of concerns.[127.0.0]
+* The Flipchart section at the bottom functions as a narrative anchor, pairing Credit regime context with Depth/Command bar — smart pairing.[127.0.0]
+Issues:
+* Left rail labels are extremely small (~9–10px visually). Navigation buttons like "Midwest Compute Crush," "Bang Bang Da," "Ladder deep dive" are clipped and difficult to distinguish at a glance. No icons to differentiate tools.
+* Console Layer tabs (Scan/Dig/Iterate) have no visible differentiation from nav buttons above them. The section label "CONSOLE LAYER" is tiny caps that disappears at this density.
+* "RISK CURVE SUMMARY" / "Curve · —" in the left rail is orphaned — no obvious connection to the Risk Curve panel on the right. The dot notation (·) is opaque.
+
+2. Risk Cockpit Panel — 6/10
+Strengths:
+* Risk score 58 / AMBER with freshness indicator is the primary hero number — correct priority placement.[127.0.0]
+* Transmission score 65 (Elevated) is adjacent — good pairing.
+* BTC Gate caution badge is clearly color-coded.
+Issues:
+* Risk Curve component buttons (LIQ, CREDIT, BREADTH, BTC, BASIS) — four of five show UNAVAILABLE. This is a major data quality signal presented in a tiny right-side panel with no prominent alert. If 4/5 inputs are unavailable, the 58 score is unreliable and that needs a banner-level warning, not just small status chips.[127.0.0]
+* CREDIT shows FALLBACK_1D — a degraded mode — but this looks identical in weight to any other state. Fallback/degraded should have a distinct visual treatment (e.g., striped or dashed border).
+* "Show rationale" (⋯) buttons appear in multiple locations with no tooltip on hover, making them invisible to first-time users.
+* Freshness: 44.4h — this is stale by most intraday trading standards. This should be a prominent amber/red indicator, not a small footnote.
+
+3. Transmission Signal Radar — 5/10
+Strengths:
+* Five-pillar layout (LIQUIDITY / CREDIT / BREADTH / BTC / BASIS) maps cleanly to the risk curve nodes.[127.0.0]
+* Regime label "CONSTRUCTIVE" is prominent at the top.
+Issues:
+* All five pillars show "Pending / Not computed" — the radar is entirely hollow. This should be the loudest warning on the page. Instead, it looks like a normal loading state with no urgency.[127.0.0]
+* The "1d / 1w / Show" filter row is present but its context is ambiguous when no data is rendered.
+* Column headers (LIQUIDITY, CREDIT, etc.) are all-caps in the same weight as data — hard to parse hierarchy.
+
+4. HY OAS Proxy Panel — 8/10
+Strengths:
+* This is the best-executed panel on the page.[127.0.0]
+* 339.2 bps hero number is large and legible.
+* Horizon Table bar chart is visually clean and effectively shows cross-tenor percentile distribution — the salmon/orange color is distinct.
+* Percentile + Quartile + Richness table beneath the chart is a clean data summary.[127.0.0]
+* Time horizon toggle (1M / 3M / 6M / 12M / 3Y) is functional and clearly placed.
+Issues:
+* VALUE column shows — for 1M, 6M, 12M, 3Y — missing data not flagged. Looks like an intentional dash, but is actually missing input.
+* The footnote about "3Y data" is 8px light gray text on dark background — effectively invisible.
+* "Export RV PNG / Export RV CSV" buttons are top-right micro-text — easy to miss.
+* ▸ FULL READ disclosure is collapsed by default; power users may want it expanded by default with an option to collapse.
+
+5. Flipchart / Thesis Panel — 6/10
+Strengths:
+* Credit regime badge (CONSTRUCTIVE) + page indicator (2 of 5) + navigation arrows is clean.
+* "Here's Why / Compare / Export node" button group at the bottom is well-labeled with descriptive subtitles.[127.0.0]
+Issues:
+* Flipchart body is empty — "Not displayed" / "DESK FEED" collapsed. For a narrative-driven panel, showing nothing is a significant gap.
+* The Depth / Command bar panel (right half of Flipchart row) is entirely empty — unused real estate at the bottom of the page.
+* "Full diagnostics" disclosure is collapsed with no preview — users have no signal about what's inside.
+* "Parquet hydration applied · track · 9/x →" metadata in the Depth header is useful for ops/debug but out of place on the main dashboard.
+
+6. Global Typography & Density — 5/10
+* Base font size is too small across the board (~10–11px for most content labels). On a standard 1080p display this is borderline; on a laptop retina display it may be acceptable, but combined with the zoom-lock this becomes a real problem.[127.0.0]
+* Color palette is well-executed: dark background, amber/red for warnings, salmon for chart fills, green for healthy states.
+* Section headers (NAVIGATION, CONSOLE LAYER, TOOLS, RISK CURVE) use tiny uppercase labels — these need either more weight or a slightly larger point size.
+* The top header bar packs ~15 controls into 3 rows of ~6px-tall text. This is extremely cramped and would benefit from grouping into dropdown menus or a collapsible toolbar.
+
+PRIORITY BUG LIST
+Priority	Issue	Impact
+Priority	Issue	Impact
+🔴 P0	Zoom completely non-functional (CMD+/-/0 no effect)	Accessibility / WCAG failure
+🔴 P0	4/5 Risk Curve inputs UNAVAILABLE with no prominent alert	Operator trust in score
+🔴 P0	All Transmission Radar pillars "Pending/Not computed"	Core feature non-functional
+🟠 P1	Freshness 44.4h shown in footnote — should be banner-level alert	Data staleness risk
+🟠 P1	CREDIT FALLBACK_1D degraded mode not visually distinct	Misread operational state
+🟡 P2	Base font size too small for sustained operator use	Fatigue / readability
+🟡 P2	Top header bar overly dense — 15 controls in 3 tight rows	Cognitive load
+🟡 P2	Missing VALUE entries in HY OAS table look like intentional dashes	Silent data gap
+🟢 P3	Flipchart body empty, Depth panel empty — wasted lower canvas	Utility
+🟢 P3	"Show rationale" (⋯) buttons not discoverable	Feature discoverability
+
+
+
+
+
+
+OVERALL SCORE: 6.0 / 10
+The information model is sophisticated and well-conceived — the right signals are present and the panel hierarchy makes conceptual sense. The HY OAS section in particular is production-quality. The critical gaps are: (1) the zoom lockout, (2) missing/degraded data presented without adequate escalation, and (3) font density that will create fatigue during high-frequency operator sessions. Fix the zoom and elevate the data quality warnings and this jumps to an 8+.

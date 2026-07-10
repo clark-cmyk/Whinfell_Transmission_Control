@@ -2365,8 +2365,18 @@ body.ia-layer-dig.ia-dig-view-basis-watch .ia-a-host {
   flex-direction: column;
   overflow: hidden;
 }
+/* !important beats index.html .zone-hidden { display:none !important } until JS strips the class */
 body.ia-layer-dig.ia-dig-view-ark .ia-center-canvas .ia-ark-host {
-  display: flex;
+  display: flex !important;
+}
+body.ia-layer-dig.ia-dig-view-ark .ia-center-canvas .ia-ark-host .ia-ark-actions {
+  display: flex !important;
+  visibility: visible !important;
+}
+body.ia-layer-dig.ia-dig-view-ark .ia-center-canvas .ia-ark-host .ia-ark-btn {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 body.ia-layer-dig.ia-dig-view-ark #basisWatchPanel {
   display: none !important;

@@ -1,0 +1,9 @@
+{
+  "meta_version": "1.0.0",
+  "status": "quarantined",
+  "operator": "desk",
+  "source_file": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_001827.csv",
+  "quarantined_at": "2026-07-10T03:41:51.888296+00:00",
+  "reason": "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_001827.csv",
+  "sha256": "fc646bbb152ec96e7fad52513695881a85d3617aee5bd897ae495fc54a53d711"
+}

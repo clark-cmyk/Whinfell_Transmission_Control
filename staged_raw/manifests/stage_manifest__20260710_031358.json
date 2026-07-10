@@ -1,0 +1,506 @@
+{
+  "manifest_version": "1.0.0",
+  "runbook_version": "1.0.0",
+  "manifest_type": "stage",
+  "created_at": "2026-07-10T03:13:58.891089+00:00",
+  "operator": "desk",
+  "staged_root": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw",
+  "downloads_dir": "/Users/clarksonwthornburgh/Downloads/whinfell_drop",
+  "window": "today",
+  "files_scanned": 37,
+  "files_staged": 31,
+  "files_quarantined": 6,
+  "files_skipped": 0,
+  "entries": [
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_0937.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_0937.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_0937.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_2114.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2114.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2114.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_2152.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2152.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2152.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_2201.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2201.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2201.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_2205.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2205.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2205.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/china_policy_20260709_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=china_policy/china_policy_20260709_2209.csv.meta.json",
+      "source": "china_policy",
+      "dataset": null,
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: dominant_theme"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_0937.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_0937.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_0937.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_0937.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2114.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2114.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2114.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_2114.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2152.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2152.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2152.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_2152.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2201.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2201.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2201.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_2201.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2205.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2205.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2205.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_2205.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2209.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "credit",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score",
+        "crypto snapshot ingested from credit_20260709_2209.csv (4 assets)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_0937.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_0937.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_0937.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_2114.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2114.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2114.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_2152.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2152.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2152.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_2201.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2201.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2201.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_2206.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2206.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2206.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/equities_20260709_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=equities/equities_20260709_2209.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "equities",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/flows_20260709_0937.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "flows",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "optional headers absent: key_observation, observation_id, regime_tag, sq3_band, sq3_score, timestamp, transmission_state, whinfell_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/flows_20260709_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260709_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=flows/flows_20260709_2209.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "flows",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "optional headers absent: key_observation, observation_id, regime_tag, sq3_band, sq3_score, timestamp, transmission_state, whinfell_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260709_0936.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_0936.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_0936.csv.meta.json",
+      "source": "barchart",
+      "dataset": "futures_intraday",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (barchart_watchlist)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260709_1845.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1845.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1845.csv.meta.json",
+      "source": "barchart",
+      "dataset": "futures_intraday",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (barchart_watchlist)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260709_1847.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1847.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1847.csv.meta.json",
+      "source": "barchart",
+      "dataset": "futures_intraday",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "raw\u2192WTM transform applied (barchart_watchlist)"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260709_1851.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1851.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_1851.csv.meta.json",
+      "source": "barchart",
+      "dataset": "futures_intraday",
+      "status": "staged",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_001827.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_001827.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_021402.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_021402.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_025225.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_025225.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_030105.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_030105.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_030541.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_030541.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_030927.csv",
+      "staged_path": "",
+      "meta_path": "",
+      "source": "",
+      "dataset": null,
+      "status": "quarantined",
+      "errors": [
+        "filename must match {dataset}_{YYYYMMDD}_{HHMM}.csv or {product}_{flavor}_{YYYYMMDD}.csv: futures_intraday_20260710_030927.csv"
+      ],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/futures_intraday_20260710_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260710_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260710_2209.csv.meta.json",
+      "source": "barchart",
+      "dataset": "futures_intraday",
+      "status": "staged",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_0937.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_0937.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_0937.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2114.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2114.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2114.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2152.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2152.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2152.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2201.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2201.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2201.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2205.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2205.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2205.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    },
+    {
+      "source_path": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/rates_20260709_2209.csv",
+      "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2209.csv",
+      "meta_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=rates/rates_20260709_2209.csv.meta.json",
+      "source": "koyfin",
+      "dataset": "rates",
+      "status": "staged",
+      "errors": [],
+      "warnings": [
+        "no source_system match",
+        "raw\u2192WTM transform applied (koyfin_snapshot)",
+        "optional headers absent: sq3_band, sq3_score"
+      ]
+    }
+  ]
+}

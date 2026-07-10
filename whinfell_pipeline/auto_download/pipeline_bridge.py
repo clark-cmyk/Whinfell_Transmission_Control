@@ -1,4 +1,4 @@
-"""Bridge to Cousins normalize + run_batch_collect / run_csv_download."""
+"""Bridge to in-repo normalize + run_batch_collect / run_csv_download (TC self-rooted)."""
 
 from __future__ import annotations
 
@@ -122,11 +122,36 @@ class PipelineBridge:
         if norm_code != 0:
             return ChainResult(normalize_exit=norm_code, normalize_stdout=norm_out)
 
+        # Koyfin Midwest GM → Litmus (corporate_gm.json). Not part of Parquet staged
+        # datasets; map after normalize so vendor + canonical names both resolve.
+        litmus_out = ""
+        try:
+            from whinfell_pipeline.koyfin_corporate_gm import ingest_corporate_gm
+
+            litmus_doc = ingest_corporate_gm(drop_dir)
+            litmus_out = (
+                f"litmus_corporate_gm data_status={litmus_doc.get('data_status')} "
+                f"as_of={litmus_doc.get('as_of')}\n"
+            )
+        except Exception as exc:  # noqa: BLE001 — never block rates/credit chain
+            litmus_out = f"litmus_corporate_gm_warn={exc}\n"
+
+        try:
+            from whinfell_pipeline.coinglass_perp import ingest_crypto_market
+
+            crypto_doc = ingest_crypto_market(drop_dir=drop_dir)
+            litmus_out += (
+                f"litmus_crypto_market data_status={crypto_doc.get('data_status')} "
+                f"live_signals={crypto_doc.get('lineage', {}).get('live_signal_count')}\n"
+            )
+        except Exception as exc:  # noqa: BLE001 — never block chain
+            litmus_out += f"litmus_crypto_market_warn={exc}\n"
+
         run_code, run_out = self.run_pipeline(drop_dir, operator=operator, window=window)
         return ChainResult(
             normalize_exit=norm_code,
             run_exit=run_code,
-            normalize_stdout=norm_out,
+            normalize_stdout=norm_out + litmus_out,
             run_stdout=run_out,
             quarantine_stdout=q_out,
         )

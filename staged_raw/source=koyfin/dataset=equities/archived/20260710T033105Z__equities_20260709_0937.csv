@@ -1,0 +1,2 @@
+observation_id,timestamp,whinfell_score,transmission_state,regime_tag,key_observation
+global-2026-07-10-raw2wtm-01,2026-07-09T22:31:04-05:00,78,normal,Confirmed Risk-On,IWM +; QQQ +; MEDIAN +; AVERAGE +; MAX +

@@ -170,7 +170,60 @@ async function run() {
   });
   assert(out2.ok && out2.prompt.includes('Bang Bang Da'), 'runBbdm');
 
-  console.log('PASS articulate.test.mjs — prompt, log, adapters, runBasisWatch/runBbdm');
+  // --- Litmus adapter + registerButton ---
+  assert(typeof A.contextFromLitmus === 'function', 'contextFromLitmus');
+  assert(typeof A.registerButton === 'function', 'registerButton');
+  const litmusTable = {
+    id: 'midwest_basis_primary',
+    trade_id: 'midwest_basis',
+    title: 'Midwest Compute — Primary',
+    columns: ['company', 'current_gm_pct', 'gm_z_3yr', 'quartile', 'status'],
+    rows: [
+      {
+        company: 'Microsoft',
+        current_gm_pct: 68.31,
+        gm_z_3yr: 0.8,
+        quartile: 'Q1',
+        regime_signal: 'fair',
+        status: 'live',
+      },
+    ],
+  };
+  const litCtx = A.contextFromLitmus(litmusTable, {
+    by_trade: { midwest_basis: { alignment: 'confirm' } },
+  });
+  assert(litCtx.panelId === 'midwest_basis_primary', 'litmus panelId');
+  assert(litCtx.moduleName === 'Litmus', 'litmus module');
+  assert(litCtx.dataBlock.includes('Microsoft'), 'litmus row');
+  assert(litCtx.dataBlock.includes('GM%=68.31'), 'litmus GM');
+  assert(litCtx.dataBlock.includes('Alignment: confirm'), 'litmus alignment');
+
+  const blockCtx = A.contextFromLitmusBlock({ tables: [litmusTable] });
+  assert(blockCtx.panelId === 'litmus', 'litmus block id');
+  assert(blockCtx.dataBlock.includes('midwest_basis_primary') || blockCtx.dataBlock.includes('Midwest'), 'block tables');
+
+  // Fake DOM button registration
+  let clicked = false;
+  const fakeBtn = {
+    _handlers: {},
+    addEventListener(type, fn) {
+      this._handlers[type] = fn;
+      clicked = true;
+    },
+    setAttribute() {},
+    getAttribute() { return null; },
+  };
+  sandbox._clip = null;
+  const regOk = A.registerButton(fakeBtn, () => litCtx);
+  assert(regOk === true, 'registerButton ok');
+  assert(clicked, 'listener attached');
+  await fakeBtn._handlers.click({ preventDefault() {}, stopPropagation() {} });
+  assert(sandbox._clip && String(sandbox._clip).includes('Litmus'), 'registered click copies litmus prompt');
+
+  const out3 = await A.runLitmus(litmusTable, {});
+  assert(out3.ok && out3.prompt.includes('Litmus'), 'runLitmus');
+
+  console.log('PASS articulate.test.mjs — prompt, log, adapters, Litmus registerButton');
 }
 
 run().catch((err) => {

@@ -1,0 +1,34 @@
+{
+  "meta_version": "1.0.0",
+  "collector_id": "comet-first-pass",
+  "collector_version": "1.0.0",
+  "pipeline_version": "1.0.0",
+  "source_file": "/Users/clarksonwthornburgh/Downloads/whinfell_drop/credit_20260709_2205.csv",
+  "staged_path": "/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/staged_raw/source=koyfin/dataset=credit/credit_20260709_2205.csv",
+  "staged_at": "2026-07-10T03:43:50.533782+00:00",
+  "operator": "desk",
+  "source": "koyfin",
+  "dataset": "credit",
+  "filename": "credit_20260709_2205.csv",
+  "sha256": "a8bfca3f37dedcf7c4a47e20137f1f713756784d80be9a40e7ad4adc42ea5d31",
+  "status": "staged",
+  "errors": [],
+  "warnings": [
+    "optional headers absent: sq3_band, sq3_score"
+  ],
+  "route": {
+    "source_class": "koyfin_snapshot_csv",
+    "vendor": "koyfin",
+    "priority": "",
+    "parser": "whinfell_pipeline.crypto_sleeve.parse_snapshot_rows",
+    "output_kinds": [
+      "snapshot_validation",
+      "universe_membership"
+    ],
+    "vendor_format": "koyfin_snapshot",
+    "symbols": [],
+    "canonical_assets": [],
+    "matched_by": "source_systems.koyfin_snapshot_csv",
+    "warnings": []
+  }
+}

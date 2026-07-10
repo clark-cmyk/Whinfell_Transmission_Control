@@ -219,6 +219,22 @@ body.bbdm-left-collapsed .bbdm-left-body {
   max-height: 220px;
 }
 
+.bbdm-litmus-block__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.25rem;
+}
+
+.bbdm-litmus-block__toolbar-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bbdm-muted);
+}
+
 .bbdm-litmus-block__meta {
   display: flex;
   flex-wrap: wrap;
@@ -373,13 +389,35 @@ body.bbdm-left-collapsed .bbdm-left-body {
   background: var(--bbdm-accent-soft);
 }
 
+.bbdm-litmus-btn--articulate {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.12);
+  min-width: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.bbdm-litmus-btn--articulate:hover {
+  color: #fde68a;
+  border-color: rgba(251, 191, 36, 0.55);
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.bbdm-litmus-btn--articulate[data-articulate-registered='1'] {
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.15);
+}
+
 .bbdm-litmus-table__scroll {
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .bbdm-litmus-grid {
   width: 100%;
+  min-width: 58rem; /* keep all 9 Midwest columns visible (scroll, don't clip) */
   border-collapse: collapse;
+  table-layout: auto;
   font-size: 0.75rem;
 }
 
@@ -389,6 +427,39 @@ body.bbdm-left-collapsed .bbdm-left-body {
   border-bottom: 1px solid var(--bbdm-border);
   text-align: left;
   vertical-align: middle;
+  color: var(--bbdm-text);
+  white-space: nowrap;
+  min-width: 4.25rem;
+}
+
+.bbdm-litmus-grid td[data-litmus-col='company'],
+.bbdm-litmus-grid th[data-litmus-col='company'] {
+  min-width: 7rem;
+}
+
+.bbdm-litmus-grid td[data-litmus-col='segment'],
+.bbdm-litmus-grid th[data-litmus-col='segment'] {
+  min-width: 8rem;
+}
+
+.bbdm-litmus-grid__empty-cell {
+  color: var(--bbdm-muted);
+  opacity: 0.85;
+}
+
+.bbdm-litmus-grid__z,
+.bbdm-litmus-grid__regime {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, 'JetBrains Mono', monospace;
+}
+
+.bbdm-litmus-grid__status--live {
+  color: var(--bbdm-green);
+}
+
+.bbdm-litmus-grid__status--pending-koyfin,
+.bbdm-litmus-grid__status--partial {
+  color: #fbbf24;
 }
 
 .bbdm-litmus-grid th {

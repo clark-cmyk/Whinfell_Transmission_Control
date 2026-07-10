@@ -16,7 +16,7 @@ from typing import Any
 
 import yaml
 
-from bang_bang_da.litmus_midwest import midwest_table_templates
+from bang_bang_da.litmus_midwest import midwest_table_templates, regime_signal_from_gm
 
 ADAPTER_VERSION = "2.0.0-chunk24"
 SCHEMA_VERSION = "2.0.0"
@@ -54,9 +54,13 @@ NICE_TO_HAVE_TICKERS: tuple[dict[str, str], ...] = (
 TRADE_IDS = ("midwest_basis", "midwest_calendar")
 
 CSV_GLOB_PATTERNS = (
+    # Vendor export names (pre-normalize)
     "koyfin_WTM-Midwest-Corporate-GM_*",
     "WTM-Midwest-Corporate-GM.csv",
     "koyfin_wtm-midwest-corporate-gm_*",
+    # Canonical name after normalize_drop_dir / data_dictionary normalize_rules
+    "midwest_corporate_gm_*.csv",
+    "midwest_corporate_gm_*",
 )
 
 TICKER_ALIASES = {
@@ -65,12 +69,19 @@ TICKER_ALIASES = {
 
 GM_COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
     "current_gm_pct": (
+        # Ideal desk columns (fixture / custom export)
         "gross margin %",
         "gross margin",
         "gm %",
         "current gm%",
         "current gm %",
         "gross margin (ttm)",
+        # Live Koyfin WTM-Midwest-Corporate-GM watchlist export headers
+        "gross profit margin % (ltm)",
+        "gross profit margin % (fq)",
+        "gross profit margin % (fy)",
+        "gross profit margin %",
+        "gm % - est avg (fy1e)",
     ),
     "avg_gm_3yr": (
         "3yr avg",
@@ -79,6 +90,10 @@ GM_COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
         "3y avg gm %",
         "gross margin % 3y avg",
         "avg gm 3yr",
+        # Approximate multi-year / forward average columns from Koyfin
+        "gm % - est avg (fy2e)",
+        "gm % - est avg (fy3e)",
+        "gross profit margin % (fy)",
     ),
     "gm_z_3yr": (
         "3yr z-score",
@@ -132,6 +147,17 @@ def _safe_float(raw: Any) -> float | None:
         return round(float(text), 4)
     except ValueError:
         return None
+
+
+def _safe_gm_pct(raw: Any) -> float | None:
+    """Parse GM% fields; Koyfin often exports fractions (0.68) — desk uses percent points (68)."""
+    value = _safe_float(raw)
+    if value is None:
+        return None
+    # Values in (0, 1.5] are almost always fractions; fixture uses 15–75 percent points.
+    if 0 < abs(value) <= 1.5:
+        return round(value * 100.0, 4)
+    return value
 
 
 def _normalize_ticker(raw: str) -> str | None:
@@ -233,6 +259,8 @@ def parse_koyfin_watchlist_csv(csv_path: Path) -> dict[str, dict[str, Any]]:
                 if field == "quartile":
                     value = (raw_row.get(column) or "").strip() or None
                     parsed[field] = value
+                elif field in {"current_gm_pct", "avg_gm_3yr"}:
+                    parsed[field] = _safe_gm_pct(raw_row.get(column))
                 else:
                     parsed[field] = _safe_float(raw_row.get(column))
             rows_by_ticker[ticker] = parsed
@@ -250,6 +278,57 @@ def discover_koyfin_csv(drop_dir: Path) -> Path | None:
     if not candidates:
         return None
     return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
+def enrich_cross_section_gm_stats(rows: list[dict[str, Any]]) -> None:
+    """Fill missing gm_z_3yr / quartile / regime_signal from current_gm_pct peers.
+
+    Live Koyfin WTM-Midwest-Corporate-GM exports carry GM levels but often omit
+    pre-computed z-score and quartile. Litmus right-half columns need those
+    derived in-peer so the table is fully hydrated.
+    """
+    peers = [
+        (idx, float(row["current_gm_pct"]))
+        for idx, row in enumerate(rows)
+        if isinstance(row, dict) and row.get("current_gm_pct") is not None
+    ]
+    if len(peers) < 2:
+        # Still stamp defaults for single live rows so cells are not null blanks.
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            if row.get("cloud_multiplier") is None:
+                row["cloud_multiplier"] = 1.0
+            if row.get("current_gm_pct") is not None and row.get("regime_signal") is None:
+                row["regime_signal"] = regime_signal_from_gm(row.get("gm_z_3yr"), row.get("quartile"))
+        return
+
+    values = [gm for _, gm in peers]
+    mean = sum(values) / len(values)
+    var = sum((gm - mean) ** 2 for gm in values) / len(values)
+    std = var**0.5
+    ordered = sorted(values)
+    n = len(ordered)
+
+    for idx, gm in peers:
+        row = rows[idx]
+        if row.get("gm_z_3yr") is None:
+            row["gm_z_3yr"] = round((gm - mean) / std, 4) if std > 1e-9 else 0.0
+        if row.get("quartile") is None:
+            # High GM → Q1 (rich); low GM → Q4 (cheap) — matches regime_signal_from_gm.
+            rank = sum(1 for v in ordered if v <= gm) / n
+            if rank >= 0.75:
+                row["quartile"] = "Q1"
+            elif rank >= 0.5:
+                row["quartile"] = "Q2"
+            elif rank >= 0.25:
+                row["quartile"] = "Q3"
+            else:
+                row["quartile"] = "Q4"
+        if row.get("cloud_multiplier") is None:
+            row["cloud_multiplier"] = 1.0
+        if row.get("regime_signal") is None:
+            row["regime_signal"] = regime_signal_from_gm(row.get("gm_z_3yr"), row.get("quartile"))
 
 
 def merge_csv_into_stub(doc: dict[str, Any], csv_path: Path) -> dict[str, Any]:
@@ -270,10 +349,16 @@ def merge_csv_into_stub(doc: dict[str, Any], csv_path: Path) -> dict[str, Any]:
                     row[field] = value
                     if field == "current_gm_pct":
                         live_count += 1
+            if row.get("cloud_multiplier") is None:
+                row["cloud_multiplier"] = 1.0
             if row.get("current_gm_pct") is not None:
                 row["status"] = "live"
             elif any(row.get(field) is not None for field in ("avg_gm_3yr", "gm_z_3yr", "quartile")):
                 row["status"] = "partial"
+
+    # Derive right-half Litmus columns when Koyfin export lacks z/quartile.
+    enrich_cross_section_gm_stats(merged.get("rows") or [])
+    enrich_cross_section_gm_stats(merged.get("nice_to_have") or [])
 
     primary_rows = merged.get("rows", [])
     primary_live = sum(1 for row in primary_rows if row.get("current_gm_pct") is not None)
@@ -367,6 +452,13 @@ def validate_corporate_gm_doc(doc: Any) -> list[str]:
     return errors
 
 
+def _finalize_corporate_gm_doc(doc: dict[str, Any]) -> dict[str, Any]:
+    """Ensure right-half Litmus columns are populated before write/return."""
+    enrich_cross_section_gm_stats(doc.get("rows") or [])
+    enrich_cross_section_gm_stats(doc.get("nice_to_have") or [])
+    return doc
+
+
 def ingest_corporate_gm(
     drop_dir: Path | None = None,
     *,
@@ -380,12 +472,31 @@ def ingest_corporate_gm(
     resolved_csv = csv_path
     if resolved_csv is None and drop_dir is not None:
         resolved_csv = discover_koyfin_csv(drop_dir)
+    # Fallback: vendor export often lands in ~/Downloads before drop staging.
+    # Only when using the real desk drop (never temp test dirs).
+    if (resolved_csv is None or not resolved_csv.is_file()) and drop_dir is not None:
+        drop_path = Path(drop_dir)
+        desk_drop = Path.home() / "Downloads" / "whinfell_drop"
+        if drop_path.resolve() == desk_drop.resolve() or drop_path.name == "whinfell_drop":
+            downloads = Path.home() / "Downloads"
+            if downloads.is_dir() and downloads.resolve() != drop_path.resolve():
+                resolved_csv = discover_koyfin_csv(downloads)
 
     if resolved_csv is None or not resolved_csv.is_file():
+        # Preserve an existing live/partial file when drop has no Midwest GM CSV yet.
+        if target.is_file():
+            try:
+                existing = json.loads(target.read_text(encoding="utf-8"))
+                if isinstance(existing, dict) and existing.get("data_status") in {"live", "partial"}:
+                    finalized = _finalize_corporate_gm_doc(existing)
+                    target.write_text(json.dumps(finalized, indent=2) + "\n", encoding="utf-8")
+                    return finalized
+            except (OSError, json.JSONDecodeError):
+                pass
         write_corporate_gm_stub(target)
         return build_corporate_gm_stub()
 
-    merged = merge_csv_into_stub(stub, resolved_csv)
+    merged = _finalize_corporate_gm_doc(merge_csv_into_stub(stub, resolved_csv))
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(merged, indent=2) + "\n", encoding="utf-8")
     return merged

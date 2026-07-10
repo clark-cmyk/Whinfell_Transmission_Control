@@ -85,7 +85,8 @@ def test_committed_stub_file_matches_contract():
     assert DEFAULT_OUT.is_file(), f"missing committed stub {DEFAULT_OUT}"
     doc = json.loads(DEFAULT_OUT.read_text(encoding="utf-8"))
     assert validate_corporate_gm_doc(doc) == []
-    assert doc["data_status"] == "stub"
+    # stub until Collect maps a Koyfin Midwest GM CSV; live/partial after ingest
+    assert doc["data_status"] in {"stub", "partial", "live"}
 
 
 def test_parse_koyfin_watchlist_csv():
@@ -101,6 +102,40 @@ def test_parse_koyfin_watchlist_csv():
     assert parsed["SMCI"]["current_gm_pct"] == 15.2
 
 
+# Live Koyfin WTM-Midwest-Corporate-GM headers (fraction scale, LTM GM column)
+REAL_KOYFIN_CSV = """\
+Ticker,Name,Gross Profit Margin % (LTM),Gross Profit Margin % (FQ),Gross Profit Margin % (FY),GM % - Est Avg (FY2E)
+MSFT,Microsoft Corporation,0.6831,0.6763,0.6882,0.6660
+GOOGL,Alphabet Inc.,0.6037,0.6245,0.5965,0.6128
+AMZN,Amazon.com Inc.,0.5060,0.5182,0.5029,0.5243
+ORCL,Oracle Corporation,0.6582,0.6523,0.6582,0.5476
+SMCI,Super Micro Computer Inc.,0.0839,0.0995,0.1106,0.0831
+"""
+
+
+def test_parse_real_koyfin_export_headers():
+    """Real Koyfin watchlist uses Gross Profit Margin % (LTM) as 0–1 fractions."""
+    with tempfile.TemporaryDirectory() as tmp:
+        csv_path = Path(tmp) / "koyfin_WTM-Midwest-Corporate-GM_2026.07.08.csv"
+        csv_path.write_text(REAL_KOYFIN_CSV, encoding="utf-8")
+        parsed = parse_koyfin_watchlist_csv(csv_path)
+    assert parsed["MSFT"]["current_gm_pct"] == 68.31
+    assert parsed["SMCI"]["current_gm_pct"] == 8.39
+    # avg falls back to FY2E estimate or FY margin aliases
+    assert parsed["MSFT"]["avg_gm_3yr"] == 66.6
+
+
+def test_discover_canonical_midwest_corporate_gm_name():
+    """After normalize, drop holds midwest_corporate_gm_YYYYMMDD_HHMM.csv."""
+    with tempfile.TemporaryDirectory() as tmp:
+        drop = Path(tmp)
+        csv_path = drop / "midwest_corporate_gm_20260708_0955.csv"
+        csv_path.write_text(REAL_KOYFIN_CSV, encoding="utf-8")
+        found = discover_koyfin_csv(drop)
+    assert found is not None
+    assert found.name.startswith("midwest_corporate_gm_")
+
+
 def test_merge_csv_into_stub_promotes_live_status():
     with tempfile.TemporaryDirectory() as tmp:
         csv_path = Path(tmp) / "koyfin_WTM-Midwest-Corporate-GM_2026.07.07.csv"
@@ -112,6 +147,35 @@ def test_merge_csv_into_stub_promotes_live_status():
     msft = next(row for row in merged["rows"] if row["ticker"] == "MSFT")
     assert msft["current_gm_pct"] == 69.8
     assert msft["status"] == "live"
+
+
+def test_merge_real_koyfin_fills_right_half_columns():
+    """Live Koyfin LTM GM export lacks z/quartile — derive full Litmus right half."""
+    with tempfile.TemporaryDirectory() as tmp:
+        csv_path = Path(tmp) / "koyfin_WTM-Midwest-Corporate-GM_2026.07.08.csv"
+        csv_path.write_text(REAL_KOYFIN_CSV, encoding="utf-8")
+        merged = merge_csv_into_stub(build_corporate_gm_stub(), csv_path)
+    assert merged["data_status"] == "live"
+    msft = next(row for row in merged["rows"] if row["ticker"] == "MSFT")
+    assert msft["current_gm_pct"] == 68.31
+    assert msft["gm_z_3yr"] is not None
+    assert msft["quartile"] in {"Q1", "Q2", "Q3", "Q4"}
+    assert msft["cloud_multiplier"] == 1.0
+    assert msft["regime_signal"] in {
+        "extreme_rich",
+        "rich",
+        "fair",
+        "cheap",
+        "extreme_cheap",
+    }
+    assert msft["status"] == "live"
+    # All primary right-half cells hydrated
+    for row in merged["rows"]:
+        assert row["gm_z_3yr"] is not None
+        assert row["quartile"] is not None
+        assert row["cloud_multiplier"] == 1.0
+        assert row["regime_signal"] is not None
+        assert row["status"] == "live"
 
 
 def test_discover_koyfin_csv_prefers_newest():
@@ -182,7 +246,10 @@ def main() -> int:
         test_validate_stub_doc_passes,
         test_committed_stub_file_matches_contract,
         test_parse_koyfin_watchlist_csv,
+        test_parse_real_koyfin_export_headers,
+        test_discover_canonical_midwest_corporate_gm_name,
         test_merge_csv_into_stub_promotes_live_status,
+        test_merge_real_koyfin_fills_right_half_columns,
         test_discover_koyfin_csv_prefers_newest,
         test_ingest_without_csv_writes_stub,
         test_ingest_with_csv_writes_live_doc,

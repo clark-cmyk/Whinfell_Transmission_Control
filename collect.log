@@ -1,0 +1,199 @@
+=== Whinfell Morning Collect ===
+repo=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control
+drop=/Users/clarksonwthornburgh/Downloads/whinfell_drop
+auto_download_version=0.4.3
+drop_archive moved=104 kept=0 root=/Users/clarksonwthornburgh/Desktop/Whinfell_Transmission_Control/data/archive/drop
+drop_dir=/Users/clarksonwthornburgh/Downloads/whinfell_drop
+ready=0/6
+required_ready=False
+missing_required=koyfin_rates,barchart_futures_intraday
+  koyfin_rates                 MISSING  -
+  koyfin_equities              MISSING  -
+  koyfin_import_core           MISSING  -
+  koyfin_china                 MISSING  -
+  barchart_futures_intraday    MISSING  -
+  koyfin_flows_global          MISSING  -
+
+--- fetch barchart_futures_intraday ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/watchlist-wtm-futures-daily-intraday-07-09-2026.csv
+
+--- fetch koyfin_import_core ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/koyfin_WTM-Import-Core_2026.07.09_09.37.01.512.csv
+
+--- fetch koyfin_flows_global ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/WTM-Flows-Global.csv
+
+--- fetch koyfin_rates ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/koyfin_WTM-Rates-Credit_2026.07.09_09.37.17.673.csv
+
+--- fetch koyfin_china ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/koyfin_WTM-China-Policy_2026.07.09_09.37.21.955.csv
+
+--- fetch koyfin_equities ---
+fetch_ok path=/Users/clarksonwthornburgh/Downloads/whinfell_drop/koyfin_WTM-Equities-Breadth_2026.07.09_09.37.26.021.csv
+
+drop_dir=/Users/clarksonwthornburgh/Downloads/whinfell_drop
+ready=6/6
+required_ready=True
+  koyfin_rates                 OK       koyfin_WTM-Rates-Credit_2026.07.09_09.37.17.673.csv
+  koyfin_equities              OK       koyfin_WTM-Equities-Breadth_2026.07.09_09.37.26.021.csv
+  koyfin_import_core           OK       koyfin_WTM-Import-Core_2026.07.09_09.37.01.512.csv
+  koyfin_china                 OK       koyfin_WTM-China-Policy_2026.07.09_09.37.21.955.csv
+  barchart_futures_intraday    OK       watchlist-wtm-futures-daily-intraday-07-09-2026.csv
+  koyfin_flows_global          OK       WTM-Flows-Global.csv
+
+--- pipeline chain ---
+status_manifest=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/manifests/auto_download_20260709_143726.json
+ready=6/6
+required_ready=True
+staged_noise_quarantine_ok
+moved=14 malformed=0 no_adapter=14 skipped=0
+quarantine_dir=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/quarantine/collect_noise/20260709
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_0718.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_0718.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_0741.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_0741.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_0743.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_0743.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_1356.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_1356.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_1622.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_1622.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_1629.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_1629.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_1652.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_1652.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2024.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2024.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2241.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2241.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2243.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2243.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2245.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2245.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2246.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2246.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2250.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2250.csv
+quarantine source=barchart/dataset=futures_intraday/futures_intraday_20260707_2256.csv reason=no_adapter -> quarantine/collect_noise/20260709/futures_intraday_20260707_2256.csv
+normalize_ok renamed=6 skipped=0
+ok    WTM-Flows-Global.csv -> flows_20260709_0937.csv
+ok    koyfin_WTM-China-Policy_2026.07.09_09.37.21.955.csv -> china_policy_20260709_0937.csv
+ok    koyfin_WTM-Equities-Breadth_2026.07.09_09.37.26.021.csv -> equities_20260709_0937.csv
+ok    koyfin_WTM-Import-Core_2026.07.09_09.37.01.512.csv -> credit_20260709_0937.csv
+ok    koyfin_WTM-Rates-Credit_2026.07.09_09.37.17.673.csv -> rates_20260709_0937.csv
+ok    watchlist-wtm-futures-daily-intraday-07-09-2026.csv -> futures_intraday_20260709_0936.csv
+csv_download_daily_ok
+hydration_bundle=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/hydration/latest.json
+next_step=Transmission Control → Import Latest Hydration Bundle
+daily_manifest=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/manifests/daily_manifest__20260709_143733.json
+stage_manifest=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/manifests/stage_manifest__20260709_143730.json
+files_staged=6
+files_quarantined=0
+collect_exit=0
+hydrate_exit=0
+barchart_exit=0
+hydrate_output=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/hydration/latest.json
+barchart_history_ok
+fetch_policy=file_only
+approved=79 core_ok=16 curve_ok=58 spread_ok=5
+failed=0 empty=0
+output_dir=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/barchart/v1
+output=barchart_core_history path=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/barchart/v1/barchart_core_history.json
+output=barchart_curve_history path=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/barchart/v1/barchart_curve_history.json
+output=barchart_spread_history path=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/barchart/v1/barchart_spread_history.json
+output=barchart_run_manifest path=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/data/barchart/v1/barchart_run_manifest.json
+symbol=^BTCUSD bucket=core status=ok canonical_id=btc_spot_usd row_count=2560
+symbol=^ETHUSD bucket=core status=ok canonical_id=eth_spot_usd row_count=1
+symbol=^XRPUSD bucket=core status=ok canonical_id=xrp_spot_usd row_count=1
+symbol=^SOLUSD bucket=core status=ok canonical_id=sol_spot_usd row_count=1
+symbol=IBIT bucket=core status=ok canonical_id=btc_vehicle_ibit row_count=1
+symbol=GBTC bucket=core status=ok canonical_id=btc_vehicle_gbtc row_count=1
+symbol=SOFR bucket=core status=ok canonical_id=sofr_index row_count=1
+symbol=$HSI bucket=core status=ok canonical_id=hsi_index row_count=1
+symbol=$VHSI bucket=core status=ok canonical_id=hsi_vol_index row_count=1
+symbol=$VXHY bucket=core status=ok canonical_id=hy_credit_vol_index row_count=1
+symbol=CBON bucket=core status=ok canonical_id=china_bond_etf row_count=1
+symbol=KHYB bucket=core status=ok canonical_id=asia_hy_bond_etf row_count=1
+symbol=ASHR bucket=core status=ok canonical_id=china_ashares_etf row_count=1
+symbol=DXY00 bucket=core status=ok canonical_id=dxy_index row_count=1
+symbol=GCY00 bucket=core status=ok canonical_id=gold_continuous row_count=1
+symbol=HGY00 bucket=core status=ok canonical_id=copper_continuous row_count=1
+symbol=DXM26 bucket=curve status=ok canonical_id=barchart_contract_dxm26 row_count=1
+symbol=E6M26 bucket=curve status=ok canonical_id=barchart_contract_e6m26 row_count=1
+symbol=J6M26 bucket=curve status=ok canonical_id=barchart_contract_j6m26 row_count=1
+symbol=A6M26 bucket=curve status=ok canonical_id=barchart_contract_a6m26 row_count=1
+symbol=GCN26 bucket=curve status=ok canonical_id=barchart_contract_gcn26 row_count=1
+symbol=GCQ26 bucket=curve status=ok canonical_id=barchart_contract_gcq26 row_count=1
+symbol=GCU26 bucket=curve status=ok canonical_id=barchart_contract_gcu26 row_count=1
+symbol=GCV26 bucket=curve status=ok canonical_id=barchart_contract_gcv26 row_count=1
+symbol=GCX26 bucket=curve status=ok canonical_id=barchart_contract_gcx26 row_count=1
+symbol=GCZ26 bucket=curve status=ok canonical_id=barchart_contract_gcz26 row_count=1
+symbol=GCF27 bucket=curve status=ok canonical_id=barchart_contract_gcf27 row_count=1
+symbol=HGN26 bucket=curve status=ok canonical_id=barchart_contract_hgn26 row_count=1
+symbol=HGQ26 bucket=curve status=ok canonical_id=barchart_contract_hgq26 row_count=1
+symbol=CLQ26 bucket=curve status=ok canonical_id=barchart_contract_clq26 row_count=1
+symbol=CLG27 bucket=curve status=ok canonical_id=barchart_contract_clg27 row_count=1
+symbol=CLV26 bucket=curve status=ok canonical_id=barchart_contract_clv26 row_count=1
+symbol=CLU26 bucket=curve status=ok canonical_id=barchart_contract_clu26 row_count=1
+symbol=CLZ26 bucket=curve status=ok canonical_id=barchart_contract_clz26 row_count=1
+symbol=CLX26 bucket=curve status=ok canonical_id=barchart_contract_clx26 row_count=1
+symbol=CLF27 bucket=curve status=ok canonical_id=barchart_contract_clf27 row_count=1
+symbol=NGQ26 bucket=curve status=ok canonical_id=barchart_contract_ngq26 row_count=1
+symbol=BTM26 bucket=curve status=ok canonical_id=barchart_contract_btm26 row_count=18
+symbol=BTN26 bucket=curve status=ok canonical_id=barchart_contract_btn26 row_count=4
+symbol=BTQ26 bucket=curve status=ok canonical_id=barchart_contract_btq26 row_count=1
+symbol=BTU26 bucket=curve status=ok canonical_id=barchart_contract_btu26 row_count=1
+symbol=BTV26 bucket=curve status=ok canonical_id=barchart_contract_btv26 row_count=1
+symbol=BTX26 bucket=curve status=ok canonical_id=barchart_contract_btx26 row_count=1
+symbol=BTZ26 bucket=curve status=ok canonical_id=barchart_contract_btz26 row_count=1
+symbol=BTH27 bucket=curve status=ok canonical_id=barchart_contract_bth27 row_count=1
+symbol=TAN26 bucket=curve status=ok canonical_id=barchart_contract_tan26 row_count=1
+symbol=TAQ26 bucket=curve status=ok canonical_id=barchart_contract_taq26 row_count=1
+symbol=TAU26 bucket=curve status=ok canonical_id=barchart_contract_tau26 row_count=1
+symbol=TAV26 bucket=curve status=ok canonical_id=barchart_contract_tav26 row_count=1
+symbol=TAX26 bucket=curve status=ok canonical_id=barchart_contract_tax26 row_count=1
+symbol=TAZ26 bucket=curve status=ok canonical_id=barchart_contract_taz26 row_count=1
+symbol=TAH27 bucket=curve status=ok canonical_id=barchart_contract_tah27 row_count=1
+symbol=ZMN26 bucket=curve status=ok canonical_id=barchart_contract_zmn26 row_count=1
+symbol=ZLN26 bucket=curve status=ok canonical_id=barchart_contract_zln26 row_count=1
+symbol=ZBU26 bucket=curve status=ok canonical_id=barchart_contract_zbu26 row_count=1
+symbol=ZFM26 bucket=curve status=ok canonical_id=barchart_contract_zfm26 row_count=1
+symbol=ZNU26 bucket=curve status=ok canonical_id=barchart_contract_znu26 row_count=1
+symbol=ZQM26 bucket=curve status=ok canonical_id=barchart_contract_zqm26 row_count=1
+symbol=OYU26 bucket=curve status=ok canonical_id=barchart_contract_oyu26 row_count=1
+symbol=OYZ26 bucket=curve status=ok canonical_id=barchart_contract_oyz26 row_count=1
+symbol=OYH27 bucket=curve status=ok canonical_id=barchart_contract_oyh27 row_count=1
+symbol=OGU26 bucket=curve status=ok canonical_id=barchart_contract_ogu26 row_count=1
+symbol=OGZ26 bucket=curve status=ok canonical_id=barchart_contract_ogz26 row_count=1
+symbol=OGH27 bucket=curve status=ok canonical_id=barchart_contract_ogh27 row_count=1
+symbol=LUN26 bucket=curve status=ok canonical_id=barchart_contract_lun26 row_count=1
+symbol=FLM26 bucket=curve status=ok canonical_id=barchart_contract_flm26 row_count=1
+symbol=LVN26 bucket=curve status=ok canonical_id=barchart_contract_lvn26 row_count=1
+symbol=QRU26 bucket=curve status=ok canonical_id=barchart_contract_qru26 row_count=1
+symbol=S!N26 bucket=curve status=ok canonical_id=barchart_contract_s!n26 row_count=1
+symbol=SQJ26 bucket=curve status=ok canonical_id=barchart_contract_sqj26 row_count=1
+symbol=U7M26 bucket=curve status=ok canonical_id=barchart_contract_u7m26 row_count=1
+symbol=VIN26 bucket=curve status=ok canonical_id=barchart_contract_vin26 row_count=1
+symbol=YCN26 bucket=curve status=ok canonical_id=barchart_contract_ycn26 row_count=1
+symbol=YQN26 bucket=curve status=ok canonical_id=barchart_contract_yqn26 row_count=1
+symbol=_S_IV_ZBU6_UDU6 bucket=spread status=ok canonical_id=barchart_spread_s_iv_zbu6_udu6 row_count=1
+symbol=_S_RT_ZBU6_ZBZ6 bucket=spread status=ok canonical_id=barchart_spread_s_rt_zbu6_zbz6 row_count=1
+symbol=_S_BF_ZBU6_ZBZ6_ZBH7 bucket=spread status=ok canonical_id=barchart_spread_s_bf_zbu6_zbz6_zbh7 row_count=1
+symbol=_S_RT_ZBU6_ZBH7 bucket=spread status=ok canonical_id=barchart_spread_s_rt_zbu6_zbh7 row_count=1
+symbol=_S_RT_ZBZ6_ZBH7 bucket=spread status=ok canonical_id=barchart_spread_s_rt_zbz6_zbh7 row_count=1
+pipeline_staged_ingest_ok version=1.0.0
+staged_root=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw
+files_found=6
+files_processed=6
+files_failed=0
+global_written=3
+china_written=1
+execution_records=1
+crypto_ingested=0
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=barchart/dataset=futures_intraday/futures_intraday_20260709_0936.csv source=barchart dataset=futures_intraday adapter=barchart status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=barchart/dataset=futures_intraday/archived/20260709T143730Z__futures_intraday_20260709_0936.csv
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=rates/rates_20260709_0937.csv source=koyfin dataset=rates adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=rates/archived/20260709T143731Z__rates_20260709_0937.csv
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=rates/rates_20260709_0937.csv: optional headers absent: sq3_band, sq3_score
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=credit/credit_20260709_0937.csv source=koyfin dataset=credit adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=credit/archived/20260709T143731Z__credit_20260709_0937.csv
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=credit/credit_20260709_0937.csv: optional headers absent: sq3_band, sq3_score
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=equities/equities_20260709_0937.csv source=koyfin dataset=equities adapter=koyfin status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=equities/archived/20260709T143731Z__equities_20260709_0937.csv
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=equities/equities_20260709_0937.csv: optional headers absent: sq3_band, sq3_score
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv source=koyfin dataset=flows adapter=flows_fallback status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=flows/archived/20260709T143731Z__flows_20260709_0937.csv
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv: optional headers absent: key_observation, observation_id, regime_tag, sq3_band, sq3_score, timestamp, transmission_state, whinfell_score
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv: flows_snapshot_1d_fallback
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=koyfin/dataset=flows/flows_20260709_0937.csv: flows_sidecar tickers=3
+file=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=china_policy/china_policy_20260709_0937.csv source=china_policy dataset=- adapter=legacy_parser status=parsed archived=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=china_policy/archived/20260709T143731Z__china_policy_20260709_0937.csv
+warning=/Users/clarksonwthornburgh/Desktop/Whinfell_BUILD_Cousins_v2_OLD_2238_ARCHIVE/staged_raw/source=china_policy/china_policy_20260709_0937.csv: optional headers absent: dominant_theme
+normalize_exit=0 run_exit=0
+chain_ok
+
+--- desk data publish ---
+scripts/sync_live_desk_data.sh: line 6: unexpected EOF while looking for matching `)'
+WARN: desk data publish incomplete — curve or hydration may be missing for BasisWatch

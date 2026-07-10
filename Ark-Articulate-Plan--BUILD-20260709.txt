@@ -1,0 +1,339 @@
+# Plan: The Ark + Articulate (WTC)
+
+**Source of truth:** `~/Desktop/Whinfell_Transmission_Control/Ark-Articulate-Plan-20260709.txt`  
+**Method:** `/plan` + `/arena` (4 explore specialists: Data, Shell, Clipboard/UX, Test/Build)  
+**Scope:** Phases 1–3 only. Phase 4+ nice-to-haves stay deferred.
+
+---
+
+## Context
+
+Today multiple modules independently `fetch` the same raw files (`latest.json` triple-loaded on refresh; BasisWatch also loads curve history; BBDM HTML loads its own report). `Agents.md` already declares **The Ark** as the sole raw-data loader, but `js/ark.js` does not exist yet.
+
+**Articulate** is a composable intelligence layer: generate a floor-trader prompt from the current panel’s data, copy to clipboard, and log the session. There is no Articulate engine yet (BBDM only has a placeholder “articulator” rail slot).
+
+**Why change:** enforce single source of truth, stop dual-fetch races, give operators an ARK status page + “Fix with LLM” diagnostics, and add the A analysis workflow without regressing BasisWatch / Bang Bang DA / desk refresh.
+
+---
+
+## Arena consensus (key decisions)
+
+| Topic | Decision | Rationale |
+|-------|----------|-----------|
+| **Ark boundary** | Ark = **load + cache + stamp + subscribe**. Apply-to-UI stays in `core.hydrateFromBundle` / BW `mergeHydrationBundle` / WMC merge initially | Avoid rewriting the entire hydrate path in one PR; matches “SSOT for files” without boiling the ocean |
+| **ARK / A placement** | Dig specialized tools (same path as BasisWatch / Midwest), **not** Scan view-shortcuts | Full-canvas takeover; product asks for full pages |
+| **Collapsed labels** | Literal **`ARK`** and **`A`** via CSS `::before` | Product requirement (not `AK`) |
+| **Nav section** | New left-rail section **“Intelligence”** (or append under Tools after Midwest) with `#btnIaArk` + `#btnIaA` | Keeps Tools clutter down; either is fine — prefer **Tools** first for minimal HTML churn |
+| **Articulate module** | New `js/articulate.js` (`window.WTM_Articulate`) shared by main desk + BBDM | Separate from Ark; pure prompt + log + clipboard |
+| **Log storage** | `localStorage` key `wtm_articulate_log_v1` (JSON array, capped, try/catch) | Matches prefs/theme patterns; Phase 4 can add per-user names later |
+| **A buttons (in-scope major panels)** | BasisWatch utility cluster + BBDM scan toolbar next to Export; optional other dig panels only if time after 3.x core | Product: “major panels” = BW + BBDM first |
+| **BBDM rewire** | Standalone `bang_bang_da_machine.html` must load `js/ark.js` and route report/hydration meta through Ark | Shell JS has no loaders today; loaders live in HTML |
+| **Out of scope** | Phase 4+ (user name, summaries, multi-select, review templates, Guru, search/filter) | Explicit in product plan |
+
+---
+
+## Recommended approach (phased)
+
+Implement **strictly in product order**. Do not start Phase 2 until Phase 1 is verified; same for Phase 3.
+
+### Phase 1 – The Ark
+
+#### 1.1 Create `js/ark.js` (central data engine)
+
+**Public API** (`window.WTM_Ark` or `window.TheArk` — prefer **`WTM_Ark`** to match `WTM_*` globals):
+
+```text
+WTM_Ark.loadHydration({ force })  → { ok, data, as_of, snapshot_id, freshness_status, error? }
+WTM_Ark.getHydration()            → cached bundle | null
+WTM_Ark.getStamp()                → { as_of, snapshot_id, freshness_status, lastRefreshedAt, sources[] }
+WTM_Ark.loadCurveHistory({ force }) → { ok, data, … }
+WTM_Ark.getCurveHistory()
+WTM_Ark.loadBbdmReport({ force }) → { ok, data, … }   // report JSON (+ optional API later)
+WTM_Ark.getSources()              → inventory for ARK page
+WTM_Ark.subscribe(listener)       → unsubscribe fn; fires on successful reload
+WTM_Ark.buildFixWithLlmPrompt()   → diagnostic string for clipboard
+WTM_Ark.BUILD
+```
+
+**Behavior:**
+
+- Sole owner of raw `fetch` for:
+  - `data/hydration/latest.json`
+  - `data/barchart/v1/barchart_curve_history.json`
+  - `bang_bang_da/bang_bang_da_report.json` (and path cascade used today)
+- In-memory cache + `force` bust (`?_=${Date.now()}`, `cache: 'no-store'`) matching current BW/core patterns
+- Source registry entries: id, url, status (`ok|missing|error|stale`), last success time, error message
+- No DOM rendering inside `ark.js` (Lego: data only)
+
+#### 1.2 Full ARK page (Dig tool)
+
+Mirror Midwest dig embed:
+
+| Piece | Action |
+|-------|--------|
+| `index.html` | Button `#btnIaArk` `data-ia-dig-view="ark"`; host `#iaArkHost` / `#iaArkViewport` inside `#iaDigHost` |
+| `js/console_ia_shell.js` | `DIG_VIEW_CLASS.ark = 'ia-dig-view-ark'`; activate/deactivate `WTM_ArkIaPanel` in `setDigView` / dig `setLayer` |
+| `css/console_ia.css` | Dig visibility for ark; peer-hide BW/Midwest/A; collapsed `body.ia-left-collapsed #btnIaArk::before { content: "ARK"; }` |
+| `js/ark_ia_panel.js` | UI only: table of data sources, last refreshed, status chips; listens `WTM_Ark.subscribe` |
+
+**Dashboard content (minimum):**
+
+- Rows: Hydration, Curve history, BBDM report (as registered), last refresh wall-clock
+- Status chips: ok / warn / risk (reuse `.console-chip--*`)
+- Optional “Refresh via DeskOps” button calling `WTM_DeskOps.refreshAllDeskData` (does not re-implement collect)
+
+#### 1.3 “Fix with LLM” button
+
+On ARK page actions bar:
+
+1. Build diagnostic prompt via `WTM_Ark.buildFixWithLlmPrompt()` including: source inventory, last errors, stamp fields, `file:` protocol note, brief “expected paths”
+2. `navigator.clipboard.writeText` + `showToast` (same pattern as `auto_collect_panel.copyText`)
+
+---
+
+### Phase 2 – Data integration
+
+#### 2.1 `desk_data_ops.js` hosts The Ark
+
+- Ensure Ark is loaded before DeskOps (script order)
+- `refreshHydration()` becomes: **one** `WTM_Ark.loadHydration({ force: true })`, then call existing apply paths:
+  1. Prefer `WTM_reloadDeployHydration` **rewired to consume Ark cache** (no second network hop), **or** pass Ark payload into `hydrateFromBundle` if cleaner
+  2. BW `mergeHydrationBundle` / `reloadHydration` uses Ark cache
+  3. WMC hydrate uses Ark cache
+- Stamp for toasts continues from Ark `getStamp()`
+- Emit existing `whinfell-desk-refresh` after apply (do not invent a second fan-out that double-paints)
+
+#### 2.2 Rewire BasisWatch
+
+In `js/basis_watch_panel.js`:
+
+- Remove direct `fetch` in `loadHydrationBundle` / `ensureCurveHistory`
+- Call `WTM_Ark.loadHydration` / `loadCurveHistory` (or get cache if warm)
+- Keep pure analytics in `basis_watch_analytics.js` unchanged
+- Standalone path still works if Ark is on the page
+
+#### 2.3 Rewire Bang Bang DA
+
+In `bang_bang_da_machine.html`:
+
+- Include `js/ark.js`
+- Replace `fetchFirst` / `loadReport` / hydration-meta loads with Ark APIs
+- Keep presentation modules (`bbdm_ia_shell.js`, `bbdm_litmus_table.js`) free of raw I/O
+
+**Also rewire (required by Ark absolute rule, within Phase 2):**
+
+- `js/core.js` `reloadDeployHydration` → Ark fetch
+- `midwest_compute/wmc-hydrate.js` → Ark hydration cache (merge logic stays)
+- Do **not** block Phase 2 on ladder deep-dive / data_dictionary meta unless they still `fetch` hydration; if they fetch `latest.json`, route those too. Dictionary meta can remain panel-local **only if** product list doesn’t require it — **Agents.md is absolute**: any raw data file load must go through Ark. Prefer registering dictionary meta as an Ark source if it is still loaded via fetch.
+
+---
+
+### Phase 3 – Articulate (core)
+
+#### 3.1 `js/articulate.js` engine
+
+```text
+WTM_Articulate.buildPrompt({ panelId, subject, snapshot, dataBlock })
+WTM_Articulate.copyPrompt(promptText) → Promise<boolean>
+WTM_Articulate.logSession({ panelId, subject, snapshot, promptPreview? })
+WTM_Articulate.listSessions()
+WTM_Articulate.clearSessions()   // test helper / future
+```
+
+**Prompt template** (exact structure from product plan):
+
+```text
+**WTC Analysis — [Panel / Subject]**
+**Snapshot:** [Current snapshot date/time]
+
+**Current Data:**
+[Key quantitative data …]
+
+**Instructions:**
+You are an experienced floor trader turned analyst. …
+```
+
+Panel adapters (small pure functions):
+
+- `articulate_context_basis_watch(state)` → key levels, spreads, percentiles from BW model
+- `articulate_context_bbdm(report)` → top scores / litmus summary fields
+
+#### 3.2 “A” button on major panel outputs
+
+| Panel | Attachment |
+|-------|------------|
+| BasisWatch | `.bw-utility-cluster` next to CSV/PNG (`#btnBwArticulate`) |
+| BBDM | Scan toolbar next to `#btnExport` |
+
+On click: build context → `buildPrompt` → clipboard → `logSession` → toast.
+
+#### 3.3 Session log fields (v1)
+
+```json
+{
+  "id": "uuid-or-ts",
+  "at": "ISO-8601",
+  "panelId": "basis_watch|bbdm|…",
+  "moduleName": "BasisWatch",
+  "snapshot": "as_of or snapshot_id",
+  "promptPreview": "first ~200 chars"
+}
+```
+
+Cap list (e.g. 100 entries). Full prompt optional in log to avoid bloating localStorage — store preview + rebuildable metadata; if product requires full text for A page replay, store full prompt with a hard size cap.
+
+#### 3.4 Full **A** page
+
+Same dig pattern as ARK:
+
+- `#btnIaA` `data-ia-dig-view="a_page"`, collapsed glyph **`A`**
+- `js/a_ia_panel.js` → table of past sessions (timestamp, module, snapshot)
+- Data only via `WTM_Articulate.listSessions()` (no raw files)
+
+---
+
+## Critical files
+
+### New
+
+| File | Role |
+|------|------|
+| `js/ark.js` | SSOT data engine |
+| `js/ark_ia_panel.js` | ARK Dig page UI |
+| `js/articulate.js` | Prompt + log + clipboard |
+| `js/a_ia_panel.js` | A Dig page UI |
+| `tests/ark.test.mjs` | Ark unit tests (vm + mock fetch) |
+| `tests/articulate.test.mjs` | Prompt template + log cap |
+
+### Modify
+
+| File | Role |
+|------|------|
+| `index.html` | Nav buttons, dig hosts, script tags (Ark **before** consumers / before `core.js`) |
+| `js/console_ia_shell.js` | `DIG_VIEW_CLASS`, activate/deactivate for ark + a_page |
+| `css/console_ia.css` | Dig visibility + collapsed labels `ARK` / `A` |
+| `js/desk_data_ops.js` | Host Ark; single reload path |
+| `js/basis_watch_panel.js` | Remove direct fetches |
+| `js/core.js` | `reloadDeployHydration` uses Ark |
+| `midwest_compute/wmc-hydrate.js` | Use Ark cache |
+| `bang_bang_da_machine.html` | Ark script + loaders |
+| `scripts/build.sh` | `cp` + required list for new JS |
+| `scripts/build_desk_preview.sh` / `build_web.sh` | As needed for verify lists |
+| Optional: `docs/index.html` + `docs/js/` | Only if team still serves docs mirror |
+
+---
+
+## Reuse (do not reinvent)
+
+| Existing | Use for |
+|----------|---------|
+| `core.prepareHydrationBundle` / `hydrateFromBundle` | Apply layer after Ark load |
+| `WTM_reloadDeployHydration` public name | Keep as shim over Ark for tests/callers |
+| `WTM_DeskOps.refreshAllDeskData` | Orchestration + toast stamps |
+| `WTM_WmcIaPanel` / Midwest dig host markup | Template for ARK/A hosts |
+| `auto_collect_panel.copyText` / `core.copyText` + `showToast` | Clipboard UX |
+| `core.buildGrokPromptPackage` structure | Inspiration only; Articulate uses **product** trader template |
+| `console-chip--ok\|warn\|risk` | ARK status chips |
+| Test Pattern A (`vm` + mock fetch) like `desk_data_ops_standalone.test.mjs` | ark / articulate unit tests |
+| `dom_shim` / `phase23_console*.test.mjs` | Shell + script-order regressions |
+
+---
+
+## Implementation order (PR-sized chunks)
+
+1. **PR1 — Ark engine + tests** (`js/ark.js`, `tests/ark.test.mjs`, build/script wire, no panel rewires yet)
+2. **PR2 — ARK Dig page + Fix with LLM** (`ark_ia_panel.js`, shell/CSS/HTML)
+3. **PR3 — DeskOps + core + BW + WMC rewire** (single fetch path; regression tests)
+4. **PR4 — BBDM via Ark**
+5. **PR5 — Articulate engine + A buttons + log**
+6. **PR6 — A Dig page + articulate tests + final verification**
+
+Each PR mergeable independently; Phases 1→2→3 ordering preserved across PRs.
+
+---
+
+## Verification
+
+```bash
+# Units
+node tests/ark.test.mjs
+node tests/articulate.test.mjs
+node tests/desk_data_ops_standalone.test.mjs
+node tests/basis_watch_refresh.test.mjs
+node tests/basis_watch_math.test.mjs
+node tests/bbdm_ia_shell.test.mjs
+
+# Console / hydrate regression
+node tests/phase23_console.test.mjs
+node tests/phase23_console_depth.test.mjs
+node tests/phase16_integration.test.mjs
+node tests/safe_boot_render.test.mjs
+
+# Build registration
+bash scripts/build.sh
+# optional full:
+node tests/build_web.test.mjs
+```
+
+**Manual desk checks:**
+
+1. Refresh data → ARK page stamp matches toast / `latest.json` `as_of` / snapshot_id  
+2. Network tab: only **one** hydration fetch per refresh (not triple)  
+3. BasisWatch still renders after refresh; no console fetch errors  
+4. ARK → Fix with LLM → clipboard has diagnostic text  
+5. BW **A** → clipboard has trader template + session row on A page  
+6. BBDM report load via Ark; **A** works if BBDM in scope  
+7. Collapsed rail shows **ARK** and **A**  
+8. No regression: Scan KPIs, radar, Midwest dig still open
+
+**Success criteria (from product):**
+
+- Refresh updates panels with current snapshot from `latest.json`
+- ARK page: sources, status, last refreshed
+- A button: valid trader prompt, clipboard, log
+- A page: history list
+- No regression in BasisWatch / Bang Bang DA / desk ops
+
+---
+
+## Explicitly deferred (Phase 4+)
+
+- One-time user name setup  
+- One-sentence summary per log entry  
+- Multi-select past entries → new analysis  
+- Review templates (Day Open/Close, Mid-day, Week/Month/Quarter)  
+- Feed logs back into new Articulate session  
+- Guru / Google Docs export  
+- Search & filter on A page  
+
+---
+
+## Risks & mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Double-paint on refresh | One Ark load; apply layers only; keep single `whinfell-desk-refresh` |
+| Standalone BW without core | Ark script on standalone pages; apply via BW merge only |
+| `file:` protocol | Ark returns clear error status; Fix with LLM prompt documents it |
+| localStorage quota | Cap log entries; store preview not megabyte prompts |
+| Shortcut collision | Dig tools use Alt-only; Agent remains Alt+Shift+A — use Alt+K for ARK if needed |
+| docs/ drift | Prefer root + `build.sh`; update docs only if still served |
+| Over-rewire scope creep | Phase 1 lands engine + UI first; Phase 2 rewires listed loaders only |
+
+---
+
+## Open questions (defaults if you approve without answering)
+
+1. **Nav placement:** Tools section (default) vs new “Intelligence” section.  
+2. **Global name:** `WTM_Ark` (default) vs `TheArk`.  
+3. **A page log: full prompt vs preview only** — default **full prompt with 50-entry hard cap** so history is useful without Phase 4 multi-select.  
+4. **Dictionary meta via Ark in Phase 2?** Default **yes** if it remains a fetch; cheap registry entry.
+
+---
+
+## What this plan deliberately does *not* do
+
+- Does not implement Phase 4+  
+- Does not move `hydrateFromBundle` fully into Ark in v1  
+- Does not redesign BBDM Articulator rail into full Articulate (optional later; main desk A page is the product surface)  
+- Does not change collect-agent / publish-web (ops RPC, not market SSOT)

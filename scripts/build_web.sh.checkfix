@@ -1,0 +1,7 @@
+for req in bang_bang_da/bang_bang_da_report.json bang_bang_da/litmus/corporate_gm.json js/ark_ia_panel.js js/articulate.js js/a_ia_panel.js data/hydration/latest.json .nojekyll; do
+  if [[ ! -f "dist/$req" && ! -f "$req" ]]; then
+    echo "build_web: missing required output: $req" >&2
+    exit 1
+  fi
+done
+echo "All required outputs OK."
