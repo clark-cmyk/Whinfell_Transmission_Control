@@ -17,6 +17,7 @@ function assert(cond, msg) {
 
 function testHtmlWiring() {
   const html = fs.readFileSync(path.join(ROOT, 'Whinfell_BasisWatch.html'), 'utf8');
+  const themeIdx = html.indexOf('src="js/theme.js"');
   const arkIdx = html.indexOf('src="js/ark.js"');
   const analyticsIdx = html.indexOf('src="js/basis_watch_analytics.js"');
   const panelIdx = html.indexOf('src="js/basis_watch_panel.js"');
@@ -27,6 +28,9 @@ function testHtmlWiring() {
   const taskForceIdx = html.indexOf('src="js/task_force_panel_feed.js"');
 
   assert(arkIdx >= 0, 'Whinfell_BasisWatch.html must include js/ark.js');
+  // Chunk 26/28 — theme chrome on focus page; load before time_format.
+  assert(themeIdx >= 0 && html.includes('src="js/theme.js"'), 'preserves theme.js');
+  assert(timeFmtIdx > themeIdx, 'preserves theme.js before time_format');
   assert(timeFmtIdx >= 0, 'preserves time_format.js');
   assert(taskForceIdx >= 0, 'preserves task_force_panel_feed.js');
   assert(analyticsIdx > arkIdx, 'ark.js must load before basis_watch_analytics.js');

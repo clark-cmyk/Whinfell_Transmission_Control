@@ -15,6 +15,27 @@ function assert(cond, msg) {
   if (!cond) throw new Error(msg);
 }
 
+/**
+ * Chunk 28 hist lock: applyHydrationQuartileFallback must never assign
+ * histQ1 / histMedian / histQ3 (rank-only from RV; bands only from curve history).
+ */
+function testHydrationFallbackDoesNotInventHistBands() {
+  const panelSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_panel.js'), 'utf8');
+  const start = panelSrc.indexOf('function applyHydrationQuartileFallback');
+  assert(start >= 0, 'applyHydrationQuartileFallback present');
+  const nextFn = panelSrc.indexOf('\n  function ', start + 1);
+  const body = nextFn > start ? panelSrc.slice(start, nextFn) : panelSrc.slice(start, start + 1200);
+  assert(body.includes('historySource'), 'fallback body extracted');
+  assert(!/\.histQ1\s*=/.test(body), 'fallback must not assign histQ1 from RV');
+  assert(!/\.histMedian\s*=/.test(body), 'fallback must not assign histMedian from RV');
+  assert(!/\.histQ3\s*=/.test(body), 'fallback must not assign histQ3 from RV');
+  // Positive lock: rank fields still set; bands left untouched.
+  assert(/basisPercentile\s*=/.test(body), 'fallback may set basisPercentile');
+  assert(/basisQuartile\s*=/.test(body), 'fallback may set basisQuartile');
+  assert(body.includes('histQ1') && body.includes('histMedian') && body.includes('histQ3'),
+    'fallback comment documents hist bands left untouched');
+}
+
 function loadBasisWatch() {
   const analyticsSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_analytics.js'), 'utf8');
   const panelSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_panel.js'), 'utf8');
@@ -49,6 +70,8 @@ function loadBasisWatch() {
 }
 
 async function run() {
+  testHydrationFallbackDoesNotInventHistBands();
+
   const bw = loadBasisWatch();
   const hydration = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs/data/hydration/latest.json'), 'utf8'));
   const curve = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/barchart/v1/barchart_curve_history.json'), 'utf8'));
@@ -144,9 +167,6 @@ async function run() {
       `ETH hist Q1/Med/Q3 complete when median present q1=${ethFront.histQ1} q3=${ethFront.histQ3}`);
     assert(ethFront.histQ1 <= ethFront.histMedian && ethFront.histMedian <= ethFront.histQ3,
       'ETH hist Q1 ≤ Med ≤ Q3 (real series stats)');
-    assert(ethFront.historySource !== 'hydration_rv' || !Number.isFinite(ethFront.histMedian)
-      || Number.isFinite(ethFront.historyN),
-      'hist bands not a lone invented hydration RV point');
   }
   // BTC front hist from curve history when available.
   if (Number.isFinite(modelBtc.front.histMedian)) {
