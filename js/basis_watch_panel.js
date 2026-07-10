@@ -24,7 +24,7 @@
    * Chunk 17 — standalone loads via WTM_Ark; valuation anchors to Ark hydration
    * when curve quote dates lag (stale Barchart nodes).
    */
-  const BW_BUILD = '3.9-BASISWATCH-ARK-ETH-ASSET-SPLIT-2026-07-09';
+  const BW_BUILD = '3.9-BASISWATCH-ARK-CHUNK28-FOCUS-A-PAINT-2026-07-09';
   /** Shared with WTM_Theme — Chunk 26 Dark / Light / Nature. */
   const THEME_KEY = (global.WTM_Theme && global.WTM_Theme.STORAGE_KEY) || 'whinfell_tc_theme';
   const THEME_COLORS = {
@@ -42,6 +42,11 @@
   const DUAL_CURVE_MAX = 8;
   /** Heuristic: AE dollar spreads mis-stored as unit=pct when |v| is large vs spot. */
   const HYDRATION_BASIS_DOLLAR_ABS = 5;
+  /**
+   * Chunk 28 — canvas paint ownership (panel-only; LWC migration is Chunk 29).
+   * Cap zero-width rAF retries so layout races cannot spin forever.
+   */
+  const CHART_ZERO_WIDTH_RAF_CAP = 30;
 
   /** Clark desk shortcuts — saved Barchart watchlist + Koyfin MYD */
   const DESK_LINKS = {
@@ -89,6 +94,9 @@
   let _refreshGen = 0;
   let _refreshLoop = null;
   let _pendingRefresh = null;
+  /** Chunk 28 — single active chart paint rAF + generation token. */
+  let _chartPaintRaf = null;
+  let _chartPaintGen = 0;
   const isStandalone = () => document.body?.dataset?.bwLayout === 'standalone';
 
   function getState() {
@@ -509,6 +517,12 @@
     return contracts.find((c) => c.symbol === front.symbol) || front;
   }
 
+  /**
+   * Rank-only fallback when curve history is thin.
+   * Chunk 28 hist lock: may attach percentile/quartile from Ark RV for context,
+   * but NEVER invent histQ1 / histMedian / histQ3 from hydration RV series.
+   * Those quartiles come only from curve price history via enrichContractRows.
+   */
   function applyHydrationQuartileFallback(contracts, front, hydration, assetKey) {
     if (!front || !hydration) return;
     const seriesId = basisRankSeriesId(assetKey || 'BTC');
@@ -523,6 +537,7 @@
       c.insufficientHistory = false;
       c.historySource = 'hydration_rv';
       c.historyN = h.n_observations || null;
+      // Explicit: leave histQ1 / histMedian / histQ3 untouched (no invented quartiles).
     });
   }
 
@@ -1770,9 +1785,71 @@
     ctx.fillText('Tenor →', w - pad.r - 44, h - 8);
   }
 
+  /**
+   * Chunk 28 — cancel in-flight chart paint and bump generation so stale rAF exits.
+   * Call on asset/view switch and at the start of every draw/refresh paint path.
+   */
+  function invalidateChartPaint() {
+    _chartPaintGen += 1;
+    if (_chartPaintRaf != null) {
+      if (typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(_chartPaintRaf);
+      }
+      _chartPaintRaf = null;
+    }
+    const canvas = el('bwCurveCanvas');
+    if (canvas && canvas.dataset) {
+      delete canvas.dataset.bwPaintKey;
+    }
+  }
+
+  /**
+   * Resolve drawable width. Prefer canvas rect; if zero-width (hidden/collapsed layout),
+   * fall back to chart-wrap / parent — never re-measure only the canvas after a style wipe.
+   */
+  function resolveChartLayoutSize(canvas) {
+    const rect = canvas.getBoundingClientRect?.() || { width: 0, height: 0 };
+    let width = Number(rect.width) || 0;
+    let height = Number(rect.height) || 0;
+
+    if (width < 8) {
+      const wrap = (typeof canvas.closest === 'function' && canvas.closest('.bw-chart-wrap'))
+        || canvas.parentElement
+        || null;
+      if (wrap && typeof wrap.getBoundingClientRect === 'function') {
+        const wr = wrap.getBoundingClientRect();
+        if ((Number(wr.width) || 0) >= 8) {
+          width = Number(wr.width);
+          if (height < 8) height = Number(wr.height) || height;
+        } else if (wrap.parentElement && typeof wrap.parentElement.getBoundingClientRect === 'function') {
+          // Outer layout column (not the canvas itself).
+          const or = wrap.parentElement.getBoundingClientRect();
+          if ((Number(or.width) || 0) >= 8) {
+            width = Number(or.width);
+            if (height < 8) height = Number(or.height) || height;
+          }
+        }
+      }
+    }
+    return { width, height };
+  }
+
+  function scheduleChartPaint(paintFn) {
+    if (typeof requestAnimationFrame === 'function') {
+      _chartPaintRaf = requestAnimationFrame(paintFn);
+      return;
+    }
+    _chartPaintRaf = null;
+    paintFn();
+  }
+
   function drawBasisChart(model) {
     const canvas = el('bwCurveCanvas');
     if (!canvas) return;
+
+    // Own the paint path: drop any prior rAF chain before scheduling a new one.
+    invalidateChartPaint();
+    const paintGen = _chartPaintGen;
     const theme = getChartTheme();
     const legend = el('bwChartLegend');
     // Tag canvas with active asset so switch BTC↔ETH always invalidates paint path.
@@ -1780,22 +1857,34 @@
     canvas.dataset.bwPaintKey = paintKey;
     canvas.setAttribute('aria-label', `${model.assetKey || 'BTC'} futures curve vs spot`);
 
+    let zeroWidthAttempts = 0;
+
     const paint = () => {
-      // Drop stale frames if asset/view changed mid-rAF.
+      _chartPaintRaf = null;
+      // Drop stale frames if invalidate/asset/view changed mid-rAF.
+      if (paintGen !== _chartPaintGen) return;
       if (canvas.dataset.bwPaintKey !== paintKey) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width < 8) {
-        requestAnimationFrame(paint);
+
+      const layout = resolveChartLayoutSize(canvas);
+      if (layout.width < 8) {
+        zeroWidthAttempts += 1;
+        if (zeroWidthAttempts > CHART_ZERO_WIDTH_RAF_CAP) {
+          // Layout still collapsed — stop spinning; next refresh/resize re-invalidates.
+          return;
+        }
+        scheduleChartPaint(paint);
         return;
       }
+
       const dpr = window.devicePixelRatio || 1;
-      const w = Math.max(280, rect.width);
-      const h = isStandalone() ? 280 : Math.max(110, rect.height || 110);
+      const w = Math.max(280, layout.width);
+      const h = isStandalone() ? 280 : Math.max(110, layout.height || 110);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       const ctx = canvas.getContext('2d');
+      if (!ctx) return;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
       ctx.scale(dpr, dpr);
@@ -1813,7 +1902,7 @@
         }
       }
     };
-    paint();
+    scheduleChartPaint(paint);
   }
 
   function approxEq(a, b, tol = 0.01) {
@@ -2010,6 +2099,7 @@
   }
 
   function renderPanelChart(model) {
+    // Chunk 28 — refresh/render re-owns paint (recovers after zero-width cap).
     drawBasisChart(model);
   }
 
@@ -2036,6 +2126,8 @@
       else setTimeout(resolve, 0);
     });
     if (gen !== _refreshGen) return;
+    // Recovering paint after layout settle (zero-width rAF cap may have bailed earlier).
+    invalidateChartPaint();
     renderPanelChart(model);
   }
 
@@ -2195,6 +2287,8 @@
         const s = getState();
         s.basisWatch = s.basisWatch || {};
         s.basisWatch.view = btn.dataset.bwView || 'basis';
+        // Chunk 28 — drop in-flight paint before view switch rebuild.
+        invalidateChartPaint();
         refresh(s, hooks);
         markDirty();
       });
@@ -2208,6 +2302,8 @@
         s.basisWatch.asset = nextAsset === 'ETH' ? 'ETH' : 'BTC';
         // Drop cached model so chart/table rebuild from the selected asset immediately.
         s._basisWatchModel = null;
+        // Chunk 28 — cancel zero-width/stale rAF so BTC↔ETH never paints the prior asset.
+        invalidateChartPaint();
         savePrefs({ asset: s.basisWatch.asset, view: s.basisWatch.view, rollLogic: s.basisWatch.rollLogic, mode: s.basisWatch.mode });
         refresh(s, hooks);
         markDirty();
@@ -2357,7 +2453,7 @@
 
   global.WTM_BasisWatch = {
     init, initStandalone, getState, render: renderPanel, refresh, reloadCurve, reloadHydration,
-    invalidateCurveCache, exportCsv, exportPng,
+    invalidateCurveCache, invalidateChartPaint, exportCsv, exportPng,
     buildModel, buildContracts, buildCalendarPairs, computeSpotAnnualizedCarry, resolveBasisValuation,
     buildAssetBoard, buildDualCurveBoards, renderDualCurveSection,
     hydrationBasisSpot, ensureCurveHistory,

@@ -66,6 +66,7 @@
             <option value="snapshot">Snapshot</option>
           </select>
         </label>
+        <button type="button" id="btnBwArticulate" class="bw-btn bw-btn--utility" title="Articulate · copy trader analysis prompt (A)">A</button>
         <button type="button" id="btnBwExportCsv" class="bw-btn" title="Export BasisWatch table CSV">Export CSV</button>
         <button type="button" id="btnBwExportPng" class="bw-btn" title="Export chart PNG">Export PNG</button>
         <button type="button" id="btnBwBarchart" class="bw-btn" title="Open Clark Barchart watchlist">Barchart ↗</button>
@@ -117,12 +118,14 @@
   </footer>
 
   <!-- Chunk 17: The Ark SSOT must load before BasisWatch / desk ops (no raw market fetch elsewhere). -->
+  <!-- Chunk 28: articulate.js after panel so #btnBwArticulate can call WTM_Articulate.runBasisWatch. -->
   <script src="js/theme.js"></script>
   <script src="js/time_format.js"></script>
   <script src="js/ark.js"></script>
   <script src="js/task_force_panel_feed.js"></script>
   <script src="js/basis_watch_analytics.js"></script>
   <script src="js/basis_watch_panel.js"></script>
+  <script src="js/articulate.js"></script>
   <script src="js/desk_data_ops.js"></script>
   <script src="js/auto_collect_panel.js"></script>
   <script>

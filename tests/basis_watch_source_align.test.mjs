@@ -37,6 +37,7 @@ function loadBasisWatch() {
     setTimeout,
     clearTimeout,
     requestAnimationFrame: (fn) => setTimeout(fn, 0),
+    cancelAnimationFrame: (id) => clearTimeout(id),
     fetch: async () => ({ ok: true, json: async () => ({ records: [] }) }),
   };
   sandbox.window = sandbox;
@@ -133,10 +134,28 @@ async function run() {
     'ETH dual front basis is independent of pure BTC clone when eth_basis present',
   );
   // Hist Q1/Med/Q3 restored via BT history alias on synthetic ETH.
+  // Chunk 28 lock: hist bands come from curve history (not invented from hydration RV).
   const ethFront = modelBtc.dualBoards.eth.front;
   assert(ethFront, 'ETH dual front');
   assert(Number.isFinite(ethFront.histMedian) || Number.isFinite(ethFront.basisPercentile),
     `ETH hist/rank present histMed=${ethFront.histMedian} pct=${ethFront.basisPercentile}`);
+  if (Number.isFinite(ethFront.histMedian)) {
+    assert(Number.isFinite(ethFront.histQ1) && Number.isFinite(ethFront.histQ3),
+      `ETH hist Q1/Med/Q3 complete when median present q1=${ethFront.histQ1} q3=${ethFront.histQ3}`);
+    assert(ethFront.histQ1 <= ethFront.histMedian && ethFront.histMedian <= ethFront.histQ3,
+      'ETH hist Q1 ≤ Med ≤ Q3 (real series stats)');
+    assert(ethFront.historySource !== 'hydration_rv' || !Number.isFinite(ethFront.histMedian)
+      || Number.isFinite(ethFront.historyN),
+      'hist bands not a lone invented hydration RV point');
+  }
+  // BTC front hist from curve history when available.
+  if (Number.isFinite(modelBtc.front.histMedian)) {
+    assert(Number.isFinite(modelBtc.front.histQ1) && Number.isFinite(modelBtc.front.histQ3),
+      'BTC front hist Q1/Med/Q3 complete');
+    assert(modelBtc.front.histQ1 <= modelBtc.front.histMedian
+      && modelBtc.front.histMedian <= modelBtc.front.histQ3,
+      'BTC hist Q1 ≤ Med ≤ Q3');
+  }
 
   const dualHtml = bw.renderDualCurveSection(modelBtc);
   assert(dualHtml.includes('Enhanced basis curve'), 'dual section title');
@@ -159,6 +178,16 @@ async function run() {
     `ETH basis ${modelEth.frontBasisPct} must differ from BTC ${modelBtc.frontBasisPct}`);
   assert(Number.isFinite(modelEth.front?.histQ1) || Number.isFinite(modelEth.front?.histMedian),
     `ETH hist Q1/Med/Q3 restored q1=${modelEth.front?.histQ1} med=${modelEth.front?.histMedian}`);
+  // Chunk 28 — hist lock in ETH focus mode (curve-history alias, not hydration fabrication).
+  if (Number.isFinite(modelEth.front?.histMedian)) {
+    assert(
+      Number.isFinite(modelEth.front.histQ1)
+      && Number.isFinite(modelEth.front.histQ3)
+      && modelEth.front.histQ1 <= modelEth.front.histMedian
+      && modelEth.front.histMedian <= modelEth.front.histQ3,
+      'ETH focus hist ordered Q1/Med/Q3 from history',
+    );
+  }
   assert(modelEth.dualBoards?.btc?.contracts?.length > 0, 'ETH mode still has BTC dual board');
 
   console.log([

@@ -20,13 +20,34 @@ function testHtmlWiring() {
   const arkIdx = html.indexOf('src="js/ark.js"');
   const analyticsIdx = html.indexOf('src="js/basis_watch_analytics.js"');
   const panelIdx = html.indexOf('src="js/basis_watch_panel.js"');
+  const articulateIdx = html.indexOf('src="js/articulate.js"');
   const deskOpsIdx = html.indexOf('src="js/desk_data_ops.js"');
+  const autoCollectIdx = html.indexOf('src="js/auto_collect_panel.js"');
+  const timeFmtIdx = html.indexOf('src="js/time_format.js"');
+  const taskForceIdx = html.indexOf('src="js/task_force_panel_feed.js"');
 
   assert(arkIdx >= 0, 'Whinfell_BasisWatch.html must include js/ark.js');
+  assert(timeFmtIdx >= 0, 'preserves time_format.js');
+  assert(taskForceIdx >= 0, 'preserves task_force_panel_feed.js');
   assert(analyticsIdx > arkIdx, 'ark.js must load before basis_watch_analytics.js');
   assert(panelIdx > arkIdx, 'ark.js must load before basis_watch_panel.js');
   assert(deskOpsIdx > arkIdx, 'ark.js must load before desk_data_ops.js');
+  assert(autoCollectIdx > deskOpsIdx, 'preserves auto_collect_panel.js after desk ops');
+  // Chunk 28 — focus A: Articulate button + script after panel (additive).
+  assert(html.includes('id="btnBwArticulate"'), 'focus view must include #btnBwArticulate');
+  assert(articulateIdx > panelIdx, 'articulate.js must load after basis_watch_panel.js');
   assert(html.includes('data-bw-layout="standalone"'), 'standalone layout flag');
+}
+
+function testPaintOwnershipSource() {
+  const panelSrc = fs.readFileSync(path.join(ROOT, 'js/basis_watch_panel.js'), 'utf8');
+  assert(panelSrc.includes('function invalidateChartPaint'), 'invalidateChartPaint present');
+  assert(panelSrc.includes('cancelAnimationFrame'), 'cancels in-flight chart rAF');
+  assert(panelSrc.includes('CHART_ZERO_WIDTH_RAF_CAP'), 'zero-width rAF cap constant');
+  assert(/CHART_ZERO_WIDTH_RAF_CAP\s*=\s*30/.test(panelSrc), 'zero-width rAF cap ~30');
+  assert(panelSrc.includes('resolveChartLayoutSize') || panelSrc.includes('bw-chart-wrap'),
+    'fallback width from chart wrap parent');
+  assert(panelSrc.includes('invalidateChartPaint()'), 'invalidate called on switch/render paths');
 }
 
 async function testStandaloneLoadsViaArk() {
@@ -127,6 +148,7 @@ async function testStandaloneLoadsViaArk() {
     setTimeout,
     clearTimeout,
     requestAnimationFrame: (fn) => setTimeout(fn, 0),
+    cancelAnimationFrame: (id) => clearTimeout(id),
     URLSearchParams,
     addEventListener() {},
     removeEventListener() {},
@@ -194,8 +216,9 @@ async function testStandaloneLoadsViaArk() {
 
 async function run() {
   testHtmlWiring();
+  testPaintOwnershipSource();
   await testStandaloneLoadsViaArk();
-  console.log('PASS basis_watch_standalone_ark.test.mjs — Chunk 17 HTML + Ark IO');
+  console.log('PASS basis_watch_standalone_ark.test.mjs — Chunk 17/28 HTML + Ark IO + paint + A');
 }
 
 run().catch((err) => {
