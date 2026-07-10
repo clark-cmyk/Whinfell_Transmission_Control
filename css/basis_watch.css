@@ -239,28 +239,36 @@ html {
 }
 
 .bw-chart-wrap { padding: 12px 14px 8px; }
+/* Chunk 30 — chart containers: display block + min-height (not height:auto alone) */
 #bwCurveCanvas, .bw-curve-canvas, .wtm-lwc-mount.bw-curve-canvas {
   width: 100%;
   height: 220px;
   min-height: 110px;
   display: block;
   position: relative;
+  box-sizing: border-box;
   background: var(--bw-chart-bg);
   border-radius: var(--bw-radius-sm);
   border: 1px solid var(--bw-border);
 }
-.bw-standalone #bwCurveCanvas { height: 280px; min-height: 280px; }
+.bw-standalone #bwCurveCanvas {
+  height: 280px;
+  min-height: 280px;
+  display: block;
+}
 
-/* Chunk 29 — LWC host (div, not canvas) */
+/* Chunk 29/30 — LWC host (div, not canvas): block + min-height floor for ResizeObserver */
 .wtm-lwc-mount {
   position: relative;
+  display: block;
   width: 100%;
   min-width: 0;
-  min-height: 0;
+  min-height: 110px;
   box-sizing: border-box;
 }
+/* Absolute-fill mounts (e.g. cockpit) override height/min-height in main.css */
 .wtm-lwc-mount canvas {
-  /* LWC injects its own canvas; keep layout stable under zoom */
+  /* LWC injects its own canvas; keep layout stable under browser zoom */
   display: block;
 }
 
@@ -504,9 +512,10 @@ html[data-theme="light"] .bw-dual-table tr.bw-dual-row--extreme td,
   background: var(--bw-surface);
   max-height: 38vh;
   min-height: 180px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* main + rail are the scroll regions (Chunk 30) */
   transition: max-height 0.25s ease, min-height 0.25s ease;
 }
 body.ia-shell-active .ia-dig-host .basis-watch-panel,
@@ -514,6 +523,7 @@ body.ia-layer-dig .basis-watch-panel {
   max-height: none;
   flex: 1;
   min-height: 0;
+  min-width: 0;
 }
 .basis-watch-panel--collapsed { max-height: 40px; min-height: 40px; }
 .basis-watch-panel--collapsed .basis-watch-body { display: none; }
@@ -675,30 +685,39 @@ body.ia-layer-dig .basis-watch-panel {
 .basis-watch-body {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 1fr 260px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
   gap: 0;
   overflow: hidden;
   padding-top: 4px;
 }
 @media (max-width: 1024px) {
-  .basis-watch-body { grid-template-columns: 1fr; overflow-y: auto; }
+  .basis-watch-body { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
 }
+/* Chunk 30 — critical scroll regions (replace overflow clip/hidden under zoom) */
 .basis-watch-main {
   min-height: 0;
+  min-width: 0;
   overflow: auto;
   padding: 8px 10px;
   border-right: 1px solid var(--bw-border);
 }
 .basis-watch-rail {
   min-height: 0;
+  min-width: 0;
   overflow: auto;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.basis-watch-panel #bwCurveCanvas { height: 110px; }
+/* Embedded chart: fixed height + matching min-height for LWC content box */
+.basis-watch-panel #bwCurveCanvas {
+  height: 110px;
+  min-height: 110px;
+  display: block;
+}
 
 /* ── Shared controls ── */
 .bw-view-tab, .bw-asset-btn, .bw-btn {
