@@ -1550,6 +1550,8 @@
     </footer>
   </div>
 
+  <script src="js/time_format.js"></script>
+  <script src="js/ark.js"></script>
   <script src="js/desk_chart_links.js"></script>
   <script src="js/desk_china_chart_links.js"></script>
   <script src="js/desk_china_ladder_models.js"></script>
@@ -1563,7 +1565,6 @@
     'whinfell_transmission_control_v0',
     'whinfell_operator_v1_1',
   ];
-  const HYDRATION_PATHS = ['data/hydration/latest.json', 'docs/data/hydration/latest.json', '../data/hydration/latest.json'];
 
   const STAGE_RANK = { liquidity: 0, credit: 1, breadth: 2, highbeta: 3, basis: 4 };
 
@@ -2101,6 +2102,7 @@
       regimeStatus: regimeStatus,
       whinfellScore: wf,
       avgScore: avg,
+      source: raw.source || 'fixture',
       stages: stages,
       weak: ladder.weak,
       btc: asset(false),
@@ -2154,41 +2156,86 @@
     return null;
   }
 
+  /** Chunk 31 — hydration only via The Ark (never raw fetch of hydration JSON). */
+  async function loadHydrationViaArk() {
+    const ark = window.WTM_Ark;
+    if (!ark || typeof ark.loadHydration !== 'function') return null;
+    const result = await ark.loadHydration({ force: true });
+    // NEVER result.bundle — use result.ok && result.data
+    const bundle = (result && result.ok && result.data)
+      ? result.data
+      : (ark.getHydration && ark.getHydration()) || null;
+    return bundle && typeof bundle === 'object' ? bundle : null;
+  }
+
+  function payloadFromHydrationBundle(bundle) {
+    if (!bundle || typeof bundle !== 'object') return null;
+    return {
+      asOf: bundle.as_of,
+      regimeLabel: bundle.global && bundle.global.regime_tag,
+      whinfellScore: bundle.global && bundle.global.whinfell_score,
+      horizons: bundle.suggested_tracer,
+      chinaHorizons: bundle.china_ladder && bundle.china_ladder.horizons,
+      chinaSq3: (bundle.china_ladder && bundle.china_ladder.sq3_score) || (bundle.china && bundle.china.sq3_score),
+      chinaRegimeLabel: (bundle.china && bundle.china.sq3_band) || 'China overlay',
+      source: 'ark-hydration',
+    };
+  }
+
+  function payloadFromLocalState(state) {
+    if (!state) return null;
+    return {
+      asOf: (state.provenance && state.provenance.dataAsOf) || (state.provenance && state.provenance.hydratedAt),
+      regimeLabel: state.intake && state.intake.regimeTag,
+      whinfellScore: parseInt(state.intake && state.intake.whinfellScore, 10) || 50,
+      horizons: state.tracer && state.tracer.horizons,
+      source: 'local',
+    };
+  }
+
+  function prefersLocalFirst() {
+    try {
+      return new URLSearchParams(location.search || '').get('preferLocal') === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function tryLocalPayload() {
+    try {
+      return payloadFromLocalState(readSavedState());
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function tryArkPayload() {
+    try {
+      return payloadFromHydrationBundle(await loadHydrationViaArk());
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Default: Ark → localStorage → FIXTURE.
+   * Optional ?preferLocal=1: localStorage → Ark → FIXTURE.
+   * file: protocol: Ark fails; local/fixture OK.
+   */
   async function loadRaw() {
     var payload = null;
-    try {
-      var state = readSavedState();
-      if (state) {
-        payload = {
-          asOf: (state.provenance && state.provenance.dataAsOf) || (state.provenance && state.provenance.hydratedAt),
-          regimeLabel: state.intake && state.intake.regimeTag,
-          whinfellScore: parseInt(state.intake && state.intake.whinfellScore, 10) || 50,
-          horizons: state.tracer && state.tracer.horizons,
-        };
-      }
-    } catch (e) { /* ignore */ }
+    var preferLocal = prefersLocalFirst();
 
-    if (!payload) {
-      for (var i = 0; i < HYDRATION_PATHS.length; i++) {
-        try {
-          var res = await fetch(HYDRATION_PATHS[i]);
-          if (!res.ok) continue;
-          var bundle = await res.json();
-          payload = {
-            asOf: bundle.as_of,
-            regimeLabel: bundle.global && bundle.global.regime_tag,
-            whinfellScore: bundle.global && bundle.global.whinfell_score,
-            horizons: bundle.suggested_tracer,
-            chinaHorizons: bundle.china_ladder && bundle.china_ladder.horizons,
-            chinaSq3: (bundle.china_ladder && bundle.china_ladder.sq3_score) || (bundle.china && bundle.china.sq3_score),
-            chinaRegimeLabel: (bundle.china && bundle.china.sq3_band) || 'China overlay',
-          };
-          break;
-        } catch (e) { /* ignore */ }
-      }
+    if (preferLocal) {
+      payload = await tryLocalPayload();
+      if (!payload) payload = await tryArkPayload();
+    } else {
+      payload = await tryArkPayload();
+      if (!payload) payload = await tryLocalPayload();
     }
 
-    if (!payload) payload = Object.assign({}, FIXTURE);
+    if (!payload) payload = Object.assign({}, FIXTURE, { source: 'fixture' });
+    if (!payload.source) payload.source = 'fixture';
     payload.horizons = normalizeHorizons(payload.horizons || FIXTURE.horizons);
     payload.chinaHorizons = normalizeHorizonsFor(payload.chinaHorizons || FIXTURE.chinaHorizons, CHINA_STAGES, FIXTURE.chinaHorizons);
     if (payload.chinaSq3 == null) payload.chinaSq3 = FIXTURE.chinaSq3;
@@ -2222,6 +2269,8 @@
     grid.appendChild(tile('ETH posture', p.eth.posture, 'eth-tile'));
     grid.appendChild(tile('Ladder avg', String(p.avgScore) + ' / 100', ''));
     grid.appendChild(tile('As of', timeStr, 'time-tile'));
+    // Chunk 31 — visible source chip: ark-hydration | local | fixture (+ as_of above)
+    grid.appendChild(tile('Source', 'Source · ' + (p.source || 'fixture'), 'source-tile'));
     root.appendChild(grid);
   }
 
