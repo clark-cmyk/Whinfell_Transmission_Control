@@ -2057,6 +2057,8 @@
     const weakestName = weakest.name;
     const avg = ladder.avgScore;
     const fragile = avg < 65 || ranked[0].score < 55;
+    // Must be local to buildPayload — wf in buildStagePayload is not in scope under 'use strict'
+    var wf = raw.whinfellScore ?? 50;
 
     const btcPosture = fragile ? 'Reduced carry · tactical only' : 'Carry and beta within policy';
     const ethPosture = fragile ? 'More selective than BTC' : 'Selective — cleaner ladder required';
@@ -2253,15 +2255,25 @@
     return t;
   }
 
+  function formatAsOfStamp(asOf) {
+    if (typeof window.WTM_formatLocalStamp === 'function') {
+      return window.WTM_formatLocalStamp(asOf, { fallback: '—' });
+    }
+    if (window.WTM_Time && typeof window.WTM_Time.formatLocalStamp === 'function') {
+      return window.WTM_Time.formatLocalStamp(asOf, { fallback: '—' });
+    }
+    var dt = asOf ? new Date(asOf) : new Date();
+    return dt.toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+  }
+
   function renderDecision(p) {
     var root = document.getElementById('decisionBand');
     while (root.firstChild) root.removeChild(root.firstChild);
 
     var grid = el('div', 'decision-grid');
-    var dt = p.asOf ? new Date(p.asOf) : new Date();
-    var timeStr = dt.toLocaleString(undefined, {
-      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
-    });
+    var timeStr = formatAsOfStamp(p.asOf);
 
     grid.appendChild(tile('Regime', p.regimeLabel, 'regime-tile status-' + (p.regimeStatus || 'fragile')));
     grid.appendChild(tile('Weakest link', p.weak[0].name + ' · ' + p.weak[0].score + ' / 100', 'weakest-tile'));
@@ -2269,8 +2281,8 @@
     grid.appendChild(tile('ETH posture', p.eth.posture, 'eth-tile'));
     grid.appendChild(tile('Ladder avg', String(p.avgScore) + ' / 100', ''));
     grid.appendChild(tile('As of', timeStr, 'time-tile'));
-    // Chunk 31 — visible source chip: ark-hydration | local | fixture (+ as_of above)
-    grid.appendChild(tile('Source', 'Source · ' + (p.source || 'fixture'), 'source-tile'));
+    // Chunk 31 — source chip: ark-hydration | local | fixture (label Source, value is id only)
+    grid.appendChild(tile('Source', p.source || 'fixture', 'source-tile'));
     root.appendChild(grid);
   }
 
