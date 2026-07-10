@@ -297,6 +297,139 @@ html {
 
 .bw-main-body { padding: 0 14px 14px; }
 
+/* ── Chunk 19: dual BTC | ETH enhanced basis curve table ── */
+.bw-dual-curve-host {
+  padding: 0 14px 12px;
+}
+.bw-dual-curve {
+  border: 1px solid var(--bw-border);
+  border-radius: var(--bw-radius-sm);
+  background: var(--bw-surface-2);
+  overflow: hidden;
+}
+.bw-dual-head {
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid var(--bw-border);
+}
+.bw-dual-title {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+.bw-dual-stale {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--bw-warn, #d4a017);
+  font-weight: 600;
+}
+.bw-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-width: 0;
+}
+@media (max-width: 960px) {
+  .bw-dual-grid { grid-template-columns: 1fr; }
+}
+.bw-dual-col {
+  min-width: 0;
+  padding: 10px 10px 12px;
+  border-right: 1px solid var(--bw-border);
+}
+.bw-dual-col:last-child { border-right: none; }
+@media (max-width: 960px) {
+  .bw-dual-col {
+    border-right: none;
+    border-bottom: 1px solid var(--bw-border);
+  }
+  .bw-dual-col:last-child { border-bottom: none; }
+}
+.bw-dual-col-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.bw-dual-col-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bw-text);
+}
+.bw-dual-spot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+.bw-dual-spot-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bw-muted);
+}
+.bw-dual-spot-val {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--bw-accent, #3d8bfd);
+  letter-spacing: -0.02em;
+}
+.bw-dual-col-meta {
+  font-size: 10px;
+  color: var(--bw-muted);
+  font-weight: 600;
+}
+.bw-dual-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.bw-dual-table {
+  width: 100%;
+  font-size: 11px;
+}
+.bw-dual-table th {
+  white-space: nowrap;
+  font-size: 9px;
+}
+.bw-dual-table td {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bw-dual-table .bw-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.bw-dual-table .bw-dual-sym {
+  font-weight: 700;
+  text-align: left;
+}
+.bw-dual-syn {
+  color: var(--bw-muted);
+  font-weight: 600;
+}
+.bw-dual-table tr.bw-dual-row--extreme td {
+  background: rgba(224, 123, 57, 0.12);
+}
+html[data-theme="light"] .bw-dual-table tr.bw-dual-row--extreme td,
+[data-theme="light"] .bw-dual-table tr.bw-dual-row--extreme td {
+  background: rgba(196, 95, 32, 0.1);
+}
+.bw-dual-table tr.bw-row-front td {
+  box-shadow: inset 3px 0 0 var(--bw-accent, #3d8bfd);
+}
+.bw-dual-empty {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--bw-muted);
+  font-style: italic;
+}
+.basis-watch-main .bw-dual-curve-host {
+  padding: 8px 0 10px;
+}
+
 /* ── Methodology block ── */
 .bw-methodology {
   margin: 0 14px 14px;

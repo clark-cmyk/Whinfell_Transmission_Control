@@ -8,7 +8,7 @@
 (function arkModule(global) {
   'use strict';
 
-  const BUILD = 'ARK-1.2.0-CHUNK18-2026-07-09';
+  const BUILD = 'ARK-1.5.0-CHUNK24-REFRESH-ALL-2026-07-09';
 
   const HYDRATION_URL = 'data/hydration/latest.json';
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
@@ -217,15 +217,40 @@
   }
 
   /**
+   * Drop in-memory curve cache so the next load hits disk/network.
+   * Chunk 23 — permanent fix for stale BTN26 after watchlist rebuild.
+   */
+  function invalidateCurveHistory() {
+    curveCache = null;
+    const prev = sources.get('curve') || makeSource('curve', CURVE_URL);
+    sources.set('curve', {
+      id: 'curve',
+      url: prev.url || CURVE_URL,
+      status: prev.status === 'ok' ? 'stale' : prev.status,
+      lastSuccessAt: prev.lastSuccessAt,
+      error: null,
+    });
+    notify({ type: 'curve_invalidate', ok: true, source: 'curve' });
+  }
+
+  /**
    * Load Barchart curve history JSON.
+   * Always cache-busts on the wire. force:true (default) re-reads the file.
    * @param {{ force?: boolean }} [options]
    */
   async function loadCurveHistory(options) {
     const opts = options || {};
+    // Chunk 23: default force=true so callers cannot silently reuse a warm stale cache
+    // unless they explicitly pass { force: false }.
     const force = opts.force !== false;
 
     if (!force && curveCache) {
       return okResult(curveCache);
+    }
+
+    // Clear before fetch so concurrent getCurveHistory() never returns the previous vintage.
+    if (force) {
+      curveCache = null;
     }
 
     const fetched = await fetchJson(CURVE_URL);
@@ -262,6 +287,11 @@
     if (isFileProtocol()) {
       setSourceStatus('bbdm_report', 'unavailable', 'file: protocol cannot fetch data files', BBDM_REPORT_URLS[0]);
       return failResult('file: protocol cannot fetch data files');
+    }
+
+    // Chunk 24: clear before fetch so UI cannot read a stale report mid-reload.
+    if (force) {
+      bbdmReportCache = null;
     }
 
     const fetched = await fetchJsonFirst(BBDM_REPORT_URLS.slice());
@@ -337,11 +367,27 @@
    */
   function getStamp() {
     const stamp = stampFromBundle(hydrationCache);
+    const curveAsOf = curveCache && typeof curveCache === 'object'
+      ? (curveCache.as_of || curveCache.refresh?.refreshed_at || null)
+      : null;
+    let btn26 = null;
+    if (curveCache && Array.isArray(curveCache.records)) {
+      for (let i = 0; i < curveCache.records.length; i += 1) {
+        const rec = curveCache.records[i];
+        if (String(rec.raw_symbol || '').toUpperCase() === 'BTN26') {
+          const lat = rec.latest || {};
+          btn26 = { close: lat.close, date: lat.date };
+          break;
+        }
+      }
+    }
     return {
       as_of: stamp.as_of,
       snapshot_id: stamp.snapshot_id,
       freshness_status: stamp.freshness_status,
       lastRefreshedAt: lastRefreshedAt,
+      curve_as_of: curveAsOf,
+      BTN26: btn26,
       sources: getSources(),
     };
   }
@@ -367,6 +413,7 @@
     getHydration: getHydration,
     loadCurveHistory: loadCurveHistory,
     getCurveHistory: getCurveHistory,
+    invalidateCurveHistory: invalidateCurveHistory,
     loadBbdmReport: loadBbdmReport,
     getBbdmReport: getBbdmReport,
     loadCoinglass: loadCoinglass,

@@ -24,7 +24,7 @@
    * Chunk 17 — standalone loads via WTM_Ark; valuation anchors to Ark hydration
    * when curve quote dates lag (stale Barchart nodes).
    */
-  const BW_BUILD = '3.7-BASISWATCH-ARK-SPOT-2026-07-09';
+  const BW_BUILD = '3.9-BASISWATCH-ARK-ETH-ASSET-SPLIT-2026-07-09';
   const THEME_COLORS = { dark: '#090d12', light: '#eef1f5' };
   const PREFS_KEY = 'whinfell_basiswatch_prefs';
   const THEME_KEY = 'whinfell_tc_theme';
@@ -33,6 +33,10 @@
   const CURVE_URL = 'data/barchart/v1/barchart_curve_history.json';
   /** CME-style floor — do not annualize ultra-short DTE (avoids 500%+ noise on 1d front). */
   const MIN_ANN_DTE = 7;
+  /** Chunk 19 — dual BTC|ETH curve board depth (active tenors only). */
+  const DUAL_CURVE_MAX = 8;
+  /** Heuristic: AE dollar spreads mis-stored as unit=pct when |v| is large vs spot. */
+  const HYDRATION_BASIS_DOLLAR_ABS = 5;
 
   /** Clark desk shortcuts — saved Barchart watchlist + Koyfin MYD */
   const DESK_LINKS = {
@@ -43,9 +47,10 @@
   const CME_MONTH = { F: 0, G: 1, H: 2, J: 3, K: 4, M: 5, N: 6, Q: 7, U: 8, V: 9, X: 10, Z: 11 };
   const MONTH_LABEL = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+  /** Barchart CME roots: BT = Bitcoin, ET = Ether (not "ETH"). */
   const ASSETS = {
-    BTC: { root: 'BT', spotKey: 'btc_spot_usd', label: 'Bitcoin' },
-    ETH: { root: 'ETH', spotKey: 'eth_spot_usd', label: 'Ethereum' },
+    BTC: { root: 'BT', roots: ['BT'], spotKey: 'btc_spot_usd', label: 'Bitcoin' },
+    ETH: { root: 'ET', roots: ['ET', 'ETH'], spotKey: 'eth_spot_usd', label: 'Ethereum' },
   };
 
   const CROSS_ASSET_ROOTS = [
@@ -135,6 +140,21 @@
   }
 
   function el(id) { return document.getElementById(id); }
+
+  /** Local desk stamp: "2026-07-09 23:45 CDT" */
+  function formatLocalStamp(value, fallback) {
+    if (typeof global.WTM_formatLocalStamp === 'function') {
+      return global.WTM_formatLocalStamp(value, { fallback: fallback != null ? fallback : '—' });
+    }
+    if (value == null || value === '') return fallback != null ? fallback : '—';
+    try {
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return String(value);
+      return d.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC');
+    } catch (_) {
+      return String(value);
+    }
+  }
 
   function unavailSpan(kind = 'awaiting') {
     return kind === 'na'
@@ -253,8 +273,38 @@
     return assetKey === 'ETH' ? 'eth_basis_spot_1m' : 'btc_basis_spot_1m';
   }
 
+  function basisRankSeriesId(assetKey) {
+    return assetKey === 'ETH' ? 'eth_basis_spot_1m' : 'btc_basis_vs_refs';
+  }
+
+  function calendarRankSeriesId(assetKey) {
+    return assetKey === 'ETH' ? 'eth_calendar_et_near_deferred' : 'btc_calendar_bt_near_deferred';
+  }
+
   function hydrationBasisSpot(hydration, assetKey, horizon = '1m') {
     return rvHorizon(hydration, 'basis', basisSpotSeriesId(assetKey), horizon);
+  }
+
+  /**
+   * Convert hydration basis current_value to true % of spot.
+   * Barchart AE spreads are dollars; when ref price was missing they land as raw
+   * dollar levels (e.g. -18) with unit=pct. Detect and convert with spot.
+   */
+  function normalizeHydrationBasisPct(raw, spot) {
+    const v = Number(raw);
+    if (!Number.isFinite(v)) return null;
+    const s = Number(spot);
+    if (Number.isFinite(s) && s > 50 && Math.abs(v) > HYDRATION_BASIS_DOLLAR_ABS) {
+      return (v / s) * 100;
+    }
+    return v;
+  }
+
+  function btcCounterpartSymbol(symbol) {
+    const s = String(symbol || '').toUpperCase();
+    if (s.startsWith('ETH') && s.length >= 5) return `BT${s.slice(3)}`;
+    if (s.startsWith('ET') && !s.startsWith('ETH') && s.length >= 4) return `BT${s.slice(2)}`;
+    return s;
   }
 
   function parseQuoteDate(raw) {
@@ -270,9 +320,9 @@
     return Math.round(Math.abs(db - da) / 86400000);
   }
 
-  function maxRootQuoteDate(records, root) {
+  function maxRootQuoteDate(records, rootOrRoots) {
     let max = '';
-    recordsForRoot(records, root).forEach((r) => {
+    recordsForRoot(records, rootOrRoots).forEach((r) => {
       const d = parseQuoteDate(r.latest?.date);
       if (d && d >= max) max = d;
     });
@@ -290,16 +340,18 @@
    * Nearest live futures node under asOf (skip expired). Prefer dte >= MIN_ANN_DTE.
    * Implied spot must use the same front the panel displays (never a hardcoded expired month).
    */
-  function pickNearestLiveFuture(records, root, asOfDate) {
+  function pickNearestLiveFuture(records, rootOrRoots, asOfDate) {
     const asOf = asOfDate instanceof Date ? asOfDate : new Date(asOfDate || Date.now());
+    const asOfMs = asOf.getTime();
     const live = [];
-    recordsForRoot(records, root).forEach((r) => {
+    recordsForRoot(records, rootOrRoots).forEach((r) => {
       const parsed = parseCmeSymbol(r.raw_symbol);
       if (!parsed) return;
       const futuresPrice = Number(r.latest?.close ?? r.points?.[r.points.length - 1]?.close);
       if (!Number.isFinite(futuresPrice) || futuresPrice <= 0) return;
-      const dte = daysToExpiry(parsed.expiry, asOf);
-      if (dte < 0) return;
+      const rawDays = Math.round((parsed.expiry.getTime() - asOfMs) / 86400000);
+      if (rawDays < 0) return;
+      const dte = Math.max(0, rawDays);
       live.push({
         rec: r,
         symbol: r.raw_symbol,
@@ -354,67 +406,66 @@
     const koyfinSpot = Number(sleeve[asset.spotKey]?.last_price);
     const basisH = hydrationBasisSpot(hyd, assetKey, '1m')
       || hydrationBasisSpot(arkHyd, assetKey, '1m');
-    const basisPct = Number(basisH?.current_value);
 
-    // Front live node under valuation asOf — never hardcode expired BTM26.
-    const refRoot = assetKey === 'ETH' ? 'BT' : asset.root;
-    const refLive = pickNearestLiveFuture(records, refRoot, asOfDate);
+    // Live futures root for this asset (ET when present; BTC never uses ETH).
+    const assetRoots = asset.roots || [asset.root];
+    const refLive = pickNearestLiveFuture(records, assetRoots, asOfDate)
+      || (assetKey === 'ETH' ? pickNearestLiveFuture(records, 'BT', asOfDate) : null);
     const refFuture = refLive ? refLive.futuresPrice : null;
     const refQuoteDate = refLive?.quoteDate || null;
     const refFutureSymbol = refLive?.symbol || null;
 
-    // Chunk 18: primary displayed spot = Ark hydration Koyfin (crypto_sleeve) when present.
-    // Front basis % still comes from Ark btc/eth_basis_spot_1m (applyHydrationFrontBasis).
+    // Chunk 18/19: primary displayed spot = Ark hydration Koyfin (crypto_sleeve) when present.
+    // Front basis % = (F−S)/S from curve futures × Ark spot (not RV series clobber).
     let spotForBasis = null;
     let spotSource = 'unavailable';
     let impliedSpot = null;
+
+    if (assetKey === 'ETH') {
+      const ethKoyfin = Number(sleeve.eth_spot_usd?.last_price
+        || arkHyd?.crypto_sleeve?.assets?.eth_spot_usd?.last_price);
+      if (Number.isFinite(ethKoyfin) && ethKoyfin > 0) {
+        spotForBasis = ethKoyfin;
+        spotSource = 'ark_koyfin';
+      }
+    } else if (Number.isFinite(koyfinSpot) && koyfinSpot > 0) {
+      spotForBasis = koyfinSpot;
+      spotSource = 'ark_koyfin';
+    }
+
+    const basisPct = normalizeHydrationBasisPct(basisH?.current_value, spotForBasis || koyfinSpot);
 
     if (assetKey === 'BTC' && Number.isFinite(refFuture) && Number.isFinite(basisPct)) {
       impliedSpot = impliedSpotFromBasis(refFuture, basisPct);
     }
 
     if (assetKey === 'ETH') {
-      const btcBasis = hydrationBasisSpot(hyd, 'BTC', '1m')
-        || hydrationBasisSpot(arkHyd, 'BTC', '1m');
-      const btcImplied = Number.isFinite(refFuture) && Number.isFinite(btcBasis?.current_value)
-        ? impliedSpotFromBasis(refFuture, btcBasis.current_value)
-        : null;
-      const ethKoyfin = Number(sleeve.eth_spot_usd?.last_price
-        || arkHyd?.crypto_sleeve?.assets?.eth_spot_usd?.last_price);
-      const ratio = Number.isFinite(btcImplied) && btcImplied > 0 && Number.isFinite(ethKoyfin)
-        ? ethKoyfin / btcImplied
-        : null;
-      const ethRefF = Number.isFinite(refFuture) && Number.isFinite(ratio) ? refFuture * ratio : null;
-      if (Number.isFinite(ethRefF) && Number.isFinite(basisPct)) {
-        impliedSpot = impliedSpotFromBasis(ethRefF, basisPct);
+      if (Number.isFinite(refFuture) && Number.isFinite(basisPct)
+        && String(refFutureSymbol || '').toUpperCase().startsWith('ET')) {
+        impliedSpot = impliedSpotFromBasis(refFuture, basisPct);
       }
-      if (Number.isFinite(ethKoyfin) && ethKoyfin > 0) {
-        spotForBasis = ethKoyfin;
-        spotSource = 'ark_koyfin';
-      } else if (Number.isFinite(impliedSpot) && impliedSpot > 0) {
+      if (!(Number.isFinite(spotForBasis) && spotForBasis > 0)
+        && Number.isFinite(impliedSpot) && impliedSpot > 0) {
         spotForBasis = impliedSpot;
         spotSource = 'ark_eth_basis_implied';
       }
-    } else {
-      // BTC (and default): prefer fresh Ark Koyfin spot from hydration.
-      if (Number.isFinite(koyfinSpot) && koyfinSpot > 0) {
-        spotForBasis = koyfinSpot;
-        spotSource = 'ark_koyfin';
-      } else if (Number.isFinite(impliedSpot) && impliedSpot > 0) {
-        spotForBasis = impliedSpot;
-        spotSource = 'ark_basis_implied';
-      }
+    } else if (!(Number.isFinite(spotForBasis) && spotForBasis > 0)
+      && Number.isFinite(impliedSpot) && impliedSpot > 0) {
+      spotForBasis = impliedSpot;
+      spotSource = 'ark_basis_implied';
     }
 
     let dataNote = '';
+    const hydLabel = hydrationDate ? formatLocalStamp(hydrationDate) : '';
+    const curveLabel = curveQuoteDate ? formatLocalStamp(curveQuoteDate) : '';
     if (curveQuoteDate && hydrationDate && gap != null && gap > 1) {
-      dataNote = `Ark hydration ${hydrationDate} · curve quotes ${curveQuoteDate} (${gap}d lag) · front ${refFutureSymbol || '—'} · basis ${basisSpotSeriesId(assetKey)}`;
+      dataNote = `Ark hydration ${hydLabel} · curve quotes ${curveLabel} (${gap}d lag) · front ${refFutureSymbol || '—'} · basis ${basisSpotSeriesId(assetKey)}`;
     } else if (curveQuoteDate && hydrationDate) {
-      dataNote = `Ark hydration ${hydrationDate} · curve ${curveQuoteDate} · front ${refFutureSymbol || '—'} · ${spotSource}`;
+      dataNote = `Ark hydration ${hydLabel} · curve ${curveLabel} · front ${refFutureSymbol || '—'} · ${spotSource}`;
     } else if (hydrationDate) {
-      dataNote = `Ark hydration ${hydrationDate} · futures curve pending`;
+      dataNote = `Ark hydration ${hydLabel} · futures curve pending`;
     } else if (curveQuoteDate) {
-      dataNote = `Curve quotes ${curveQuoteDate} · ${spotSource}`;
+      dataNote = `Curve quotes ${curveLabel} · ${spotSource}`;
     }
 
     return {
@@ -438,39 +489,26 @@
   }
 
   /**
-   * Force front row to Ark hydration basis % and recompute ann carry with valuation DTE.
+   * Chunk 19 — attach Ark RV series as metadata only.
+   * Front basis/ann MUST stay futures-vs-spot: (F−S)/S and ((F/S)−1)×(365/DTE).
+   * Never clobber with btc_basis_spot_1m (that produced the −7% garbage path).
    */
   function applyHydrationFrontBasis(contracts, front, valuation) {
     if (!front || !contracts?.length) return front;
     const basisPct = Number(valuation?.hydrationBasisPct);
-    if (!Number.isFinite(basisPct)) return front;
-    const spot = Number(valuation?.spotForBasis);
     contracts.forEach((c) => {
       if (c.symbol !== front.symbol) return;
-      c.spotBasisPct = basisPct;
-      c.pctBasis = basisPct;
-      if (Number.isFinite(spot) && spot > 0) {
-        c.spotPrice = spot;
-        // $ basis from Ark series × desk spot (not raw stale F − S).
-        c.absBasis = spot * (basisPct / 100);
-      }
-      const ann = annualizeBasisPct(basisPct, c.dte);
-      if (Number.isFinite(ann)) {
-        c.spotAnnualizedCarry = ann;
-        c.annBasis = ann;
-      } else if (Number.isFinite(c.futuresPrice) && Number.isFinite(spot)) {
-        const fromFs = computeSpotAnnualizedCarry(c.futuresPrice, spot, c.dte);
-        c.spotAnnualizedCarry = fromFs;
-        c.annBasis = fromFs;
-      }
-      c.basisSource = 'ark_hydration';
+      if (Number.isFinite(basisPct)) c.hydrationBasisPct = basisPct;
+      c.basisSource = 'futures_vs_spot';
     });
     return contracts.find((c) => c.symbol === front.symbol) || front;
   }
 
-  function applyHydrationQuartileFallback(contracts, front, hydration) {
+  function applyHydrationQuartileFallback(contracts, front, hydration, assetKey) {
     if (!front || !hydration) return;
-    const h = rvHorizon(hydration, 'basis', 'btc_basis_vs_refs');
+    const seriesId = basisRankSeriesId(assetKey || 'BTC');
+    const h = rvHorizon(hydration, 'basis', seriesId)
+      || (assetKey === 'ETH' ? null : rvHorizon(hydration, 'basis', 'btc_basis_vs_refs'));
     if (!h || !Number.isFinite(h.percentile)) return;
     contracts.forEach(c => {
       if (c.symbol !== front.symbol || !c.insufficientHistory) return;
@@ -483,9 +521,9 @@
     });
   }
 
-  function applyHydrationForwardFallback(pairs, frontPair, hydration) {
+  function applyHydrationForwardFallback(pairs, frontPair, hydration, assetKey) {
     if (!pairs.length || !hydration) return;
-    const h = rvHorizon(hydration, 'basis', 'btc_calendar_bt_near_deferred');
+    const h = rvHorizon(hydration, 'basis', calendarRankSeriesId(assetKey || 'BTC'));
     if (!h || !Number.isFinite(h.percentile)) return;
     const target = frontPair || pairs[0];
     pairs.forEach(p => {
@@ -650,6 +688,14 @@
     curveCache = null;
     curveFetchPromise = null;
     forceNextCurveLoad = true;
+    // Chunk 23: also drop Ark curve cache so ensureCurveHistory cannot reuse a warm stale vintage.
+    try {
+      if (typeof getArk()?.invalidateCurveHistory === 'function') {
+        getArk().invalidateCurveHistory();
+      } else if (typeof global.WTM_Ark?.invalidateCurveHistory === 'function') {
+        global.WTM_Ark.invalidateCurveHistory();
+      }
+    } catch (_) { /* ignore */ }
   }
 
   async function reloadHydration(state) {
@@ -699,8 +745,12 @@
         return curveCache;
       }
       try {
-        // Force when cache was invalidated; otherwise reuse Ark cache if warm.
+        // Chunk 23: always force Ark re-fetch when panel cache was invalidated;
+        // also force when Ark has no curve, or when caller set forceNextCurveLoad.
         const needForce = force || !ark.getCurveHistory?.();
+        if (needForce && typeof ark.invalidateCurveHistory === 'function') {
+          ark.invalidateCurveHistory();
+        }
         const result = await ark.loadCurveHistory({ force: needForce });
         if (result && result.ok && result.data) {
           curveCache = result.data;
@@ -744,22 +794,33 @@
     }
   }
 
-  function recordsForRoot(records, root) {
-    return (records || []).filter(r => {
+  function recordsForRoot(records, rootOrRoots) {
+    const roots = Array.isArray(rootOrRoots)
+      ? rootOrRoots.map((r) => String(r || '').toUpperCase()).filter(Boolean)
+      : [String(rootOrRoots || '').toUpperCase()].filter(Boolean);
+    if (!roots.length) return [];
+    // Longer roots first so ETH is preferred over ET prefix collisions if both appear.
+    const ordered = [...roots].sort((a, b) => b.length - a.length);
+    return (records || []).filter((r) => {
       const meta = r.contract_meta || {};
-      return meta.contract_root === root || String(r.raw_symbol || '').startsWith(root);
+      const metaRoot = String(meta.contract_root || '').toUpperCase();
+      const sym = String(r.raw_symbol || '').toUpperCase();
+      return ordered.some((root) => metaRoot === root || sym.startsWith(root));
     });
   }
 
   function buildContracts(records, spot, asOfDate) {
     const asOf = asOfDate ? new Date(asOfDate) : new Date();
+    const asOfMs = asOf.getTime();
     return records.map(r => {
       const parsed = parseCmeSymbol(r.raw_symbol);
       if (!parsed) return null;
       const futuresPrice = Number(r.latest?.close ?? r.points?.[r.points.length - 1]?.close);
       if (!Number.isFinite(futuresPrice) || futuresPrice <= 0) return null;
-      const dte = daysToExpiry(parsed.expiry, asOf);
-      if (dte < 0) return null;
+      // daysBetween floors at 0 — use raw signed days so expired months drop off.
+      const rawDays = Math.round((parsed.expiry.getTime() - asOfMs) / 86400000);
+      if (rawDays < 0) return null;
+      const dte = Math.max(0, rawDays);
       const absBasis = futuresPrice - spot;
       const spotBasisPct = spot > 0 ? (absBasis / spot) * 100 : null;
       const spotAnnualizedCarry = computeSpotAnnualizedCarry(futuresPrice, spot, dte);
@@ -774,21 +835,57 @@
     }).filter(Boolean).sort((a, b) => a.expiry - b.expiry);
   }
 
-  function synthesizeEthCurve(btcContracts, ethSpot, btcSpot) {
-    if (!btcContracts.length || !ethSpot || !btcSpot) return [];
-    const ratio = ethSpot / btcSpot;
-    return btcContracts.map(c => {
-      const futuresPrice = c.futuresPrice * ratio;
+  /**
+   * Build ETH term structure when Barchart ET nodes are missing.
+   * - Prefer re-anchor: front F = S × (1 + ethBasis%/100), deferred follow BTC shape vs front.
+   * - Fallback: pure spot-ratio scale of BTC (same basis % — only when eth basis unavailable).
+   * Symbols use CME/Barchart ET* root (not ETH*).
+   */
+  function synthesizeEthCurve(btcContracts, ethSpot, btcSpot, ethFrontBasisPct) {
+    if (!btcContracts.length || !Number.isFinite(ethSpot) || ethSpot <= 0) return [];
+    const btcFront = btcContracts[0];
+    const btcFrontF = Number(btcFront?.futuresPrice);
+    if (!Number.isFinite(btcFrontF) || btcFrontF <= 0) return [];
+
+    let ethFrontF = null;
+    let mode = 'ratio';
+    if (Number.isFinite(ethFrontBasisPct)) {
+      ethFrontF = ethSpot * (1 + ethFrontBasisPct / 100);
+      mode = 'basis_reanchor';
+    } else if (Number.isFinite(btcSpot) && btcSpot > 0) {
+      ethFrontF = btcFrontF * (ethSpot / btcSpot);
+      mode = 'ratio';
+    } else {
+      return [];
+    }
+
+    return btcContracts.map((c) => {
+      const btcF = Number(c.futuresPrice);
+      const futuresPrice = mode === 'basis_reanchor'
+        ? ethFrontF * (btcF / btcFrontF)
+        : btcF * (ethSpot / btcSpot);
       const absBasis = futuresPrice - ethSpot;
       const spotBasisPct = (absBasis / ethSpot) * 100;
       const spotAnnualizedCarry = computeSpotAnnualizedCarry(futuresPrice, ethSpot, c.dte);
+      const etSymbol = String(c.symbol || '').replace(/^BT/i, 'ET');
       return {
-        ...c, symbol: c.symbol.replace(/^BT/, 'ETH'),
+        ...c,
+        symbol: etSymbol,
         label: c.label,
-        futuresPrice, spotPrice: ethSpot, price: futuresPrice,
-        absBasis, spotBasisPct, pctBasis: spotBasisPct,
-        spotAnnualizedCarry, annBasis: spotAnnualizedCarry,
+        futuresPrice,
+        spotPrice: ethSpot,
+        price: futuresPrice,
+        absBasis,
+        spotBasisPct,
+        pctBasis: spotBasisPct,
+        spotAnnualizedCarry,
+        annBasis: spotAnnualizedCarry,
         synthetic: true,
+        syntheticMode: mode,
+        historySymbol: btcCounterpartSymbol(etSymbol),
+        historySpotResolver: Number.isFinite(btcSpot) && btcSpot > 0
+          ? () => btcSpot
+          : null,
       };
     });
   }
@@ -857,6 +954,109 @@
     return pairs.map(p => p.forwardAnnualizedYield).filter(Number.isFinite);
   }
 
+  /**
+   * Resolve contracts for one asset: real curve nodes when present, else ETH synthetic.
+   */
+  function resolveAssetContracts(state, curveData, assetKey, valuation) {
+    const asset = ASSETS[assetKey] || ASSETS.BTC;
+    const records = curveData?.records || [];
+    const spot = valuation.spotForBasis;
+    const asOf = valuation.asOfDate;
+    const roots = asset.roots || [asset.root];
+
+    let contracts = buildContracts(recordsForRoot(records, roots), spot, asOf)
+      .filter((c) => Number.isFinite(c.dte) && c.dte >= 0);
+    let synthetic = false;
+
+    // Real ET nodes present — use them (no BTC clone).
+    if (assetKey === 'ETH' && contracts.length) {
+      return { contracts, synthetic: false, btcSpot: null };
+    }
+
+    if (assetKey === 'ETH') {
+      const btcVal = resolveBasisValuation(state, curveData, 'BTC');
+      const btcContracts = buildContracts(
+        recordsForRoot(records, 'BT'),
+        btcVal.spotForBasis,
+        btcVal.asOfDate
+      ).filter((c) => Number.isFinite(c.dte) && c.dte >= 0);
+      if (btcContracts.length && Number.isFinite(spot) && spot > 0) {
+        const ethBasisPct = Number.isFinite(valuation.hydrationBasisPct)
+          ? valuation.hydrationBasisPct
+          : null;
+        contracts = synthesizeEthCurve(
+          btcContracts,
+          spot,
+          btcVal.spotForBasis,
+          ethBasisPct
+        );
+        synthetic = true;
+        return { contracts, synthetic, btcSpot: btcVal.spotForBasis };
+      }
+    }
+
+    return { contracts, synthetic, btcSpot: null };
+  }
+
+  function enrichContractsForAsset(contracts, curveData, spot, synthetic, btcSpot) {
+    const analytics = A();
+    if (!analytics) return contracts;
+    const rows = (contracts || []).map((c) => {
+      if (!synthetic) return c;
+      return {
+        ...c,
+        historySymbol: c.historySymbol || btcCounterpartSymbol(c.symbol),
+        historySpotResolver: c.historySpotResolver
+          || (Number.isFinite(btcSpot) && btcSpot > 0 ? () => btcSpot : null),
+      };
+    });
+    // History resolver uses BTC spot for synthetic ETH; current basis stays F/S on ETH.
+    const historySpot = synthetic && Number.isFinite(btcSpot) ? btcSpot : spot;
+    return analytics.enrichContractRows(rows, curveData || { records: [] }, historySpot);
+  }
+
+  /**
+   * Chunk 19/25 — single-asset board for dual BTC|ETH curve table.
+   * Active contracts only (dte ≥ 0), max DUAL_CURVE_MAX, F/S basis (no hydration clobber).
+   */
+  function buildAssetBoard(state, curveData, assetKey) {
+    const asset = ASSETS[assetKey] || ASSETS.BTC;
+    const valuation = resolveBasisValuation(state, curveData, assetKey);
+    const spot = valuation.spotForBasis;
+    const resolved = resolveAssetContracts(state, curveData, assetKey, valuation);
+    let contracts = resolved.contracts
+      .filter((c) => Number.isFinite(c.dte) && c.dte >= 0)
+      .slice(0, DUAL_CURVE_MAX);
+    contracts = enrichContractsForAsset(
+      contracts,
+      curveData,
+      spot,
+      resolved.synthetic,
+      resolved.btcSpot
+    );
+
+    const front = pickFrontContract(contracts, 'nearest', '');
+    return {
+      assetKey,
+      asset,
+      spot: Number.isFinite(spot) ? spot : null,
+      spotSource: valuation.spotSource,
+      synthetic: resolved.synthetic,
+      front,
+      contracts,
+      valuationDate: valuation.valuationDate,
+      curveQuoteDate: valuation.curveQuoteDate,
+      curveStale: !!valuation.curveStale,
+    };
+  }
+
+  function buildDualCurveBoards(state, curveData) {
+    return {
+      btc: buildAssetBoard(state, curveData, 'BTC'),
+      eth: buildAssetBoard(state, curveData, 'ETH'),
+    };
+  }
+
   function crossAssetStrip(records) {
     return CROSS_ASSET_ROOTS.map(spec => {
       const recs = recordsForRoot(records, spec.root);
@@ -885,22 +1085,23 @@
 
     const valuation = resolveBasisValuation(state, curveData, assetKey);
     const spot = valuation.spotForBasis;
-    const asOf = valuation.asOfDate;
     const koyfinSpot = valuation.koyfinSpot;
 
-    let contracts = buildContracts(recordsForRoot(records, asset.root), spot, asOf);
+    const resolved = resolveAssetContracts(state, curveData, assetKey, valuation);
+    let contracts = resolved.contracts
+      .filter((c) => Number.isFinite(c.dte) && c.dte >= 0);
     let dataNote = valuation.dataNote || '';
-    let syntheticCurve = false;
+    let syntheticCurve = resolved.synthetic;
 
-    if (assetKey === 'ETH') {
-      const btcVal = resolveBasisValuation(state, curveData, 'BTC');
-      const btcContracts = buildContracts(recordsForRoot(records, 'BT'), btcVal.spotForBasis, btcVal.asOfDate);
-      if (btcContracts.length && Number.isFinite(spot) && spot > 0 && Number.isFinite(btcVal.spotForBasis)) {
-        contracts = synthesizeEthCurve(btcContracts, spot, btcVal.spotForBasis);
-        syntheticCurve = true;
-        if (!dataNote) {
-          dataNote = `ETH curve proxied from BTC futures · basis from Barchart ${basisSpotSeriesId('ETH')}`;
-        }
+    if (syntheticCurve && assetKey === 'ETH') {
+      const mode = contracts[0]?.syntheticMode || 'ratio';
+      const modeBit = mode === 'basis_reanchor'
+        ? `ETH front re-anchored to ${basisSpotSeriesId('ETH')}`
+        : 'ETH shape from BTC ratio (no eth basis)';
+      if (!dataNote) {
+        dataNote = `ETH curve synthetic (ET*) · ${modeBit} · Ark ETH spot`;
+      } else if (!String(dataNote).includes('ETH')) {
+        dataNote = `${dataNote} · ${modeBit}`;
       }
     }
 
@@ -918,22 +1119,29 @@
 
     const rollLogic = prefs.rollLogic || 'nearest';
     let front = pickFrontContract(contracts, rollLogic, state.btcL3?.nearMonth || '');
-    // Align front basis/ann to Ark hydration series (not raw stale curve vs wrong spot).
+    // Metadata only — basis stays F/S (Chunk 19).
     front = applyHydrationFrontBasis(contracts, front, valuation);
     let calendarPairs = buildCalendarPairs(contracts);
 
     global._bwHydrationRef = state.hydration;
     const analytics = A();
     if (analytics) {
-      contracts = analytics.enrichContractRows(contracts, curveData || { records }, spot);
+      contracts = enrichContractsForAsset(
+        contracts,
+        curveData,
+        spot,
+        syntheticCurve,
+        resolved.btcSpot
+      );
       calendarPairs = analytics.enrichCalendarPairs(calendarPairs, curveData || { records });
-      // Re-apply after analytics so history enrich does not clobber Ark front basis.
       front = applyHydrationFrontBasis(contracts, front, valuation);
-      applyHydrationQuartileFallback(contracts, front, state.hydration);
+      applyHydrationQuartileFallback(contracts, front, state.hydration, assetKey);
       const steepestPair = steepestCalendar(calendarPairs);
-      applyHydrationForwardFallback(calendarPairs, steepestPair, state.hydration);
+      applyHydrationForwardFallback(calendarPairs, steepestPair, state.hydration, assetKey);
       front = contracts.find(c => c.symbol === front?.symbol) || front;
     }
+
+    const dualBoards = buildDualCurveBoards(state, curveData);
 
     const richestByAnn = richestTenor(contracts);
     const richest = analytics?.richestTenorByBasisRank(contracts) || richestByAnn;
@@ -974,12 +1182,12 @@
       quoteGapDays: valuation.gap,
       curveStale: !!valuation.curveStale,
       hydrationBasisPct: valuation.hydrationBasisPct,
-      frontBasisPct: Number.isFinite(valuation.hydrationBasisPct)
-        ? valuation.hydrationBasisPct
-        : (front?.spotBasisPct ?? null),
+      // Chunk 19: front basis is always futures vs spot (not RV series).
+      frontBasisPct: front?.spotBasisPct ?? null,
       frontAnnCarry: front?.spotAnnualizedCarry ?? null,
       refFutureSymbol: valuation.refFutureSymbol || null,
       syntheticCurve,
+      dualBoards,
       contracts, front, calendarPairs, forwards: calendarPairs,
       spotCurve: spotCurveVector(contracts), forwardCurve: forwardCurveVector(calendarPairs),
       cross: crossAssetStrip(records), crossPeers,
@@ -1026,7 +1234,7 @@
     return `
       <div class="bw-card"><span class="bw-card-label">${model.asset.label} spot${model.spotSource === 'ark_koyfin' ? ' · Ark Koyfin' : (model.spotSource?.includes('implied') ? ' · basis-implied' : (model.spotSource?.includes('barchart') ? ' · Barchart' : ' · desk'))}${model.syntheticCurve ? ' · BTC curve' : ''}</span><strong class="bw-card-value">${spot > 0 ? '$' + fmtNum(spot, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${Number.isFinite(model.spotDesk) && model.spotDesk !== spot ? `Sleeve $${fmtNum(model.spotDesk, 0)} · ` : ''}${Number.isFinite(model.spotChg) ? fmtPct(model.spotChg) + ' 1d' : (model.hydrationAsOf || model.curveQuoteDate || unavailSpan('na'))}</span></div>
       <div class="bw-card"><span class="bw-card-label">Front basis ($)</span><strong class="bw-card-value bw-card-value--secondary">${front ? '$' + fmtNum(front.absBasis, 0) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${front ? front.symbol + ' · ' + front.dte + 'd' : unavailSpan('awaiting')}</span></div>
-      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${Number.isFinite(frontBasisPct) ? fmtPct(frontBasisPct) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${Number.isFinite(model.hydrationBasisPct) ? 'Barchart spot vs 1m · ' : ''}${front ? interpretationFromPercentile(front.basisPercentile) : unavailSpan('awaiting')}</span></div>
+      <div class="bw-card${hi}"><span class="bw-card-label">Front basis % vs spot <button type="button" class="bw-tip" data-bw-tip="basisPct" aria-label="Basis % definition">?</button></span><strong class="bw-card-value bw-card-value--primary">${Number.isFinite(frontBasisPct) ? fmtPct(frontBasisPct) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${front ? 'F/S · ' + interpretationFromPercentile(front.basisPercentile) : unavailSpan('awaiting')}</span></div>
       <div class="bw-card${hi}"><span class="bw-card-label">Basis % rank <button type="button" class="bw-tip" data-bw-tip="quartileRank" aria-label="Quartile rank">?</button></span><strong class="bw-card-value">${front?.basisQuartile ? 'Q' + front.basisQuartile : unavailSpan('na')}</strong><span class="bw-card-meta">${rankMeta}</span></div>
       <div class="bw-card"><span class="bw-card-label">Spot curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="annBasis" aria-label="Annualized basis">?</button></span><strong class="bw-card-value">${front ? fmtPct(front.spotAnnualizedCarry) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.spotCurve.length ? vectorSummary(model.spotCurve) : unavailSpan('awaiting')}</span></div>
       <div class="bw-card"><span class="bw-card-label">Forward curve % (ann.) <button type="button" class="bw-tip" data-bw-tip="forwardCurve" aria-label="Forward curve">?</button></span><strong class="bw-card-value">${model.steepest ? fmtPct(model.steepest.forwardAnnualizedYield) : unavailSpan('awaiting')}</strong><span class="bw-card-meta">${model.forwardCurve.length ? vectorSummary(model.forwardCurve) : unavailSpan('awaiting')}</span></div>`;
@@ -1073,6 +1281,98 @@
   function histRangeCell(c) {
     if (!c.basisStats || c.basisStats.n < 2) return unavailSpan('awaiting');
     return `${fmtPct(c.histQ1, 2)} / ${fmtPct(c.histMedian, 2)} / ${fmtPct(c.histQ3, 2)}`;
+  }
+
+  /** Highlight extreme basis rows on the dual board (rich/cheap ann or wide simple basis). */
+  function dualRowExtremeClass(c) {
+    const ann = Number(c.spotAnnualizedCarry);
+    const pct = Number(c.spotBasisPct);
+    if (Number.isFinite(ann) && Math.abs(ann) >= 12) return 'bw-dual-row--extreme';
+    if (Number.isFinite(pct) && Math.abs(pct) >= 2) return 'bw-dual-row--extreme';
+    return '';
+  }
+
+  function renderDualBoardColumn(board) {
+    if (!board) {
+      return `<div class="bw-dual-col"><p class="bw-dual-empty">Awaiting curve</p></div>`;
+    }
+    const label = board.asset?.label || board.assetKey || '—';
+    const spotTxt = Number.isFinite(board.spot) ? `$${fmtNum(board.spot, 0)}` : unavailSpan('awaiting');
+    const srcBit = board.spotSource === 'ark_koyfin'
+      ? 'Ark Koyfin'
+      : (board.synthetic ? 'synthetic curve' : (board.spotSource || 'Ark'));
+    const frontSym = board.front?.symbol || '—';
+
+    if (!board.contracts?.length) {
+      return `<div class="bw-dual-col" data-asset="${escapeHtml(board.assetKey)}">
+        <header class="bw-dual-col-head">
+          <div class="bw-dual-col-title">${escapeHtml(board.assetKey)} · ${escapeHtml(label)}</div>
+          <div class="bw-dual-spot"><span class="bw-dual-spot-label">Spot</span><strong class="bw-dual-spot-val">${spotTxt}</strong></div>
+          <div class="bw-dual-col-meta">${escapeHtml(srcBit)}</div>
+        </header>
+        <p class="bw-dual-empty">No active futures tenors</p>
+      </div>`;
+    }
+
+    const rows = board.contracts.map((c) => {
+      const isFront = board.front && c.symbol === board.front.symbol;
+      const extreme = dualRowExtremeClass(c);
+      const rank = Number.isFinite(c.basisPercentile)
+        ? fmtPercentile(c.basisPercentile)
+        : (c.basisQuartile ? `Q${c.basisQuartile}` : unavailSpan('na'));
+      const qTitle = c.quoteDate ? ` title="Futures quote ${escapeHtml(c.quoteDate)}"` : '';
+      return `<tr class="${isFront ? 'bw-row-front ' : ''}${extreme}">
+        <td class="bw-dual-sym">${escapeHtml(c.symbol)}${c.synthetic ? ' <span class="bw-dual-syn" title="Synthetic ET curve: front re-anchored to eth_basis_spot_1m, shape from BTC">*</span>' : ''}</td>
+        <td>${escapeHtml(c.label || '')}</td>
+        <td class="bw-num">${c.dte}d</td>
+        <td class="bw-num"${qTitle}>$${fmtNumDisplay(c.futuresPrice, 0)}</td>
+        <td class="bw-num ${Number(c.absBasis) < 0 ? 'bw-heat--cold' : (Number(c.absBasis) > 0 ? 'bw-heat--flat' : '')}">$${fmtNumDisplay(c.absBasis, 0)}</td>
+        <td class="bw-num bw-col-primary ${c.basisHeatClass || heatClass(c.spotBasisPct)}"><strong>${fmtPctDisplay(c.spotBasisPct)}</strong></td>
+        <td class="bw-num ${heatClass(c.spotAnnualizedCarry)}">${fmtPctDisplay(c.spotAnnualizedCarry)}</td>
+        <td class="bw-num">${rank}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="bw-dual-col" data-asset="${escapeHtml(board.assetKey)}">
+      <header class="bw-dual-col-head">
+        <div class="bw-dual-col-title">${escapeHtml(board.assetKey)} · ${escapeHtml(label)}</div>
+        <div class="bw-dual-spot">
+          <span class="bw-dual-spot-label">Spot</span>
+          <strong class="bw-dual-spot-val">${spotTxt}</strong>
+          <span class="bw-dual-col-meta">${escapeHtml(srcBit)}${board.synthetic ? ' · BTC shape' : ''} · front ${escapeHtml(frontSym)}</span>
+        </div>
+      </header>
+      <div class="bw-table-wrap bw-dual-table-wrap">
+        <table class="bw-table bw-table--compact bw-dual-table">
+          <thead>
+            <tr>
+              <th>Contract</th><th>Expiry</th><th>DTE</th><th>Futures Price</th>
+              <th>Basis ($)</th><th>Basis %</th><th>Annualized %</th><th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  function renderDualCurveSection(model) {
+    const boards = model.dualBoards || {};
+    const btc = boards.btc;
+    const eth = boards.eth;
+    const staleNote = (btc?.curveStale || eth?.curveStale)
+      ? '<span class="bw-dual-stale">Curve quotes lag Ark spot — basis is still (F−S)/S on published nodes</span>'
+      : '';
+    return `<section class="bw-dual-curve" id="bwDualCurveInner" aria-label="BTC and ETH basis curve table">
+      <div class="bw-dual-head">
+        <h4 class="bw-subhead bw-dual-title">Enhanced basis curve · BTC | ETH</h4>
+        <p class="bw-methodology-inline">Next ${DUAL_CURVE_MAX} active contracts · Basis % = (F−S)/S · Ann. = ((F/S)−1)×(365/DTE) · Ark spot + curve via The Ark ${staleNote}</p>
+      </div>
+      <div class="bw-dual-grid">
+        ${renderDualBoardColumn(btc)}
+        ${renderDualBoardColumn(eth)}
+      </div>
+    </section>`;
   }
 
   function renderBasisTable(model) {
@@ -1130,7 +1430,7 @@
   function renderCrossAsset(model) {
     const front = model.front;
     const cal = model.frontCalendar || model.steepest;
-    const asOf = String(model.asOf || '').slice(0, 19).replace('T', ' ');
+    const asOf = formatLocalStamp(model.asOf, '');
     const anchor = `
       <article class="bw-xasset-card bw-xasset-card--anchor">
         <div class="bw-xasset-card-top">
@@ -1188,7 +1488,7 @@
     return `<section class="bw-xasset" aria-label="Cross-asset basis context">
       <header class="bw-xasset-head">
         <h4 class="bw-xasset-title">Cross-asset basis</h4>
-        <span class="bw-xasset-asof">${asOf ? 'As of ' + asOf + ' UTC' : ''}</span>
+        <span class="bw-xasset-asof">${asOf ? 'As of ' + asOf : ''}</span>
         <button type="button" class="bw-tip" data-bw-tip="crossAssetContext" aria-label="Cross-asset context">?</button>
       </header>
       ${anchor}
@@ -1456,8 +1756,14 @@
     if (!canvas) return;
     const theme = getChartTheme();
     const legend = el('bwChartLegend');
+    // Tag canvas with active asset so switch BTC↔ETH always invalidates paint path.
+    const paintKey = `${model.assetKey || 'BTC'}|${model.view || 'basis'}|${model.front?.symbol || ''}|${model.contracts?.length || 0}`;
+    canvas.dataset.bwPaintKey = paintKey;
+    canvas.setAttribute('aria-label', `${model.assetKey || 'BTC'} futures curve vs spot`);
 
     const paint = () => {
+      // Drop stale frames if asset/view changed mid-rAF.
+      if (canvas.dataset.bwPaintKey !== paintKey) return;
       const rect = canvas.getBoundingClientRect();
       if (rect.width < 8) {
         requestAnimationFrame(paint);
@@ -1472,18 +1778,19 @@
       canvas.style.height = `${h}px`;
       const ctx = canvas.getContext('2d');
       ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, w, h);
       ctx.scale(dpr, dpr);
       paintBasisChart(ctx, w, h, model, theme);
       if (legend) {
         if (model.view === 'implied') {
           legend.innerHTML = `
-            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-curve)"></i>Spot curve % (ann.)</span>
-            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-front)"></i>Forward curve % (ann.)</span>`;
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-curve)"></i>${model.assetKey} spot curve % (ann.)</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-front)"></i>${model.assetKey} forward curve % (ann.)</span>`;
         } else {
           legend.innerHTML = `
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>${model.assetKey} spot (CF proxy)</span>
-            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>Futures curve</span>
-            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front contract</span>`;
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>${model.assetKey} futures curve</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front ${model.front?.symbol || 'contract'}</span>`;
         }
       }
     };
@@ -1608,11 +1915,11 @@
         const hyd = model.hydrationAsOf || model.hydrationDate;
         const fut = model.curveQuoteDate || model.asOf;
         if (hyd && fut && String(hyd).slice(0, 10) !== String(fut).slice(0, 10)) {
-          note.textContent = `Hydration ${String(hyd).slice(0, 10)} · Futures quote ${String(fut).slice(0, 10)}`;
+          note.textContent = `Hydration ${formatLocalStamp(hyd)} · Futures quote ${formatLocalStamp(fut)}`;
         } else if (hyd) {
-          note.textContent = `Hydration ${String(hyd).slice(0, 19)}`;
+          note.textContent = `Hydration ${formatLocalStamp(hyd)}`;
         } else {
-          note.textContent = `As of ${String(model.asOf).slice(0, 19)}`;
+          note.textContent = `As of ${formatLocalStamp(model.asOf)}`;
         }
       } else {
         note.textContent = '';
@@ -1658,11 +1965,19 @@
   }
 
   function renderPanelHeavy(state, model) {
+    // Chunk 19 — dual BTC|ETH curve board sits below the chart mount.
+    const dualHost = el('bwDualCurveTable');
+    if (dualHost) {
+      dualHost.innerHTML = renderDualCurveSection(model);
+      dualHost.hidden = false;
+    }
+
     const main = el('bwMainView');
     if (main) {
+      const dualInline = dualHost ? '' : renderDualCurveSection(model);
       main.innerHTML = model.view === 'implied'
-        ? renderImpliedTable(model)
-        : `${renderHeatmap(model)}${renderBasisTable(model)}`;
+        ? `${dualInline}${renderImpliedTable(model)}`
+        : `${dualInline}${renderHeatmap(model)}${renderBasisTable(model)}`;
     }
 
     const methodology = el('bwMethodology');
@@ -1871,7 +2186,10 @@
       btn.addEventListener('click', () => {
         const s = getState();
         s.basisWatch = s.basisWatch || {};
-        s.basisWatch.asset = btn.dataset.bwAsset || 'BTC';
+        const nextAsset = (btn.getAttribute('data-bw-asset') || btn.dataset.bwAsset || 'BTC').toUpperCase();
+        s.basisWatch.asset = nextAsset === 'ETH' ? 'ETH' : 'BTC';
+        // Drop cached model so chart/table rebuild from the selected asset immediately.
+        s._basisWatchModel = null;
         savePrefs({ asset: s.basisWatch.asset, view: s.basisWatch.view, rollLogic: s.basisWatch.rollLogic, mode: s.basisWatch.mode });
         refresh(s, hooks);
         markDirty();
@@ -2023,8 +2341,9 @@
     init, initStandalone, getState, render: renderPanel, refresh, reloadCurve, reloadHydration,
     invalidateCurveCache, exportCsv, exportPng,
     buildModel, buildContracts, buildCalendarPairs, computeSpotAnnualizedCarry, resolveBasisValuation,
+    buildAssetBoard, buildDualCurveBoards, renderDualCurveSection,
     hydrationBasisSpot, ensureCurveHistory,
-    popOutUrl, applyTheme, runBasisWatchValidation, DESK_LINKS, BW_BUILD, MIN_ANN_DTE,
+    popOutUrl, applyTheme, runBasisWatchValidation, DESK_LINKS, BW_BUILD, MIN_ANN_DTE, DUAL_CURVE_MAX,
   };
 
   if (document.body?.dataset?.bwLayout === 'standalone') {

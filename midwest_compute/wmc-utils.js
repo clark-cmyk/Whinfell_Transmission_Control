@@ -43,9 +43,15 @@ WMC.Utils = {
   },
 
   liveDateString() {
+    if (typeof window.WTM_formatLocalStamp === 'function') {
+      return window.WTM_formatLocalStamp(new Date());
+    }
     const now = new Date();
-    const opts = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return now.toLocaleString('en-US', opts) + ' CT';
+    const opts = {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
+    };
+    return now.toLocaleString('en-US', opts);
   },
 
   drawSparkline(canvas) {

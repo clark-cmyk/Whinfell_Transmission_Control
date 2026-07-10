@@ -52,11 +52,16 @@ else
   echo "WARN: hydration copy failed" >&2
 fi
 
-if bash "$SCRIPT_DIR/copy_barchart_curve_bundle.sh"; then
+# Chunk 22 — rebuild curve from latest Barchart watchlist in drop (permanent path).
+# Prefer live watchlist overlay; fall back to Cousins copy if no CSV yet.
+if python3 "$ROOT/scripts/refresh_barchart_curve_from_watchlist.py"; then
+  CURVE_OK=1
+  echo "curve_watchlist_refresh_ok"
+elif bash "$SCRIPT_DIR/copy_barchart_curve_bundle.sh"; then
   CURVE_OK=1
   echo "curve_copy_ok"
 else
-  echo "WARN: barchart curve copy failed" >&2
+  echo "WARN: barchart curve refresh failed (no watchlist CSV and Cousins copy missing)" >&2
 fi
 
 # Mirror docs → dist only when hydration publish succeeded (enriched preferred).

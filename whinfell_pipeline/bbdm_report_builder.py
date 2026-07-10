@@ -171,15 +171,28 @@ def build_inspection(
 def build_v2_summary(trades: list[dict[str, Any]]) -> dict[str, Any]:
     """Aggregate v2 summary block from sorted trade dicts."""
     bucket_counts = {bucket: 0 for bucket in SIZING_BUCKETS}
+    verdict_counts: dict[str, int] = {
+        "BANG": 0,
+        "WATCH": 0,
+        "PASS": 0,
+        "BLOCKED": 0,
+        "DATA_GAP": 0,
+    }
     for trade in trades:
         bucket = (trade.get("recommendation") or {}).get("sizing_bucket", "DATA_GAP")
         if bucket in bucket_counts:
             bucket_counts[bucket] += 1
+        verdict = str(trade.get("verdict") or "PASS").upper()
+        if verdict in verdict_counts:
+            verdict_counts[verdict] += 1
+        else:
+            verdict_counts["PASS"] += 1
 
     top = trades[0] if trades else None
     return {
         "trade_count": len(trades),
         "bucket_counts": bucket_counts,
+        "verdict_counts": verdict_counts,
         "top_signal": top.get("id") if top else None,
         "top_z": top.get("z_score") if top else None,
         "top_sizing_bucket": (top.get("recommendation") or {}).get("sizing_bucket") if top else None,

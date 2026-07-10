@@ -4,11 +4,16 @@
 (function deskDataOps(global) {
   'use strict';
 
-  const BUILD = '1.3-DESK-OPS-ARK-STAMP-2026-07-09';
+  const BUILD = '1.5-DESK-OPS-CHUNK23-CURVE-FORCE-2026-07-09';
   const REFRESH_BTN_ID = 'btnDeskRefresh';
   const COLLECT_BTN_ID = 'btnMorningCollect';
+  /** Local collect agent ports — Chunk 23 probes for curve-capable agent. */
+  const AGENT_PORTS = [8767, 8768, 8769];
+  const AGENT_DEFAULT = 'http://127.0.0.1:8767';
 
   let refreshBusy = false;
+  /** @type {string|null} */
+  let resolvedAgentBase = null;
 
   /** Standalone tools (BasisWatch) keep state off appState — resolve via WTM_BasisWatch.getState(). */
   function resolveDeskState() {
@@ -29,6 +34,33 @@
     else console.log('[DeskOps]', msg);
   }
 
+  /**
+   * Chunk 23 — prefer an agent that exposes /v1/curve/* (skip stale Desktop v0.1.0 on :8767).
+   */
+  async function resolveAgentBase(force) {
+    if (!force && resolvedAgentBase) return resolvedAgentBase;
+    for (let i = 0; i < AGENT_PORTS.length; i += 1) {
+      const base = `http://127.0.0.1:${AGENT_PORTS[i]}`;
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 1800);
+        const healthRes = await fetch(`${base}/health`, { cache: 'no-store', signal: ctrl.signal });
+        clearTimeout(t);
+        if (!healthRes.ok) continue;
+        const health = await healthRes.json().catch(() => ({}));
+        if (!health?.ok) continue;
+        const cs = await fetch(`${base}/v1/curve/status`, { cache: 'no-store' });
+        const body = await cs.json().catch(() => ({}));
+        if (cs.ok && body && body.error !== 'not_found' && (body.ok === true || body.path || body.BTN26)) {
+          resolvedAgentBase = base;
+          return base;
+        }
+      } catch (_) { /* next */ }
+    }
+    resolvedAgentBase = AGENT_DEFAULT;
+    return resolvedAgentBase;
+  }
+
   function setButtonBusy(btn, on, busyLabel) {
     if (!btn) return;
     if (!btn.dataset.deskOpsLabel) btn.dataset.deskOpsLabel = btn.textContent || '';
@@ -39,6 +71,62 @@
     else if (!on) btn.textContent = btn.dataset.deskOpsLabel;
   }
 
+  /**
+   * Chunk 22 — rebuild barchart_curve_history.json from latest watchlist via collect agent.
+   * Safe no-op if agent offline (caller still reloads existing JSON via Ark).
+   */
+  async function rebuildCurveFromWatchlist() {
+    try {
+      const base = await resolveAgentBase(true);
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 12000);
+      const res = await fetch(`${base}/v1/curve/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        return {
+          ok: true,
+          BTN26_close: data.BTN26_close,
+          max_quote_date: data.max_quote_date,
+          as_of: data.as_of,
+          source_csv: data.source_csv,
+          agent: base,
+        };
+      }
+      // Retry other ports if this one is stale.
+      if (res.status === 404) {
+        resolvedAgentBase = null;
+        const again = await resolveAgentBase(true);
+        if (again !== base) {
+          const res2 = await fetch(`${again}/v1/curve/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}',
+          });
+          const data2 = await res2.json().catch(() => ({}));
+          if (res2.ok && data2.ok) {
+            return {
+              ok: true,
+              BTN26_close: data2.BTN26_close,
+              max_quote_date: data2.max_quote_date,
+              as_of: data2.as_of,
+              source_csv: data2.source_csv,
+              agent: again,
+            };
+          }
+        }
+      }
+      return { ok: false, error: data.error || `http_${res.status}` };
+    } catch (err) {
+      return { ok: false, error: err?.message || 'agent_offline', offline: true };
+    }
+  }
+
   async function refreshBasisWatch() {
     if (!global.WTM_BasisWatch) return false;
     const state = resolveDeskState();
@@ -46,12 +134,19 @@
       renderAll: typeof global.renderAll === 'function' ? global.renderAll : undefined,
     };
     try {
-      if (typeof global.WTM_BasisWatch.reloadCurve === 'function') {
-        await global.WTM_BasisWatch.reloadCurve(state, hooks);
-        return true;
+      // Chunk 23: drop Ark + panel caches, then force re-fetch newest JSON.
+      if (typeof global.WTM_Ark?.invalidateCurveHistory === 'function') {
+        global.WTM_Ark.invalidateCurveHistory();
+      }
+      if (typeof global.WTM_Ark?.loadCurveHistory === 'function') {
+        await global.WTM_Ark.loadCurveHistory({ force: true });
       }
       if (typeof global.WTM_BasisWatch.invalidateCurveCache === 'function') {
         global.WTM_BasisWatch.invalidateCurveCache();
+      }
+      if (typeof global.WTM_BasisWatch.reloadCurve === 'function') {
+        await global.WTM_BasisWatch.reloadCurve(state, hooks);
+        return true;
       }
       if (typeof global.WTM_BasisWatch.refresh === 'function') {
         await global.WTM_BasisWatch.refresh(state, hooks);
@@ -214,6 +309,7 @@
     const results = {
       hydration: false,
       curve: false,
+      curveRebuild: null,
       wmc: false,
       surfaces: false,
       as_of: null,
@@ -228,6 +324,9 @@
       results.as_of = arkStamp.as_of || hyd?.as_of || null;
       results.snapshot_id = arkStamp.snapshot_id || hyd?.snapshot_id || null;
       results.freshness_status = arkStamp.freshness_status || hyd?.freshness_status || null;
+
+      // Chunk 22: rebuild curve JSON from latest watchlist before Ark reloads it.
+      results.curveRebuild = await rebuildCurveFromWatchlist();
       results.curve = await refreshBasisWatch();
       results.wmc = await refreshWmc();
       results.surfaces = refreshToolSurfaces();
@@ -244,16 +343,31 @@
       results.freshness_status = finalStamp.freshness_status;
 
       const any = results.hydration || results.curve || results.wmc || results.surfaces;
+      const asOfLabel = results.as_of
+        ? (typeof global.WTM_formatLocalStamp === 'function'
+          ? global.WTM_formatLocalStamp(results.as_of)
+          : results.as_of)
+        : '';
       const stampBit = results.snapshot_id
-        ? ` · ${results.snapshot_id}${results.as_of ? ` @ ${results.as_of}` : ''}`
+        ? ` · ${results.snapshot_id}${asOfLabel ? ` @ ${asOfLabel}` : ''}`
+        : '';
+      const btnBit = results.curveRebuild?.ok && results.curveRebuild.BTN26_close != null
+        ? ` · BTN26 $${Number(results.curveRebuild.BTN26_close).toLocaleString('en-US')}`
         : '';
       if (!options.silent) {
         if (results.hydration && results.curve) {
-          notify(`Desk data refreshed — hydration + BasisWatch curve${stampBit}`);
+          notify(`Desk data refreshed — hydration + BasisWatch curve${btnBit}${stampBit}`);
         } else if (any) {
-          notify(`Desk data refreshed — partial${stampBit} (some panels may need publish/collect)`);
+          notify(`Desk data refreshed — partial${btnBit}${stampBit} (some panels may need publish/collect)`);
         } else {
           notify('Refresh complete — no live data paths (check hydration / curve JSON)');
+        }
+        if (results.curveRebuild && !results.curveRebuild.ok) {
+          if (results.curveRebuild.offline) {
+            notify('Curve rebuild skipped — run: bash scripts/ensure_collect_agent.sh');
+          } else {
+            notify(`Curve rebuild note: ${results.curveRebuild.error || 'failed'}`);
+          }
         }
       }
       return { ok: any, results };
@@ -322,9 +436,13 @@
     BUILD,
     REFRESH_BTN_ID,
     COLLECT_BTN_ID,
+    AGENT_DEFAULT,
+    AGENT_PORTS,
+    resolveAgentBase,
     resolveDeskState,
     stampFromArk,
     warmArkHydration,
+    rebuildCurveFromWatchlist,
     refreshAllDeskData,
     triggerDeskRefresh,
     refreshBasisWatch,

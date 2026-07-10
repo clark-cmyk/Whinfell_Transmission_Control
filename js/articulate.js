@@ -173,7 +173,11 @@
         );
       }
       if (model.hydrationAsOf || model.asOf) {
-        lines.push(`As of: ${model.hydrationAsOf || model.asOf}`);
+        const rawAsOf = model.hydrationAsOf || model.asOf;
+        const asOf = typeof global.WTM_formatLocalStamp === 'function'
+          ? global.WTM_formatLocalStamp(rawAsOf)
+          : rawAsOf;
+        lines.push(`As of: ${asOf}`);
       }
       if (model.dataNote) lines.push(`Note: ${model.dataNote}`);
       // Top few contracts for mental math
@@ -213,7 +217,9 @@
     const trades = Array.isArray(r.trades) ? r.trades : [];
     const lines = [];
 
-    lines.push(`Report as_of: ${r.as_of || '—'}`);
+    lines.push(`Report as_of: ${r.as_of
+      ? (typeof global.WTM_formatLocalStamp === 'function' ? global.WTM_formatLocalStamp(r.as_of) : r.as_of)
+      : '—'}`);
     lines.push(`Window days: ${r.window_days ?? '—'}`);
     lines.push(
       `Verdicts: BANG=${vc.BANG || 0} WATCH=${vc.WATCH || 0} `
@@ -239,8 +245,11 @@
 
     if (r._hydrationMeta) {
       const h = r._hydrationMeta;
+      const hAsOf = h.as_of
+        ? (typeof global.WTM_formatLocalStamp === 'function' ? global.WTM_formatLocalStamp(h.as_of) : h.as_of)
+        : '—';
       lines.push(
-        `Hydration meta: as_of=${h.as_of || '—'} snapshot=${h.snapshot_id || '—'} `
+        `Hydration meta: as_of=${hAsOf} snapshot=${h.snapshot_id || '—'} `
         + `freshness=${h.freshness_status || '—'} score=${h.score ?? '—'}`
       );
     }

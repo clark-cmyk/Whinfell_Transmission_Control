@@ -443,6 +443,8 @@ window.DICTIONARY_BADGE_DEFAULT = {
     <div class="basis-watch-body">
       <div class="basis-watch-main">
         <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+        <!-- Chunk 19: dual BTC | ETH enhanced basis curve table (below chart) -->
+        <div id="bwDualCurveTable" class="bw-dual-curve-host" aria-label="BTC and ETH basis curve table"></div>
         <div id="bwMainView"></div>
         <details class="bw-methodology-disclosure" id="bwMethodologyDisclosure">
           <summary>Methodology</summary>
@@ -549,6 +551,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
         <span class="ia-ark-sub">Single source of truth · data inventory</span>
       </div>
       <div class="ia-ark-actions">
+        <button type="button" class="ia-ark-btn ia-ark-btn--primary" id="btnArkRefreshAll" title="Chunk 24: full Ark refresh — curve rebuild (if agent) + force-load hydration, curve, BBDM report, and CoinGlass/Litmus">Refresh All Data</button>
         <button type="button" class="ia-ark-btn" id="btnArkFixWithLlm" title="Copy diagnostic prompt for LLM">Fix with LLM</button>
       </div>
     </header>
@@ -1174,6 +1177,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
 
   <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
 
+<script src="js/time_format.js"></script>
 <script src="js/desk_china_ladder_models.js"></script>
   <script src="js/task_force_panel_feed.js"></script>
   <script src="js/basis_watch_analytics.js"></script>

@@ -35,7 +35,14 @@
       <p class="v15-muted mt-1">${c.tactical_lead || '—'}</p>
       <p class="v15-muted">RV: ${c.rv_posture} · ${c.preferred_expression}</p>`;
     const badge = el('v15HydrationBadge');
-    if (badge) badge.textContent = window.appState?.hydration?.corporate_credit ? `Hydrated · ${c.as_of}` : `Desk defaults · ${c.as_of}`;
+    if (badge) {
+      const asOf = typeof window.WTM_formatLocalStamp === 'function'
+        ? window.WTM_formatLocalStamp(c.as_of)
+        : c.as_of;
+      badge.textContent = window.appState?.hydration?.corporate_credit
+        ? `Hydrated · ${asOf}`
+        : `Desk defaults · ${asOf}`;
+    }
   }
 
   function renderTrades(d) {

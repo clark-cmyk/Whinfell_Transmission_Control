@@ -2,7 +2,9 @@
 # Morning collect — auto-download core exports then optional pipeline chain.
 set -euo pipefail
 
-REPO="${WHINFELL_TC_ROOT:-$HOME/Desktop/Whinfell_Transmission_Control}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Prefer this checkout (script parent) over legacy Desktop default.
+REPO="${WHINFELL_TC_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 DROP="${WHINFELL_DROP:-$HOME/Downloads/whinfell_drop}"
 CHAIN="${WHINFELL_MORNING_CHAIN:-1}"
 
@@ -12,6 +14,11 @@ echo "=== Whinfell Morning Collect ==="
 echo "repo=$REPO"
 echo "drop=$DROP"
 echo "auto_download_version=$(python3 -c 'from whinfell_pipeline.auto_download.targets import MODULE_VERSION; print(MODULE_VERSION)')"
+
+# Chunk 22 permanent: ARK/Desk one-click need a curve-capable agent on :8767.
+if [[ -x "$SCRIPT_DIR/ensure_collect_agent.sh" ]] || [[ -f "$SCRIPT_DIR/ensure_collect_agent.sh" ]]; then
+  bash "$SCRIPT_DIR/ensure_collect_agent.sh" || echo "WARN: ensure_collect_agent failed — curve one-click may be offline"
+fi
 
 # Auto-archive runs inside run_auto_download.py (status/fetch/daily) before each step.
 python3 run_auto_download.py --drop "$DROP" status || true
@@ -29,7 +36,14 @@ fetch_one() {
 }
 
 FAIL=0
+# Barchart fetch also rebuilds barchart_curve_history.json (Chunk 22 auto hook).
 fetch_one barchart_futures_intraday || FAIL=1
+# Belt-and-suspenders: rebuild curve from newest drop CSV even if fetch was partial.
+if python3 scripts/refresh_barchart_curve_from_watchlist.py; then
+  echo "curve_refresh_ok"
+else
+  echo "WARN: curve refresh skipped — no usable watchlist CSV in drop"
+fi
 
 for kid in koyfin_import_core koyfin_flows_global koyfin_rates koyfin_china koyfin_equities; do
   if python3 - <<PY

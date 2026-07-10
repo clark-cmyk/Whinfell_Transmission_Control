@@ -71,7 +71,7 @@
       tier: 'action',
       variant: 'primary',
       label: 'Collect CSVs',
-      title: 'One-click Barchart + Koyfin CSV fetch via collect agent (python3 scripts/whinfell_collect_agent.py)',
+      title: 'One-click Barchart + Koyfin CSV fetch via collect agent (bash scripts/ensure_collect_agent.sh)',
       extraClass: 'wtm-collect-btn',
       shortcut: 'c',
       shortcutMod: 'alt-shift',

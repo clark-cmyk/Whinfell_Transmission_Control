@@ -228,7 +228,10 @@
     const badge = el('aiComputeHydrationBadge');
     if (badge) {
       const hydrated = !!window.appState?.hydration?.ai_compute;
-      badge.textContent = hydrated ? `Hydrated · ${data.as_of}` : `Desk defaults · ${data.as_of}`;
+      const asOf = typeof window.WTM_formatLocalStamp === 'function'
+        ? window.WTM_formatLocalStamp(data.as_of)
+        : data.as_of;
+      badge.textContent = hydrated ? `Hydrated · ${asOf}` : `Desk defaults · ${asOf}`;
     }
     const thesis = el('aiComputeThesis');
     if (thesis) thesis.textContent = data.thesis || '';

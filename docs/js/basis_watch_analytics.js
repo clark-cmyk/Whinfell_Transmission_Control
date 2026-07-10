@@ -57,14 +57,43 @@
     return [];
   }
 
-  function findHistoryRecord(allHistory, symbol) {
+  /**
+   * CME/Barchart crypto roots: BT (BTC), ET (ETH). Synthetic ETH rows may carry
+   * ETH* labels; history often lives under the BTC counterpart when ET nodes
+   * are missing from the curve bundle.
+   */
+  function historySymbolCandidates(symbol) {
     const key = String(symbol || '').trim().toUpperCase();
-    if (!key) return null;
+    if (!key) return [];
+    const out = [key];
+    const push = (s) => { if (s && !out.includes(s)) out.push(s); };
+    if (key.startsWith('ETH') && key.length >= 5) {
+      const suffix = key.slice(3);
+      push(`ET${suffix}`);
+      push(`BT${suffix}`);
+    } else if (key.startsWith('ET') && !key.startsWith('ETH') && key.length >= 4) {
+      const suffix = key.slice(2);
+      push(`BT${suffix}`);
+      push(`ETH${suffix}`);
+    } else if (key.startsWith('BT') && key.length >= 4) {
+      const suffix = key.slice(2);
+      push(`ET${suffix}`);
+      push(`ETH${suffix}`);
+    }
+    return out;
+  }
+
+  function findHistoryRecord(allHistory, symbol) {
+    const candidates = historySymbolCandidates(symbol);
+    if (!candidates.length) return null;
     const records = historyRecords(allHistory);
-    for (let i = 0; i < records.length; i++) {
-      const rec = records[i];
-      const sym = String(rec.raw_symbol || rec.symbol || rec.contract || rec.ticker || '').toUpperCase();
-      if (sym === key) return rec;
+    for (let c = 0; c < candidates.length; c++) {
+      const key = candidates[c];
+      for (let i = 0; i < records.length; i++) {
+        const rec = records[i];
+        const sym = String(rec.raw_symbol || rec.symbol || rec.contract || rec.ticker || '').toUpperCase();
+        if (sym === key) return rec;
+      }
     }
     return null;
   }
@@ -257,23 +286,29 @@
 
   function enrichContractRows(rows, historyData, spotPrice, spotResolver) {
     if (!Array.isArray(rows)) return [];
-    const resolver = typeof spotResolver === 'function'
+    const defaultResolver = typeof spotResolver === 'function'
       ? spotResolver
       : () => toFiniteNumber(spotPrice);
 
     return rows.map(row => {
       const symbol = row.symbol || row.contract || row.ticker || '';
+      const histSymbol = row.historySymbol || symbol;
       const futuresPrice = toFiniteNumber(row.futuresPrice ?? row.price ?? row.last ?? row.close);
+      // Preserve pre-computed F/S basis (asset spot); do not recompute with history spot.
       const basisPct = row.spotBasisPct != null
         ? toFiniteNumber(row.spotBasisPct)
         : computeSpotBasisPct(futuresPrice, spotPrice);
-      const historySeries = buildBasisPctSeriesBySymbol(historyData, symbol, resolver);
+      const histResolver = typeof row.historySpotResolver === 'function'
+        ? row.historySpotResolver
+        : defaultResolver;
+      const historySeries = buildBasisPctSeriesBySymbol(historyData, histSymbol, histResolver);
       const basisHistory = historySeries.map(p => p.basisPct);
       const stats = computeQuartileStats(basisHistory);
       const rank = rankFieldsForValue(basisHistory, basisPct);
       return {
         ...row,
         symbol,
+        historySymbol: histSymbol,
         futuresPrice,
         spotBasisPct: basisPct,
         basisHistory,
@@ -350,6 +385,8 @@
     quartileFromPercentile,
     quartileHeatClass,
     computeQuartileStats,
+    historySymbolCandidates,
+    findHistoryRecord,
     buildBasisPctSeriesForContract,
     buildBasisPctSeriesBySymbol,
     buildForwardSeriesByPairKey,

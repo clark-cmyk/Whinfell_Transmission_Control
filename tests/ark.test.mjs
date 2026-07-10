@@ -303,6 +303,31 @@ async function run() {
     assert(curveSrc && curveSrc.status === 'ok', 'curve source ok');
   }
 
+  // --- Chunk 23: invalidateCurveHistory clears cache; force reload re-fetches ---
+  {
+    let gen = 0;
+    const { Ark, getFetchCount } = loadArk({
+      fetchImpl: async () => {
+        gen += 1;
+        return okResponse({
+          as_of: `t${gen}`,
+          records: [{ raw_symbol: 'BTN26', latest: { close: 63000 + gen, date: '2026-07-09' } }],
+        });
+      },
+    });
+    assert(typeof Ark.invalidateCurveHistory === 'function', 'invalidateCurveHistory exported');
+    await Ark.loadCurveHistory({ force: true });
+    assert(Ark.getCurveHistory()?.records?.[0]?.latest?.close === 63001, 'first load');
+    Ark.invalidateCurveHistory();
+    assert(Ark.getCurveHistory() === null, 'invalidate clears cache');
+    const stamp = Ark.getStamp();
+    assert(sourceById(stamp.sources, 'curve')?.status === 'stale', 'source marked stale');
+    await Ark.loadCurveHistory({ force: true });
+    assert(Ark.getCurveHistory()?.records?.[0]?.latest?.close === 63002, 'reload after invalidate');
+    assert(getFetchCount() === 2, 'two network fetches');
+    assert(Ark.getStamp().BTN26?.close === 63002, 'stamp exposes BTN26');
+  }
+
   // --- curve error ---
   {
     const { Ark } = loadArk({

@@ -16,7 +16,7 @@ from urllib.parse import urlparse
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PORT = 8767
-AGENT_VERSION = "0.1.0"
+AGENT_VERSION = "0.3.0-chunk23-curve-force"
 
 _jobs: dict[str, dict] = {}
 _jobs_lock = threading.Lock()
@@ -79,6 +79,9 @@ class CollectAgentHandler(BaseHTTPRequestHandler):
         if path == "/v1/status":
             self._drop_status()
             return
+        if path == "/v1/curve/status":
+            self._curve_status()
+            return
         if path.startswith("/v1/job/"):
             job_id = path.rsplit("/", 1)[-1]
             with _jobs_lock:
@@ -112,7 +115,25 @@ class CollectAgentHandler(BaseHTTPRequestHandler):
                 "--id",
                 str(export_id),
             ]
+            # run_auto_download already rebuilds curve after barchart_futures_intraday.
             self._spawn_job(f"fetch-{export_id}", cmd, cwd=REPO_ROOT)
+            return
+        if path == "/v1/curve/refresh":
+            # Sync rebuild from latest drop CSV (no browser). One-click for ARK / DeskOps.
+            self._curve_refresh_sync(body)
+            return
+        if path == "/v1/curve/fetch-and-refresh":
+            # Fetch live Barchart watchlist then curve rebuild (async job).
+            cmd = [
+                sys.executable,
+                str(REPO_ROOT / "run_auto_download.py"),
+                "--drop",
+                _drop_dir(),
+                "fetch",
+                "--id",
+                "barchart_futures_intraday",
+            ]
+            self._spawn_job("curve-fetch-and-refresh", cmd, cwd=REPO_ROOT)
             return
         if path == "/v1/collect/terminal":
             self._open_terminal()
@@ -140,6 +161,63 @@ class CollectAgentHandler(BaseHTTPRequestHandler):
             self._send_json(200, payload)
         except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError) as exc:
             self._send_json(500, {"error": str(exc)})
+
+    def _curve_status(self) -> None:
+        curve_path = REPO_ROOT / "data" / "barchart" / "v1" / "barchart_curve_history.json"
+        if not curve_path.is_file():
+            self._send_json(200, {"ok": False, "error": "curve_missing", "path": str(curve_path)})
+            return
+        try:
+            payload = json.loads(curve_path.read_text(encoding="utf-8"))
+            btn = None
+            max_date = ""
+            for rec in payload.get("records") or []:
+                lat = rec.get("latest") or {}
+                d = str(lat.get("date") or "")
+                if d > max_date:
+                    max_date = d
+                if str(rec.get("raw_symbol") or "").upper() == "BTN26":
+                    btn = {
+                        "close": lat.get("close"),
+                        "date": lat.get("date"),
+                        "source_file": rec.get("source_file"),
+                    }
+            self._send_json(
+                200,
+                {
+                    "ok": True,
+                    "path": str(curve_path),
+                    "as_of": payload.get("as_of"),
+                    "symbol_count": payload.get("symbol_count"),
+                    "max_quote_date": max_date,
+                    "refresh": payload.get("refresh"),
+                    "BTN26": btn,
+                },
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            self._send_json(500, {"ok": False, "error": str(exc)})
+
+    def _curve_refresh_sync(self, body: dict) -> None:
+        """Rebuild curve JSON from latest drop watchlist (fast, sync)."""
+        if str(REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(REPO_ROOT))
+        try:
+            from whinfell_pipeline.barchart_curve_refresh import (  # noqa: WPS433
+                CurveRefreshError,
+                refresh_barchart_curve,
+            )
+
+            csv_arg = body.get("csv")
+            result = refresh_barchart_curve(
+                csv_path=Path(csv_arg) if csv_arg else None,
+                drop=Path(_drop_dir()),
+                repo_root=REPO_ROOT,
+            )
+            self._send_json(200, result)
+        except CurveRefreshError as exc:
+            self._send_json(400, {"ok": False, "error": str(exc)})
+        except Exception as exc:  # noqa: BLE001
+            self._send_json(500, {"ok": False, "error": str(exc)})
 
     def _spawn_job(self, label: str, cmd: list[str], cwd: Path | None = None) -> None:
         job_id = uuid.uuid4().hex[:12]

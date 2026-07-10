@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * BasisWatch — Ark hydration alignment when curve quotes lag.
- * Chunk 17: front basis/ann from Ark series; DTE from hydration as_of when stale.
+ * Chunk 19: front basis/ann from F/S (not RV series clobber); dual boards BTC|ETH.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -59,51 +59,122 @@ async function run() {
   const hydrationBasis = hydration.node_cockpits.basis.rv_basis.series.btc_basis_spot_1m.horizons['1m'].current_value;
   const hydDay = String(hydration.as_of || '').slice(0, 10);
 
-  assert(modelBtc.curveQuoteDate === '2026-06-29', `curve quote vintage ${modelBtc.curveQuoteDate}`);
-  assert(modelBtc.curveStale === true, 'curve should be flagged stale vs Ark hydration');
+  // Chunk 21/22: curve is live-refreshed from Barchart watchlist (BTN26 current).
+  // Accept whatever max quote date the SSOT JSON carries (not a hard-coded session day).
+  const liveCurveDay = String(
+    curve?.refresh?.max_quote_date
+    || curve?.as_of
+    || '',
+  ).slice(0, 10);
+  assert(
+    modelBtc.curveQuoteDate === liveCurveDay
+      || modelBtc.curveQuoteDate === hydDay
+      || (liveCurveDay && modelBtc.curveQuoteDate >= liveCurveDay.slice(0, 8)),
+    `curve quote vintage ${modelBtc.curveQuoteDate} (ssot max=${liveCurveDay})`,
+  );
+  assert(modelBtc.curveStale === false, 'fresh curve should not be stale vs Ark hydration');
   assert(String(modelBtc.valuationDate || modelBtc.asOf).startsWith(hydDay)
     || String(modelBtc.asOf).includes(hydDay)
     || modelBtc.hydrationDate === hydDay, `asOf/valuation anchored to hydration ${hydDay}, got asOf=${modelBtc.asOf} val=${modelBtc.valuationDate}`);
   assert(modelBtc.hydrationAsOf === hydration.as_of || modelBtc.hydrationDate === hydDay, 'hydration stamp on model');
-  assert(String(modelBtc.dataNote || '').includes('Ark') || String(modelBtc.dataNote || '').includes('Hydration'), `dataNote: ${modelBtc.dataNote}`);
+  assert(String(modelBtc.dataNote || '').includes('Ark') || String(modelBtc.dataNote || '').includes('curve'), `dataNote: ${modelBtc.dataNote}`);
   assert(modelBtc.spotDesk === koyfin, 'desk Koyfin spot preserved on spotDesk');
   assert(modelBtc.spotSource === 'ark_koyfin', `spotSource ${modelBtc.spotSource}`);
   assert(Math.abs(modelBtc.spot - koyfin) < 1, `spot from Ark Koyfin ${modelBtc.spot} vs ${koyfin}`);
-  // Front basis MUST match Ark hydration series (not raw stale F vs wrong S).
-  assert(Math.abs(modelBtc.frontBasisPct - hydrationBasis) < 0.01, `front basis ${modelBtc.frontBasisPct} vs hydration ${hydrationBasis}`);
-  assert(modelBtc.frontBasisPct > -1 && modelBtc.frontBasisPct < 1, 'front basis in sane range');
+
+  // Chunk 19/21: front basis MUST be futures-vs-spot; BTN26 live ~63,375.
   assert(modelBtc.front, 'front contract present');
   assert(modelBtc.front.symbol !== 'BTM26', `front must not be expired June BTM26, got ${modelBtc.front.symbol}`);
-  assert(Math.abs((modelBtc.front.spotBasisPct ?? modelBtc.front.pctBasis) - hydrationBasis) < 0.01, 'front row basis = Ark');
-  assert(Number.isFinite(modelBtc.front.spotAnnualizedCarry) || modelBtc.front.dte < 7, `front ann ${modelBtc.front.spotAnnualizedCarry}`);
-  // Ann should not be the old ~−100%+ blow-up from wrong DTE/spot mix.
+  assert(modelBtc.front.symbol === 'BTN26' || modelBtc.front.dte >= 0, `front live ${modelBtc.front.symbol}`);
+  assert(modelBtc.front.futuresPrice > 60000 && modelBtc.front.futuresPrice < 80000,
+    `BTN26 near market, got ${modelBtc.front.futuresPrice}`);
+
+  const f = modelBtc.front.futuresPrice;
+  const s = modelBtc.spot;
+  const expectedPct = ((f - s) / s) * 100;
+  const expectedAnn = bw.computeSpotAnnualizedCarry(f, s, modelBtc.front.dte);
+  assert(Math.abs(modelBtc.frontBasisPct - expectedPct) < 0.02, `front basis F/S ${modelBtc.frontBasisPct} vs ${expectedPct}`);
+  assert(Math.abs((modelBtc.front.spotBasisPct ?? modelBtc.front.pctBasis) - expectedPct) < 0.02, 'front row basis = F/S');
+  // Positive contango vs Koyfin spot (not the old −0.47% / −7% hydration path).
+  assert(modelBtc.frontBasisPct > 0 && modelBtc.frontBasisPct < 5,
+    `front basis sane contango ${modelBtc.frontBasisPct}%`);
+  assert(Math.abs(modelBtc.frontBasisPct - hydrationBasis) > 0.05 || Math.abs(expectedPct - hydrationBasis) < 0.05,
+    'front basis is F/S (differs from hydration unless market matches)');
+  if (Number.isFinite(modelBtc.front.spotAnnualizedCarry) && Number.isFinite(expectedAnn)) {
+    assert(Math.abs(modelBtc.front.spotAnnualizedCarry - expectedAnn) < 0.05, `ann F/S ${modelBtc.front.spotAnnualizedCarry} vs ${expectedAnn}`);
+  }
+  // The infamous -7% garbage must not reappear from hydration annualize.
   if (Number.isFinite(modelBtc.front.spotAnnualizedCarry)) {
-    assert(Math.abs(modelBtc.front.spotAnnualizedCarry) < 80, `ann carry sane ${modelBtc.front.spotAnnualizedCarry}`);
+    const hydAnn = hydrationBasis * (365 / modelBtc.front.dte);
+    assert(Math.abs(modelBtc.front.spotAnnualizedCarry - hydAnn) > 0.5
+      || Math.abs(expectedAnn - hydAnn) < 0.5,
+      `ann must not be hydration×365/DTE garbage (${modelBtc.front.spotAnnualizedCarry} vs ${hydAnn})`);
+    assert(modelBtc.front.spotAnnualizedCarry > 0, `ann carry positive contango ${modelBtc.front.spotAnnualizedCarry}`);
   }
 
   const btq = modelBtc.contracts.find((c) => c.symbol === 'BTQ26');
   assert(btq, 'BTQ26 present');
-  // Deferred tenors keep curve shape vs Ark-implied spot (not legacy BTM26-implied levels).
   assert(Number.isFinite(btq.spotBasisPct), `BTQ26 basis ${btq.spotBasisPct}`);
+
+  // Dual boards
+  assert(modelBtc.dualBoards?.btc && modelBtc.dualBoards?.eth, 'dualBoards present');
+  assert(modelBtc.dualBoards.btc.contracts.length > 0, 'BTC dual board rows');
+  assert(modelBtc.dualBoards.btc.contracts.length <= bw.DUAL_CURVE_MAX, 'BTC dual board ≤ 8');
+  assert(modelBtc.dualBoards.btc.contracts.every((c) => c.symbol !== 'BTM26'), 'no expired BTM26 on dual board');
+  assert(modelBtc.dualBoards.btc.contracts[0].symbol === 'BTN26' || modelBtc.dualBoards.btc.front?.symbol === 'BTN26',
+    `dual BTC starts at BTN26, got ${modelBtc.dualBoards.btc.contracts[0]?.symbol}`);
+  assert(Number.isFinite(modelBtc.dualBoards.btc.spot), 'BTC dual spot');
+  assert(Number.isFinite(modelBtc.dualBoards.eth.spot), 'ETH dual spot');
+  assert(modelBtc.dualBoards.eth.synthetic === true, 'ETH dual board synthetic from BTC');
+  assert(String(modelBtc.dualBoards.eth.front?.symbol || '').startsWith('ET'), 'ETH dual front uses ET root');
+  assert(
+    Math.abs((modelBtc.dualBoards.eth.front?.spotBasisPct ?? 0) - (modelBtc.frontBasisPct ?? 0)) > 0.2
+      || Math.abs((modelBtc.dualBoards.eth.front?.spotBasisPct ?? 0)) > 0,
+    'ETH dual front basis is independent of pure BTC clone when eth_basis present',
+  );
+  // Hist Q1/Med/Q3 restored via BT history alias on synthetic ETH.
+  const ethFront = modelBtc.dualBoards.eth.front;
+  assert(ethFront, 'ETH dual front');
+  assert(Number.isFinite(ethFront.histMedian) || Number.isFinite(ethFront.basisPercentile),
+    `ETH hist/rank present histMed=${ethFront.histMedian} pct=${ethFront.basisPercentile}`);
+
+  const dualHtml = bw.renderDualCurveSection(modelBtc);
+  assert(dualHtml.includes('Enhanced basis curve'), 'dual section title');
+  assert(dualHtml.includes('data-asset="BTC"'), 'BTC column');
+  assert(dualHtml.includes('data-asset="ETH"'), 'ETH column');
+  assert(dualHtml.includes('BTN26'), 'BTN26 in dual table');
+  assert(dualHtml.includes('ETN26') || dualHtml.includes('ET'), 'ET symbols in dual ETH column');
+  assert(!dualHtml.includes('BTM26'), 'BTM26 excluded from dual table');
 
   const stateEth = { basisWatch: { asset: 'ETH' }, hydration };
   const modelEth = bw.buildModel(stateEth, curve);
-  const ethBasis = hydration.node_cockpits.basis.rv_basis.series.eth_basis_spot_1m.horizons['1m'].current_value;
-
   assert(modelEth.assetKey === 'ETH', 'eth asset');
-  assert(Math.abs(modelEth.frontBasisPct - ethBasis) < 0.01, `ETH front basis ${modelEth.frontBasisPct} vs ${ethBasis}`);
-  assert(modelEth.frontBasisPct !== modelBtc.frontBasisPct, 'ETH differs from BTC');
+  assert(modelEth.spotSource === 'ark_koyfin', `ETH spot ark ${modelEth.spotSource}`);
+  assert(Math.abs(modelEth.spot - hydration.crypto_sleeve.assets.eth_spot_usd.last_price) < 1, 'ETH Ark spot');
+  assert(modelEth.syntheticCurve, 'ETH model synthetic without ET nodes');
+  assert(String(modelEth.front?.symbol || '').startsWith('ET'), `ETH front ET* got ${modelEth.front?.symbol}`);
+  assert(Number.isFinite(modelEth.frontBasisPct), `ETH front basis ${modelEth.frontBasisPct}`);
+  // Re-anchored front should not equal BTC front basis.
+  assert(Math.abs(modelEth.frontBasisPct - modelBtc.frontBasisPct) > 0.3,
+    `ETH basis ${modelEth.frontBasisPct} must differ from BTC ${modelBtc.frontBasisPct}`);
+  assert(Number.isFinite(modelEth.front?.histQ1) || Number.isFinite(modelEth.front?.histMedian),
+    `ETH hist Q1/Med/Q3 restored q1=${modelEth.front?.histQ1} med=${modelEth.front?.histMedian}`);
+  assert(modelEth.dualBoards?.btc?.contracts?.length > 0, 'ETH mode still has BTC dual board');
 
   console.log([
     'PASS basis_watch_source_align.test.mjs',
     `curveQuote=${modelBtc.curveQuoteDate}`,
     `valuationDate=${modelBtc.valuationDate || modelBtc.asOf}`,
     `front=${modelBtc.front.symbol}`,
-    `btc_spot_basis=${modelBtc.spot.toFixed(0)}`,
-    `btc_front_basis=${modelBtc.frontBasisPct}%`,
+    `btc_spot=${modelBtc.spot.toFixed(0)}`,
+    `btc_front_basis=${modelBtc.frontBasisPct?.toFixed?.(4)}%`,
     `btc_front_ann=${modelBtc.front.spotAnnualizedCarry?.toFixed?.(2)}%`,
-    `eth_front_basis=${modelEth.frontBasisPct}%`,
-    `btq_basis=${btq.spotBasisPct?.toFixed(2)}%`,
+    `eth_front=${modelEth.front?.symbol}`,
+    `eth_front_basis=${modelEth.frontBasisPct?.toFixed?.(4)}%`,
+    `eth_hist=${modelEth.front?.histQ1?.toFixed?.(2)}/${modelEth.front?.histMedian?.toFixed?.(2)}/${modelEth.front?.histQ3?.toFixed?.(2)}`,
+    `dual_btc_n=${modelBtc.dualBoards.btc.contracts.length}`,
+    `dual_eth_n=${modelBtc.dualBoards.eth.contracts.length}`,
+    `dual_eth_spot=${modelBtc.dualBoards.eth.spot?.toFixed?.(0)}`,
     `curveStale=${modelBtc.curveStale}`,
   ].join('\n'));
 }

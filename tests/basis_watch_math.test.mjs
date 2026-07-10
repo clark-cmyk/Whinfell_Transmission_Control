@@ -81,10 +81,38 @@ async function run() {
   assert(modelEth.syntheticCurve, 'ETH synthetic flag');
   assert(modelBtc.contracts[0].futuresPrice !== modelEth.contracts[0].futuresPrice, 'ETH futures $ differs');
   assert(modelBtc.contracts[0].absBasis !== modelEth.contracts[0].absBasis, 'ETH basis $ differs');
+  // Without eth_basis hydration, ratio mode keeps same basis % shape.
   assert(
     Math.abs(modelBtc.contracts[0].spotBasisPct - modelEth.contracts[0].spotBasisPct) < 0.001,
-    'synthetic ETH basis % tracks BTC shape',
+    'ratio synthetic ETH basis % tracks BTC shape',
   );
+  assert(String(modelEth.contracts[0].symbol).startsWith('ET'), `ETH uses ET root, got ${modelEth.contracts[0].symbol}`);
+
+  // With eth_basis re-anchor, front basis must differ from BTC.
+  const ethBasisPct = -1.04;
+  const stateEthAnchored = {
+    basisWatch: { asset: 'ETH', view: 'basis' },
+    hydration: {
+      as_of: '2026-06-01T12:00:00Z',
+      crypto_sleeve: { assets: { btc_spot_usd: { last_price: btcSpot }, eth_spot_usd: { last_price: ethSpot } } },
+      node_cockpits: {
+        basis: {
+          rv_basis: {
+            series: {
+              eth_basis_spot_1m: {
+                horizons: { '1m': { current_value: ethBasisPct, percentile: 40, quartile: 2, n_observations: 5 } },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+  const modelEthA = bw.buildModel(stateEthAnchored, curve);
+  assert(modelEthA.syntheticCurve, 're-anchor synthetic');
+  assert(Math.abs(modelEthA.frontBasisPct - ethBasisPct) < 0.05, `ETH front re-anchored ${modelEthA.frontBasisPct} vs ${ethBasisPct}`);
+  assert(Math.abs(modelEthA.frontBasisPct - modelBtc.frontBasisPct) > 0.5, 'ETH front basis differs from BTC');
+  assert(String(modelEthA.front?.symbol || '').startsWith('ET'), 'front ET*');
 
   console.log([
     'PASS basis_watch_math.test.mjs',
@@ -92,7 +120,9 @@ async function run() {
     `btc_spot=${modelBtc.spot}`,
     `eth_spot=${modelEth.spot}`,
     `btc_basis_pct=${modelBtc.contracts[0].spotBasisPct?.toFixed(2)}`,
-    `eth_futures=${modelEth.contracts[0].futuresPrice}`,
+    `eth_ratio_basis=${modelEth.contracts[0].spotBasisPct?.toFixed(2)}`,
+    `eth_reanchor_basis=${modelEthA.frontBasisPct?.toFixed(2)}`,
+    `eth_front=${modelEthA.front?.symbol}`,
   ].join('\n'));
 }
 

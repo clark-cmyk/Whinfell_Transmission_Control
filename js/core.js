@@ -573,7 +573,9 @@ function buildWhyExplanations(state, gate, health) {
   const prov = state.provenance || createEmptyProvenance();
   const freshStatus = prov.freshnessStatus || computeFreshnessFromIso(prov.dataAsOf).status;
   const asOfLabel = prov.dataAsOf
-    ? new Date(prov.dataAsOf).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    ? (typeof window.WTM_formatLocalStamp === 'function'
+      ? window.WTM_formatLocalStamp(prov.dataAsOf)
+      : new Date(prov.dataAsOf).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))
     : 'not set';
   const snapId = prov.snapshotId || 'none';
 
@@ -2308,7 +2310,7 @@ function buildWtmExportV21() {
     `Shock Scenario: ${state.tracer.activeShock || 'none'} · P=${op.shockProbability}% · ${op.shockHorizon}`,
     `Gross Risk Recommendation: ${total.toFixed(0)}% total, ${POSTURE_LABELS[posture] || posture || '—'} posture`,
     `BTC Bias: ${state.research.btcBias || btcBias}`,
-    `Timestamp: ${new Date().toISOString().slice(0, 19)}`,
+    `Timestamp: ${typeof window.WTM_formatLocalStamp === 'function' ? window.WTM_formatLocalStamp(new Date()) : new Date().toISOString().slice(0, 19)}`,
   ];
   if (sq3) {
     lines.push(`SQ3 Score: ${sq3.sq3Score}`);
@@ -2383,7 +2385,10 @@ function buildPerplexityExport() {
     lines.push('---');
     lines.push('Tracer Snapshots:');
     state.snapshots.forEach(s => {
-      lines.push(`  - ${s.name} | ${s.savedAt?.slice(0, 19) || '—'} | Health band: ${s.scoreBand || '—'} | Regime: ${s.regimeTag || '—'}`);
+      const savedLabel = s.savedAt
+        ? (typeof window.WTM_formatLocalStamp === 'function' ? window.WTM_formatLocalStamp(s.savedAt) : s.savedAt.slice(0, 19))
+        : '—';
+      lines.push(`  - ${s.name} | ${savedLabel} | Health band: ${s.scoreBand || '—'} | Regime: ${s.regimeTag || '—'}`);
     });
   }
   if (state.btcL3.nearMonth || state.btcL3.farMonth || state.btcL3.basisSpread) {
@@ -2458,7 +2463,7 @@ function renderProvenancePanel(state) {
   }
   el('provenanceDisplay').innerHTML = [
     prov.snapshotId ? `Snapshot: <span class="text-slate-200">${prov.snapshotId}</span>` : '',
-    prov.dataAsOf ? `As of: <span class="text-slate-200">${new Date(prov.dataAsOf).toLocaleString()}</span>` : '',
+    prov.dataAsOf ? `As of: <span class="text-slate-200">${typeof window.WTM_formatLocalStamp === 'function' ? window.WTM_formatLocalStamp(prov.dataAsOf) : new Date(prov.dataAsOf).toLocaleString()}</span>` : '',
     prov.sourceChannel ? `Source: <span class="text-slate-200">${prov.sourceChannel}</span>` : '',
     prov.lineageHash ? `Lineage: <span class="text-slate-200 font-mono text-[8px]">${prov.lineageHash.slice(0, 24)}…</span>` : '',
     `Freshness: <span class="${freshnessChipCls(prov.freshnessStatus)}">${fresh}</span>`,
@@ -3008,12 +3013,16 @@ function formatWebPublishStamp(iso, hydrationVersion) {
   if (!iso) return 'Web bundle — date unknown';
   let label = iso;
   try {
-    const d = new Date(iso);
-    if (!Number.isNaN(d.getTime())) {
-      label = d.toLocaleString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric',
-        hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short',
-      });
+    if (typeof window.WTM_formatLocalStamp === 'function') {
+      label = window.WTM_formatLocalStamp(iso);
+    } else {
+      const d = new Date(iso);
+      if (!Number.isNaN(d.getTime())) {
+        label = d.toLocaleString('en-US', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short',
+        });
+      }
     }
   } catch (_) { /* keep iso */ }
   const hv = hydrationVersion && hydrationVersion !== 'missing' ? ` · hydration ${hydrationVersion}` : '';
@@ -3357,7 +3366,12 @@ function applyStateToDOM(state) {
   });
   setLastOpened('lastKoyfin', appState.meta.lastKoyfin);
   setLastOpened('lastBarchart', appState.meta.lastBarchart);
-  if (appState.meta.savedAt) setSaveIndicator('Saved · ' + new Date(appState.meta.savedAt).toLocaleString(), true);
+  if (appState.meta.savedAt) {
+    const savedLabel = typeof window.WTM_formatLocalStamp === 'function'
+      ? window.WTM_formatLocalStamp(appState.meta.savedAt)
+      : new Date(appState.meta.savedAt).toLocaleString();
+    setSaveIndicator('Saved · ' + savedLabel, true);
+  }
   renderAll();
 }
 
@@ -3381,7 +3395,9 @@ function persistState() {
     }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-  setSaveIndicator('Saved · ' + new Date().toLocaleString(), true);
+  setSaveIndicator('Saved · ' + (typeof window.WTM_formatLocalStamp === 'function'
+    ? window.WTM_formatLocalStamp(new Date())
+    : new Date().toLocaleString()), true);
   flashSave();
   renderPostImportWorkflowStrip(appState);
   renderSessionReadyChip(appState);
@@ -3955,15 +3971,23 @@ function renderHydrationImportStatus(state) {
     node.textContent = 'Stale bundle — re-import recommended';
     node.className = 'console-import-status hydration-import-status-warn';
     node.title = assessment.body;
-    if (timeNode) timeNode.textContent = prov.hydratedAt ? `Last import ${new Date(prov.hydratedAt).toLocaleString()}` : '';
+    if (timeNode) {
+      timeNode.textContent = prov.hydratedAt
+        ? `Last import ${typeof window.WTM_formatLocalStamp === 'function' ? window.WTM_formatLocalStamp(prov.hydratedAt) : new Date(prov.hydratedAt).toLocaleString()}`
+        : '';
+    }
     renderSignalDetailTech(state);
     return;
   }
   const fresh = prov.freshnessStatus || computeFreshnessFromIso(prov.dataAsOf).status;
-  const when = prov.hydratedAt ? new Date(prov.hydratedAt).toLocaleTimeString() : '—';
+  const when = prov.hydratedAt
+    ? (typeof window.WTM_formatLocalStamp === 'function'
+      ? window.WTM_formatLocalStamp(prov.hydratedAt)
+      : new Date(prov.hydratedAt).toLocaleString())
+    : '—';
   node.textContent = `Imported ${when} · ${freshnessLabelFromStatus(fresh)}`;
   node.className = `console-import-status ${fresh === 'fresh' ? 'text-wtm-green' : fresh === 'stale' ? 'text-wtm-red' : 'text-wtm-amber'}`;
-  node.title = `Data as-of: ${prov.dataAsOf || '—'}`;
+  node.title = `Data as-of: ${typeof window.WTM_formatLocalStamp === 'function' && prov.dataAsOf ? window.WTM_formatLocalStamp(prov.dataAsOf) : (prov.dataAsOf || '—')}`;
   if (timeNode) {
     const lineage = prov.lineageHash ? String(prov.lineageHash).replace(/^sha256:/, '').slice(0, 12) : '';
     timeNode.textContent = lineage ? `Lineage ${lineage}…` : '';
@@ -6938,8 +6962,15 @@ function buildL3Prompt() {
 
 function setLastOpened(id, iso) {
   const n = el(id);
-  if (iso) { n.textContent = new Date(iso).toLocaleString(); n.dataset.ts = iso; }
-  else { n.textContent = 'Never'; delete n.dataset.ts; }
+  if (iso) {
+    n.textContent = typeof window.WTM_formatLocalStamp === 'function'
+      ? window.WTM_formatLocalStamp(iso)
+      : new Date(iso).toLocaleString();
+    n.dataset.ts = iso;
+  } else {
+    n.textContent = 'Never';
+    delete n.dataset.ts;
+  }
 }
 
 function setSaveIndicator(t, ok) { el('saveIndicator').textContent = t; el('saveIndicator').classList.toggle('text-wtm-green', !!ok); el('saveIndicator').classList.toggle('text-wtm-muted', !ok); }

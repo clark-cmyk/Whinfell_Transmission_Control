@@ -226,6 +226,7 @@
     </footer>
   </div>
 
+  <script src="js/time_format.js"></script>
   <script src="js/ark.js"></script>
   <script src="js/articulate.js"></script>
   <script src="js/bbdm_litmus_table.js"></script>
@@ -314,9 +315,26 @@
       });
     }
 
+    /** Count BANG/WATCH/PASS/BLOCKED from trades (v2 summary uses bucket_counts, not verdict_counts). */
+    function verdictCountsFromReport(rep) {
+      const vc = { BANG: 0, WATCH: 0, PASS: 0, BLOCKED: 0, DATA_GAP: 0 };
+      const fromSummary = rep?.summary?.verdict_counts;
+      if (fromSummary && typeof fromSummary === 'object') {
+        Object.keys(vc).forEach((k) => {
+          if (fromSummary[k] != null) vc[k] = Number(fromSummary[k]) || 0;
+        });
+        return vc;
+      }
+      (rep?.trades || []).forEach((t) => {
+        const v = String(t.verdict || 'PASS').toUpperCase();
+        if (vc[v] != null) vc[v] += 1;
+      });
+      return vc;
+    }
+
     function renderKpis() {
       const s = report.summary || {};
-      const vc = s.verdict_counts || {};
+      const vc = verdictCountsFromReport(report);
       const chips = [
         { label: 'BANG', val: vc.BANG || 0, cls: 'text-desk-bang' },
         { label: 'WATCH', val: vc.WATCH || 0, cls: 'text-desk-watch' },
@@ -331,12 +349,72 @@
         </div>`).join('');
     }
 
+    function renderRiskDashboard() {
+      const mount = $('bbdmRiskDashboard');
+      if (!mount) return;
+      const rd = report.risk_dashboard || {};
+      const zones = rd.zones || {};
+      const gate = report.gate || {};
+      const scores = [
+        { key: 'whinfell_ex_china', label: 'Whinfell ex-China', score: rd.whinfell_ex_china },
+        { key: 'sq3', label: 'SQ3 (China)', score: rd.sq3 },
+        { key: 'combined', label: 'Combined', score: rd.combined },
+      ];
+      if (!scores.some((s) => s.score != null)) {
+        mount.innerHTML = '';
+        return;
+      }
+      const zoneCls = (z) => ({
+        green: 'border-green-500/40 text-green-300',
+        amber: 'border-amber-500/40 text-amber-300',
+        red: 'border-red-500/40 text-red-300',
+      }[z] || 'border-desk-border text-desk-muted');
+      const cards = scores.map((s) => {
+        const z = zones[s.key] || score_zone_client(s.score);
+        const val = s.score != null && Number.isFinite(Number(s.score))
+          ? Number(s.score).toFixed(0)
+          : '—';
+        return `
+          <div class="bg-desk-panel border rounded-lg px-3 py-2 ${zoneCls(z)}">
+            <div class="text-[10px] uppercase opacity-80">${s.label}</div>
+            <div class="text-xl font-semibold font-mono text-white">${val}</div>
+            <div class="text-[10px] uppercase">${z || '—'}</div>
+          </div>`;
+      }).join('');
+      mount.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-1">
+          ${cards}
+        </div>
+        <p class="text-[10px] text-desk-muted mb-2">
+          Regime · ${gate.regime_tag || gate.transmission_state || '—'}
+          · tier ${gate.tier || '—'}
+          · snapshot ${report.snapshot_id || '—'}
+        </p>`;
+    }
+
+    function score_zone_client(score) {
+      const n = Number(score);
+      if (!Number.isFinite(n)) return null;
+      if (n < 50) return 'red';
+      if (n < 65) return 'amber';
+      return 'green';
+    }
+
     function renderHeader() {
       const g = report.gate || {};
       $('gateChip').textContent = `Gate ${g.zone || '—'} · Score ${g.whinfell_score ?? '—'}`;
       $('gateChip').className = `px-2 py-1 rounded border font-mono text-xs ${gateColor(g.zone)}`;
-      const asOf = (report.as_of || '').slice(0, 19).replace('T', ' ');
-      $('asOfChip').textContent = `As-of ${asOf || '—'}`;
+      const asOf = typeof window.WTM_formatLocalStamp === 'function'
+        ? window.WTM_formatLocalStamp(report.as_of, { fallback: '—' })
+        : ((report.as_of || '').slice(0, 19).replace('T', ' ') || '—');
+      const gen = report.generated_at
+        ? (typeof window.WTM_formatLocalStamp === 'function'
+          ? window.WTM_formatLocalStamp(report.generated_at, { fallback: '' })
+          : String(report.generated_at).slice(0, 19))
+        : '';
+      $('asOfChip').textContent = gen
+        ? `As-of ${asOf} · gen ${gen}`
+        : `As-of ${asOf}`;
     }
 
     function renderTable() {
@@ -463,15 +541,52 @@
       URL.revokeObjectURL(a.href);
     }
 
+    /**
+     * Chunk 24 — Ark SSOT first (static report).
+     * Live calculator on :8766 is optional: only when ?live=1 or body[data-bbdm-live=1],
+     * and only after /health returns JSON {ok:true,service:bang_bang_da}.
+     * (A plain http.server on :8766 used to spam CORS errors on every load.)
+     */
+    async function tryLiveApiReport(windowDays) {
+      const wantLive = document.body?.dataset?.bbdmLive === '1'
+        || /(?:\?|&)live=1(?:&|$)/.test(String(location.search || ''));
+      if (!wantLive) return null;
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 1500);
+        const health = await fetch(`${API_BASE}/health`, {
+          cache: 'no-store',
+          signal: ctrl.signal,
+          headers: { Accept: 'application/json' },
+        });
+        clearTimeout(t);
+        if (!health.ok) return null;
+        const ctype = health.headers.get('content-type') || '';
+        if (!/json/i.test(ctype)) return null;
+        const hbody = await health.json().catch(() => ({}));
+        if (!hbody || !hbody.ok || hbody.service !== 'bang_bang_da') return null;
+        const r = await fetch(`${API_BASE}/api/report?window=${windowDays}`, {
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+        });
+        if (!r.ok) return null;
+        const data = await r.json();
+        if (data && Array.isArray(data.trades)) {
+          data._viaApi = true;
+          return data;
+        }
+      } catch (_) { /* offline / wrong service */ }
+      return null;
+    }
+
     async function fetchReport(windowDays) {
       const wd = windowDays || Number($('windowSelect').value) || 60;
-      // Live calculator API is ops RPC (not a raw data file) — optional when :8766 is up.
-      try {
-        const r = await fetch(`${API_BASE}/api/report?window=${wd}`, { cache: 'no-store' });
-        if (r.ok) return await r.json();
-      } catch (_) { /* API offline */ }
-      // Static report file: The Ark only.
-      return loadReportViaArk(true);
+      const live = await tryLiveApiReport(wd);
+      if (live) return live;
+      // Static report via The Ark only (SSOT, cache-busted).
+      const staticReport = await loadReportViaArk(true);
+      if (staticReport) staticReport._viaApi = false;
+      return staticReport;
     }
 
     function renderLitmusMounts() {
@@ -492,6 +607,7 @@
         $('windowSelect').value = wd;
       }
       renderHeader();
+      renderRiskDashboard();
       renderKpis();
       renderTable();
       renderLitmusMounts();
@@ -506,8 +622,8 @@
         return null;
       }
       try {
-        const force = !ark.getHydration?.();
-        const result = await ark.loadHydration({ force });
+        // Always force so desk refresh / hard reload pick up newest hydration stamp.
+        const result = await ark.loadHydration({ force: true });
         const hyd = (result && result.ok && result.data)
           ? result.data
           : (ark.getHydration?.() || null);
@@ -529,28 +645,38 @@
       const [data, hydMeta] = await Promise.all([fetchReport(), loadHydrationMeta()]);
       if (!applyReport(data, hydMeta)) {
         $('tradeBody').innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-sm text-desk-muted">
-          Report not found. Run <code class="text-desk-accent font-mono">scripts/Bang_Bang_Da.command</code><br/>
-          <span class="text-[10px]">Or: python3 scripts/bang_bang_da_server.py + bang_bang_da_calculator.py</span>
+          Report not found. Run <code class="text-desk-accent font-mono">python3 bang_bang_da_calculator.py</code><br/>
+          <span class="text-[10px]">Or: python3 scripts/bang_bang_da_server.py (:8766) for live windows</span>
         </td></tr>`;
         return;
       }
       // Surface stale static report vs live hydration without blocking paint.
       try {
+        const banner = document.getElementById('bbdmStaleBanner');
+        if (!banner) return;
         const repDay = String(report.as_of || '').slice(0, 10);
         const hydDay = String(hydMeta?.as_of || '').slice(0, 10);
+        const apiLive = !!(report._viaApi);
         if (repDay && hydDay && repDay < hydDay) {
-          const banner = document.getElementById('bbdmStaleBanner');
-          if (banner) {
-            banner.classList.remove('hidden');
-            banner.textContent = `Report as_of ${repDay} lags hydration ${hydDay} (${hydMeta.snapshot_id || '—'}). Re-run Bang_Bang_Da.command or start API :8766.`;
-          }
+          banner.classList.remove('hidden');
+          const repLabel = typeof window.WTM_formatLocalStamp === 'function'
+            ? window.WTM_formatLocalStamp(report.as_of)
+            : repDay;
+          const hydLabel = typeof window.WTM_formatLocalStamp === 'function'
+            ? window.WTM_formatLocalStamp(hydMeta?.as_of)
+            : hydDay;
+          banner.textContent = `Report as_of ${repLabel} lags hydration ${hydLabel} (${hydMeta.snapshot_id || '—'}). Run: python3 bang_bang_da_calculator.py`;
+        } else if (!apiLive && report.generated_at) {
+          banner.classList.add('hidden');
+        } else {
+          banner.classList.add('hidden');
         }
       } catch (_) { /* optional */ }
     }
 
     async function refreshWithWindow() {
       const data = await fetchReport(Number($('windowSelect').value));
-      applyReport(data);
+      applyReport(data, report?._hydrationMeta || null);
     }
 
     window.addEventListener('whinfell-desk-refresh', () => { loadReport(); });

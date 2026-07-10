@@ -451,7 +451,9 @@
       display: (ctx) => ({
         preserveMeta: true,
         metaText: ctx.metrics.dataAsOf
-          ? new Date(ctx.metrics.dataAsOf).toLocaleString()
+          ? (typeof globalThis.WTM_formatLocalStamp === 'function'
+            ? globalThis.WTM_formatLocalStamp(ctx.metrics.dataAsOf)
+            : new Date(ctx.metrics.dataAsOf).toLocaleString())
           : 'No pipeline timestamp',
       }),
       afterRender(ctx, resolved, elFn) {

@@ -126,9 +126,22 @@ class BarchartAdapter(BaseAdapter):
             with page.expect_download(timeout=60_000) as download_info:
                 download_btn.click()
             download = download_info.value
-            suggested = download.suggested_filename or f"watchlist-intraday-{self._stamp()}.csv"
-            dest = drop_dir / suggested
-            download.save_as(dest)
+            # Canonical names for status/refresh_barchart_curve_from_watchlist + Cousins discover.
+            stamp = self._stamp()  # YYYYMMDD_HHMM
+            canonical = drop_dir / f"futures_intraday_{stamp}.csv"
+            download.save_as(canonical)
+            # Mirror discoverable watchlist name (Cousins barchart_hydration patterns).
+            try:
+                ymd = stamp[:8]
+                mirror = drop_dir / (
+                    f"watchlist-wtm-canonical-universe-intraday-"
+                    f"{ymd[4:6]}-{ymd[6:8]}-{ymd[0:4]}.csv"
+                )
+                if not mirror.exists() or mirror.stat().st_mtime < canonical.stat().st_mtime:
+                    mirror.write_bytes(canonical.read_bytes())
+            except OSError:
+                pass
+            dest = canonical
 
         ok, reason = validate_barchart_csv(dest)
         if not ok:

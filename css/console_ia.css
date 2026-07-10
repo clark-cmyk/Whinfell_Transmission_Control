@@ -2407,6 +2407,15 @@ body.ia-layer-dig.ia-dig-view-ark .ia-a-host {
   flex-wrap: wrap;
   gap: 4px;
 }
+.ia-ark-btn--primary {
+  background: var(--ia-accent, #3d8bfd);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+}
+.ia-ark-btn--primary:hover {
+  filter: brightness(1.08);
+}
 .ia-ark-btn {
   font-size: 12px;
   font-weight: 700;

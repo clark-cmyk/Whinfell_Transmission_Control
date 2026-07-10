@@ -87,7 +87,11 @@ async function run() {
   assert(ac.EXPORT_IDS.barchart === 'barchart_futures_intraday', 'barchart id');
   assert(ac.EXPORT_IDS.koyfin === 'koyfin_rates', 'koyfin id');
   assert(ac.FALLBACK_CMD.includes('morning_auto_collect'), 'fallback cmd');
-  assert(ac.AGENT_START_CMD.includes('whinfell_collect_agent.py'), 'agent start cmd');
+  assert(
+    ac.AGENT_START_CMD.includes('ensure_collect_agent.sh')
+      || ac.AGENT_START_CMD.includes('whinfell_collect_agent.py'),
+    'agent start cmd',
+  );
 
   ac.wireAll();
   assert(btnMorning._autoCollectBound, 'btnMorningCollect wired');

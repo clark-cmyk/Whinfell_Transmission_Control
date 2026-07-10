@@ -1,6 +1,6 @@
 {
   "bang_bang_da_version": "2.0.0",
-  "generated_at": "2026-07-09T14:56:35.784682Z",
+  "generated_at": "2026-07-10T00:23:29.982588Z",
   "as_of": "2026-07-09T14:37:30+00:00",
   "snapshot_id": "global-2026-07-09-raw2wtm-01",
   "window_days": 60,
@@ -44,6 +44,13 @@
       "1x": 3,
       "2x": 0,
       "3x": 2,
+      "BLOCKED": 0,
+      "DATA_GAP": 0
+    },
+    "verdict_counts": {
+      "BANG": 2,
+      "WATCH": 1,
+      "PASS": 5,
       "BLOCKED": 0,
       "DATA_GAP": 0
     },

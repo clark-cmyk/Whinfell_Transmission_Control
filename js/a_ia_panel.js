@@ -32,6 +32,9 @@
   }
 
   function formatTime(iso) {
+    if (typeof global.WTM_formatLocalStamp === 'function') {
+      return global.WTM_formatLocalStamp(iso, { fallback: '—' });
+    }
     if (!iso) return '—';
     try {
       const d = new Date(iso);

@@ -78,6 +78,8 @@
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front contract</span>
           </div>
         </div>
+        <!-- Chunk 19: dual BTC | ETH enhanced basis curve table (below chart) -->
+        <div id="bwDualCurveTable" class="bw-dual-curve-host" aria-label="BTC and ETH basis curve table"></div>
         <div class="bw-main-body" id="bwMainView"></div>
         <aside class="bw-methodology" id="bwMethodology" aria-label="Methodology"></aside>
       </section>
@@ -106,6 +108,7 @@
   </footer>
 
   <!-- Chunk 17: The Ark SSOT must load before BasisWatch / desk ops (no raw market fetch elsewhere). -->
+  <script src="js/time_format.js"></script>
   <script src="js/ark.js"></script>
   <script src="js/task_force_panel_feed.js"></script>
   <script src="js/basis_watch_analytics.js"></script>

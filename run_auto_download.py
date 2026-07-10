@@ -167,6 +167,27 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 1
         print(f"fetch_ok path={path}")
+        # Chunk 22 — always rebuild Ark curve after Barchart futures watchlist land.
+        if str(args.id) == "barchart_futures_intraday":
+            try:
+                from whinfell_pipeline.barchart_curve_refresh import (  # noqa: WPS433
+                    CurveRefreshError,
+                    refresh_barchart_curve,
+                )
+
+                curve = refresh_barchart_curve(
+                    csv_path=Path(path),
+                    drop=drop,
+                    repo_root=REPO_ROOT,
+                )
+                print(
+                    "curve_refresh_ok "
+                    f"BTN26={curve.get('BTN26_close')} "
+                    f"max_date={curve.get('max_quote_date')} "
+                    f"as_of={curve.get('as_of')}"
+                )
+            except Exception as exc:  # noqa: BLE001 — keep fetch success even if curve rebuild fails
+                print(f"WARN: curve refresh after fetch failed: {exc}", file=sys.stderr)
         return 0
 
     if args.command == "daily":

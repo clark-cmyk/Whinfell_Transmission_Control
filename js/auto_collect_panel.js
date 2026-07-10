@@ -5,12 +5,13 @@
 (function autoCollectPanel(global) {
   'use strict';
 
-  const COLLECT_BUILD = '0.3-AUTO-COLLECT-CURVE-2026-07-05';
+  const COLLECT_BUILD = '0.4-AUTO-COLLECT-CURVE-ENSURE-2026-07-09';
   const JOB_POLL_INTERVAL_MS = 2000;
   const JOB_POLL_TIMEOUT_MS = 600000;
   const AGENT_BASE = 'http://127.0.0.1:8767';
   const FALLBACK_CMD = 'bash scripts/morning_auto_collect.sh';
-  const AGENT_START_CMD = 'python3 scripts/whinfell_collect_agent.py';
+  /** Chunk 22 permanent: replace stale Desktop agents and expose /v1/curve/*. */
+  const AGENT_START_CMD = 'bash scripts/ensure_collect_agent.sh';
 
   const EXPORT_IDS = {
     barchart: 'barchart_futures_intraday',
@@ -188,7 +189,13 @@
     if (!reload?.snapshot_id && !reload?.as_of) return '';
     const parts = [];
     if (reload.snapshot_id) parts.push(String(reload.snapshot_id));
-    if (reload.as_of) parts.push(String(reload.as_of));
+    if (reload.as_of) {
+      parts.push(
+        typeof global.WTM_formatLocalStamp === 'function'
+          ? global.WTM_formatLocalStamp(reload.as_of)
+          : String(reload.as_of)
+      );
+    }
     if (reload.freshness_status) parts.push(String(reload.freshness_status));
     return parts.length ? ` · ${parts.join(' · ')}` : '';
   }

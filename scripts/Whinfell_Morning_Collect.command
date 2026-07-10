@@ -1,18 +1,17 @@
 #!/bin/bash
 # Double-click launcher — Barchart + Koyfin CSV fetch + optional pipeline chain.
+# Chunk 22: always use THIS checkout (not a hard-coded Desktop path) so curve
+# refresh + collect agent match the code serving the desk.
 set -euo pipefail
 
-REPO="${WHINFELL_TC_ROOT:-$HOME/Desktop/Whinfell_Transmission_Control}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO="${WHINFELL_TC_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 cd "$REPO"
 
 echo "=== Whinfell Morning Collect (.command) ==="
 echo "repo=$REPO"
 
-# Start collect agent in background if not already listening.
-if ! curl -sf "http://127.0.0.1:${WHINFELL_COLLECT_PORT:-8767}/health" >/dev/null 2>&1; then
-  echo "Starting collect agent on :${WHINFELL_COLLECT_PORT:-8767} ..."
-  nohup python3 scripts/whinfell_collect_agent.py >/tmp/whinfell_collect_agent.log 2>&1 &
-  sleep 0.5
-fi
+# Permanent: curve-capable agent on :8767 (replaces stale Desktop v0.1.0 if needed).
+bash scripts/ensure_collect_agent.sh
 
 bash scripts/morning_auto_collect.sh

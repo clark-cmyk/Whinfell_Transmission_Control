@@ -348,7 +348,11 @@
       return `Gate ${ctx.gateTitle || '—'}${rule ? ` — ${rule}` : ''}. ${resolved.reason}`;
     },
     freshness(ctx, resolved) {
-      const asOf = ctx.metrics?.dataAsOf ? new Date(ctx.metrics.dataAsOf).toLocaleString() : 'no timestamp';
+      const asOf = ctx.metrics?.dataAsOf
+        ? (typeof globalThis.WTM_formatLocalStamp === 'function'
+          ? globalThis.WTM_formatLocalStamp(ctx.metrics.dataAsOf)
+          : new Date(ctx.metrics.dataAsOf).toLocaleString())
+        : 'no timestamp';
       return `Freshness ${ctx.freshLabel || '—'} · as-of ${asOf}. ${resolved.reason}`;
     },
     shock(ctx, resolved) {

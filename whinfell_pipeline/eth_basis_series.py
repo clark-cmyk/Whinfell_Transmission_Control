@@ -114,9 +114,13 @@ def _dig(data: dict, *keys: str, default: Any = None) -> Any:
 
 def resolve_eth_reference_price(bundle: dict | None, root: Path, obs_date: str | None) -> float | None:
     if bundle:
-        spot = _safe_float(_dig(bundle, "crypto_sleeve", "assets", "eth_spot_usd", "price"))
+        # Ark Koyfin sleeve uses last_price; older bundles may use price/last.
+        eth_asset = _dig(bundle, "crypto_sleeve", "assets", "eth_spot_usd") or {}
+        spot = _safe_float(eth_asset.get("last_price"))
         if spot is None:
-            spot = _safe_float(_dig(bundle, "crypto_sleeve", "assets", "eth_spot_usd", "last"))
+            spot = _safe_float(eth_asset.get("price"))
+        if spot is None:
+            spot = _safe_float(eth_asset.get("last"))
         if spot is not None:
             return spot
 

@@ -11,7 +11,7 @@ WMC.Overview = {
 
     root.innerHTML = `
       <p class="wmc-thesis">${meta.thesis}</p>
-      <p class="wmc-meta-line">As of <span class="wmc-num">${meta.as_of}</span> · Barchart, Koyfin, MISO API, GPU indices${meta.task_force_source ? ` · Task Force <span class="wmc-num">${meta.task_force_source}</span>` : ''}</p>
+      <p class="wmc-meta-line">As of <span class="wmc-num">${typeof window.WTM_formatLocalStamp === 'function' ? window.WTM_formatLocalStamp(meta.as_of) : meta.as_of}</span> · Barchart, Koyfin, MISO API, GPU indices${meta.task_force_source ? ` · Task Force <span class="wmc-num">${meta.task_force_source}</span>` : ''}</p>
       <div class="wmc-hero-kpi">
         <span class="wmc-hero-label">${hero.label}</span>
         <span class="wmc-hero-value wmc-num">${hero.value}<span class="wmc-hero-unit">${hero.unit}</span></span>

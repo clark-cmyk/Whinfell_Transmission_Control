@@ -1965,7 +1965,7 @@
             "label": "ETH Basis (Spot vs 1m)",
             "horizons": {
               "1m": {
-                "current_value": -18.0,
+                "current_value": -1.0372,
                 "unit": "pct",
                 "percentile": 60.0,
                 "quartile": 3,
@@ -1975,7 +1975,7 @@
                 "n_observations": 5
               },
               "3m": {
-                "current_value": -18.0,
+                "current_value": -1.0372,
                 "unit": "pct",
                 "percentile": 60.0,
                 "quartile": 3,
@@ -1985,7 +1985,7 @@
                 "n_observations": 5
               },
               "6m": {
-                "current_value": -18.0,
+                "current_value": -1.0372,
                 "unit": "pct",
                 "percentile": 60.0,
                 "quartile": 3,
@@ -1995,7 +1995,7 @@
                 "n_observations": 5
               },
               "12m": {
-                "current_value": -18.0,
+                "current_value": -1.0372,
                 "unit": "pct",
                 "percentile": 60.0,
                 "quartile": 3,
@@ -2005,7 +2005,7 @@
                 "n_observations": 5
               },
               "3y": {
-                "current_value": -18.0,
+                "current_value": -1.0372,
                 "unit": "pct",
                 "percentile": 60.0,
                 "quartile": 3,
