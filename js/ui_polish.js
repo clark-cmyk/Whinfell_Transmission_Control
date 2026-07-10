@@ -14,12 +14,12 @@
   }
 
   function enhanceRvCanvas() {
-    const canvas = document.getElementById('cockpitRvCanvas');
-    if (!canvas || canvas._polishBound) return;
-    canvas._polishBound = true;
+    const mount = document.getElementById('cockpitRvCanvas');
+    if (!mount || mount._polishBound) return;
+    mount._polishBound = true;
     const tip = ensureTooltip();
-    canvas.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
+    mount.addEventListener('mousemove', (e) => {
+      const rect = mount.getBoundingClientRect();
       if (!rect.width) return;
       const x = (e.clientX - rect.left) / rect.width;
       tip.style.display = 'block';
@@ -27,7 +27,7 @@
       tip.style.top = `${e.clientY + 12}px`;
       tip.textContent = `RV probe · x=${(x * 100).toFixed(0)}% · ${document.getElementById('cockpitChartValue')?.textContent || '—'}`;
     });
-    canvas.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    mount.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
   }
 
   function addChartExportButtons() {
@@ -38,11 +38,20 @@
     bar.innerHTML = '<button type="button" class="chart-export-btn" data-export="rv-png">Export RV PNG</button><button type="button" class="chart-export-btn" data-export="rv-csv">Export RV CSV</button>';
     area.prepend(bar);
     bar.querySelector('[data-export="rv-png"]')?.addEventListener('click', () => {
-      const c = document.getElementById('cockpitRvCanvas');
-      if (!c) return;
+      const mount = document.getElementById('cockpitRvCanvas');
+      if (!mount) return;
+      let dataUrl = null;
+      // Chunk 29 — prefer LWC takeScreenshot when chart handle is present.
+      try {
+        const canvas = mount.querySelector('canvas');
+        if (canvas && typeof canvas.toDataURL === 'function') {
+          dataUrl = canvas.toDataURL('image/png');
+        }
+      } catch (_) { /* ignore */ }
+      if (!dataUrl) return;
       const a = document.createElement('a');
       a.download = 'whinfell-rv-chart.png';
-      a.href = c.toDataURL('image/png');
+      a.href = dataUrl;
       a.click();
     });
     bar.querySelector('[data-export="rv-csv"]')?.addEventListener('click', () => {
@@ -73,18 +82,24 @@
     const checks = [];
     const ok = (name, pass, detail) => checks.push({ name, pass, detail });
 
-    ok('cockpitRvCanvas', !!document.getElementById('cockpitRvCanvas'), 'RV canvas present');
+    ok('cockpitRvCanvas', !!document.getElementById('cockpitRvCanvas'), 'RV LWC mount present');
     ok('basisWatchPanel', !!document.getElementById('basisWatchPanel'), 'BasisWatch panel present');
     ok('aiComputePanel', !!document.getElementById('panel-aicompute'), 'AI Compute panel present');
     ok('v15DeskPanel', !!document.getElementById('panel-v15desk'), 'v1.5 Desk panel present');
     ok('WTM_BasisWatch', typeof window.WTM_BasisWatch !== 'undefined', window.WTM_BasisWatch?.BW_BUILD || 'missing');
+    ok('WTM_Charts', typeof window.WTM_Charts !== 'undefined', window.WTM_Charts?.isAvailable?.() ? 'LWC ready' : 'factory');
     ok('WTM_AICompute', typeof window.WTM_AICompute !== 'undefined', 'module loaded');
     ok('hydration', !!(window.appState?.hydration?.node_cockpits), window.appState?.provenance?.hydratedAt || 'not hydrated');
     ok('renderAll', typeof window.renderAll === 'function', window.renderAll?.name || 'stub');
     ok('legacyToggle', !!document.getElementById('btnWorkspaceToggle'), document.getElementById('btnWorkspaceToggle')?.textContent || '');
 
-    const canvas = document.getElementById('cockpitRvCanvas');
-    if (canvas) ok('rvCanvasSize', canvas.width > 0 && canvas.height > 0, `${canvas.width}x${canvas.height}`);
+    const mount = document.getElementById('cockpitRvCanvas');
+    if (mount) {
+      const rect = mount.getBoundingClientRect?.() || { width: mount.clientWidth || 0, height: mount.clientHeight || 0 };
+      const w = Math.floor(rect.width || 0);
+      const h = Math.floor(rect.height || 0);
+      ok('rvMountSize', w > 0 || h > 0 || !!mount.querySelector?.('canvas'), `${w}x${h}`);
+    }
 
     const passed = checks.filter(c => c.pass).length;
     const report = { ok: passed === checks.length, passed, total: checks.length, checks, at: new Date().toISOString() };

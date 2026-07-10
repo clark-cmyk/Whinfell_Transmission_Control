@@ -5046,11 +5046,18 @@ function syncHeaderSourceLinks(state) {
 }
 
 let cockpitChartResizeObs = null;
+/** Chunk 29 — LWC handle for cockpit RV line chart. */
+let _cockpitRvLwc = null;
+
 function initCockpitChartResize() {
   const host = el('cockpitChartCanvas');
   if (!host || cockpitChartResizeObs || typeof ResizeObserver === 'undefined') return;
   cockpitChartResizeObs = new ResizeObserver(() => {
     if (appState.ui?.workspaceView !== 'cockpit' || appState.navigation?.focus_mode || appState.navigation?.view_mode === 'compare') return;
+    if (_cockpitRvLwc && typeof _cockpitRvLwc.resize === 'function') {
+      _cockpitRvLwc.resize();
+      return;
+    }
     const state = buildStateFromDOM();
     const cockpit = mergeNodeCockpit(activeNodeId(), state);
     drawRvBasisChart(cockpit, el('cockpitRvCanvas'), state, deriveGate(state));
@@ -6243,210 +6250,68 @@ function renderCockpitDecisionRail(cockpit, state) {
     ${blocks.gate}`;
 }
 
-function drawRvBasisChart(cockpit, canvas, state, gate) {
-  if (!canvas || !canvas.getContext) return { drew: false, pointCount: 0 };
-  const ctx = canvas.getContext('2d');
-  const theme = getChartTheme();
-  const domState = state || buildStateFromDOM();
-  const gateState = gate || deriveGate(domState);
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const rect = canvas.parentElement?.getBoundingClientRect?.() || { width: 400, height: 240 };
-  const w = Math.max(240, Math.floor(rect.width));
-  const h = Math.max(180, Math.floor(rect.height));
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
+/**
+ * Chunk 29 — Cockpit RV / basis as TradingView Lightweight Charts line series.
+ * Horizon ordinals map to sequential synthetic UTC days (mapOrdinalSeries).
+ * Series stroke = theme accent; subtle grid; tight scaleMargins.
+ * RV table below remains the authoritative multi-column read.
+ */
+function drawRvBasisChart(cockpit, mount, state, gate) {
+  if (!mount) return { drew: false, pointCount: 0 };
 
-  const horizon = cockpit.rv_basis?.active_horizon || appState.chart?.shared_horizon || '3m';
   const seriesMap = cockpit.rv_basis?.series || {};
   const seriesId = cockpit.rv_basis?.active_series_id || Object.keys(seriesMap)[0];
   const series = seriesId ? seriesMap[seriesId] : null;
   if (!series) return { drew: false, pointCount: 0 };
 
+  const isBasis = cockpit.node_id === 'basis';
   const points = RV_HORIZONS.map(hzKey => {
     const hz = series.horizons?.[hzKey];
-    return hz ? { key: hzKey, value: Number(hz.current_value), percentile: Number(hz.percentile), quartile: hz.quartile, unit: hz.unit } : null;
+    if (!hz) return null;
+    const value = isBasis
+      ? Number(hz.current_value)
+      : Number(hz.percentile);
+    if (!Number.isFinite(value)) return null;
+    return { key: hzKey, value };
   }).filter(Boolean);
 
   if (!points.length) return { drew: false, pointCount: 0 };
 
-  const isMission = isMissionSurfaceNode(cockpit.node_id);
-  const isBasis = cockpit.node_id === 'basis';
-  const diagTags = isMission ? buildMissionChartDiagnosis(cockpit, domState, gateState) : [];
-  const pad = { l: 72, r: 20, t: 28, b: 44 };
-  const plotW = w - pad.l - pad.r;
-  const plotH = h - pad.t - pad.b;
-  const vals = points.map(p => p.value);
-  const refs = isBasis ? resolveBasisRefLines(domState) : {};
-  const refsReady = isBasis && basisRefsAvailable(refs);
-  const domainSource = isBasis
-    ? (refsReady ? [...vals, 0, refs.low, refs.mid, refs.high] : [...vals, 0])
-    : [0, ...vals, 100];
-  const domain = isBasis ? getBasisDomain(domainSource) : [0, 100];
-  const [yMin, yMax] = domain;
-  const yBase = isBasis && yMin <= 0 && yMax >= 0 ? 0 : yMin;
-  const barW = plotW / points.length;
-  const activeHz = series.horizons?.[horizon];
-  const axisFont = '600 12px system-ui,sans-serif';
-  const labelFont = '600 11px system-ui,sans-serif';
-  const valueFont = '600 11px system-ui,sans-serif';
+  const Charts = typeof WTM_Charts !== 'undefined' ? WTM_Charts : (typeof window !== 'undefined' ? window.WTM_Charts : null);
+  if (!Charts || !Charts.isAvailable || !Charts.isAvailable()) {
+    return { drew: false, pointCount: 0 };
+  }
 
-  if (isBasis) {
-    const permText = gateState.blocked ? 'No new risk' : gateState.tight ? 'Allowed · capped 0.5×' : 'Eligible';
-    ctx.fillStyle = gateState.blocked ? 'rgba(245,101,101,0.85)' : gateState.tight ? 'rgba(245,166,35,0.85)' : 'rgba(61,221,140,0.75)';
-    ctx.font = labelFont;
-    ctx.textAlign = 'right';
-    ctx.fillText(permText, w - pad.r, pad.t - 10);
-    if (gateState.tight || gateState.blocked) {
-      ctx.fillStyle = gateState.blocked ? 'rgba(245,101,101,0.35)' : 'rgba(245,166,35,0.28)';
-      ctx.fillRect(pad.l - 4, pad.t, 3, plotH);
+  if (mount.style) {
+    mount.style.width = '100%';
+    mount.style.height = '100%';
+    mount.style.position = 'absolute';
+    mount.style.inset = '0';
+  }
+  mount.setAttribute('role', 'img');
+  mount.setAttribute('aria-label', isBasis ? 'Basis reading by horizon' : 'RV percentile by horizon');
+
+  if (!_cockpitRvLwc || _cockpitRvLwc.container !== mount) {
+    if (_cockpitRvLwc) {
+      try { Charts.destroyChart(_cockpitRvLwc); } catch (_) { /* ignore */ }
+      _cockpitRvLwc = null;
     }
-  }
-
-  if (isBasis && !refsReady) {
-    drawBasisQuartileScaffold(ctx, domain, pad, plotW, plotH);
-  }
-
-  ctx.strokeStyle = theme.grid;
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 4; i++) {
-    const v = yMin + ((yMax - yMin) * i) / 4;
-    const y = basisValueToY(v, domain, pad, plotH);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y);
-    ctx.lineTo(w - pad.r, y);
-    ctx.stroke();
-    ctx.fillStyle = theme.axisText;
-    ctx.font = axisFont;
-    ctx.textAlign = 'right';
-    const axisLabel = isBasis
-      ? formatChartValue(v, points[0]?.unit)
-      : `${Math.round(v)}%`;
-    ctx.fillText(axisLabel, pad.l - 8, y + 4);
-  }
-
-  if (isBasis && yMin <= 0 && yMax >= 0) {
-    const y0 = basisValueToY(0, domain, pad, plotH);
-    ctx.strokeStyle = theme.zeroLine;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, y0);
-    ctx.lineTo(w - pad.r, y0);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = theme.muted;
-    ctx.font = labelFont;
-    ctx.textAlign = 'right';
-    ctx.fillText('0', pad.l - 8, y0 + 4);
-  }
-
-  if (refsReady && refs.low < refs.high) {
-    const yLo = basisValueToY(refs.low, domain, pad, plotH);
-    const yHi = basisValueToY(refs.high, domain, pad, plotH);
-    ctx.fillStyle = 'rgba(214,168,95,0.12)';
-    ctx.fillRect(pad.l, Math.min(yLo, yHi), plotW, Math.abs(yHi - yLo));
-    [{ v: refs.low, a: 0.28 }, { v: refs.mid, a: 0.42 }, { v: refs.high, a: 0.28 }].forEach(ref => {
-      const y = basisValueToY(ref.v, domain, pad, plotH);
-      ctx.strokeStyle = `rgba(214,168,95,${ref.a})`;
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    });
-  } else if (isBasis) {
-    ctx.fillStyle = theme.muted;
-    ctx.font = labelFont;
-    ctx.textAlign = 'left';
-    ctx.fillText('Ref band unavailable — table below is authoritative', pad.l, pad.t - 10);
-  }
-
-  const activeIdx = points.findIndex(p => p.key === horizon);
-  if (activeIdx >= 0) {
-    ctx.fillStyle = theme.activeBand;
-    ctx.fillRect(pad.l + activeIdx * barW, pad.t, barW, plotH);
-  }
-
-  points.forEach((p, i) => {
-    const x = pad.l + i * barW + barW * 0.12;
-    const bw = barW * 0.76;
-    const yTop = isBasis
-      ? basisValueToY(p.value, domain, pad, plotH)
-      : pad.t + plotH - ((p.percentile || 50) / 100) * plotH;
-    const yBot = isBasis ? basisValueToY(yBase, domain, pad, plotH) : pad.t + plotH;
-    const q = p.quartile || 2;
-    ctx.fillStyle = q >= 4 ? theme.barHi : q <= 1 ? theme.barLo : theme.barMid;
-    if (isBasis) {
-      ctx.fillRect(x, Math.min(yTop, yBot), bw, Math.max(6, Math.abs(yBot - yTop)));
-    } else {
-      const barH = Math.max(6, plotH * ((p.percentile || 50) / 100));
-      ctx.fillRect(x, pad.t + plotH - barH, bw, barH);
-    }
-    ctx.fillStyle = theme.label;
-    ctx.font = labelFont;
-    ctx.textAlign = 'center';
-    ctx.fillText(RV_HORIZON_LABELS[p.key] || p.key, x + bw / 2, h - pad.b + 16);
-    const valLabel = isBasis
-      ? formatChartValue(p.value, p.unit)
-      : `${Math.round(p.percentile || 0)}%`;
-    ctx.fillStyle = theme.axisText;
-    ctx.font = valueFont;
-    const labelY = isBasis ? Math.min(yTop, yBot) - 6 : Math.max(pad.t + 14, yTop - 6);
-    ctx.fillText(valLabel, x + bw / 2, labelY);
-  });
-
-  if (!isBasis) {
-    ctx.strokeStyle = theme.line;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    points.forEach((p, i) => {
-      const x = pad.l + i * barW + barW / 2;
-      const y = pad.t + plotH - ((p.percentile || 50) / 100) * plotH;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    ctx.fillStyle = theme.muted;
-    ctx.font = labelFont;
-    ctx.textAlign = 'left';
-    ctx.fillText('Y-axis: percentile vs history', pad.l, pad.t - 10);
-  }
-
-  if (isBasis && activeHz && Number.isFinite(activeHz.percentile)) {
-    const pctY = pad.t + plotH - ((activeHz.percentile || 50) / 100) * plotH;
-    ctx.strokeStyle = theme.line;
-    ctx.setLineDash([3, 4]);
-    ctx.beginPath();
-    ctx.moveTo(pad.l, pctY);
-    ctx.lineTo(w - pad.r, pctY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = theme.muted;
-    ctx.font = labelFont;
-    ctx.textAlign = 'right';
-    ctx.fillText(formatPercentile(Number(activeHz.percentile)), w - pad.r, pctY - 4);
-  }
-
-  if (diagTags.length) {
-    const fontSize = 10;
-    let xCursor = pad.l;
-    const yDiag = h - 8;
-    ctx.font = `${fontSize}px system-ui,sans-serif`;
-    ctx.textAlign = 'left';
-    diagTags.forEach(tag => {
-      const textW = ctx.measureText(tag).width + 12;
-      if (xCursor + textW > w - pad.r) return;
-      ctx.fillStyle = theme.activeBand;
-      ctx.fillRect(xCursor, yDiag - fontSize - 6, textW, fontSize + 6);
-      ctx.fillStyle = theme.muted;
-      ctx.fillText(tag, xCursor + 6, yDiag - 2);
-      xCursor += textW + 6;
+    _cockpitRvLwc = Charts.createLineChart(mount, null, {
+      minHeight: 160,
+      listenTheme: true,
+      observeResize: true,
     });
   }
+  if (!_cockpitRvLwc) return { drew: false, pointCount: 0 };
+
+  const lineData = Charts.mapOrdinalSeries(points.map(p => p.value));
+  _cockpitRvLwc.setData(lineData);
+  if (typeof _cockpitRvLwc.applyTheme === 'function') _cockpitRvLwc.applyTheme();
+  if (typeof _cockpitRvLwc.resize === 'function') _cockpitRvLwc.resize();
+
+  // Optional gate annotation via series title is not needed; decision rail owns permission copy.
+  void gate;
+  void state;
 
   return { drew: true, pointCount: points.length };
 }

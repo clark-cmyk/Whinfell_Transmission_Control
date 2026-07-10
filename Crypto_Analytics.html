@@ -83,18 +83,18 @@
               <span class="ca-legend-item"><span class="ca-legend-swatch ca-legend-swatch--spot"></span>Spot Marker</span>
             </div>
             <div class="ca-chart-wrap">
-              <canvas class="ca-chart-canvas" aria-label="BasisWatch historical chart"></canvas>
+              <div class="wtm-lwc-mount ca-chart-canvas" role="img" aria-label="BasisWatch historical chart"></div>
               <div class="ca-tooltip" role="tooltip"></div>
             </div>
             <div class="ca-navigator-wrap">
-              <canvas class="ca-navigator-canvas" aria-label="Chart range navigator"></canvas>
+              <div class="wtm-lwc-mount ca-navigator-canvas" role="img" aria-label="Chart range navigator"></div>
             </div>
           </section>
 
           <section id="caPanelForward" class="ca-viz-panel" aria-label="Forward curve">
             <p class="ca-curve-y-label" id="caCurveYLabel">Annualized Implied Forward Rate (%)</p>
             <div class="ca-chart-wrap">
-              <canvas class="ca-chart-canvas" aria-label="Forward curve chart"></canvas>
+              <div class="wtm-lwc-mount ca-chart-canvas" role="img" aria-label="Forward curve chart"></div>
               <div class="ca-tooltip" role="tooltip"></div>
             </div>
           </section>
@@ -102,7 +102,7 @@
           <section id="caPanelSpot" class="ca-viz-panel" aria-label="Spot curve">
             <p class="ca-curve-y-label">Annualized Spot Rate (%)</p>
             <div class="ca-chart-wrap">
-              <canvas class="ca-chart-canvas" aria-label="Spot curve chart"></canvas>
+              <div class="wtm-lwc-mount ca-chart-canvas" role="img" aria-label="Spot curve chart"></div>
               <div class="ca-tooltip" role="tooltip"></div>
             </div>
           </section>
@@ -111,6 +111,9 @@
     </div>
   </div>
 
+  <script src="js/theme.js"></script>
+  <script src="js/vendor/lightweight-charts.standalone.production.js"></script>
+  <script src="js/charts/lwc_factory.js"></script>
   <script src="crypto_analytics/ca-models.js"></script>
   <script src="crypto_analytics/ca-data.js"></script>
   <script src="crypto_analytics/ca-summary.js"></script>

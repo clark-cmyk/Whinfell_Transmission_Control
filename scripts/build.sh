@@ -15,6 +15,15 @@ cp "${ROOT}/css/main.css" "$OUT/css/main.css"
 cp "${ROOT}/css/console_ia.css" "$OUT/css/console_ia.css"
 cp "${ROOT}/css/transmission_radar.css" "$OUT/css/transmission_radar.css"
 cp "${ROOT}/js/bootstrap.js" "$OUT/js/bootstrap.js"
+# Chunk 26/29 — theme + TradingView Lightweight Charts (offline vendor)
+[[ -f "${ROOT}/js/theme.js" ]] && cp "${ROOT}/js/theme.js" "$OUT/js/theme.js"
+[[ -f "${ROOT}/js/time_format.js" ]] && cp "${ROOT}/js/time_format.js" "$OUT/js/time_format.js"
+[[ -f "${ROOT}/css/theme.css" ]] && cp "${ROOT}/css/theme.css" "$OUT/css/theme.css"
+mkdir -p "$OUT/js/vendor" "$OUT/js/charts"
+[[ -f "${ROOT}/js/vendor/lightweight-charts.standalone.production.js" ]] \
+  && cp "${ROOT}/js/vendor/lightweight-charts.standalone.production.js" "$OUT/js/vendor/"
+[[ -f "${ROOT}/js/charts/lwc_factory.js" ]] \
+  && cp "${ROOT}/js/charts/lwc_factory.js" "$OUT/js/charts/lwc_factory.js"
 # The Ark + Articulate (SSOT data layer + intelligence; all four required)
 cp "${ROOT}/js/ark.js" "$OUT/js/ark.js"
 cp "${ROOT}/js/ark_ia_panel.js" "$OUT/js/ark_ia_panel.js"
@@ -156,6 +165,9 @@ for req in \
   css/console_ia.css \
   css/transmission_radar.css \
   js/bootstrap.js \
+  js/theme.js \
+  js/vendor/lightweight-charts.standalone.production.js \
+  js/charts/lwc_factory.js \
   js/ark.js \
   js/ark_ia_panel.js \
   js/articulate.js \

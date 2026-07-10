@@ -1,4 +1,8 @@
-/** Chart placeholders — WTC deep-links + sparklines */
+/**
+ * Chart placeholders — WTC deep-links + micro-sparklines.
+ * Chunk 29: full analytical charts use TradingView LWC; these tiles stay as
+ * theme-accent micro-sparks (exception policy — same accent/grid rules).
+ */
 window.WMC = window.WMC || {};
 
 WMC.Charts = {
@@ -6,6 +10,7 @@ WMC.Charts = {
     WMC.Charts.render();
     if (typeof window.addEventListener === 'function') {
       window.addEventListener('resize', WMC.Charts.redrawSparklines);
+      window.addEventListener('wtm:themechange', WMC.Charts.redrawSparklines);
     }
   },
 

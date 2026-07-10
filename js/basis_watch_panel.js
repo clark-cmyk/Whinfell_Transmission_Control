@@ -24,7 +24,7 @@
    * Chunk 17 — standalone loads via WTM_Ark; valuation anchors to Ark hydration
    * when curve quote dates lag (stale Barchart nodes).
    */
-  const BW_BUILD = '3.9-BASISWATCH-ARK-CHUNK28-FOCUS-A-PAINT-2026-07-09';
+  const BW_BUILD = '3.10-BASISWATCH-ARK-CHUNK29-LWC-2026-07-09';
   /** Shared with WTM_Theme — Chunk 26 Dark / Light / Nature. */
   const THEME_KEY = (global.WTM_Theme && global.WTM_Theme.STORAGE_KEY) || 'whinfell_tc_theme';
   const THEME_COLORS = {
@@ -43,7 +43,7 @@
   /** Heuristic: AE dollar spreads mis-stored as unit=pct when |v| is large vs spot. */
   const HYDRATION_BASIS_DOLLAR_ABS = 5;
   /**
-   * Chunk 28 — canvas paint ownership (panel-only; LWC migration is Chunk 29).
+   * Chunk 28/29 — chart paint ownership (LWC mount; invalidate on asset/view switch).
    * Cap zero-width rAF retries so layout races cannot spin forever.
    */
   const CHART_ZERO_WIDTH_RAF_CAP = 30;
@@ -94,9 +94,12 @@
   let _refreshGen = 0;
   let _refreshLoop = null;
   let _pendingRefresh = null;
-  /** Chunk 28 — single active chart paint rAF + generation token. */
+  /** Chunk 28/29 — single active chart paint rAF + generation token + LWC handle. */
   let _chartPaintRaf = null;
   let _chartPaintGen = 0;
+  /** @type {null|{chart:*,series:*,secondarySeries:*,setData:Function,destroy:Function,takeScreenshot:Function,applyTheme:Function,_spotPriceLine?:*}} */
+  let _bwLwc = null;
+  let _bwSpotPriceLine = null;
   const isStandalone = () => document.body?.dataset?.bwLayout === 'standalone';
 
   function getState() {
@@ -638,8 +641,9 @@
       axis: v('--bw-chart-axis') || v('--wtm-chart-axis') || v('--wtm-muted') || '#8b9aab',
       spotLine: v('--bw-chart-spot-line') || v('--wtm-accent-soft') || 'rgba(34,139,34,0.35)',
       spotLabel: v('--bw-chart-spot-label') || v('--wtm-muted') || '#8b9aab',
-      curve: v('--bw-chart-curve') || '#e07b39',
-      front: v('--bw-chart-front') || v('--wtm-chart-line') || accent,
+      // Chunk 29 — primary series = theme accent (no orange neon curve branding).
+      curve: v('--wtm-chart-line') || accent,
+      front: v('--wtm-chart-line') || accent,
       node: v('--bw-chart-node') || v('--wtm-muted') || '#c5d0dc',
       muted: v('--bw-muted') || v('--wtm-muted') || '#8b9aab',
       empty: v('--bw-muted') || v('--wtm-muted') || '#8b9aab',
@@ -1627,167 +1631,104 @@
     return global._bwTooltipCtl;
   }
 
-  function drawRateSeries(ctx, pad, plotW, plotH, w, h, dtes, rates, color, yMin, yMax, xOffset = 0, xDenom) {
-    const denom = xDenom || Math.max(...dtes, 1);
-    const yAt = r => pad.t + plotH - ((r - yMin) / (yMax - yMin || 1)) * plotH;
-    const xAt = d => pad.l + xOffset + (d / denom) * plotW;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    dtes.forEach((d, i) => {
-      const x = xAt(d), y = yAt(rates[i]);
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    ctx.lineWidth = 1;
-    dtes.forEach((d, i) => {
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.arc(xAt(d), yAt(rates[i]), 3, 0, Math.PI * 2); ctx.fill();
-    });
-  }
-
   function contractChartLabel(symbol) {
     const m = String(symbol || '').match(/([FGHJKMNQUVXZ]\d{2})$/);
     return m ? m[1] : String(symbol || '').slice(-3);
   }
 
-  function drawYAxisPriceLabels(ctx, pad, plotH, yAt, minP, maxP, theme) {
-    ctx.fillStyle = theme.axis;
-    ctx.font = '9px system-ui,sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i <= 4; i++) {
-      const p = minP + ((maxP - minP) * i) / 4;
-      ctx.fillText(`$${fmtNum(p, 0)}`, pad.l - 6, yAt(p));
+  /**
+   * Chunk 29 — map BasisWatch model → LWC line data.
+   * Rate/price vs DTE is not a pure time series; approach (A) maps DTE ordinals
+   * to synthetic UTC timestamps (epoch 2020-01-01 + dte days) so LWC time scale
+   * preserves spacing semantics. Dual-board table remains authoritative for labels.
+   */
+  function buildBwLwcSeries(model) {
+    const Charts = global.WTM_Charts;
+    const contracts = model.contracts || [];
+    if (!Charts || typeof Charts.mapDteSeries !== 'function') {
+      return { primary: [], secondary: null, mode: model.view || 'basis', spot: model.spot };
     }
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
+    if (model.view === 'implied') {
+      const primary = Charts.mapDteSeries(
+        contracts
+          .filter((c) => Number.isFinite(c.spotAnnualizedCarry) && Number.isFinite(c.dte))
+          .map((c) => ({ dte: c.dte, value: c.spotAnnualizedCarry }))
+      );
+      const secondary = Charts.mapDteSeries(
+        (model.calendarPairs || [])
+          .filter((p) => Number.isFinite(p.forwardAnnualizedYield)
+            && Number.isFinite(p.nearDte) && Number.isFinite(p.farDte))
+          .map((p) => ({ dte: (p.nearDte + p.farDte) / 2, value: p.forwardAnnualizedYield }))
+      );
+      return { primary, secondary, mode: 'implied', spot: model.spot };
+    }
+    const primary = Charts.mapDteSeries(
+      contracts
+        .filter((c) => Number.isFinite(c.futuresPrice) && Number.isFinite(c.dte))
+        .map((c) => ({ dte: c.dte, value: c.futuresPrice }))
+    );
+    return { primary, secondary: null, mode: 'basis', spot: model.spot };
   }
 
-  function paintBasisChart(ctx, w, h, model, theme) {
-    ctx.clearRect(0, 0, w, h);
-    const contracts = model.contracts || [];
-    if (!contracts.length || !(model.spot > 0)) {
-      ctx.fillStyle = theme.empty;
-      ctx.font = '12px system-ui,sans-serif';
-      ctx.fillText('Curve populates after hydration + Barchart curve JSON', 16, h / 2);
-      return;
+  function destroyBwLwc() {
+    if (_bwSpotPriceLine && _bwLwc?.series && typeof _bwLwc.series.removePriceLine === 'function') {
+      try { _bwLwc.series.removePriceLine(_bwSpotPriceLine); } catch (_) { /* ignore */ }
     }
-
-    if (model.view === 'implied') {
-      const spotPts = contracts.filter(c => Number.isFinite(c.spotAnnualizedCarry));
-      const spotDtes = spotPts.map(c => c.dte);
-      const spotRates = spotPts.map(c => c.spotAnnualizedCarry);
-      const fwdPts = (model.calendarPairs || []).filter(p => Number.isFinite(p.forwardAnnualizedYield));
-      const fwdDtes = fwdPts.map(p => (p.nearDte + p.farDte) / 2);
-      const fwdRates = fwdPts.map(p => p.forwardAnnualizedYield);
-      const allRates = [...spotRates, ...fwdRates].filter(Number.isFinite);
-      if (!allRates.length) {
-        ctx.fillStyle = theme.empty;
-        ctx.font = '12px system-ui,sans-serif';
-        ctx.fillText(`No annualized tenors ≥ ${MIN_ANN_DTE}d DTE`, 16, h / 2);
-        return;
-      }
-      const yMin = Math.min(0, ...allRates) - 1;
-      const yMax = Math.max(...allRates, 1) + 1;
-      const maxDte = Math.max(...spotDtes, ...fwdPts.map(p => p.farDte), 1);
-      const pad = { l: 48, r: 16, t: 18, b: 40 };
-      const plotW = w - pad.l - pad.r;
-      const plotH = h - pad.t - pad.b;
-      const yAt = r => pad.t + plotH - ((r - yMin) / (yMax - yMin || 1)) * plotH;
-      const xAtDte = d => pad.l + (d / maxDte) * plotW;
-
-      ctx.strokeStyle = theme.grid;
-      for (let i = 0; i <= 4; i++) {
-        const y = pad.t + (plotH * i) / 4;
-        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
-      }
-      ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
-
-      ctx.setLineDash([4, 3]);
-      ctx.strokeStyle = theme.muted;
-      const zeroY = yAt(0);
-      ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(w - pad.r, zeroY); ctx.stroke();
-      ctx.setLineDash([]);
-
-      drawRateSeries(ctx, pad, plotW, plotH, w, h, spotDtes, spotRates, theme.curve, yMin, yMax, 0, maxDte);
-      drawRateSeries(ctx, pad, plotW, plotH, w, h, fwdDtes, fwdRates, theme.front, yMin, yMax, 0, maxDte);
-
-      ctx.fillStyle = theme.axis;
-      ctx.font = '9px system-ui,sans-serif';
-      ctx.textAlign = 'center';
-      spotPts.forEach((c) => {
-        ctx.fillText(contractChartLabel(c.symbol), xAtDte(c.dte), h - pad.b + 14);
-      });
-      ctx.textAlign = 'left';
-      ctx.fillText('DTE →', w - pad.r - 36, h - 8);
-      ctx.save();
-      ctx.translate(12, pad.t + plotH / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText('% ann.', 0, 0);
-      ctx.restore();
-      return;
+    _bwSpotPriceLine = null;
+    if (_bwLwc) {
+      try {
+        if (global.WTM_Charts && typeof global.WTM_Charts.destroyChart === 'function') {
+          global.WTM_Charts.destroyChart(_bwLwc);
+        } else if (typeof _bwLwc.destroy === 'function') {
+          _bwLwc.destroy();
+        }
+      } catch (_) { /* ignore */ }
+      _bwLwc = null;
     }
+  }
 
-    const prices = [model.spot, ...contracts.map(c => c.futuresPrice)];
-    const minP = Math.min(...prices) * 0.998;
-    const maxP = Math.max(...prices) * 1.002;
-    const pad = { l: 58, r: 16, t: 18, b: 40 };
-    const plotW = w - pad.l - pad.r;
-    const plotH = h - pad.t - pad.b;
-    const xAt = i => pad.l + (i / Math.max(1, contracts.length)) * plotW;
-    const yAt = p => pad.t + plotH - ((p - minP) / (maxP - minP || 1)) * plotH;
-
-    ctx.strokeStyle = theme.grid;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (plotH * i) / 4;
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+  function ensureBwLwc(container, withSecondary) {
+    const Charts = global.WTM_Charts;
+    if (!Charts || typeof Charts.createLineChart !== 'function' || !Charts.isAvailable()) {
+      return null;
     }
-    ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, h - pad.b); ctx.lineTo(w - pad.r, h - pad.b); ctx.stroke();
-    drawYAxisPriceLabels(ctx, pad, plotH, yAt, minP, maxP, theme);
-
-    ctx.setLineDash([5, 4]);
-    ctx.strokeStyle = theme.spotLine;
-    ctx.beginPath(); ctx.moveTo(pad.l, yAt(model.spot)); ctx.lineTo(w - pad.r, yAt(model.spot)); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = theme.spotLabel;
-    ctx.font = '10px system-ui,sans-serif';
-    ctx.fillText(`${model.assetKey} spot $${fmtNum(model.spot, 0)}`, pad.l + 6, Math.max(pad.t + 10, yAt(model.spot) - 6));
-
-    const grad = ctx.createLinearGradient(pad.l, 0, w - pad.r, 0);
-    grad.addColorStop(0, theme.curve);
-    grad.addColorStop(1, theme.front);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    contracts.forEach((c, i) => {
-      const x = xAt(i + 1);
-      const y = yAt(c.futuresPrice);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+    if (_bwLwc && _bwLwc.container === container) {
+      const hasSec = !!_bwLwc.secondarySeries;
+      if (hasSec === !!withSecondary) return _bwLwc;
+      destroyBwLwc();
+    } else if (_bwLwc) {
+      destroyBwLwc();
+    }
+    _bwLwc = Charts.createLineChart(container, null, {
+      secondary: withSecondary ? {} : null,
+      minHeight: isStandalone() ? 280 : 110,
+      listenTheme: true,
+      observeResize: true,
     });
-    ctx.stroke();
-    ctx.lineWidth = 1;
+    return _bwLwc;
+  }
 
-    const labelY = h - pad.b + 14;
-    ctx.font = '9px system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    contracts.forEach((c, i) => {
-      const x = xAt(i + 1);
-      const y = yAt(c.futuresPrice);
-      const isFront = model.front && c.symbol === model.front.symbol;
-      ctx.fillStyle = isFront ? theme.front : theme.node;
-      ctx.beginPath(); ctx.arc(x, y, isFront ? 5 : 3.5, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = theme.axis;
-      ctx.fillText(contractChartLabel(c.symbol), x, labelY);
+  function applyBwSpotPriceLine(handle, spot, assetKey) {
+    if (!handle?.series || !Number.isFinite(spot) || spot <= 0) return;
+    if (_bwSpotPriceLine && typeof handle.series.removePriceLine === 'function') {
+      try { handle.series.removePriceLine(_bwSpotPriceLine); } catch (_) { /* ignore */ }
+      _bwSpotPriceLine = null;
+    }
+    if (typeof handle.series.createPriceLine !== 'function') return;
+    const theme = getChartTheme();
+    _bwSpotPriceLine = handle.series.createPriceLine({
+      price: spot,
+      color: theme.spotLine || theme.muted || 'rgba(34,139,34,0.35)',
+      lineWidth: 1,
+      lineStyle: 2, /* dashed */
+      axisLabelVisible: true,
+      title: `${assetKey || ''} spot`.trim(),
     });
-    ctx.textAlign = 'left';
-    ctx.fillText('Tenor →', w - pad.r - 44, h - 8);
   }
 
   /**
-   * Chunk 28 — cancel in-flight chart paint and bump generation so stale rAF exits.
-   * Call on asset/view switch and at the start of every draw/refresh paint path.
+   * Chunk 28/29 — cancel in-flight chart paint, drop LWC on hard invalidate,
+   * bump generation so stale rAF exits. Call on asset/view switch and refresh.
    */
   function invalidateChartPaint() {
     _chartPaintGen += 1;
@@ -1797,24 +1738,27 @@
       }
       _chartPaintRaf = null;
     }
-    const canvas = el('bwCurveCanvas');
-    if (canvas && canvas.dataset) {
-      delete canvas.dataset.bwPaintKey;
+    const mount = el('bwCurveCanvas');
+    if (mount && mount.dataset) {
+      delete mount.dataset.bwPaintKey;
     }
   }
 
   /**
-   * Resolve drawable width. Prefer canvas rect; if zero-width (hidden/collapsed layout),
-   * fall back to chart-wrap / parent — never re-measure only the canvas after a style wipe.
+   * Resolve drawable width. Prefer mount rect; if zero-width (hidden/collapsed layout),
+   * fall back to chart-wrap / parent.
    */
-  function resolveChartLayoutSize(canvas) {
-    const rect = canvas.getBoundingClientRect?.() || { width: 0, height: 0 };
+  function resolveChartLayoutSize(mount) {
+    if (global.WTM_Charts && typeof global.WTM_Charts.containerSize === 'function') {
+      return global.WTM_Charts.containerSize(mount);
+    }
+    const rect = mount.getBoundingClientRect?.() || { width: 0, height: 0 };
     let width = Number(rect.width) || 0;
     let height = Number(rect.height) || 0;
 
     if (width < 8) {
-      const wrap = (typeof canvas.closest === 'function' && canvas.closest('.bw-chart-wrap'))
-        || canvas.parentElement
+      const wrap = (typeof mount.closest === 'function' && mount.closest('.bw-chart-wrap'))
+        || mount.parentElement
         || null;
       if (wrap && typeof wrap.getBoundingClientRect === 'function') {
         const wr = wrap.getBoundingClientRect();
@@ -1822,7 +1766,6 @@
           width = Number(wr.width);
           if (height < 8) height = Number(wr.height) || height;
         } else if (wrap.parentElement && typeof wrap.parentElement.getBoundingClientRect === 'function') {
-          // Outer layout column (not the canvas itself).
           const or = wrap.parentElement.getBoundingClientRect();
           if ((Number(or.width) || 0) >= 8) {
             width = Number(or.width);
@@ -1843,19 +1786,23 @@
     paintFn();
   }
 
+  /**
+   * Chunk 29 — mount/update TradingView Lightweight Charts line series.
+   * Primary series color = theme accent; secondary (forward) = muted only.
+   */
   function drawBasisChart(model) {
-    const canvas = el('bwCurveCanvas');
-    if (!canvas) return;
+    const mount = el('bwCurveCanvas');
+    if (!mount) return;
 
     // Own the paint path: drop any prior rAF chain before scheduling a new one.
     invalidateChartPaint();
     const paintGen = _chartPaintGen;
-    const theme = getChartTheme();
     const legend = el('bwChartLegend');
-    // Tag canvas with active asset so switch BTC↔ETH always invalidates paint path.
+    // Tag mount with active asset so switch BTC↔ETH always invalidates paint path.
     const paintKey = `${model.assetKey || 'BTC'}|${model.view || 'basis'}|${model.front?.symbol || ''}|${model.contracts?.length || 0}`;
-    canvas.dataset.bwPaintKey = paintKey;
-    canvas.setAttribute('aria-label', `${model.assetKey || 'BTC'} futures curve vs spot`);
+    if (mount.dataset) mount.dataset.bwPaintKey = paintKey;
+    mount.setAttribute('aria-label', `${model.assetKey || 'BTC'} futures curve vs spot`);
+    mount.setAttribute('role', 'img');
 
     let zeroWidthAttempts = 0;
 
@@ -1863,41 +1810,64 @@
       _chartPaintRaf = null;
       // Drop stale frames if invalidate/asset/view changed mid-rAF.
       if (paintGen !== _chartPaintGen) return;
-      if (canvas.dataset.bwPaintKey !== paintKey) return;
+      if (mount.dataset && mount.dataset.bwPaintKey !== paintKey) return;
 
-      const layout = resolveChartLayoutSize(canvas);
+      const layout = resolveChartLayoutSize(mount);
       if (layout.width < 8) {
         zeroWidthAttempts += 1;
         if (zeroWidthAttempts > CHART_ZERO_WIDTH_RAF_CAP) {
-          // Layout still collapsed — stop spinning; next refresh/resize re-invalidates.
           return;
         }
         scheduleChartPaint(paint);
         return;
       }
 
-      const dpr = window.devicePixelRatio || 1;
-      const w = Math.max(280, layout.width);
       const h = isStandalone() ? 280 : Math.max(110, layout.height || 110);
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, w, h);
-      ctx.scale(dpr, dpr);
-      paintBasisChart(ctx, w, h, model, theme);
+      if (mount.style) {
+        mount.style.width = '100%';
+        mount.style.height = `${h}px`;
+      }
+
+      const Charts = global.WTM_Charts;
+      if (!Charts || !Charts.isAvailable()) {
+        // Offline/test environments without vendored LWC — leave empty mount.
+        if (legend) {
+          legend.innerHTML = '<span class="bw-legend-item">Lightweight Charts unavailable</span>';
+        }
+        return;
+      }
+
+      const seriesPack = buildBwLwcSeries(model);
+      const wantsSecondary = seriesPack.mode === 'implied' && seriesPack.secondary && seriesPack.secondary.length > 0;
+      const handle = ensureBwLwc(mount, wantsSecondary);
+      if (!handle) return;
+
+      if (seriesPack.mode === 'implied') {
+        handle.setData({
+          primary: seriesPack.primary || [],
+          secondary: seriesPack.secondary || [],
+        });
+        if (_bwSpotPriceLine && handle.series?.removePriceLine) {
+          try { handle.series.removePriceLine(_bwSpotPriceLine); } catch (_) { /* ignore */ }
+          _bwSpotPriceLine = null;
+        }
+      } else {
+        handle.setData(seriesPack.primary || []);
+        applyBwSpotPriceLine(handle, seriesPack.spot, model.assetKey);
+      }
+
+      if (typeof handle.resize === 'function') handle.resize();
+      if (typeof handle.applyTheme === 'function') handle.applyTheme();
+
       if (legend) {
         if (model.view === 'implied') {
           legend.innerHTML = `
-            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-curve)"></i>${model.assetKey} spot curve % (ann.)</span>
-            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--bw-chart-front)"></i>${model.assetKey} forward curve % (ann.)</span>`;
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--wtm-accent,var(--bw-accent))"></i>${model.assetKey} spot curve % (ann.)</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--wtm-muted,var(--bw-muted))"></i>${model.assetKey} forward curve % (ann.)</span>`;
         } else {
           legend.innerHTML = `
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>${model.assetKey} spot (CF proxy)</span>
-            <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>${model.assetKey} futures curve</span>
+            <span class="bw-legend-item"><i class="bw-legend-swatch" style="background:var(--wtm-accent,var(--bw-accent))"></i>${model.assetKey} futures curve</span>
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--front"></i>Front ${model.front?.symbol || 'contract'}</span>`;
         }
       }
@@ -2212,20 +2182,45 @@
 
   function exportPng(state) {
     const model = state._basisWatchModel || buildModel(state, curveCache || { records: [] });
-    const theme = getChartTheme();
-    const exportW = 960;
-    const exportH = isStandalone() ? 360 : 280;
-    const off = document.createElement('canvas');
-    const dpr = 2;
-    off.width = exportW * dpr;
-    off.height = exportH * dpr;
-    const ctx = off.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr);
-    paintBasisChart(ctx, exportW, exportH, model, theme);
+    let dataUrl = null;
+
+    // Prefer LWC screenshot when the live chart is mounted.
+    if (_bwLwc && typeof _bwLwc.takeScreenshot === 'function') {
+      try {
+        const shot = _bwLwc.takeScreenshot();
+        if (shot && typeof shot.toDataURL === 'function') {
+          dataUrl = shot.toDataURL('image/png');
+        }
+      } catch (_) {
+        /* fall through */
+      }
+    }
+
+    // Minimal fallback when LWC is unavailable (tests / headless without vendor).
+    if (!dataUrl) {
+      const exportW = 960;
+      const exportH = isStandalone() ? 360 : 280;
+      const off = document.createElement('canvas');
+      off.width = exportW;
+      off.height = exportH;
+      const ctx = off.getContext('2d');
+      if (ctx) {
+        const theme = getChartTheme();
+        ctx.fillStyle = theme.empty || '#8b9aab';
+        ctx.font = '14px system-ui,sans-serif';
+        ctx.fillText(
+          `${model.assetKey || 'BTC'} curve · ${model.contracts?.length || 0} tenors · export requires LWC mount`,
+          24,
+          exportH / 2
+        );
+        dataUrl = off.toDataURL('image/png');
+      }
+    }
+
+    if (!dataUrl) return;
 
     const a = document.createElement('a');
-    a.href = off.toDataURL('image/png');
+    a.href = dataUrl;
     a.download = `wtm_basiswatch_${model.assetKey || 'curve'}_${new Date().toISOString().slice(0, 10)}.png`;
     a.click();
 

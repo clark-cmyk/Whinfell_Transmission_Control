@@ -326,7 +326,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
           </div>
           <div id="cockpitDataViewport" class="cockpit-data-viewport">
           <div id="cockpitChartCanvas" class="cockpit-chart-canvas">
-            <canvas id="cockpitRvCanvas" aria-label="RV basis chart"></canvas>
+            <div id="cockpitRvCanvas" class="wtm-lwc-mount" role="img" aria-label="RV basis chart"></div>
             <div id="cockpitChartPlaceholder" class="cockpit-chart-placeholder">
               <p class="text-[10px] text-wtm-muted">Import hydration to populate RV quartiles and basis history.</p>
               <span id="cockpitChartValue" class="zone-hidden">—</span>
@@ -456,7 +456,7 @@ window.DICTIONARY_BADGE_DEFAULT = {
     </div>
     <div class="basis-watch-body">
       <div class="basis-watch-main">
-        <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+        <div id="bwCurveCanvas" class="wtm-lwc-mount bw-curve-canvas" role="img" aria-label="Futures curve vs spot"></div>
         <!-- Chunk 19: dual BTC | ETH enhanced basis curve table (below chart) -->
         <div id="bwDualCurveTable" class="bw-dual-curve-host" aria-label="BTC and ETH basis curve table"></div>
         <div id="bwMainView"></div>
@@ -1192,6 +1192,8 @@ window.DICTIONARY_BADGE_DEFAULT = {
   <div id="toast" class="fixed bottom-4 right-4 max-w-sm px-4 py-3 rounded-lg border border-wtm-border bg-wtm-card text-xs shadow-xl translate-y-20 opacity-0 transition-all z-50 pointer-events-none"></div>
 
 <script src="js/theme.js"></script>
+  <script src="js/vendor/lightweight-charts.standalone.production.js"></script>
+  <script src="js/charts/lwc_factory.js"></script>
 <script src="js/time_format.js"></script>
 <script src="js/desk_china_ladder_models.js"></script>
   <script src="js/task_force_panel_feed.js"></script>

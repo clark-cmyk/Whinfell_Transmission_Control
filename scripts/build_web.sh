@@ -85,6 +85,9 @@ for req in \
   whinfell-transmission-ladder-deep-dive.html \
   js/desk_chart_links.js \
   js/desk_china_chart_links.js \
+  js/theme.js \
+  js/vendor/lightweight-charts.standalone.production.js \
+  js/charts/lwc_factory.js \
   midwest_compute/wmc.css \
   midwest_compute/wmc-boot.js \
   crypto_analytics/ca.css \

@@ -54,6 +54,11 @@ WMC.Utils = {
     return now.toLocaleString('en-US', opts);
   },
 
+  /**
+   * Chunk 29 exception — micro-spark remains canvas 2D (full LWC too heavy for
+   * placeholder tiles). Same rules as desk charts: theme accent stroke, no neon
+   * multi-series, no gradients/glows; mid-line uses subtle chart-grid tone.
+   */
   drawSparkline(canvas) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -69,21 +74,31 @@ WMC.Utils = {
     });
     const min = Math.min(...pts);
     const max = Math.max(...pts);
-    ctx.fillStyle = '#0b0f14';
+    let surface = '#0b0f14';
+    let grid = 'rgba(255,255,255,0.07)';
+    let accent = '#228B22';
+    try {
+      if (typeof getComputedStyle === 'function' && document.documentElement) {
+        const s = getComputedStyle(document.documentElement);
+        surface = s.getPropertyValue('--wtm-surface').trim() || surface;
+        grid = s.getPropertyValue('--wtm-chart-grid').trim() || grid;
+        accent = s.getPropertyValue('--wtm-chart-line').trim()
+          || s.getPropertyValue('--wtm-accent').trim()
+          || accent;
+      }
+    } catch (_) { /* ignore */ }
+    if (typeof window !== 'undefined' && window.WTM_Theme && typeof window.WTM_Theme.getAccent === 'function') {
+      accent = window.WTM_Theme.getAccent() || accent;
+    }
+    ctx.fillStyle = surface;
     ctx.fillRect(0, 0, cw, ch);
-    ctx.strokeStyle = '#2a3548';
+    ctx.strokeStyle = grid;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, ch * 0.5);
     ctx.lineTo(cw, ch * 0.5);
     ctx.stroke();
-    ctx.strokeStyle = (typeof window !== 'undefined' && window.WTM_Theme && typeof window.WTM_Theme.getAccent === 'function')
-      ? window.WTM_Theme.getAccent()
-      : (typeof getComputedStyle === 'function'
-        ? (getComputedStyle(document.documentElement).getPropertyValue('--wtm-chart-line').trim()
-          || getComputedStyle(document.documentElement).getPropertyValue('--wtm-accent').trim()
-          || '#228B22')
-        : '#228B22');
+    ctx.strokeStyle = accent;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     pts.forEach((v, i) => {

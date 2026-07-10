@@ -81,7 +81,7 @@
           <span class="bw-panel-title" id="bwCurveMeta">—</span>
         </div>
         <div class="bw-chart-wrap">
-          <canvas id="bwCurveCanvas" aria-label="Futures curve vs spot"></canvas>
+          <div id="bwCurveCanvas" class="wtm-lwc-mount bw-curve-canvas" role="img" aria-label="Futures curve vs spot"></div>
           <div id="bwChartLegend" class="bw-chart-legend" aria-hidden="true">
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--spot"></i>Spot (CF proxy)</span>
             <span class="bw-legend-item"><i class="bw-legend-swatch bw-legend-swatch--curve"></i>Futures curve</span>
@@ -120,6 +120,8 @@
   <!-- Chunk 17: The Ark SSOT must load before BasisWatch / desk ops (no raw market fetch elsewhere). -->
   <!-- Chunk 28: articulate.js after panel so #btnBwArticulate can call WTM_Articulate.runBasisWatch. -->
   <script src="js/theme.js"></script>
+  <script src="js/vendor/lightweight-charts.standalone.production.js"></script>
+  <script src="js/charts/lwc_factory.js"></script>
   <script src="js/time_format.js"></script>
   <script src="js/ark.js"></script>
   <script src="js/task_force_panel_feed.js"></script>

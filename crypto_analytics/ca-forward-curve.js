@@ -1,106 +1,15 @@
 /**
- * CME Crypto Analytics — Implied Rate Forward Curve (term structure).
+ * CME Crypto Analytics — Implied Rate Forward Curve (Chunk 29 LWC).
+ * DTE mapped to synthetic UTC timestamps (approach A). Series = theme accent.
  * @module CAForwardCurve
  */
 (function cryptoAnalyticsForwardCurve(global) {
   'use strict';
 
   const M = global.CAModels;
-  const COLOR = '#4c8db8';
 
-  function drawForwardCurve(canvas, points, asset, hoverIdx) {
-    const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(280, rect.width);
-    const h = Math.max(280, rect.height);
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const pad = { l: 52, r: 20, t: 16, b: 40 };
-    const plotW = w - pad.l - pad.r;
-    const plotH = h - pad.t - pad.b;
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    const title = document.getElementById('caCurveTitle');
-    if (title) title.textContent = `${asset} Implied Forward Curve`;
-
-    const yLabel = document.getElementById('caCurveYLabel');
-    if (yLabel) yLabel.textContent = 'Annualized Implied Forward Rate (%)';
-
-    if (!points?.length) {
-      ctx.fillStyle = '#555';
-      ctx.font = '12px Segoe UI, system-ui, sans-serif';
-      ctx.fillText('No curve data', pad.l, pad.t + 20);
-      return;
-    }
-
-    const vals = points.map((p) => p.annualized_rate_pct).filter(Number.isFinite);
-    let ymin = Math.min(...vals);
-    let ymax = Math.max(...vals);
-    if (ymin === ymax) { ymin -= 1; ymax += 1; }
-    const ypad = (ymax - ymin) * 0.1;
-    ymin -= ypad;
-    ymax += ypad;
-
-    ctx.strokeStyle = '#e8e8e8';
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + (plotH * i) / 4;
-      ctx.beginPath();
-      ctx.moveTo(pad.l, y);
-      ctx.lineTo(w - pad.r, y);
-      ctx.stroke();
-    }
-
-    function xAt(i) {
-      return pad.l + (plotW * i) / Math.max(points.length - 1, 1);
-    }
-    function yAt(v) {
-      return pad.t + plotH * (1 - (v - ymin) / (ymax - ymin));
-    }
-
-    ctx.strokeStyle = COLOR;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    points.forEach((p, i) => {
-      const x = xAt(i);
-      const y = yAt(p.annualized_rate_pct);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    points.forEach((p, i) => {
-      const x = xAt(i);
-      const y = yAt(p.annualized_rate_pct);
-      ctx.fillStyle = i === hoverIdx ? '#2a5f82' : COLOR;
-      ctx.beginPath();
-      ctx.arc(x, y, i === hoverIdx ? 5 : 3.5, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = '#555';
-    ctx.font = '10px Segoe UI, system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    points.forEach((p, i) => {
-      const x = xAt(i);
-      ctx.save();
-      ctx.translate(x, h - 8);
-      ctx.rotate(-0.45);
-      ctx.fillText(p.contract_symbol, 0, 0);
-      ctx.restore();
-    });
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= 4; i++) {
-      const v = ymin + ((ymax - ymin) * (4 - i)) / 4;
-      ctx.fillText(v.toFixed(2) + '%', pad.l - 6, pad.t + (plotH * i) / 4 + 4);
-    }
+  function chartsApi() {
+    return global.WTM_Charts || null;
   }
 
   function showTooltip(tooltip, point, x, y) {
@@ -122,52 +31,91 @@
     tooltip.classList.add('ca-tooltip--visible');
   }
 
+  function ensureMount(wrap) {
+    let mount = wrap.querySelector('.wtm-lwc-mount');
+    if (!mount) {
+      const old = wrap.querySelector('canvas.ca-chart-canvas, canvas');
+      if (old && old.tagName === 'CANVAS') old.remove();
+      mount = document.createElement('div');
+      mount.className = 'wtm-lwc-mount ca-chart-canvas';
+      mount.setAttribute('role', 'img');
+      mount.setAttribute('aria-label', 'Forward curve chart');
+      mount.style.width = '100%';
+      mount.style.height = '100%';
+      mount.style.minHeight = '280px';
+      wrap.insertBefore(mount, wrap.firstChild);
+    }
+    return mount;
+  }
+
   function createForwardCurve(mountEl, callbacks) {
-    const canvas = mountEl.querySelector('.ca-chart-canvas');
+    const wrap = mountEl.querySelector('.ca-chart-wrap') || mountEl;
     const tooltip = mountEl.querySelector('.ca-tooltip');
     let points = [];
-    let hoverIdx = -1;
+    let handle = null;
 
     function render() {
-      drawForwardCurve(canvas, points, callbacks.getAsset(), hoverIdx);
+      const Charts = chartsApi();
+      const title = document.getElementById('caCurveTitle');
+      if (title) title.textContent = `${callbacks.getAsset()} Implied Forward Curve`;
+      const yLabel = document.getElementById('caCurveYLabel');
+      if (yLabel) yLabel.textContent = 'Annualized Implied Forward Rate (%)';
+
+      if (!Charts || !Charts.isAvailable()) return;
+      const mount = ensureMount(wrap);
+      if (!handle || handle.container !== mount) {
+        if (handle) Charts.destroyChart(handle);
+        handle = Charts.createLineChart(mount, null, {
+          minHeight: 280,
+          listenTheme: true,
+          observeResize: true,
+        });
+      }
+      if (!handle) return;
+      const data = Charts.mapDteSeries(
+        (points || [])
+          .filter((p) => Number.isFinite(p.annualized_rate_pct) && Number.isFinite(p.dte))
+          .map((p) => ({ dte: p.dte, value: p.annualized_rate_pct }))
+      );
+      handle.setData(data);
+      handle.applyTheme?.();
+      handle.resize?.();
     }
 
     function setData(curvePoints) {
       points = curvePoints || [];
-      hoverIdx = -1;
       render();
     }
 
     function indexAt(clientX) {
-      const rect = canvas.getBoundingClientRect();
-      const pad = { l: 52, r: 20 };
-      const plotW = rect.width - pad.l - pad.r;
-      const x = clientX - rect.left - pad.l;
-      return Math.max(0, Math.min(points.length - 1, Math.round((x / Math.max(plotW, 1)) * Math.max(points.length - 1, 0))));
+      if (!points.length) return 0;
+      const mount = wrap.querySelector('.wtm-lwc-mount') || wrap;
+      const rect = mount.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(rect.width, 1)));
+      return Math.round(ratio * (points.length - 1));
     }
 
-    canvas.addEventListener('mousemove', (e) => {
+    wrap.addEventListener('mousemove', (e) => {
       if (!points.length) return;
-      hoverIdx = indexAt(e.clientX);
-      render();
-      showTooltip(tooltip, points[hoverIdx], e.clientX, e.clientY);
-      callbacks.onHover?.(points[hoverIdx]);
+      const idx = indexAt(e.clientX);
+      showTooltip(tooltip, points[idx], e.clientX, e.clientY);
+      callbacks.onHover?.(points[idx]);
     });
-
-    canvas.addEventListener('mouseleave', () => {
-      hoverIdx = -1;
-      render();
+    wrap.addEventListener('mouseleave', () => {
       if (tooltip) tooltip.classList.remove('ca-tooltip--visible');
     });
-
-    canvas.addEventListener('click', (e) => {
+    wrap.addEventListener('click', (e) => {
       const pt = points[indexAt(e.clientX)];
       if (pt) callbacks.onPin?.(pt);
     });
-
     window.addEventListener('resize', render);
+    window.addEventListener('wtm:themechange', () => handle?.applyTheme?.());
 
     return { setData, render };
+  }
+
+  function drawForwardCurve() {
+    /* LWC path — retained for API compatibility */
   }
 
   global.CAForwardCurve = { createForwardCurve, drawForwardCurve };
